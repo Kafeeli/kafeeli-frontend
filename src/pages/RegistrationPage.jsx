@@ -6,6 +6,8 @@ import logo from '../assets/kafeeli-logo.png'
 import guardianIcon from '../assets/guardian-icon.png'
 import sponsorIcon from '../assets/sponsor-icon.png'
 import sideIcon from '../assets/side-icon.png'
+import checkIcon from '../assets/check-icon.png'
+import reportIcon from '../assets/report-icon.png'
 export default function RegistrationPage() {
    const [selected, setSelected] = useState(null)
 
@@ -36,20 +38,23 @@ export default function RegistrationPage() {
         
   <section className='w-[80%] mx-auto flex justify-center min-h-screen gap-5 mt-8'>
            <div id='Rdiv'>
-            <div className="hidden lg:flex md:w-40%  flex-col justify-center p-10 h-full rounded-r-lg" style={{backgroundColor: 'rgba(13, 75, 142, 1)'}}>
-    <img src={sideIcon} alt="icon" className="w-12 " />
-    <h2 className="text-white text-2xl font-bold mb-3 leading-relaxed">خطوة واحدة لنصنع الفرق</h2>
-    <p className="text-blue-200 text-sm mb-6 leading-relaxed max-w-xs">من خلال تسجيلك، تفتح أبواب الأمل لآلاف الأطفال الذين ينتظرون يد العون.</p>
-    <div className="flex items-center gap-2 mb-2">
-      <span className="text-blue-200 text-sm">تحقق أمني عالي</span>
-      <FaCheckCircle className="text-blue-200" />
-    </div>
+  <div className="hidden lg:flex flex-col justify-center p-10 h-full rounded-r-lg gap-4" style={{backgroundColor: 'rgba(13, 75, 142, 1)'}}>
+    <img src={sideIcon} alt="icon" className="w-12" />
+<h2 className="text-white text-3xl font-bold leading-loose text-right">
+  خطوة واحدة لنصنع <br /> الفرق
+</h2>    <p className="text-blue-200 text-sm leading-loose max-w-xs">من خلال تسجيلك، تفتح أبواب الأمل لآلاف الأطفال الذين ينتظرون يد العون.</p>
     <div className="flex items-center gap-2">
-      <span className="text-blue-200 text-sm">تقارير دورية شفافة</span>
-      <FaFileAlt className="text-blue-200" />
-    </div>
+      <img src={checkIcon} alt="check" className="w-5 h-5" />
+  <span className="text-blue-200 text-sm">تحقق أمني عالي</span>
+  
+</div>
+<div className="flex items-center gap-2">
+  <img src={reportIcon} alt="report" className="w-5 h-5" />
+  <span className="text-blue-200 text-sm">تقارير دورية شفافة</span>
+  
+</div>
   </div>
-  </div>
+</div>
           <div id='Ldiv'>
   <div className="flex flex-col sm:flex-row gap-4 mx-auto max-w-lg w-full">
     {roles.map((role) => {
@@ -220,13 +225,13 @@ export default function RegistrationPage() {
 </div>
   </section>
     </main>
-   <footer className="flex flex-col md:flex-row items-center justify-between px-8 py-4 border-t border-gray-200 gap-3 mt-10">
+   <footer dir="ltr" className="flex flex-col md:flex-row items-center justify-between px-8 py-4 border-t border-gray-200 gap-3 mt-10">
   <div className="flex gap-6 order-3 md:order-1">
     <a href="#" className="text-sm text-gray-500 hover:text-blue-700">اتصل بنا</a>
     <a href="#" className="text-sm text-gray-500 hover:text-blue-700">الشروط والأحكام</a>
     <a href="#" className="text-sm text-gray-500 hover:text-blue-700">سياسة الخصوصية</a>
   </div>
-  <p className="text-sm text-gray-500 order-2 text-center">© 2026 كفيلي - منصة رعاية الأيتام. جميع الحقوق محفوظة</p>
+  <p className="text-sm text-gray-500 order-2 text-center">&copy; 2026 كفيلي - منصة رعاية الأيتام. جميع الحقوق محفوظة</p>
   <p className="text-lg font-bold text-blue-900 order-1 md:order-3">كفيلي</p>
 </footer>
     
