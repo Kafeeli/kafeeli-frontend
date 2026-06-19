@@ -3,11 +3,11 @@
 // import viteLogo from './assets/vite.svg'
 // import heroImg from './assets/hero.png'
 // import './App.css'
-import Registration from "./pages/RegistrationPage"
+import ForgotPassword from "./pages/ForgotPassword"
 function App() {
   return (
    
-    <Registration/>
+    <ForgotPassword/>
   )
 }
 
