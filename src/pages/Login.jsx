@@ -138,9 +138,8 @@ function Login() {
 
           <div className="text-center mt-[25px] text-[#666]">
             ليس لديك حساب؟
-            <a href="#" className="text-[#008b8b] no-underline font-semibold">
-              {" "}
-              أنشئ حساباً جديداً
+            <a href="/register" className="text-[#008b8b] no-underline font-semibold">
+            أنشئ حساباً جديداً
             </a>
           </div>
 
