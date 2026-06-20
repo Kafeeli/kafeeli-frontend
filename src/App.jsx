@@ -4,11 +4,19 @@
 // import heroImg from './assets/hero.png'
 // import './App.css'
 import Registration from "./pages/RegistrationPage"
+import EmailVerification from "./pages/EmailVerification"
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+
 function App() {
   return (
-   
-    <Registration/>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Registration />} />
+        <Route path="/verify-email" element={<EmailVerification />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
