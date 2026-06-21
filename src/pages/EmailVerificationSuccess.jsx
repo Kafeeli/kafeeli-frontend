@@ -5,6 +5,7 @@ function EmailVerificationSuccess() {
   const navigate = useNavigate();
 
   return (
+    <>
     <div className="min-h-screen flex items-center justify-center bg-[#f0f4ff] relative overflow-hidden">
 
       {/* كونفيتي فوق الكارد */}
@@ -71,6 +72,18 @@ function EmailVerificationSuccess() {
         </p>
       </div>
     </div>
+    <footer dir="ltr" className="flex flex-col md:flex-row items-center justify-between px-8 py-4 border-t border-gray-200 gap-3 ">
+    <div className="flex gap-6 order-3 md:order-1">
+      <a href="#" className="text-sm text-gray-500 hover:text-blue-700">اتصل بنا</a>
+      <a href="#" className="text-sm text-gray-500 hover:text-blue-700">الشروط والأحكام</a>
+      <a href="#" className="text-sm text-gray-500 hover:text-blue-700">سياسة الخصوصية</a>
+    </div>
+    <p className="text-sm text-gray-500 order-2 text-center">&copy; 2026 كفيلي - منصة رعاية الأيتام. جميع الحقوق محفوظة</p>
+    <p className="text-lg font-bold text-blue-900 order-1 md:order-3">كفيلي</p>
+</footer>
+    
+    
+</>
   );
 }
 
