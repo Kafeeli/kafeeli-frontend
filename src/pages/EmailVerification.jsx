@@ -37,7 +37,7 @@ export default function EmailVerification() {
         </nav>
       </div>
     </header>
-    <div className="min-h-screen bg-gray-50" dir="rtl">
+    <div className="max-h-full bg-gray-50" dir="rtl">
           <div className="flex items-center justify-center min-h-screen px-6">
             <div className="flex flex-col md:flex-row items-center justify-center gap-16 w-[80%] mt-10">
     
@@ -115,8 +115,8 @@ export default function EmailVerification() {
               </div>
     
               {/* Left - Illustration */}
-              <div className="hidden md:flex flex-col items-center justify-center w-72 min-h-64 bg-white border border-gray-200 rounded-2xl p-8 gap-5">
-                <img src={emailImg} alt="email verification" className="w-60 h-52 object-f" />
+              <div className="hidden md:flex flex-col items-center justify-center w-80 min-h-96 bg-white border border-gray-200 rounded-2xl p-8 gap-5">
+                <img src={emailImg} alt="email verification" className="w-60 h-52 object-cover" />
                 <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 shadow-sm">
                   <div className="w-6 h-6 rounded-full bg-[#0D4B8E] flex items-center justify-center">
                     <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -133,6 +133,15 @@ export default function EmailVerification() {
             </div>
           </div>
         </div>
+        <footer dir="ltr" className="flex flex-col md:flex-row items-center justify-between px-8 py-4 border-t border-gray-200 gap-3 ">
+    <div className="flex gap-6 order-3 md:order-1">
+      <a href="#" className="text-sm text-gray-500 hover:text-blue-700">اتصل بنا</a>
+      <a href="#" className="text-sm text-gray-500 hover:text-blue-700">الشروط والأحكام</a>
+      <a href="#" className="text-sm text-gray-500 hover:text-blue-700">سياسة الخصوصية</a>
+    </div>
+    <p className="text-sm text-gray-500 order-2 text-center">&copy; 2026 كفيلي - منصة رعاية الأيتام. جميع الحقوق محفوظة</p>
+    <p className="text-lg font-bold text-blue-900 order-1 md:order-3">كفيلي</p>
+</footer>
     </>
   );
 }

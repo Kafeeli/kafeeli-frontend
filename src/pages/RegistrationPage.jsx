@@ -27,7 +27,7 @@ export default function RegistrationPage() {
     <header className="flex items-center justify-between px-8 py-4 bg-gray-50 shadow-sm">
       <a href=""><img src={logo} alt="logo"  /></a>
       <h1 className="text-[24px] font-bold text-[#003469] hidden md:block">كفيلي</h1>
-      <a href=""><p className="text-navy-800 font-medium md:text[16px]">تسجيل دخول </p></a>
+      <a href="/"><p className="text-navy-800 font-medium md:text[16px]">تسجيل دخول </p></a>
     </header>
    
     <main>
