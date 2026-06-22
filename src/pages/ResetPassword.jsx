@@ -2,16 +2,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import logo from "../assets/logo.png";
-import { TbShieldCheck } from "react-icons/tb";
+// import { TbShieldCheck } from "react-icons/tb";
 import Icon from "../assets/Icon.svg";
-import securityIcon from "../assets/Icon (2).svg";
-import { FaCheckCircle } from "react-icons/fa";
 
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 function ResetPassword() {
   const navigate = useNavigate();
 
   const [password, setPassword] = useState("");
+import securityIcon from "../assets/Icon (2).svg";
+import { FaCheckCircle } from "react-icons/fa";
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
@@ -112,7 +112,7 @@ return (
                               />
                </div>
 
-        <h2 className="text-center text-[#0b4f93] text-xl font-bold mb-2">
+        <h2 className="text-center text-[#0b4f93] text-xl  mb-2">
           إعادة تعيين كلمة المرور
         </h2>
 
@@ -223,34 +223,14 @@ return (
       </div>
     </main>
 
-    <footer className="w-full bg-white border-t border-gray-200 flex justify-center">
-  <div className="w-full max-w-[1280px] h-[96px] px-8 flex items-center justify-between">
-    
-    {/* اليمين */}
-    <h2 className="font-[Cairo] font-semibold text-2xl leading-8 text-[#0b4f93]">
-      كفيلي
-    </h2>
-
-    {/* الوسط */}
-    <p className="font-[Cairo] font-normal text-base leading-6 text-gray-500">
-      © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
-    </p>
-
-    {/* اليسار */}
-    <div className="flex items-center gap-4 text-gray-500">
-      <span className="font-[Cairo] font-normal text-sm leading-5 cursor-pointer">
-        اتصل بنا
-      </span>
-
-      <span className="font-[Cairo] font-normal text-sm leading-5 cursor-pointer">
-        الشروط والأحكام
-      </span>
-
-      <span className="font-[Cairo] font-normal text-sm leading-5 cursor-pointer">
-        سياسة الخصوصية
-      </span>
+    <footer dir="ltr" className="flex flex-col md:flex-row items-center justify-between px-8 py-4 border-t border-gray-200 gap-3 ">
+    <div className="flex gap-6 order-3 md:order-1">
+      <a href="#" className="text-sm text-gray-500 hover:text-blue-700">اتصل بنا</a>
+      <a href="#" className="text-sm text-gray-500 hover:text-blue-700">الشروط والأحكام</a>
+      <a href="#" className="text-sm text-gray-500 hover:text-blue-700">سياسة الخصوصية</a>
     </div>
-  </div>
+    <p className="text-sm text-gray-500 order-2 text-center">&copy; 2026 كفيلي - منصة رعاية الأيتام. جميع الحقوق محفوظة</p>
+    <p className="text-lg font-bold text-blue-900 order-1 md:order-3">كفيلي</p>
 </footer>
   </div>
 );
