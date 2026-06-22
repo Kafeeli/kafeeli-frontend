@@ -118,7 +118,7 @@ function Login() {
               <IoEyeOutline className="absolute left-[15px] top-1/2 -translate-y-1/2 text-[#7d8492] text-lg cursor-pointer" />
             </div>
 
-            <a href="#" className="text-[#008b8b] text-[13px] no-underline">
+            <a href="forgot-password" className="text-[#008b8b] text-[13px] no-underline">
               نسيت كلمة المرور؟
             </a>
 
