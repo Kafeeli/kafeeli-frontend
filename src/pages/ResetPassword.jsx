@@ -4,14 +4,14 @@ import { useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 // import { TbShieldCheck } from "react-icons/tb";
 import Icon from "../assets/Icon.svg";
-import securityIcon from "../assets/Icon (2).svg";
-import { FaCheckCircle } from "react-icons/fa";
 
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 function ResetPassword() {
   const navigate = useNavigate();
 
   const [password, setPassword] = useState("");
+import securityIcon from "../assets/Icon (2).svg";
+import { FaCheckCircle } from "react-icons/fa";
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
