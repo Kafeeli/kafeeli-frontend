@@ -10,8 +10,8 @@ function ResetPassword() {
   const navigate = useNavigate();
 
   const [password, setPassword] = useState("");
-import securityIcon from "../assets/Icon (2).svg";
-import { FaCheckCircle } from "react-icons/fa";
+// import securityIcon from "../assets/Icon (2).svg";
+// import { FaCheckCircle } from "react-icons/fa";
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
