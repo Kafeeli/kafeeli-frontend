@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import kafeeli from "../assets/kafeeli.png";
-
 import { MdOutlineMailOutline } from "react-icons/md";
 import { LuLock } from "react-icons/lu";
-import { IoEyeOutline } from "react-icons/io5";
 import { TbShieldCheck, TbScan } from "react-icons/tb";
-
+import { FaEye, FaEyeSlash, FaArrowLeft } from "react-icons/fa";
+import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorType, setErrorType] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -40,10 +40,10 @@ function Login() {
   };
 
   return (
-    <div className="h-screen w-full overflow-hidden flex max-md:flex-col font-[Cairo,sans-serif]">
+    <div className="min-h-screen flex flex-col md:flex-row overflow-y-auto">
       {/* الصورة شمال */}
       <div
-        className="w-1/2 max-md:w-full max-md:min-h-[350px] bg-cover bg-center relative flex justify-center items-center"
+        className="hidden md:flex w-1/2 max-md:w-full max-md:min-h-[350px] bg-cover bg-center relative justify-center items-center"
         style={{ backgroundImage: `url(${kafeeli})` }}
       >
         <div className="absolute inset-0 bg-[rgba(0,52,105,0.75)]"></div>
@@ -75,9 +75,9 @@ function Login() {
       {/* الفورم يمين */}
       <div
         dir="rtl"
-        className="w-1/2 max-md:w-full bg-[#f5f6f8] flex justify-center items-center"
+        className="w-full md:w-1/2 bg-[#f5f6f8] flex justify-center items-center pt-18 md:pt-0"
       >
-        <div className="w-[558px] h-[661px] bg-white rounded-xl px-[38px] py-9 shadow-[0_8px_25px_rgba(0,0,0,0.06)] flex flex-col scale-[0.62] max-md:scale-100 max-md:w-[90%] max-md:h-auto max-md:my-[30px]">
+        <div className="w-full max-w-[450px] bg-white rounded-2xl px-8 py-10 shadow-lg">
           <h2 className="text-center text-[#003469] mb-2 text-2xl font-bold">
             تسجيل الدخول
           </h2>
@@ -108,17 +108,27 @@ function Login() {
 
             <div className="relative mb-[18px]">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="********"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full h-12 border border-[#d8dbe2] rounded-md bg-[#f5f6fa] pr-[45px] pl-[45px] outline-none focus:border-[#003469]"
               />
+
               <LuLock className="absolute right-[15px] top-1/2 -translate-y-1/2 text-[#7d8492] text-lg" />
-              <IoEyeOutline className="absolute left-[15px] top-1/2 -translate-y-1/2 text-[#7d8492] text-lg cursor-pointer" />
+
+              <div
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute left-[15px] top-1/2 -translate-y-1/2 text-[#7d8492] text-lg cursor-pointer"
+              >
+                {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
+              </div>
             </div>
 
-            <a href="forgot-password" className="text-[#008b8b] text-[13px] no-underline">
+            <a
+              href="forgot-password"
+              className="text-[#00696E] text-[14px] no-underline hover:text-[#008b8b] duration-200"
+            >
               نسيت كلمة المرور؟
             </a>
 
@@ -137,20 +147,23 @@ function Login() {
           </form>
 
           <div className="text-center mt-[25px] text-[#666]">
-            ليس لديك حساب؟
-            <a href="/register" className="text-[#008b8b] no-underline font-semibold">
-            أنشئ حساباً جديداً
+            ليس لديك حساب ؟
+            <a
+              href="/register"
+              className="text-[#00696E] no-underline font-semibold hover:cursor-pointer hover:text-[#008b8b] duration-200 ml-[5px]"
+            >
+              أنشئ حساباً جديداً
             </a>
           </div>
 
           <div className="mt-[30px] pt-5 border-t border-[#ececec] flex justify-center gap-[15px] flex-wrap">
-            <a href="#" className="no-underline text-[#9b9b9b] text-xs">
+            <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
               سياسة الخصوصية
             </a>
-            <a href="#" className="no-underline text-[#9b9b9b] text-xs">
+            <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
               الشروط والأحكام
             </a>
-            <a href="#" className="no-underline text-[#9b9b9b] text-xs">
+            <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
               اتصل بنا
             </a>
           </div>

@@ -109,9 +109,28 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 } */
- @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap");
 
 body {
-  font-family: 'Cairo', sans-serif;
+  font-family: "Cairo", sans-serif;
 }
 @import "tailwindcss";
+
+@keyframes floatIn {
+  0% {
+    transform: translateY(20px) rotate(var(--r, 0deg)) scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(-4px) rotate(var(--r, 0deg)) scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0px) rotate(var(--r, 0deg)) scale(1);
+    opacity: 1;
+  }
+}
+
+.confetti-dot {
+  animation: floatIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
