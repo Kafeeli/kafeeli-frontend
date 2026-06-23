@@ -75,7 +75,7 @@ export default function RegistrationPage() {
         <section className="w-[80%] mx-auto flex justify-center min-h-screen gap-5 mt-8">
           <div id="Rdiv">
             <div
-              className="hidden lg:flex flex-col justify-center p-10 h-full rounded-r-lg gap-4"
+              className="hidden lg:flex flex-col justify-center p-4 h-full rounded-r-lg gap-4"
               style={{ backgroundColor: "rgba(13, 75, 142, 1)" }}
             >
               <img src={sideIcon} alt="icon" className="w-12" />
