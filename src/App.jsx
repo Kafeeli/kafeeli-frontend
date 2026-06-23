@@ -1,4 +1,6 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+
 import Login from "./pages/Login";
 import RegistrationPage from "./pages/RegistrationPage";
 import EmailVerification from "./pages/EmailVerification";
@@ -7,24 +9,129 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
 
-function App() {
+function PageWrapper({ children }) {
   return (
-   
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<RegistrationPage />} />
-        <Route path="/verify-email" element={<EmailVerification />} />
-        <Route path="/email-verified" element={<EmailVerificationSuccess />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/invalid-Email" element={<InvalidEmail />} />
-        <Route path="/sponsor-dashboard" element={<h1>Sponsor Dashboard</h1>} />
-        <Route path="/guardian-dashboard" element={<h1>Guardian Dashboard</h1>} />
-        <Route path="/admin-dashboard" element={<h1>Admin Dashboard</h1>} />
-      </Routes>
-   
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 0.25 }}
+      style={{ height: "100%" }}
+    >
+      {children}
+    </motion.div>
   );
 }
 
-export default App;
+function AnimatedRoutes() {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route
+          path="/"
+          element={
+            <PageWrapper>
+              <Login />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/login"
+          element={
+            <PageWrapper>
+              <Login />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            <PageWrapper>
+              <RegistrationPage />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/verify-email"
+          element={
+            <PageWrapper>
+              <EmailVerification />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/email-verified"
+          element={
+            <PageWrapper>
+              <EmailVerificationSuccess />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/forgot-password"
+          element={
+            <PageWrapper>
+              <ForgotPassword />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/reset-password"
+          element={
+            <PageWrapper>
+              <ResetPassword />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/invalid-Email"
+          element={
+            <PageWrapper>
+              <InvalidEmail />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/sponsor-dashboard"
+          element={
+            <PageWrapper>
+              <h1>Sponsor Dashboard</h1>
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/guardian-dashboard"
+          element={
+            <PageWrapper>
+              <h1>Guardian Dashboard</h1>
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/admin-dashboard"
+          element={
+            <PageWrapper>
+              <h1>Admin Dashboard</h1>
+            </PageWrapper>
+          }
+        />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
+export default function App() {
+  return <AnimatedRoutes />;
+}
