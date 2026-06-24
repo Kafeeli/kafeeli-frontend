@@ -1,22 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import logo from "../assets/logo.png";
-// import { TbShieldCheck } from "react-icons/tb";
 import Icon from "../assets/Icon.svg";
-
+import securityIcon from "../assets/Icon (2).svg";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
+import { FaCheckCircle } from "react-icons/fa";
+
 function ResetPassword() {
   const navigate = useNavigate();
-
   const [password, setPassword] = useState("");
-  // import securityIcon from "../assets/Icon (2).svg";
-  // import { FaCheckCircle } from "react-icons/fa";
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState(false);
 
@@ -54,63 +49,28 @@ function ResetPassword() {
 
   return (
     <div dir="rtl" className="min-h-screen bg-[#f6f8fb] flex flex-col">
-      {/* <header className="w-full bg-white border-b border-gray-200 flex justify-center">
-      <div className="w-full max-w-[1280px] h-[79px] flex items-center justify-between px-8">
-        <img
-  src={logo}
-  alt="logo"
-  className="w-[109px] h-[55px] object-contain"
-/>
-
-        <h1 className="font-[Cairo] font-bold text-2xl leading-6 text-[#0b4f93]">
-  كفيلي
-           </h1>
-<div className="text-xs text-gray-500 flex items-center gap-1">
-  <img
-    src={securityIcon}
-    alt="security"
-    className="w-[12px] h-[12px] object-contain"
-  />
-  مركز الأمان والتحقق
-</div>
-      </div>
-    </header> */}
       <header className="w-full bg-white border-b border-gray-200 flex justify-center">
         <div className="w-full max-w-[1280px] h-[79px] flex items-center justify-between px-8">
-          <img
-            src={logo}
-            alt="logo"
-            className="w-[109px] h-[55px] object-contain"
-          />
-
+          <img src={logo} alt="logo" className="w-[109px] h-[55px] object-contain" />
           <h1 className="font-[Cairo] font-bold text-2xl leading-6 text-[#0b4f93]">
             كفيلي
           </h1>
-
           <div className="flex items-center gap-1">
-            <img
-              src={securityIcon}
-              alt="security"
-              className="w-[12px] h-[12px] object-contain"
-            />
-
+            <img src={securityIcon} alt="security" className="w-[12px] h-[12px] object-contain" />
             <span className="font-[Cairo] font-normal text-base leading-6 text-gray-600">
               مركز الأمان والتحقق
             </span>
           </div>
         </div>
       </header>
+
       <main className="flex-1 flex items-center justify-center px-4 py-8">
         <div className="w-[520px] bg-white rounded-2xl border border-gray-200 shadow-lg px-12 py-8">
           <div className="flex justify-center mb-4">
-            <img
-              src={Icon}
-              alt="Reset Password Icon"
-              className="w-[80px] h-[70px] object-contain"
-            />
+            <img src={Icon} alt="Reset Password Icon" className="w-[80px] h-[70px] object-contain" />
           </div>
 
-          <h2 className="text-center text-[#0b4f93] text-xl  mb-2">
+          <h2 className="text-center text-[#0b4f93] text-xl mb-2">
             إعادة تعيين كلمة المرور
           </h2>
 
@@ -119,13 +79,11 @@ function ResetPassword() {
           </p>
 
           {message && (
-            <div
-              className={`mb-4 text-sm rounded-lg p-3 text-center ${
-                success
-                  ? "bg-green-50 border border-green-200 text-green-700"
-                  : "bg-red-50 border border-red-200 text-red-600"
-              }`}
-            >
+            <div className={`mb-4 text-sm rounded-lg p-3 text-center ${
+              success
+                ? "bg-green-50 border border-green-200 text-green-700"
+                : "bg-red-50 border border-red-200 text-red-600"
+            }`}>
               {message}
             </div>
           )}
@@ -136,7 +94,6 @@ function ResetPassword() {
                 <label className="font-[Cairo] font-normal text-base leading-6 text-gray-600">
                   كلمة المرور الجديدة
                 </label>
-
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
@@ -145,7 +102,6 @@ function ResetPassword() {
                   <span className="font-[Cairo] text-[#0D4B8E]">
                     {showPassword ? "إخفاء" : "إظهار"}
                   </span>
-
                   {showPassword ? (
                     <HiOutlineEyeOff className="text-[#0D4B8E] text-lg" />
                   ) : (
@@ -171,7 +127,6 @@ function ResetPassword() {
                     ) : (
                       <span className="w-3.5 h-3.5 rounded-full border border-gray-400"></span>
                     )}
-
                     <span className="font-[Cairo] font-normal text-sm leading-5 text-gray-600">
                       {req.label}
                     </span>
@@ -185,7 +140,6 @@ function ResetPassword() {
                 <label className="font-[Cairo] font-normal text-base leading-6 text-gray-600">
                   تأكيد كلمة المرور
                 </label>
-
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
@@ -194,7 +148,6 @@ function ResetPassword() {
                   <span className="font-[Cairo] text-[#0D4B8E]">
                     {showConfirmPassword ? "إخفاء" : "إظهار"}
                   </span>
-
                   {showConfirmPassword ? (
                     <HiOutlineEyeOff className="text-[#0D4B8E] text-lg" />
                   ) : (
@@ -221,27 +174,16 @@ function ResetPassword() {
         </div>
       </main>
 
-      <footer
-        dir="ltr"
-        className="flex flex-col md:flex-row items-center justify-between px-8 py-4 border-t border-gray-200 gap-3 "
-      >
+      <footer dir="ltr" className="flex flex-col md:flex-row items-center justify-between px-8 py-4 border-t border-gray-200 gap-3">
         <div className="flex gap-6 order-3 md:order-1">
-          <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
-            اتصل بنا
-          </a>
-          <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
-            الشروط والأحكام
-          </a>
-          <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
-            سياسة الخصوصية
-          </a>
+          <a href="#" className="text-sm text-gray-500 hover:text-blue-700">اتصل بنا</a>
+          <a href="#" className="text-sm text-gray-500 hover:text-blue-700">الشروط والأحكام</a>
+          <a href="#" className="text-sm text-gray-500 hover:text-blue-700">سياسة الخصوصية</a>
         </div>
         <p className="text-sm text-gray-500 order-2 text-center">
           &copy; 2026 كفيلي - منصة رعاية الأيتام. جميع الحقوق محفوظة
         </p>
-        <p className="text-lg font-bold text-blue-900 order-1 md:order-3">
-          كفيلي
-        </p>
+        <p className="text-lg font-bold text-blue-900 order-1 md:order-3">كفيلي</p>
       </footer>
     </div>
   );
