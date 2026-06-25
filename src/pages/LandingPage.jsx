@@ -1,6 +1,6 @@
 // LandingPage.jsx
 import Header from "./header";
-import Footer from "./Footer";
+import Footer from "./F ooter";
 import heroImage from "../assets/smileChildern.jpg";
 import orphan1 from '../assets/orphan1.jpg';
 import orphan2 from '../assets/orphan2.jpg';
