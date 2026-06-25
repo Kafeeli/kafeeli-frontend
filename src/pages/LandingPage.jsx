@@ -1,6 +1,6 @@
 // LandingPage.jsx
 import Header from "./header";
-import Footer from "./Footer";
+import Footer from "./footer";
 import heroImage from "../assets/smileChildern.jpg";
 import orphan1 from '../assets/orphan1.jpg';
 import orphan2 from '../assets/orphan2.jpg';
@@ -108,7 +108,7 @@ const steps = [
   ];
 
   return (
-    <div dir="rtl" className="min-h-screen bg-[#F8F9FA] font-sans">
+    <div dir="rtl" className="min-h-screen bg-[#F8F9FA]">
       <Header />
       
       {/* Hero Section */}
@@ -171,8 +171,8 @@ const steps = [
             {/* 5000+ */}
             <div className="text-center py-2 lg:py-4">
               <div className="flex items-center justify-center gap-0" dir="ltr">
+                                <span className="text-lg sm:text-xl lg:text-4xl xl:text-5xl font-bold text-[#0D4B8E] lg:text-white">+</span>
                 <span className="text-lg sm:text-xl lg:text-4xl xl:text-5xl font-bold text-[#0D4B8E] lg:text-white">{count3}</span>
-                <span className="text-lg sm:text-xl lg:text-4xl xl:text-5xl font-bold text-[#0D4B8E] lg:text-white">+</span>
               </div>
               <div className="text-[#0D4B8E]/70 lg:text-white/80 text-xs sm:text-sm lg:text-base mt-1">
                 يتيم مكفول
@@ -182,8 +182,8 @@ const steps = [
             {/* M2+ */}
             <div className="text-center py-2 lg:py-4 border-r border-[#0D4B8E]/10 lg:border-r lg:border-white/20">
               <div className="flex items-center justify-center gap-0" dir="ltr">
-                <span className="text-lg sm:text-xl lg:text-4xl xl:text-5xl font-bold text-[#0D4B8E] lg:text-white">M{count2}</span>
-                <span className="text-lg sm:text-xl lg:text-4xl xl:text-5xl font-bold text-[#0D4B8E] lg:text-white">+</span>
+                <span className="text-lg sm:text-xl lg:text-4xl xl:text-5xl font-bold text-[#0D4B8E] lg:text-white">+{count2}</span>
+                <span className="text-lg sm:text-xl lg:text-4xl xl:text-5xl font-bold text-[#0D4B8E] lg:text-white">M</span>
               </div>
               <div className="text-[#0D4B8E]/70 lg:text-white/80 text-xs sm:text-sm lg:text-base mt-1">
                 تبرعات (دولار)
@@ -193,8 +193,9 @@ const steps = [
             {/* 10+ */}
             <div className="text-center py-2 lg:py-4 border-r border-[#0D4B8E]/10 lg:border-r lg:border-white/20">
               <div className="flex items-center justify-center gap-0" dir="ltr">
+                 <span className="text-lg sm:text-xl lg:text-4xl xl:text-5xl font-bold text-[#0D4B8E] lg:text-white">+</span>
                 <span className="text-lg sm:text-xl lg:text-4xl xl:text-5xl font-bold text-[#0D4B8E] lg:text-white">{count1}</span>
-                <span className="text-lg sm:text-xl lg:text-4xl xl:text-5xl font-bold text-[#0D4B8E] lg:text-white">+</span>
+               
               </div>
               <div className="text-[#0D4B8E]/70 lg:text-white/80 text-xs sm:text-sm lg:text-base mt-1">
                 دول حول العالم
@@ -222,7 +223,7 @@ const steps = [
           {features.map((feature, index) => (
             <div 
               key={index}
-              className="bg-white rounded-2xl p-8 lg:p-10 text-center border border-gray-100 hover:shadow-lg transition-shadow duration-300"
+              className="bg-white rounded-2xl p-8 lg:p-10 text-center border border-[#C2C6D2] hover:shadow-lg transition-shadow duration-300"
             >
               {/* الأيقونة */}
               <div className="w-16 h-16 mx-auto mb-6 bg-gray-50 rounded-2xl flex items-center justify-center">
@@ -272,7 +273,7 @@ const steps = [
           {orphans.map((orphan) => (
             <div 
               key={orphan.id}
-              className="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-xl transition-shadow duration-300"
+              className="bg-white rounded-2xl overflow-hidden border border-[#C2C6D2] hover:shadow-xl transition-shadow duration-300"
             >
               {/* الصورة */}
               <div className="relative h-64 sm:h-72">
@@ -321,12 +322,12 @@ const steps = [
           {steps.map((step, index) => (
             <div key={index} className="text-center">
               {/* الدائرة */}
-              <div className={`w-16 h-16 lg:w-20 lg:h-20 mx-auto mb-6 rounded-full flex items-center justify-center text-2xl lg:text-3xl font-bold shadow-lg ${step.color}`}>
+              <div className={`w-16 h-16 lg:w-20 lg:h-20 mx-auto mb-6 rounded-full flex items-center border border-[#0D4B8E1A] justify-center text-2xl lg:text-3xl font-bold shadow-lg ${step.color}`}>
                 {step.number}
               </div>
 
               {/* العنوان */}
-              <h3 className="text-xl lg:text-2xl font-bold text-[#0D4B8E] mb-3">
+              <h3 className="text-xl lg:text-2xl text-[#191C1D] mb-3 font-semibold">
                 {step.title}
               </h3>
 
@@ -349,13 +350,13 @@ const steps = [
         </div>
 
         {/* الاقتباس */}
-        <blockquote className="text-white text-2xl lg:text-3xl xl:text-4xl font-bold leading-relaxed mb-10">
-          "أنت لا تقدم فقط مالاً، بل تبني إنساناً وتعيد له إيمانه بالمستقبل. انضم إلينا إلى عائلة كفيلي اليوم."
-        </blockquote>
+        <p className="text-white text-2xl lg:text-3xl xl:text-4xl font-bold leading-relaxed mb-10">
+          "أنت لا تقدم فقط مالاً، بل تبني إنساناً وتعيد له إيمانه بالمستقبل انضم إلينا إلى عائلة كفيلي اليوم"
+        </p>
 
         {/* الأزرار */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center">
-          <button className="bg-amber-400 hover:bg-amber-500 text-[#0D4B8E] font-bold py-3 px-8 rounded-xl transition-all active:scale-95">
+          <button className="bg-[#D9A441] hover:bg-[#e5a021] text-white font-bold py-3 px-8 rounded-xl transition-all active:scale-95">
             انضم إلينا الآن
           </button>
           
