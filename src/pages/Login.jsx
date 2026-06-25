@@ -4,7 +4,7 @@ import kafeeli from "../assets/kafeeli.png";
 import { MdOutlineMailOutline } from "react-icons/md";
 import { LuLock } from "react-icons/lu";
 import { TbShieldCheck, TbScan } from "react-icons/tb";
-import { FaEye, FaEyeSlash, FaArrowLeft } from "react-icons/fa";
+// import { FaEye, FaEyeSlash, FaArrowLeft } from "react-icons/fa";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 function Login() {
   const navigate = useNavigate();
@@ -15,29 +15,25 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!email || !password) {
-      setErrorType("empty");
-      return;
-    }
+  if (!email || !password) {
+    setErrorType("empty");
+    return;
+  }
 
-    const response = {
-      success: true,
-      role: "Sponsor",
-      error: null,
-    };
-
-    setErrorType("");
-
-    if (response.role === "Sponsor") {
-      navigate("/sponsor-dashboard");
-    } else if (response.role === "Guardian") {
-      navigate("/guardian-dashboard");
-    } else if (response.role === "Admin") {
-      navigate("/admin-dashboard");
-    }
+  const response = {
+    success: true,
+    role: "Sponsor",
+    error: null,
   };
+
+  setErrorType("");
+
+  if (response.success) {
+    navigate("/landing-page"); // أو "/landing" أو أي مسار محدد عندك لصفحة الـ landing
+  }
+};
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row overflow-y-auto">

@@ -1,6 +1,6 @@
 // LandingPage.jsx
 import Header from "./header";
-import Footer from "./F ooter";
+import Footer from "./Footer";
 import heroImage from "../assets/smileChildern.jpg";
 import orphan1 from '../assets/orphan1.jpg';
 import orphan2 from '../assets/orphan2.jpg';
@@ -129,12 +129,12 @@ const steps = [
               انضم إلينا في رحلة صناعة الأثر من خلال كفيلي. يمكنك توفير مستقبل مشرق لليتيم وتأمين احتياجاته الأساسية بكل شفافية وحب.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-stretch sm:items-center">
-              <button className="bg-[#2DBCC3] hover:bg-[#2DBCC3]/90 text-white text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl shadow-lg shadow-[#2DBCC3]/20 w-full sm:w-auto">
+            <div className="flex  flex-col sm:flex-row gap-4 justify-center lg:justify-start items-stretch sm:items-center">
+              <button className="cursor-pointer bg-[#2DBCC3] hover:bg-[#2DBCC3]/90 text-white text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl shadow-lg shadow-[#2DBCC3]/20 w-full sm:w-auto">
                 ابدأ الكفالة الآن
               </button>
 
-              <button className="bg-white hover:bg-gray-50 text-[#0D4B8E] text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-10 rounded-xl border-2 border-[#0D4B8E]/10 w-full sm:w-auto whitespace-nowrap">
+              <button className="bg-white cursor-pointer hover:bg-gray-50 text-[#0D4B8E] text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-10 rounded-xl border-2 border-[#0D4B8E]/10 w-full sm:w-auto whitespace-nowrap">
                 تعرف علينا
               </button>
             </div>
@@ -205,7 +205,7 @@ const steps = [
           </div>
         </div>
       </section>
-     <section className="bg-[#F8F9FA] py-16 lg:py-24">
+     <section className="bg-[#F8F9FA] py-10 lg:py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* العنوان */}
@@ -245,7 +245,7 @@ const steps = [
 
       </div>
     </section>
-    <section className="bg-white py-16 lg:py-24">
+    <section className="bg-white py-10 lg:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* العنوان */}
@@ -307,7 +307,7 @@ const steps = [
 
       </div>
     </section>
-    <section className="bg-white py-16 lg:py-24">
+    <section className="bg-white py-10 lg:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* العنوان */}
@@ -341,7 +341,7 @@ const steps = [
 
       </div>
     </section>
-    <section className="bg-[#0D4B8E] py-16 lg:py-24">
+    <section className="bg-[#0D4B8E] py-10 lg:py-24">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         
         {/* الأيقونة */}
@@ -356,11 +356,11 @@ const steps = [
 
         {/* الأزرار */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center">
-          <button className="bg-[#D9A441] hover:bg-[#e5a021] text-white font-bold py-3 px-8 rounded-xl transition-all active:scale-95">
+          <button className="cursor-pointer bg-[#D9A441] hover:bg-[#e5a021] text-white font-bold py-3 px-8 rounded-xl transition-all active:scale-95">
             انضم إلينا الآن
           </button>
           
-          <button className="bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-8 rounded-xl border border-white/30 transition-all active:scale-95">
+          <button className="cursor-pointer bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-8 rounded-xl border border-white/30 transition-all active:scale-95">
             شاهد قصص النجاح
           </button>
         </div>
