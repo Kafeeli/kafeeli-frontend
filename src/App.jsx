@@ -8,6 +8,7 @@ import EmailVerificationSuccess from "./pages/EmailVerificationSuccess";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
+import AdminDashboard from "./pages/AdminDashboard";
 import LandingPage from "./pages/LandingPage";
 
 function PageWrapper({ children }) {
@@ -133,7 +134,7 @@ function AnimatedRoutes() {
           path="/admin-dashboard"
           element={
             <PageWrapper>
-              <h1>Admin Dashboard</h1>
+              <AdminDashboard />
             </PageWrapper>
           }
         />
