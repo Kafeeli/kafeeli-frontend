@@ -40,13 +40,13 @@ function AnimatedRoutes() {
           }
         />
         <Route 
-  path="/landing-page" 
-  element={
-    <div dir="rtl" className="min-h-screen bg-gray-50">
-      <LandingPage />
-    </div>
-  } 
-/>
+        path="/landing-page" 
+        element={
+          <div dir="rtl" className="min-h-screen bg-gray-50">
+            <LandingPage />
+          </div>
+        } 
+      />
 
         <Route
           path="/login"

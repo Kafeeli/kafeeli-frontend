@@ -84,7 +84,7 @@ const Header = () => {
 
             {/* Desktop CTA */}
             <div className="hidden lg:block">
-              <button className="bg-blue-900 hover:bg-blue-800 text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-900/20 active:scale-95">
+              <button className="bg-blue-900 cursor-pointer hover:bg-blue-800 text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-900/20 active:scale-95">
                 تبرع الآن
               </button>
             </div>
@@ -92,7 +92,7 @@ const Header = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+              className="lg:hidden cursor-pointer p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
               aria-label="Toggle menu"
             >
               {isMenuOpen ? <FaTimes className="w-6 h-6" /> : <FaBars className="w-6 h-6" />}
@@ -152,7 +152,7 @@ const Header = () => {
 
           {/* CTA Button */}
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100 bg-white">
-            <button className="w-full bg-blue-900 hover:bg-blue-800 text-white px-6 py-3 rounded-lg text-base font-semibold transition-all active:scale-[0.98]">
+            <button className=" cursor-pointer w-full bg-blue-900 hover:bg-blue-800 text-white px-6 py-3 rounded-lg text-base font-semibold transition-all active:scale-[0.98]">
               تبرع الآن
             </button>
           </div>
