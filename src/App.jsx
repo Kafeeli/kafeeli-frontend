@@ -9,6 +9,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
 import AdminDashboard from "./pages/AdminDashboard";
+import LandingPage from "./pages/LandingPage";
 
 function PageWrapper({ children }) {
   return (
@@ -21,6 +22,7 @@ function PageWrapper({ children }) {
     >
       {children}
     </motion.div>
+    
   );
 }
 
@@ -38,6 +40,14 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
+        <Route 
+        path="/landing-page" 
+        element={
+          <div dir="rtl" className="min-h-screen bg-gray-50">
+            <LandingPage />
+          </div>
+        } 
+      />
 
         <Route
           path="/login"
@@ -129,6 +139,7 @@ function AnimatedRoutes() {
           }
         />
       </Routes>
+      
     </AnimatePresence>
   );
 }
