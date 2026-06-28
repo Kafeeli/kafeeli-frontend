@@ -10,6 +10,8 @@ import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
 import AdminDashboard from "./pages/AdminDashboard";
 import LandingPage from "./pages/LandingPage";
+import GuardianProfile from "./pages/GuardianProfile";
+
 
 function PageWrapper({ children }) {
   return (
@@ -138,6 +140,14 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
+        <Route
+  path="/guardian-profile"
+  element={
+    <PageWrapper>
+      <GuardianProfile />
+    </PageWrapper>
+  }
+/>
       </Routes>
       
     </AnimatePresence>
