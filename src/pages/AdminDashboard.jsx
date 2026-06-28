@@ -26,7 +26,6 @@ import { useState } from "react";
 import { FiMenu } from "react-icons/fi";
 
 const cardShadow = "shadow-[0_2px_10px_rgba(31,41,55,0.06)]";
-
 const sidebarItems = [
   { label: "لوحة المراجعة", icon: MdDashboard, active: true },
   { label: "الأوصياء", icon: HiOutlineIdentification },
