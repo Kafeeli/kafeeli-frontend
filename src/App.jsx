@@ -10,7 +10,7 @@ import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
 import AdminDashboard from "./pages/AdminDashboard";
 import LandingPage from "./pages/LandingPage";
-import Sidebar from './pages/sponsor-dashboard/Dashboard';
+import MainDashBorad from './pages/sponsor-dashboard/Dashboard';
 function PageWrapper({ children }) {
   return (
     <motion.div
@@ -51,10 +51,10 @@ function AnimatedRoutes() {
         
       />
       <Route 
-        path="/Side-bar" 
+        path="/MainDashBorad" 
         element={
           <div dir="rtl" className="min-h-screen bg-gray-50">
-            <Sidebar />
+            <MainDashBorad />
           </div>
         } 
         
