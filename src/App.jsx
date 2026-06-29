@@ -8,10 +8,11 @@ import EmailVerificationSuccess from "./pages/EmailVerificationSuccess";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
-import AdminDashboard from "./pages/AdminDashboard";
+import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 import LandingPage from "./pages/LandingPage";
 import MainDashBorad from './pages/sponsor-dashboard/Dashboard';
 import GuardianProfile from "./pages/GuardianProfile";
+import Sidebar from './pages/admin-dashboard/sideBar'
 
 
 function PageWrapper({ children }) {
@@ -62,13 +63,19 @@ function AnimatedRoutes() {
         } 
         
       />
-    
-
         <Route
           path="/login"
           element={
             <PageWrapper>
               <Login />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/sideBare"
+          element={
+            <PageWrapper>
+              <Sidebar />
             </PageWrapper>
           }
         />
