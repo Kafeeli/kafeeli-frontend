@@ -10,6 +10,7 @@ import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
 import AdminDashboard from "./pages/AdminDashboard";
 import LandingPage from "./pages/LandingPage";
+import MainDashBorad from './pages/sponsor-dashboard/Dashboard';
 import GuardianProfile from "./pages/GuardianProfile";
 
 
@@ -42,6 +43,7 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
+        
         <Route 
         path="/landing-page" 
         element={
@@ -49,7 +51,18 @@ function AnimatedRoutes() {
             <LandingPage />
           </div>
         } 
+        
       />
+      <Route 
+        path="/MainDashBorad" 
+        element={
+          <div dir="rtl" className="min-h-screen bg-gray-50">
+            <MainDashBorad />
+          </div>
+        } 
+        
+      />
+    
 
         <Route
           path="/login"
