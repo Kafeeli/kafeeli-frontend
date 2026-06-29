@@ -11,6 +11,9 @@ import InvalidEmail from "./pages/InvalidEmail";
 import AdminDashboard from "./pages/AdminDashboard";
 import LandingPage from "./pages/LandingPage";
 import MainDashBorad from './pages/sponsor-dashboard/Dashboard';
+import GuardianProfile from "./pages/GuardianProfile";
+
+
 function PageWrapper({ children }) {
   return (
     <motion.div
@@ -150,6 +153,14 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
+        <Route
+  path="/guardian-profile"
+  element={
+    <PageWrapper>
+      <GuardianProfile />
+    </PageWrapper>
+  }
+/>
       </Routes>
       
     </AnimatePresence>
