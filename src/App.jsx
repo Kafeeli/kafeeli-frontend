@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
 import Login from "./pages/Login";
@@ -10,10 +10,9 @@ import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
 import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 import LandingPage from "./pages/LandingPage";
-import MainDashBorad from './pages/sponsor-dashboard/Dashboard';
+import MainDashBorad from "./pages/sponsor-dashboard/Dashboard";
 import GuardianProfile from "./pages/GuardianProfile";
-import Sidebar from './pages/admin-dashboard/sideBar'
-
+import ProfilePage from "./pages/sponsor-dashboard/profileDashboard";
 
 function PageWrapper({ children }) {
   return (
@@ -26,7 +25,6 @@ function PageWrapper({ children }) {
     >
       {children}
     </motion.div>
-    
   );
 }
 
@@ -36,46 +34,45 @@ function AnimatedRoutes() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
+        {/* أول ما يفتح الموقع يوديه على صفحة الرئيسية */}
+        <Route path="/" element={<Navigate to="/main" replace />} />
+
+        {/* الرئيسية */}
+        <Route
+          path="/main"
+          element={
+            <div dir="rtl" className="min-h-screen bg-gray-50">
+              <MainDashBorad />
+            </div>
+          }
+        />
+
+        {/* الملف الشخصي */}
+        <Route
+          path="/profile"
+          element={
+            <div dir="rtl" className="min-h-screen bg-gray-50">
+              <ProfilePage />
+            </div>
+          }
+        />
+
+        
+
+        <Route
+          path="/landing-page"
+          element={
+            <div dir="rtl" className="min-h-screen bg-gray-50">
+              <LandingPage />
+            </div>
+          }
+        />
+
         <Route
           path="/"
           element={
             <PageWrapper>
               <Login />
-            </PageWrapper>
-          }
-        />
-        
-        <Route 
-        path="/landing-page" 
-        element={
-          <div dir="rtl" className="min-h-screen bg-gray-50">
-            <LandingPage />
-          </div>
-        } 
-        
-      />
-      <Route 
-        path="/MainDashBorad" 
-        element={
-          <div dir="rtl" className="min-h-screen bg-gray-50">
-            <MainDashBorad />
-          </div>
-        } 
-        
-      />
-        <Route
-          path="/login"
-          element={
-            <PageWrapper>
-              <Login />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/sideBare"
-          element={
-            <PageWrapper>
-              <Sidebar />
             </PageWrapper>
           }
         />
@@ -160,16 +157,19 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
+
         <Route
-  path="/guardian-profile"
-  element={
-    <PageWrapper>
-      <GuardianProfile />
-    </PageWrapper>
-  }
-/>
+          path="/guardian-profile"
+          element={
+            <PageWrapper>
+              <GuardianProfile />
+            </PageWrapper>
+          }
+        />
+
+        {/* أي رابط غلط يرجعه على الرئيسية */}
+        <Route path="*" element={<Navigate to="/main" replace />} />
       </Routes>
-      
     </AnimatePresence>
   );
 }

@@ -33,7 +33,7 @@ function getIcon(name) {
 }
 
 const menuItems = [
-  { icon: 'dashboard', label: 'الرئيسية', path: '/' },
+  { icon: 'dashboard', label: 'الرئيسية', path: '/main' },
   { icon: 'profile', label: 'ملفي الشخصي', path: '/profile' },
   { icon: 'orphans', label: 'تصفح الأيتام', path: '/orphans' },
   { icon: 'families', label: 'تصفح العائلات', path: '/families' },
