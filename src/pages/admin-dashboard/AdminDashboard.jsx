@@ -21,7 +21,7 @@ import { PiBaby, PiFileText, PiMoneyWavy, PiUsersThree } from "react-icons/pi";
 import { TbReportAnalytics } from "react-icons/tb";
 import { useState } from "react";
 import { FiMenu } from "react-icons/fi";
-import Sidebar from "./Sidebar";
+import Sidebar from "./sideBar";
 
 const cardShadow = "shadow-[0_2px_10px_rgba(31,41,55,0.06)]";
 
