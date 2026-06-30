@@ -342,7 +342,7 @@ export default function AdminDashboard() {
             <FiMenu className="text-xl text-[#0D4B8E]" />
           </button>
 
-          <h2 className="text-[14px] sm:text-lg font-bold text-[#0D4B8E] truncate">
+          <h2 className="text-[12px] sm:text-lg font-bold text-[#0D4B8E] truncate">
             مرحباً، Admin أهلاً بك في لوحة إدارة منصة كفيلي
           </h2>
 

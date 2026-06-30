@@ -7,6 +7,7 @@ import {
   FaCalendarCheck,
   FaAward,
   FaEnvelope,
+  FaUserTie
 } from 'react-icons/fa'
 import { FiAlertTriangle, FiAlignJustify } from 'react-icons/fi'
 import { FaBriefcase, FaShieldAlt } from 'react-icons/fa'
@@ -26,7 +27,7 @@ function Dashboard() {
     <div className="flex min-h-screen bg-gray-50" dir="rtl">
 
       <Sidebar
-        activePath="/"
+        activePath="/main"
         isOpen={isSidebarOpen}
         onClose={function () { setIsSidebarOpen(false) }}
       />
@@ -49,16 +50,19 @@ function Dashboard() {
           </div>
 
           <div className="flex items-center gap-3">
-            <FaBell className="text-gray-400 text-lg cursor-pointer hover:text-[#1e3a5f]" />
-            <div className="w-px h-8 bg-gray-200"></div>
+          <button className="relative w-9 h-9 rounded-full flex items-center justify-center text-[#003469] hover:bg-gray-100 transition">
+            <FaBell />
+            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 border border-white"></span>
+          </button>
+            
 
             <div className="text-right">
               <p className="text-sm font-bold text-[#003469]">محمد أحمد</p>
               <p className="text-xs text-gray-500">كفيل معتمد</p>
             </div>
-            <div className="w-9 h-9 bg-gray-200 rounded-full overflow-hidden">
-              <img src="https://i.pravatar.cc/40" alt="avatar" className="w-full h-full object-cover" />
-            </div>
+            <div className="w-10 h-10 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center overflow-hidden">
+                          <FaUserTie className="text-gray-500 text-lg" />
+                        </div>
           </div>
         </header>
 
