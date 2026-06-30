@@ -134,3 +134,12 @@ body {
 .confetti-dot {
   animation: floatIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
+@layer base {
+  button {
+    @apply cursor-pointer;
+  }
+
+  button:disabled {
+    @apply cursor-not-allowed;
+  }
+}

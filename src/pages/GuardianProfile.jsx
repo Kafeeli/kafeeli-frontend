@@ -1,12 +1,5 @@
 import { useState } from "react";
-
-import personalImage from "../assets/personal.jpg";
-import kafeeliLogo from "../assets/kafeeli-logo.jpg";
-
 import {
-  MdVerified,
-  MdErrorOutline,
-  MdHome,
   MdMenu,
   MdClose,
   MdLogout,
@@ -16,9 +9,6 @@ import {
   MdPerson,
   MdDescription,
   MdFamilyRestroom,
-  MdSentimentSatisfiedAlt,
-  MdAccountBalanceWallet,
-  MdPayments,
   MdCheckCircle,
   MdStars,
   MdLockReset,
@@ -30,73 +20,86 @@ import {
   MdOutlineCalendarToday,
   MdInfoOutline,
   MdSave,
+  MdVerified,
+  MdErrorOutline,
+  MdHome,
+  MdPhotoCamera,
+  MdAccountBalanceWallet,
+  MdPayments,
   MdPublishedWithChanges,
 } from "react-icons/md";
-
+import { MdSentimentSatisfiedAlt } from "react-icons/md";
+import headerImg from "../assets/headerimg.jpg";
+import kafeeliLogo from "../assets/kafeeli-removebg-preview1.png";
 import { LuPencil } from "react-icons/lu";
 import { FaRestroom, FaUserTie } from "react-icons/fa";
 import { IoEarthSharp } from "react-icons/io5";
+
+import personalImage from "../assets/personal.jpg";
+
 function GuardianProfile() {
   const [openSidebar, setOpenSidebar] = useState(false);
-  const verificationStatus = "Pending Review";
+
+  const verificationStatus = "Approved";
 
   const rejectionReason =
-    "الصورة غير واضحة، يرجى إعادة رفع الوثائق بجودة أفضل.";
+    "الوثائق المرفقة غير واضحة أو غير مكتملة. يرجى رفع وثائق جديدة بجودة أعلى.";
 
-  const verificationStatusData = {
+  const verificationData = {
     "Not Uploaded": {
       title: "لم يتم رفع الوثائق",
-      message: "لم تقم برفع وثائق الوصي بعد. يرجى رفع الوثائق لإكمال التحقق.",
-      color: "bg-gray-100 text-gray-700 border-gray-200",
+      message: "يرجى رفع الوثائق المطلوبة لبدء عملية التحقق.",
+      color: "bg-gray-50 border-gray-200 text-gray-700",
     },
     "Pending Review": {
       title: "قيد المراجعة",
-      message: "تم استلام وثائقك وهي الآن قيد المراجعة من قبل الفريق المختص.",
-      color: "bg-yellow-50 text-yellow-700 border-yellow-200",
+      message: "تم استلام الوثائق وهي الآن قيد المراجعة من قبل الفريق المختص.",
+      color: "bg-yellow-50 border-yellow-200 text-yellow-700",
     },
     Approved: {
-      title: "تمت الموافقة",
-      message: "تمت الموافقة على وثائق الوصي بنجاح.",
-      color: "bg-green-50 text-green-700 border-green-200",
+      title: "تم قبول الوثائق",
+      message: "تم التحقق من وثائق الوصي بنجاح.",
+      color: "bg-green-50 border-green-200 text-green-700",
     },
     Rejected: {
-      title: "مرفوضة",
-      message: "تم رفض الوثائق المرفوعة. يرجى مراجعة سبب الرفض وإعادة الرفع.",
-      color: "bg-red-50 text-red-700 border-red-200",
+      title: "حالة الوثائق: مرفوض",
+      message:
+        "نأسف، الوثائق المرفقة غير واضحة أو غير مكتملة. يرجى رفع وثائق جديدة.",
+      color: "bg-red-50 border-red-200 text-red-700",
     },
     "Needs Update": {
-      title: "تحتاج إلى تحديث",
-      message: "تحتاج وثائقك إلى تحديث. يرجى رفع النسخة الأحدث.",
-      color: "bg-orange-50 text-orange-700 border-orange-200",
+      title: "تحتاج الوثائق إلى تحديث",
+      message: "يرجى تحديث بعض الوثائق لاستكمال عملية التحقق.",
+      color: "bg-orange-50 border-orange-200 text-orange-700",
     },
   };
 
-  const currentVerification = verificationStatusData[verificationStatus];
+  const currentVerification = verificationData[verificationStatus];
+
   const menuItems = [
     {
-      title: "نظرة عامة",
+      title: "لوحة التحكم",
       icon: <MdDashboard />,
       active: false,
     },
     {
-      title: "الملف الشخصي",
+      title: "ملفي الشخصي",
       icon: <MdPerson />,
       active: true,
     },
     {
-      title: "الوثائق",
+      title: "وثائقي",
       icon: <MdDescription />,
       active: false,
     },
+
     {
       title: "العائلات",
-
       icon: <MdFamilyRestroom />,
       active: false,
     },
     {
       title: "الأيتام",
-
       icon: <MdSentimentSatisfiedAlt />,
       active: false,
     },
@@ -127,9 +130,12 @@ function GuardianProfile() {
       active: false,
     },
   ];
-
+  const isEmailVerified = true;
   return (
-    <div dir="rtl" className="min-h-screen bg-[#f5f6f8] flex overflow-x-hidden">
+    <div
+      dir="rtl"
+      className="min-h-screen bg-[#f5f6f8] flex overflow-x-hidden font-[Cairo,sans-serif]"
+    >
       {openSidebar && (
         <div
           onClick={() => setOpenSidebar(false)}
@@ -138,106 +144,147 @@ function GuardianProfile() {
       )}
 
       {/* Sidebar */}
+      {/* Sidebar */}
       <aside
         className={`
-          fixed lg:static top-0 right-0 z-50
-          w-[255px] h-screen lg:h-[936px] shrink-0 bg-white border-l border-gray-200
-          flex flex-col justify-between px-3 overflow-y-auto overflow-x-hidden
-          transition-transform duration-300
-          ${openSidebar ? "translate-x-0" : "translate-x-full"}
-          lg:translate-x-0
-        `}
+    fixed top-0 right-0 z-50
+    w-[256px] h-screen
+    bg-[#003469]
+    border-l border-[#C2C6D2]
+    flex flex-col
+    pt-4 pb-5
+    overflow-y-auto overflow-x-hidden
+    transition-transform duration-300
+    ${openSidebar ? "translate-x-0" : "translate-x-full"}
+    lg:translate-x-0
+  `}
       >
-        <div>
-          <div className="lg:hidden flex justify-start pt-4 px-2">
-            <button
-              onClick={() => setOpenSidebar(false)}
-              className="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-[#003469]"
-            >
-              <MdClose className="text-xl" />
-            </button>
+        {/* Close button - Mobile فقط */}
+        <div className="lg:hidden flex justify-start px-4 mb-4">
+          <button
+            onClick={() => setOpenSidebar(false)}
+            className="w-9 h-9 rounded-lg border border-white/30 flex items-center justify-center text-white"
+          >
+            <MdClose className="text-xl" />
+          </button>
+        </div>
+
+        {/* Top Content */}
+        <div className="flex flex-col gap-[0px]">
+          {/* Logo */}
+          <div className="flex flex-col items-center justify-center px-4 -mt-2">
+            <div className="w-[72px] h-[72px] rounded-full bg-white/15 flex items-center justify-center mb-5">
+              <img
+                src={kafeeliLogo}
+                alt="Kafeeli Logo"
+                className="w-[90px] h-[90px] object-contain"
+              />
+            </div>
+
+            <div className="w-fit h-auto flex flex-col items-center justify-center gap-5 text-center">
+              <h2 className="font-[Cairo] font-bold text-[23px] leading-[3px] tracking-[0px] text-center text-[#FFDEAA]">
+                كفيلي
+              </h2>
+
+              <p className="font-[Cairo] font-normal text-[14px] leading-[16px] tracking-[0px] text-center text-[#e6ecf7] whitespace-nowrap">
+                لوحة الإدارة الذكية
+              </p>
+            </div>
           </div>
 
-          <div className="flex justify-center py-8 border-b border-gray-100">
-            <img
-              src={kafeeliLogo}
-              alt="Kafeeli Logo"
-              className="w-[180px] h-[180px] max-w-[207px] opacity-100 object-contain"
-            />
-          </div>
+          {/* Menu */}
+          <nav className="px-4 flex-1 mt-2">
+            <hr className="border-white/25" />
 
-          <nav className="px-4 py-5 space-y-2 font-[Cairo] font-normal text-[16px] leading-[24px] text-right">
-            {menuItems.map((item) => (
-              <button
-                key={item.title}
-                onClick={() => setOpenSidebar(false)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition ${
-                  item.active
-                    ? "bg-[#47dbe0] text-[#003469] font-semibold shadow-sm"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-[#003469]"
-                }`}
-              >
-                <span
-                  className={`text-[22px] flex items-center ${
-                    item.active ? "text-[#003469]" : "text-[#4B5563]"
-                  }`}
+            <div className="space-y-0.2">
+              {menuItems.map((item) => (
+                <button
+                  key={item.title}
+                  onClick={() => setOpenSidebar(false)}
+                  className={`
+              w-full h-[27px]
+              flex items-center gap-3
+              px-3 rounded-[6px]
+              font-[Cairo] text-[12px] leading-[20px]
+              text-right transition
+              ${
+                item.active
+                  ? "bg-[#47DBE0] text-[#003469] font-bold"
+                  : "text-white/85 font-normal hover:bg-white/10 hover:text-white"
+              }
+            `}
                 >
-                  {item.icon}
-                </span>
+                  <span
+                    className={`
+                text-[16px] flex items-center shrink-0
+                ${item.active ? "text-[#003469]" : "text-white/85"}
+              `}
+                  >
+                    {item.icon}
+                  </span>
 
-                <span>{item.title}</span>
-              </button>
-            ))}
+                  <span className="truncate">{item.title}</span>
+                </button>
+              ))}
+            </div>
           </nav>
         </div>
 
-        <div className="p-4 border-t border-gray-100">
-          <button className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 transition">
-            <MdLogout className="text-lg" />
+        {/* Logout */}
+        <div className="mt-2 border-t border-white/25 px-4 pt-4">
+          <button className="w-full h-[25px] flex items-center gap-3 px-3 rounded-[6px] font-[Cairo] text-[12px] leading-[20px] text-white/90 hover:bg-white/10 transition cursor-pointer">
+            <MdLogout className="text-[15px]" />
             <span>تسجيل الخروج</span>
           </button>
         </div>
       </aside>
-
       {/* Header + Content */}
-      <div className="flex-1 min-w-0">
+      {/* Header + Content */}
+      <div className="flex-1 min-w-0 w-full lg:mr-[255px]">
         {/* Header */}
-        <header className="w-full h-[64px] bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-16 opacity-100">
-          <div className="flex items-center gap-3">
+        <header className="w-full h-[56px] lg:h-[64px] bg-white border-b border-gray-200 flex items-center justify-between px-3 sm:px-4 lg:px-16 opacity-100">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <button
               onClick={() => setOpenSidebar(true)}
-              className="lg:hidden w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-[#003469]"
+              className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center text-[#424750] hover:bg-gray-100 transition shrink-0 cursor-pointer"
             >
               <MdMenu className="text-2xl" />
             </button>
 
-            <h1 className="font-[Cairo] font-bold text-[16px] leading-[24px] text-right text-[#003469]">
+            <h1 className="font-[Cairo] font-bold text-[14px] sm:text-[16px] leading-[24px] text-right text-[#003469] truncate">
               ملفي الشخصي - الوصي
             </h1>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-4">
-            <button className="text-gray-600 hover:text-[#003469] transition text-lg">
-              <MdSettings />
-            </button>
+          <div dir="ltr" className="flex items-center gap-4 shrink-0">
+            <div className="flex items-center gap-2">
+              <img
+                src={headerImg}
+                alt="صورة الكفيل المعتمد"
+                className="w-[32px] h-[32px] rounded-full object-cover"
+              />
+              <div dir="rtl" className="text-right leading-none">
+                <h3 className="font-[Cairo] font-bold text-[12px] leading-[16px] text-[#111827]">
+                  أحمد العلي
+                </h3>
 
-            <button className="relative text-gray-600 hover:text-[#003469] transition text-lg">
-              <MdNotificationsNone />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-
-            <span className="hidden md:block font-[Cairo] font-bold text-[16px] leading-[24px] text-right text-gray-700">
-              أحمد محمد عبد الله
-            </span>
-
-            <div className="w-[40px] h-[40px] rounded-full bg-[#47dbe0] text-[#003469] flex items-center justify-center font-bold">
-              أ
+                <p className="font-[Cairo] font-normal text-[10px] leading-[14px] text-[#6B7280]">
+                  الكفيل المعتمد
+                </p>
+              </div>
             </div>
+
+            <div className="w-px h-[28px] bg-[#D8DEE8]"></div>
+
+            <button className="relative w-8 h-8 flex items-center justify-center text-[#111827] hover:bg-gray-100 rounded-lg transition cursor-pointer">
+              <MdNotificationsNone className="text-[21px]" />
+              <span className="absolute top-[6px] right-[7px] w-[7px] h-[7px] bg-red-500 rounded-full border border-white"></span>
+            </button>
           </div>
         </header>
 
-        {/* Main Content */}
-        <main className="px-3 sm:px-6 pt-4 pb-6">
+        {/* Desktop Main Content - نفس شكل الديسكتوب */}
+        <main className="hidden lg:block px-3 sm:px-6 pt-4 pb-6">
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-[309px_1fr] gap-6 items-start">
               {/* Guardian Card + Security Card */}
@@ -325,7 +372,7 @@ function GuardianProfile() {
                   </button>
 
                   <div dir="rtl" className="text-right">
-                    <h3 className="text-[15px] font-bold text-[#003469] leading-6">
+                    <h3 className="text-[16px] font-bold text-[#003469] leading-6">
                       تعديل البيانات الشخصية
                     </h3>
 
@@ -366,14 +413,28 @@ function GuardianProfile() {
                           value="ahmed.alali@example.com"
                           readOnly
                           disabled
-                          className="w-full h-12 rounded-lg border border-[#D0D5DD] bg-[#F9FAFB] px-4 pr-10 text-sm text-gray-500 outline-none cursor-not-allowed"
+                          dir="ltr"
+                          className="
+      w-full h-12
+      rounded-lg
+      border border-[#D0D5DD]
+      bg-[#F9FAFB]
+      pl-16 pr-12
+      text-left
+      text-sm text-gray-500
+      outline-none
+      cursor-not-allowed
+    "
                         />
-                        <MdOutlineEmail className="absolute right-3 top-1/2 -translate-y-1/2 text-[#003469] text-lg" />
+
+                        <MdOutlineEmail className="absolute right-4 top-1/2 -translate-y-1/2 text-[#003469] text-lg" />
+
+                        <MdVerified className="absolute left-4 top-1/2 -translate-y-1/2 text-[#4DA3A3] text-[20px]" />
                       </div>
                     </div>
 
                     <div className="w-full">
-                      <label className="block text-right text-[14px] leading-[20px] font-bold text-[#424750] mb-2">
+                      <label className="block text-right text-[14px] leading-[20px] font-bold  text-[#003469] mb-2">
                         رقم الهاتف
                       </label>
 
@@ -392,7 +453,7 @@ function GuardianProfile() {
                     </div>
 
                     <div className="w-full">
-                      <label className="block text-right text-[14px] leading-[20px] font-bold text-[#424750] mb-2">
+                      <label className="block text-right  text-[#003469] leading-[20px] font-bold  mb-2">
                         الجنس
                       </label>
 
@@ -406,7 +467,7 @@ function GuardianProfile() {
                     </div>
 
                     <div className="w-full">
-                      <label className="block text-right text-[14px] leading-[20px] font-bold text-[#424750] mb-2">
+                      <label className="block text-right text-[14px] leading-[20px] font-bold  text-[#003469] mb-2">
                         الدولة
                       </label>
 
@@ -423,7 +484,7 @@ function GuardianProfile() {
                     </div>
 
                     <div className="w-full">
-                      <label className="block text-right text-[14px] leading-[20px] font-bold text-[#424750] mb-2">
+                      <label className="block text-right text-[14px] leading-[20px] font-bold  text-[#003469] mb-2">
                         المدينة
                       </label>
 
@@ -438,7 +499,7 @@ function GuardianProfile() {
                     </div>
 
                     <div className="w-full">
-                      <label className="block text-right text-[14px] leading-[20px] font-bold text-[#424750] mb-2">
+                      <label className="block text-right text-[14px] leading-[20px] font-bold  text-[#003469] mb-2">
                         المهنة
                       </label>
 
@@ -453,7 +514,7 @@ function GuardianProfile() {
                     </div>
 
                     <div className="w-full">
-                      <label className="block text-right text-[14px] leading-[20px] font-bold text-[#424750] mb-2">
+                      <label className="block text-right text-[14px] leading-[20px] font-bold  text-[#003469] mb-2">
                         الدخل الشهري التقديري
                       </label>
 
@@ -465,7 +526,7 @@ function GuardianProfile() {
                     </div>
 
                     <div className="w-full md:col-span-2">
-                      <label className="block text-right text-[14px] leading-[20px] font-bold text-[#424750] mb-2">
+                      <label className="block text-right text-[14px] leading-[20px] font-bold  text-[#003469] mb-2">
                         تاريخ الميلاد
                       </label>
 
@@ -490,7 +551,7 @@ function GuardianProfile() {
                   </div>
 
                   <div
-                    dir="ltr"
+                    dir="rtl"
                     className="mt-6 pt-4 border-t border-[#E5E7EB] flex items-center gap-3"
                   >
                     <button className="h-[36px] min-w-[132px] px-6 rounded-md bg-[#003469] text-white text-[14px] font-bold flex items-center justify-center gap-2 shadow-sm hover:bg-[#002b57] transition">
@@ -498,14 +559,15 @@ function GuardianProfile() {
                       حفظ التغييرات
                     </button>
 
-                    <button className="h-[36px] min-w-[74px] px px-6 rounded-md border border-[#D0D5DD] bg-white text-[#111827] text-[14px] font-bold hover:bg-gray-50 transition">
+                    <button className="h-[36px] min-w-[74px] px-6 rounded-md border border-[#D0D5DD] bg-white text-[#111827] text-[14px] font-bold hover:bg-gray-50 transition">
                       إلغاء
                     </button>
                   </div>
                 </div>
               </section>
+
               {/* Verification Status Section */}
-              <section className="order-3 xl:order-3 w-full max-w-[642px] mx-auto bg-white rounded-xl border border-[#D8DEE8] overflow-hidden shadow-sm hover:shadow-md transition">
+              <section className="order-3 xl:order-3 w-full max-w-[722px] mx-auto bg-white rounded-xl border border-[#D8DEE8] overflow-hidden shadow-sm hover:shadow-md transition">
                 <div className="w-full bg-[#F3F4F5] border-b border-[#D8DEE8] px-4 sm:px-6 py-5 flex items-center justify-between gap-4">
                   <div className="text-right">
                     <h3 className="text-[15px] font-bold text-[#003469] leading-6">
@@ -550,17 +612,55 @@ function GuardianProfile() {
                     </div>
                   )}
 
-                  <div className="pt-4 border-t border-[#E5E7EB] grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                    <button className="w-full min-h-[46px] rounded-lg bg-[#003469] text-white text-[13px] sm:text-[14px] font-bold flex items-center justify-center gap-2 px-4 shadow-sm hover:bg-[#002b57] hover:scale-[1.02] transition">
-                      <MdDescription className="text-[16px] shrink-0" />
-                      <span className="text-center leading-5">
+                  <div className="pt-4 border-t border-[#E5E7EB] grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button
+                      className="
+      w-full h-[48px]
+      rounded-[10px]
+      bg-[#003469]
+      text-white
+      font-[Cairo] font-bold
+      text-[10px] sm:text-[10px]
+      flex items-center justify-center gap-2
+      px-4
+      shadow-sm
+      hover:bg-[#002B57]
+      hover:shadow-md
+      hover:-translate-y-[1px]
+      active:translate-y-0
+      transition-all duration-200
+      cursor-pointer
+    "
+                    >
+                      <MdDescription className="text-[18px] shrink-0" />
+                      <span className="whitespace-nowrap leading-5">
                         الانتقال إلى وثائقي
                       </span>
                     </button>
 
-                    <button className="w-full min-h-[46px] rounded-lg border border-[#D0D5DD] bg-white text-[#111827] text-[13px] sm:text-[14px] font-bold flex items-center justify-center gap-2 px-4 hover:bg-gray-50 hover:scale-[1.02] transition">
-                      <MdHome className="text-[10px] shrink-0" />
-                      <span className="text-center leading-5">
+                    <button
+                      className="
+      w-full h-[48px]
+      rounded-[10px]
+      border border-[#D0D5DD]
+      bg-white
+      text-[#003469]
+      font-[Cairo] font-bold
+      text-[10px] sm:text-[10px]
+      flex items-center justify-center gap-2
+      px-4
+      shadow-sm
+      hover:bg-[#F5F8FB]
+      hover:border-[#003469]
+      hover:shadow-md
+      hover:-translate-y-[1px]
+      active:translate-y-0
+      transition-all duration-200
+      cursor-pointer
+    "
+                    >
+                      <MdHome className="text-[18px] shrink-0" />
+                      <span className="whitespace-nowrap leading-5">
                         العودة للوحة التحكم
                       </span>
                     </button>
@@ -570,6 +670,202 @@ function GuardianProfile() {
             </div>
           </div>
         </main>
+
+        {/* Mobile Main Content - شكل الموبايل فقط */}
+        <main className="lg:hidden px-2 pt-3 pb-5">
+          <div className="w-full max-w-[340px] mx-auto space-y-3">
+            {/* Verification Alert */}
+            <section className="w-full rounded-[8px] border border-red-200 bg-red-50 p-3 shadow-sm">
+              <div className="flex items-start gap-2">
+                <div className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center shrink-0">
+                  <MdErrorOutline className="text-[19px]" />
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-[12px] font-bold text-red-700 leading-5">
+                    حالة الوثائق: مرفوض
+                  </h3>
+
+                  <p className="text-[10px] text-red-700 leading-4 mt-1">
+                    نأسف، الوثائق المرفقة غير واضحة أو غير مكتملة. يرجى رفع
+                    وثائق جديدة.
+                  </p>
+
+                  <button className="mt-2 w-full h-[30px] rounded-[5px] bg-red-700 text-white text-[10px] font-bold flex items-center justify-center gap-1">
+                    <MdDescription className="text-[13px]" />
+                    تحديث الوثائق
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            {/* Profile Card */}
+            <section className="w-full rounded-[8px] border border-[#D8DEE8] bg-white shadow-sm px-4 py-5 text-center">
+              <div className="relative w-fit mx-auto">
+                <div className="w-[58px] h-[58px] rounded-full bg-[#E8EAEE] border border-[#C8CDD5] flex items-center justify-center">
+                  <MdPerson className="text-[34px] text-[#737782]" />
+                </div>
+
+                <span className="absolute bottom-0 left-0 w-[20px] h-[20px] rounded-full bg-[#003469] text-white flex items-center justify-center border-2 border-white">
+                  <MdPhotoCamera className="text-[10px]" />
+                </span>
+              </div>
+
+              <h3 className="mt-3 text-[12px] font-bold text-[#252C32] leading-5">
+                أحمد محمد عبد الله
+              </h3>
+
+              <p className="text-[10px] text-[#6B7280] leading-4">
+                تاريخ الانضمام: أكتوبر 2023
+              </p>
+
+              <div className="mt-4 grid grid-cols-2 gap-3">
+                <div className="rounded-[5px] bg-[#F3F4F5] px-2 py-2">
+                  <p className="text-[9px] text-[#737782] leading-4">
+                    حالة الحساب
+                  </p>
+                  <p className="text-[10px] font-bold text-red-600 leading-4">
+                    معلق
+                  </p>
+                </div>
+
+                <div className="rounded-[5px] bg-[#F3F4F5] px-2 py-2">
+                  <p className="text-[9px] text-[#737782] leading-4">
+                    نوع الحساب
+                  </p>
+                  <p className="text-[10px] font-bold text-[#003469] leading-4">
+                    وصي
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Basic Info Mobile */}
+            <section className="w-full rounded-[8px] border border-[#D8DEE8] bg-white shadow-sm overflow-hidden">
+              <div className="px-3 py-3 flex items-center justify-between border-b border-[#EEF0F3]">
+                <button className="text-[11px] font-bold text-[#003469] flex items-center gap-1">
+                  <LuPencil className="text-[12px]" />
+                  تعديل /
+                </button>
+
+                <h3 className="text-[12px] font-bold text-[#003469] flex items-center gap-1">
+                  <MdOutlinePerson className="text-[14px]" />
+                  البيانات الأساسية
+                </h3>
+              </div>
+
+              <div className="p-3 space-y-3">
+                <div>
+                  <label className="block text-[9px] text-[#737782] mb-1">
+                    الاسم الكامل
+                  </label>
+                  <input
+                    type="text"
+                    value="أحمد محمد عبد الله الفقي"
+                    readOnly
+                    className="w-full h-[34px] rounded-[4px] bg-[#F1F2F4] border border-transparent px-2 text-[10px] text-[#424750] outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[9px] text-[#737782] mb-1">
+                    البريد الإلكتروني
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="email"
+                      value="ahmed.m@example.com"
+                      readOnly
+                      className="w-full h-[34px] rounded-[4px] bg-[#F1F2F4] border border-transparent px-2 pr-7 text-[10px] text-[#424750] outline-none"
+                    />
+                    <MdCheckCircle className="absolute right-2 top-1/2 -translate-y-1/2 text-[#018B8F] text-[12px]" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-[9px] text-[#737782] mb-1">
+                      رقم الهاتف
+                    </label>
+                    <input
+                      type="text"
+                      value="+966 50 123 4567"
+                      readOnly
+                      className="w-full h-[34px] rounded-[4px] bg-[#F1F2F4] border border-transparent px-2 text-[9px] text-[#424750] outline-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[9px] text-[#737782] mb-1">
+                      تاريخ الميلاد
+                    </label>
+                    <input
+                      type="text"
+                      value="1985-05-12"
+                      readOnly
+                      className="w-full h-[34px] rounded-[4px] bg-[#F1F2F4] border border-transparent px-2 text-[9px] text-[#424750] outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[9px] text-[#737782] mb-1">
+                    المهنة
+                  </label>
+                  <input
+                    type="text"
+                    value="مهندس برمجيات"
+                    readOnly
+                    className="w-full h-[34px] rounded-[4px] bg-[#F1F2F4] border border-transparent px-2 text-[10px] text-[#424750] outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[9px] text-[#737782] mb-1">
+                    العنوان
+                  </label>
+                  <input
+                    type="text"
+                    value="الرياض حي الياسمين"
+                    readOnly
+                    className="w-full h-[34px] rounded-[4px] bg-[#F1F2F4] border border-transparent px-2 text-[10px] text-[#424750] outline-none"
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* Security Mobile */}
+            <section className="w-full rounded-[8px] border border-[#D8DEE8] bg-white shadow-sm overflow-hidden">
+              <div className="px-3 py-3 flex items-center justify-between border-b border-[#EEF0F3]">
+                <h3 className="text-[12px] font-bold text-[#003469] flex items-center gap-1">
+                  <MdLockReset className="text-[14px]" />
+                  أمن الحساب
+                </h3>
+              </div>
+
+              <div className="p-3 flex items-center justify-between gap-3">
+                <div className="text-right">
+                  <h4 className="text-[11px] font-bold text-[#252C32]">
+                    تغيير كلمة المرور
+                  </h4>
+                  <p className="text-[9px] text-[#737782] mt-1">
+                    آخر تحديث قبل شهر
+                  </p>
+                </div>
+
+                <button className="h-[32px] px-3 rounded-[4px] border border-[#003469] text-[#003469] text-[10px] font-bold">
+                  تحديث
+                </button>
+              </div>
+            </section>
+          </div>
+        </main>
+        {/* Footer */}
+        <footer className="w-full h-[108px] bg-white border-t border-[#C2C6D2] flex items-center justify-center px-4">
+          <p className="font-[Cairo] font-normal text-[12px] leading-[20px] text-center text-[#6B7280]">
+            © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
+          </p>
+        </footer>
       </div>
     </div>
   );
