@@ -23,6 +23,7 @@ import { useState } from "react";
 import { FiMenu } from "react-icons/fi";
 import Sidebar from "./sideBar";
 
+
 const cardShadow = "shadow-[0_2px_10px_rgba(31,41,55,0.06)]";
 
 const overviewCards = [
@@ -343,7 +344,7 @@ export default function AdminDashboard() {
           </button>
 
           <h2 className="text-[12px] sm:text-lg font-bold text-[#0D4B8E] truncate">
-            مرحباً، Admin أهلاً بك في لوحة إدارة منصة كفيلي
+            اهلاً بك Admin في لوحة التحكم
           </h2>
 
           <div className="flex items-center gap-3 sm:gap-4">
@@ -394,6 +395,7 @@ export default function AdminDashboard() {
               © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
             </p>
           </footer>
+       
         </main>
       </div>
     </div>

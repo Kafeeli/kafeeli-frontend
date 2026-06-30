@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import Sidebar from './Sidebar'
 
 import {
@@ -18,7 +17,6 @@ import {
   FaExclamationCircle,
   FaShieldAlt,
   FaKey,
-  FaArrowRight,
   FaStar,
   FaInfoCircle,
   FaUserTie
@@ -61,10 +59,10 @@ function TopNavbar({ onMenuClick }) {
         </div>
 
         <div className="flex items-center gap-4">
-         <button className="relative w-9 h-9 rounded-full flex items-center justify-center text-[#003469] hover:bg-gray-100 transition">
-          <FaBell />
-          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 border border-white"></span>
-        </button>
+          <button className="relative w-9 h-9 rounded-full flex items-center justify-center text-[#003469] hover:bg-gray-100 transition">
+            <FaBell />
+            <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 border border-white"></span>
+          </button>
 
           <div className="hidden sm:flex items-center gap-3">
             <div className="text-right leading-tight">
@@ -86,33 +84,12 @@ function TopNavbar({ onMenuClick }) {
   )
 }
 
-function StatusBadge({ type, label, icon }) {
-  const styles = {
-    success: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    info: 'bg-blue-50 text-blue-700 border-blue-200',
-    warning: 'bg-orange-50 text-orange-700 border-orange-200',
-    role: 'bg-cyan-50 text-cyan-700 border-cyan-200'
-  }
-
-  return (
-    <span
-      className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs font-bold shadow-sm hover:shadow-md transition ${styles[type]}`}
-    >
-      {icon}
-      {label}
-    </span>
-  )
-}
-
 function ProfileSummaryCard({ data }) {
   return (
     <div className="w-full max-w-[309px] h-[467px] mx-auto bg-white rounded-xl border border-[#C2C6D2] shadow-[0_1px_2px_rgba(0,0,0,0.05)] hover:shadow-md transition overflow-hidden">
-      {/* Header Gradient */}
       <div className="h-[120px] bg-gradient-to-l from-[#003469] to-[#008b8b]" />
 
-      {/* Content */}
       <div className="-mt-16 px-5 pb-5 flex flex-col items-center text-center">
-        {/* Avatar */}
         <div className="w-24 h-24 rounded-full bg-white border-[5px] border-white shadow-lg flex items-center justify-center overflow-hidden">
           {data.avatar ? (
             <img
@@ -127,29 +104,25 @@ function ProfileSummaryCard({ data }) {
           )}
         </div>
 
-        {/* Name */}
         <h2 className="mt-8 text-xl font-bold text-[#003469]">
           {data.displayName}
         </h2>
 
-        {/* Description */}
         <p className="mt-5 text-sm text-gray-600 leading-7">
           عضو في كفيلي منذ عامين، ساهم في كفالة
           <br />
           {data.sponsoredChildren} أطفال
         </p>
 
-        {/* Status Rows */}
         <div className="mt-6 w-full space-y-4">
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-9">
             <span className="text-sm text-gray-600">
               حالة الحساب:
             </span>
 
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#73F2F9] text-[#006E72] text-sm font-bold shadow-sm hover:shadow-md transition">
-            
               <FaCheckCircle className="text-[#007b83] text-sm" />
-                نشط
+              نشط
             </span>
           </div>
 
@@ -159,9 +132,8 @@ function ProfileSummaryCard({ data }) {
             </span>
 
             <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D5E3FF] text-[#024689] text-sm font-bold shadow-sm hover:shadow-md transition">
-             
               <FaShieldAlt className="text-[#0050a8] text-sm" />
-               موثق
+              موثق
             </span>
           </div>
 
@@ -171,7 +143,6 @@ function ProfileSummaryCard({ data }) {
                 <FaStar className="text-[#483100] text-xs" />
               </span>
               تاريخ الانضمام: {data.joinDate}
-              
             </span>
           </div>
         </div>
@@ -182,7 +153,7 @@ function ProfileSummaryCard({ data }) {
 
 function SecurityCard() {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition p-6 text-center">
+    <div className="h-full min-h-[240px] bg-white rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition p-6 text-center flex flex-col justify-center">
       <div className="flex items-center justify-center gap-2 text-[#003469] mb-4">
         <FaShieldAlt className="text-lg" />
         <h3 className="font-bold text-base">
@@ -190,7 +161,7 @@ function SecurityCard() {
         </h3>
       </div>
 
-      <p className="text-sm text-gray-600 leading-7 mb-5 ">
+      <p className="text-sm text-gray-600 leading-7 mb-5">
         تغيير كلمة المرور
         <br />
         يُنصح بتغيير كلمة المرور كل 3 أشهر لضمان أقصى درجات الأمان.
@@ -270,11 +241,10 @@ function EditProfileSection({
   onChange,
   onEdit,
   onSave,
-  onCancel,
-  onBack
+  onCancel
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition overflow-hidden">
+    <div className="h-full bg-white rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition overflow-hidden">
       <div className="px-5 sm:px-7 py-5 border-b border-gray-200 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h2 className="text-base font-bold text-[#003469]">
@@ -288,21 +258,13 @@ function EditProfileSection({
 
         <div className="flex flex-col sm:flex-row gap-3">
           <button
-            onClick={onBack}
-            className="cursor-pointer h-11 px-5 rounded-lg border border-gray-300 text-gray-700 font-bold text-sm hover:bg-gray-100 transition shadow-sm hover:shadow-md flex items-center justify-center gap-2"
-          >
-            <FaArrowRight />
-            العودة للوحة التحكم
-          </button>
-
-          <button
             onClick={onEdit}
             disabled={isEditing}
             className={[
-              'h-11 px-5 rounded-lg font-bold text-sm transition shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer',
+              'h-11 px-5 rounded-lg font-bold text-sm transition shadow-sm hover:shadow-md flex items-center justify-center gap-2',
               isEditing
                 ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : 'bg-[#003469] text-white hover:bg-[#004b8f]'
+                : 'bg-[#003469] text-white hover:bg-[#004b8f] cursor-pointer'
             ].join(' ')}
           >
             <FaEdit />
@@ -407,7 +369,7 @@ function EditProfileSection({
             className={[
               'h-11 px-8 rounded-lg font-bold text-sm transition shadow-sm hover:shadow-md flex items-center justify-center gap-2',
               isEditing
-                ? 'border border-gray-400 text-gray-700 hover:bg-gray-100'
+                ? 'border border-gray-400 text-gray-700 hover:bg-gray-100 cursor-pointer'
                 : 'border border-gray-200 text-gray-400 cursor-not-allowed'
             ].join(' ')}
           >
@@ -421,7 +383,7 @@ function EditProfileSection({
             className={[
               'h-11 px-8 rounded-lg font-bold text-sm transition shadow-sm hover:shadow-md flex items-center justify-center gap-2',
               isEditing
-                ? 'bg-[#003469] text-white hover:bg-[#004b8f]'
+                ? 'bg-[#003469] text-white hover:bg-[#004b8f] cursor-pointer'
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
             ].join(' ')}
           >
@@ -435,8 +397,6 @@ function EditProfileSection({
 }
 
 export default function ProfilePage() {
-  const navigate = useNavigate()
-
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [formData, setFormData] = useState(initialProfileData)
@@ -463,10 +423,6 @@ export default function ProfilePage() {
     setIsEditing(false)
   }
 
-  function handleBackToDashboard() {
-    navigate('/main')
-  }
-
   return (
     <div dir="rtl" className="min-h-screen bg-[#f4f6f9]">
       <div className="flex min-h-screen">
@@ -480,30 +436,35 @@ export default function ProfilePage() {
           <TopNavbar onMenuClick={() => setSidebarOpen(true)} />
 
           <main className="flex-1 p-4 sm:p-5 lg:p-6">
-  <div
-    dir="rtl"
-    className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-5 lg:gap-6"
-  >
-    {/* الملف الشخصي: يمين بالديسكتوب، وأول شيء بالموبايل */}
-    <aside className="w-full lg:w-[300px] xl:w-[320px] shrink-0 space-y-5">
-      <ProfileSummaryCard data={formData} />
-      <SecurityCard />
-    </aside>
+            <div
+              dir="rtl"
+              className="max-w-7xl mx-auto flex flex-col lg:flex-row items-stretch gap-5 lg:gap-6"
+            >
+              <aside className="w-full lg:w-[300px] xl:w-[320px] shrink-0 flex flex-col gap-5 self-stretch">
+                <ProfileSummaryCard data={formData} />
 
-    {/* التعديل: يسار بالديسكتوب، وتحت بالموبايل */}
-    <section className="flex-1 min-w-0">
-      <EditProfileSection
-        formData={formData}
-        isEditing={isEditing}
-        onChange={handleChange}
-        onEdit={handleEdit}
-        onSave={handleSave}
-        onCancel={handleCancel}
-        onBack={handleBackToDashboard}
-      />
-    </section>
-  </div>
-</main>
+                <div className="flex-1">
+                  <SecurityCard />
+                </div>
+              </aside>
+
+              <section className="flex-1 min-w-0 self-stretch">
+                <EditProfileSection
+                  formData={formData}
+                  isEditing={isEditing}
+                  onChange={handleChange}
+                  onEdit={handleEdit}
+                  onSave={handleSave}
+                  onCancel={handleCancel}
+                />
+              </section>
+            </div>
+          </main>
+           <footer className="mt-20 py-2 border-t border-[#E5E7EB] text-center">
+            <p className="text-sm text-[#6B7280] mt-4">
+              © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
+            </p>
+          </footer>
         </div>
       </div>
     </div>

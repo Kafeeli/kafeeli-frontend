@@ -1,6 +1,5 @@
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-
 import Login from "./pages/Login";
 import RegistrationPage from "./pages/RegistrationPage";
 import EmailVerification from "./pages/EmailVerification";
@@ -10,7 +9,7 @@ import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
 import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 import LandingPage from "./pages/LandingPage";
-import MainDashBorad from "./pages/sponsor-dashboard/Dashboard";
+import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
 import GuardianProfile from "./pages/GuardianProfile";
 import ProfilePage from "./pages/sponsor-dashboard/profileDashboard";
 
@@ -34,20 +33,17 @@ function AnimatedRoutes() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        {/* أول ما يفتح الموقع يوديه على صفحة الرئيسية */}
-        <Route path="/" element={<Navigate to="/main" replace />} />
-
-        {/* الرئيسية */}
+      {/*  الرئيسية  في لوحة الكفيل*/}
         <Route
           path="/main"
           element={
             <div dir="rtl" className="min-h-screen bg-gray-50">
-              <MainDashBorad />
+              <MainDashBoard  />
             </div>
           }
         />
 
-        {/* الملف الشخصي */}
+        {/* الملف الشخصي  في لوحة الكفيل*/}
         <Route
           path="/profile"
           element={
@@ -168,7 +164,7 @@ function AnimatedRoutes() {
         />
 
         {/* أي رابط غلط يرجعه على الرئيسية */}
-        <Route path="*" element={<Navigate to="/main" replace />} />
+        <Route path="*" element={<Navigate to="/landing-page" replace />} />
       </Routes>
     </AnimatePresence>
   );
