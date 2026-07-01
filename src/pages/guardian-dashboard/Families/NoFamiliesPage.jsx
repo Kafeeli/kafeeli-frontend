@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
 
 import {
@@ -11,7 +12,6 @@ import {
   MdCheckCircle,
   MdAssignment,
   MdRateReview,
-  MdTabletMac,
   MdFamilyRestroom,
 } from "react-icons/md";
 
@@ -81,18 +81,15 @@ function StepPill({ icon, number, text }) {
   return (
     <div className="h-[38px] px-4 rounded-full bg-white border border-[#E5E7EB] shadow-[0_1px_2px_rgba(16,24,40,0.03)] flex items-center justify-center gap-2 text-[#6B7280]">
       <span className="text-[#003469] text-[17px]">{icon}</span>
-      <span className="font-[Cairo] text-[12px] font-bold">
-        {number}
-      </span>
-      <span className="font-[Cairo] text-[12px]">
-        {text}
-      </span>
+      <span className="font-[Cairo] text-[12px] font-bold">{number}</span>
+      <span className="font-[Cairo] text-[12px]">{text}</span>
     </div>
   );
 }
 
 function NoFamiliesPage() {
   const [openSidebar, setOpenSidebar] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div dir="rtl" className="min-h-screen bg-[#F6F7F9] font-[Cairo]">
@@ -115,13 +112,14 @@ function NoFamiliesPage() {
               </h2>
 
               <p className="mt-5 max-w-[560px] mx-auto font-[Cairo] text-[13px] sm:text-[18px] leading-8 text-[#6B7280]">
-          أضف أول عائلة تقع تحت رعايتك ليتم مراجعتها من الإدارة. نحن هنا
-لمساعدتك في رحلة العطاء.    
+                أضف أول عائلة تقع تحت رعايتك ليتم مراجعتها من الإدارة. نحن هنا
+                لمساعدتك في رحلة العطاء.
               </p>
 
               <div className="mt-10 w-full max-w-[680px] flex flex-col sm:flex-row items-center justify-center gap-4">
                 <button
                   type="button"
+                  onClick={() => navigate("/families/add")}
                   className="w-full sm:w-[280px] h-[56px] rounded-[10px] bg-[#003469] text-white font-[Cairo] text-[15px] sm:text-[16px] font-bold flex items-center justify-center gap-3 hover:bg-[#004B8F] transition shadow-[0_6px_14px_rgba(0,52,105,0.18)] hover:shadow-[0_8px_18px_rgba(0,52,105,0.24)]"
                 >
                   <MdAddCircle className="text-[22px]" />
@@ -165,7 +163,8 @@ function NoFamiliesPage() {
             </section>
           </div>
         </main>
-         <footer className="mt-10 sm:mt-14 lg:mt-20 border-t border-[#E5E7EB] text-center px-4">
+
+        <footer className="mt-10 sm:mt-14 lg:mt-20 border-t border-[#E5E7EB] text-center px-4">
           <p className="text-xs sm:text-sm text-[#6B7280] mt-4 mb-4">
             © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
           </p>
