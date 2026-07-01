@@ -26,7 +26,7 @@ function TopNavbar({ setOpenSidebar }) {
         </button>
 
         <h1 className="font-[Cairo] text-[14px] sm:text-[18px] lg:text-[20px] font-bold text-[#003469] truncate">
-          العائلات المسجلة
+      عائلاتي
         </h1>
       </div>
 

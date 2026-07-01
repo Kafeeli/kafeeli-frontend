@@ -14,6 +14,7 @@ import GuardianProfile from "./pages/GuardianProfile";
 import ProfilePage from "./pages/sponsor-dashboard/profileDashboard";
 import ErrorPage from './pages/guardian-dashboard/Families/ErrorStates';
 import FamilyAccessPendingPage from './pages/guardian-dashboard/Families/FamilyAccessPendingPage';
+import NoFamiliesPage from './pages/guardian-dashboard/Families/NoFamiliesPage';
 
 function PageWrapper({ children }) {
   return (
@@ -76,6 +77,14 @@ function AnimatedRoutes() {
           element={
             <PageWrapper>
               <FamilyAccessPendingPage />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/no-families"
+          element={
+            <PageWrapper>
+              <NoFamiliesPage />
             </PageWrapper>
           }
         />

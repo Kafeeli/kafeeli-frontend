@@ -35,8 +35,7 @@ function TopNavbar({ setOpenSidebar }) {
           </button>
 
           <h1 className="font-[Cairo] text-[15px] font-bold text-[#003469] whitespace-nowrap shrink-0">
-            عائلتي
-          </h1>
+عائلاتي          </h1>
 
           <div className="h-6 w-px bg-[#DDE2EA] shrink-0" />
 
@@ -237,6 +236,11 @@ function FamilyAccessPendingPage() {
             </section>
           </div>
         </main>
+         <footer className="mt-10 sm:mt-14 lg:mt-20 border-t border-[#E5E7EB] text-center px-4">
+          <p className="text-xs sm:text-sm text-[#6B7280] mt-4 mb-4">
+            © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
+          </p>
+        </footer>
       </div>
     </div>
   );
