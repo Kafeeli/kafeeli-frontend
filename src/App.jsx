@@ -12,6 +12,8 @@ import LandingPage from "./pages/LandingPage";
 import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
 import GuardianProfile from "./pages/GuardianProfile";
 import ProfilePage from "./pages/sponsor-dashboard/profileDashboard";
+import Sidebar from './pages/guardian-dashboard/Families/ErrorStates';
+
 
 function PageWrapper({ children }) {
   return (
@@ -52,9 +54,6 @@ function AnimatedRoutes() {
             </div>
           }
         />
-
-        
-
         <Route
           path="/landing-page"
           element={
@@ -78,6 +77,14 @@ function AnimatedRoutes() {
           element={
             <PageWrapper>
               <RegistrationPage />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/side-bar"
+          element={
+            <PageWrapper>
+              <Sidebar />
             </PageWrapper>
           }
         />
@@ -154,6 +161,14 @@ function AnimatedRoutes() {
           }
         />
 
+        <Route
+          path="/guardian-profile"
+          element={
+            <PageWrapper>
+              <GuardianProfile />
+            </PageWrapper>
+          }
+        />
         <Route
           path="/guardian-profile"
           element={
