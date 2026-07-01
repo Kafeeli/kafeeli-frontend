@@ -13,7 +13,7 @@ import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
 import GuardianProfile from "./pages/GuardianProfile";
 import ProfilePage from "./pages/sponsor-dashboard/profileDashboard";
 import ErrorPage from './pages/guardian-dashboard/Families/ErrorStates';
-
+import FamilyAccessPendingPage from './pages/guardian-dashboard/Families/FamilyAccessPendingPage';
 
 function PageWrapper({ children }) {
   return (
@@ -68,6 +68,14 @@ function AnimatedRoutes() {
           element={
             <PageWrapper>
               <Login />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/family-access-pending"
+          element={
+            <PageWrapper>
+              <FamilyAccessPendingPage />
             </PageWrapper>
           }
         />
