@@ -269,6 +269,11 @@ function Dashboard() {
           </div>
 
         </main>
+          <footer className="mt-20 py-2 border-t border-[#E5E7EB] text-center">
+            <p className="text-sm text-[#6B7280] mt-4">
+              © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
+            </p>
+          </footer>
       </div>
     </div>
   )
