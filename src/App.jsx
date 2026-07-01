@@ -12,7 +12,7 @@ import LandingPage from "./pages/LandingPage";
 import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
 import GuardianProfile from "./pages/GuardianProfile";
 import ProfilePage from "./pages/sponsor-dashboard/profileDashboard";
-import Sidebar from './pages/guardian-dashboard/Families/ErrorStates';
+import ErrorPage from './pages/guardian-dashboard/Families/ErrorStates';
 
 
 function PageWrapper({ children }) {
@@ -81,10 +81,10 @@ function AnimatedRoutes() {
           }
         />
         <Route
-          path="/side-bar"
+          path="/error-Page"
           element={
             <PageWrapper>
-              <Sidebar />
+              <ErrorPage />
             </PageWrapper>
           }
         />
