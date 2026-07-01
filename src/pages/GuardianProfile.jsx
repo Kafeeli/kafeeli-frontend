@@ -28,6 +28,7 @@ import {
   MdPayments,
   MdPublishedWithChanges,
 } from "react-icons/md";
+import Sidebar from "../components/Sidebar";
 import { MdSentimentSatisfiedAlt } from "react-icons/md";
 import headerImg from "../assets/headerimg.jpg";
 import kafeeliLogo from "../assets/kafeeli-removebg-preview1.png";
@@ -136,108 +137,11 @@ function GuardianProfile() {
       dir="rtl"
       className="min-h-screen bg-[#f5f6f8] flex overflow-x-hidden font-[Cairo,sans-serif]"
     >
-      {openSidebar && (
-        <div
-          onClick={() => setOpenSidebar(false)}
-          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
-        />
-      )}
-
-      {/* Sidebar */}
-      {/* Sidebar */}
-      <aside
-        className={`
-    fixed top-0 right-0 z-50
-    w-[256px] h-screen
-    bg-[#003469]
-    border-l border-[#C2C6D2]
-    flex flex-col
-    pt-4 pb-5
-    overflow-y-auto overflow-x-hidden
-    transition-transform duration-300
-    ${openSidebar ? "translate-x-0" : "translate-x-full"}
-    lg:translate-x-0
-  `}
-      >
-        {/* Close button - Mobile فقط */}
-        <div className="lg:hidden flex justify-start px-4 mb-4">
-          <button
-            onClick={() => setOpenSidebar(false)}
-            className="w-9 h-9 rounded-lg border border-white/30 flex items-center justify-center text-white"
-          >
-            <MdClose className="text-xl" />
-          </button>
-        </div>
-
-        {/* Top Content */}
-        <div className="flex flex-col gap-[0px]">
-          {/* Logo */}
-          <div className="flex flex-col items-center justify-center px-4 -mt-2">
-            <div className="w-[72px] h-[72px] rounded-full bg-white/15 flex items-center justify-center mb-5">
-              <img
-                src={kafeeliLogo}
-                alt="Kafeeli Logo"
-                className="w-[90px] h-[90px] object-contain"
-              />
-            </div>
-
-            <div className="w-fit h-auto flex flex-col items-center justify-center gap-5 text-center">
-              <h2 className="font-[Cairo] font-bold text-[23px] leading-[3px] tracking-[0px] text-center text-[#FFDEAA]">
-                كفيلي
-              </h2>
-
-              <p className="font-[Cairo] font-normal text-[14px] leading-[16px] tracking-[0px] text-center text-[#e6ecf7] whitespace-nowrap">
-                لوحة الإدارة الذكية
-              </p>
-            </div>
-          </div>
-
-          {/* Menu */}
-          <nav className="px-4 flex-1 mt-2">
-            <hr className="border-white/25" />
-
-            <div className="space-y-0.2">
-              {menuItems.map((item) => (
-                <button
-                  key={item.title}
-                  onClick={() => setOpenSidebar(false)}
-                  className={`
-              w-full h-[27px]
-              flex items-center gap-3
-              px-3 rounded-[6px]
-              font-[Cairo] text-[12px] leading-[20px]
-              text-right transition
-              ${
-                item.active
-                  ? "bg-[#47DBE0] text-[#003469] font-bold"
-                  : "text-white/85 font-normal hover:bg-white/10 hover:text-white"
-              }
-            `}
-                >
-                  <span
-                    className={`
-                text-[16px] flex items-center shrink-0
-                ${item.active ? "text-[#003469]" : "text-white/85"}
-              `}
-                  >
-                    {item.icon}
-                  </span>
-
-                  <span className="truncate">{item.title}</span>
-                </button>
-              ))}
-            </div>
-          </nav>
-        </div>
-
-        {/* Logout */}
-        <div className="mt-2 border-t border-white/25 px-4 pt-4">
-          <button className="w-full h-[25px] flex items-center gap-3 px-3 rounded-[6px] font-[Cairo] text-[12px] leading-[20px] text-white/90 hover:bg-white/10 transition cursor-pointer">
-            <MdLogout className="text-[15px]" />
-            <span>تسجيل الخروج</span>
-          </button>
-        </div>
-      </aside>
+      <Sidebar
+        openSidebar={openSidebar}
+        setOpenSidebar={setOpenSidebar}
+        activeItem="ملفي الشخصي"
+      />
       {/* Header + Content */}
       {/* Header + Content */}
       <div className="flex-1 min-w-0 w-full lg:mr-[255px]">
