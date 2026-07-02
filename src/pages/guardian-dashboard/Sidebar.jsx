@@ -75,7 +75,7 @@ function Sidebar({ openSidebar, setOpenSidebar, activeItem = "ملفي الشخ�
           border-l border-[#C2C6D2]
           flex flex-col
           pt-4 pb-5
-           overflow-y-hidden overflow-x-hidden
+          overflow-y-auto overflow-x-hidden
           transition-transform duration-300
           ${openSidebar ? "translate-x-0" : "translate-x-full"}
           lg:translate-x-0

@@ -21,6 +21,8 @@ import ErrorPage from "./pages/guardian-dashboard/Families/ErrorStates";
 import FamilyAccessPendingPage from "./pages/guardian-dashboard/Families/FamilyAccessPendingPage";
 import NoFamiliesPage from "./pages/guardian-dashboard/Families/NoFamiliesPage";
 import AddFamilyPage from "./pages/guardian-dashboard/Families/AddFamilyPage";
+import ManagingFamilyCards from "./pages/guardian-dashboard/Families/ManagingFamilyCards";
+import FamilyDetailsPage from "./pages/guardian-dashboard/Families/FamilyDetailsPage";
 
 function PageWrapper({ children }) {
   return (
@@ -164,6 +166,15 @@ function AnimatedRoutes() {
         />
 
         <Route
+          path="/families/manage"
+          element={
+            <PageWrapper>
+              <ManagingFamilyCards />
+            </PageWrapper>
+          }
+        />
+
+        <Route
           path="/families/access-pending"
           element={
             <PageWrapper>
@@ -180,12 +191,40 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
+        <Route
+        path="/families/details"
+        element={
+        <PageWrapper>
+          <FamilyDetailsPage />
+        </PageWrapper>
+      }
+      />
 
         {/* Old routes redirects */}
-        <Route path="/Add-Family-Page" element={<Navigate to="/families/add" replace />} />
-        <Route path="/no-families" element={<Navigate to="/families" replace />} />
-        <Route path="/family-access-pending" element={<Navigate to="/families/access-pending" replace />} />
-        <Route path="/error-Page" element={<Navigate to="/families/error" replace />} />
+        <Route
+          path="/Mange"
+          element={<Navigate to="/families/manage" replace />}
+        />
+
+        <Route
+          path="/Add-Family-Page"
+          element={<Navigate to="/families/add" replace />}
+        />
+
+        <Route
+          path="/no-families"
+          element={<Navigate to="/families" replace />}
+        />
+
+        <Route
+          path="/family-access-pending"
+          element={<Navigate to="/families/access-pending" replace />}
+        />
+
+        <Route
+          path="/error-Page"
+          element={<Navigate to="/families/error" replace />}
+        />
 
         {/* Dashboards */}
         <Route
