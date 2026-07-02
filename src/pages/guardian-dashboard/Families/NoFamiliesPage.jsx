@@ -126,13 +126,6 @@ function NoFamiliesPage() {
                   إضافة أول عائلة
                 </button>
 
-                <button
-                  type="button"
-                  className="w-full sm:w-[280px] h-[56px] rounded-[10px] bg-white border border-[#9DD6DA] text-[#007B83] font-[Cairo] text-[15px] sm:text-[16px] font-bold flex items-center justify-center gap-3 hover:bg-[#F0FCFD] transition shadow-sm hover:shadow-md"
-                >
-                  <MdHelpOutline className="text-[22px]" />
-                  كيفية الإضافة؟
-                </button>
               </div>
 
               <div className="mt-12 w-full max-w-[700px] border-t border-[#E5E7EB] pt-8">

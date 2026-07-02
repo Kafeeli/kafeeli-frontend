@@ -42,16 +42,12 @@ const stats = [
   },
   {
     id: "needs-action",
-    label: (
-      <>
-        مخفية / موقوفة
-        <br />
-        تحتاج تعديل
-      </>
-    ),
-    value: "1",
+    labelTop: "مخفية / موقوفة",
+    labelBottom: "تحتاج تعديل",
+    value: "3",
     icon: <MdWarningAmber />,
-    iconBox: "bg-[#FFD1D1] text-[#D11F1F]",
+    iconBox: "bg-[#FFD8D8] text-[#C81E1E]",
+    special: true,
   },
 ];
 
@@ -220,20 +216,44 @@ function StatCard({ item }) {
         {item.icon}
       </div>
 
-      <div className="text-right flex-1 min-w-0">
-        <p className="font-[Cairo] text-[16px] leading-7 text-[#4B5563]">
-          {item.label}
-        </p>
+      {item.special ? (
+        <div className="text-right flex-1 min-w-0" dir="rtl">
+          <p className="font-[Cairo] text-[16px] leading-7 text-[#4B5563] whitespace-nowrap">
+            {item.labelTop}
+          </p>
 
-        <p className="mt-1 font-[Cairo] text-[17px] font-bold text-[#111827]">
-          {item.value}
-        </p>
-      </div>
+          <div className="mt-1 flex items-center justify-start gap-2 whitespace-nowrap">
+            <span className="font-[Cairo] text-[16px] leading-7 text-[#4B5563]">
+              {item.labelBottom}
+            </span>
+
+            <span className="font-[Cairo] text-[16px] leading-7 text-[#4B5563]">
+              /
+            </span>
+
+            <span className="font-[Cairo] text-[17px] font-bold text-[#111827]">
+              {item.value}
+            </span>
+          </div>
+        </div>
+      ) : (
+        <div className="text-right flex-1 min-w-0">
+          <p className="font-[Cairo] text-[16px] leading-7 text-[#4B5563]">
+            {item.label}
+          </p>
+
+          <p className="mt-1 font-[Cairo] text-[17px] font-bold text-[#111827]">
+            {item.value}
+          </p>
+        </div>
+      )}
     </div>
   );
 }
 
 function FamilyCard({ card }) {
+  const navigate = useNavigate();
+
   return (
     <article
       className={`h-full min-h-[430px] overflow-hidden rounded-[12px] border ${card.borderClass} ${card.cardBg} shadow-sm hover:shadow-md transition flex flex-col`}
@@ -322,6 +342,7 @@ function FamilyCard({ card }) {
         <div className="mt-auto pt-4">
           <button
             type="button"
+            onClick={() => navigate("/families/details")}
             className="w-full h-[44px] rounded-[7px] border border-[#003469] bg-white text-[#003469] font-[Cairo] text-[15px] font-bold hover:bg-[#003469] hover:text-white transition"
           >
             عرض التفاصيل
