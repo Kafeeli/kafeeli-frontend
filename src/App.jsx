@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+
 import Login from "./pages/Login";
 import RegistrationPage from "./pages/RegistrationPage";
 import EmailVerification from "./pages/EmailVerification";
@@ -7,11 +8,19 @@ import EmailVerificationSuccess from "./pages/EmailVerificationSuccess";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
+
 import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 import LandingPage from "./pages/LandingPage";
+
 import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
-import GuardianProfile from "./pages/GuardianProfile";
 import ProfilePage from "./pages/sponsor-dashboard/profileDashboard";
+
+import GuardianProfile from "./pages/GuardianProfile";
+
+import ErrorPage from "./pages/guardian-dashboard/Families/ErrorStates";
+import FamilyAccessPendingPage from "./pages/guardian-dashboard/Families/FamilyAccessPendingPage";
+import NoFamiliesPage from "./pages/guardian-dashboard/Families/NoFamiliesPage";
+import AddFamilyPage from "./pages/guardian-dashboard/Families/AddFamilyPage";
 
 function PageWrapper({ children }) {
   return (
@@ -33,39 +42,18 @@ function AnimatedRoutes() {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-      {/*  الرئيسية  في لوحة الكفيل*/}
-        <Route
-          path="/main"
-          element={
-            <div dir="rtl" className="min-h-screen bg-gray-50">
-              <MainDashBoard  />
-            </div>
-          }
-        />
-
-        {/* الملف الشخصي  في لوحة الكفيل*/}
-        <Route
-          path="/profile"
-          element={
-            <div dir="rtl" className="min-h-screen bg-gray-50">
-              <ProfilePage />
-            </div>
-          }
-        />
-
-        
-
-        <Route
-          path="/landing-page"
-          element={
-            <div dir="rtl" className="min-h-screen bg-gray-50">
-              <LandingPage />
-            </div>
-          }
-        />
-
+        {/* Auth */}
         <Route
           path="/"
+          element={
+            <PageWrapper>
+              <Login />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/login"
           element={
             <PageWrapper>
               <Login />
@@ -127,6 +115,79 @@ function AnimatedRoutes() {
           }
         />
 
+        {/* Landing */}
+        <Route
+          path="/landing-page"
+          element={
+            <div dir="rtl" className="min-h-screen bg-gray-50">
+              <LandingPage />
+            </div>
+          }
+        />
+
+        {/* Sponsor Dashboard */}
+        <Route
+          path="/main"
+          element={
+            <div dir="rtl" className="min-h-screen bg-gray-50">
+              <MainDashBoard />
+            </div>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <div dir="rtl" className="min-h-screen bg-gray-50">
+              <ProfilePage />
+            </div>
+          }
+        />
+
+        {/* Guardian Families Pages */}
+        <Route
+          path="/families"
+          element={
+            <PageWrapper>
+              <NoFamiliesPage />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/families/add"
+          element={
+            <PageWrapper>
+              <AddFamilyPage />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/families/access-pending"
+          element={
+            <PageWrapper>
+              <FamilyAccessPendingPage />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/families/error"
+          element={
+            <PageWrapper>
+              <ErrorPage />
+            </PageWrapper>
+          }
+        />
+
+        {/* Old routes redirects */}
+        <Route path="/Add-Family-Page" element={<Navigate to="/families/add" replace />} />
+        <Route path="/no-families" element={<Navigate to="/families" replace />} />
+        <Route path="/family-access-pending" element={<Navigate to="/families/access-pending" replace />} />
+        <Route path="/error-Page" element={<Navigate to="/families/error" replace />} />
+
+        {/* Dashboards */}
         <Route
           path="/sponsor-dashboard"
           element={
@@ -163,7 +224,7 @@ function AnimatedRoutes() {
           }
         />
 
-        {/* أي رابط غلط يرجعه على الرئيسية */}
+        {/* Fallback */}
         <Route path="*" element={<Navigate to="/landing-page" replace />} />
       </Routes>
     </AnimatePresence>

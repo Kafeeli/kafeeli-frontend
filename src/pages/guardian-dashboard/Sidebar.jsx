@@ -12,7 +12,7 @@ import {
   MdSettings,
 } from "react-icons/md";
 
-import kafeeliLogo from "../assets/kafeeli-removebg-preview1.png";
+import kafeeliLogo from "../../assets/kafeeli-removebg-preview1.png";
 
 function Sidebar({ openSidebar, setOpenSidebar, activeItem = "ملفي الشخصي" }) {
   const menuItems = [

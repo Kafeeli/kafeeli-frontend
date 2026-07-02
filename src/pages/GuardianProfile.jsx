@@ -28,7 +28,7 @@ import {
   MdPayments,
   MdPublishedWithChanges,
 } from "react-icons/md";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../pages/guardian-dashboard/Sidebar";
 import { MdSentimentSatisfiedAlt } from "react-icons/md";
 import headerImg from "../assets/headerimg.jpg";
 import kafeeliLogo from "../assets/kafeeli-removebg-preview1.png";
