@@ -1,6 +1,5 @@
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
-
 import Login from "./pages/Login";
 import RegistrationPage from "./pages/RegistrationPage";
 import EmailVerification from "./pages/EmailVerification";
