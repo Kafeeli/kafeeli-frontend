@@ -6,18 +6,17 @@ import {
   MdNotificationsNone,
   MdPerson,
   MdKeyboardArrowLeft,
-  MdVisibilityOff,
   MdInfoOutline,
-
+  MdVerifiedUser,
   MdPictureAsPdf,
   MdFamilyRestroom,
   MdOutlineRemoveRedEye,
-  MdVerifiedUser
+  MdHourglassBottom,
 } from "react-icons/md";
 
 const familyInfo = {
   title: "عائلة المرحوم أحمد جابر العتيبي",
-  status: "مخفية",
+  status: "قيد المراجعة",
   guardianName: "أحمد جابر العتيبي رحمه الله",
   city: "الرياض - حي اليرموك",
   address: "شارع خالد بن الوليد، مبنى ٤٤، شقة ١٢",
@@ -134,7 +133,7 @@ function PageHeader() {
         {familyInfo.title}
       </h2>
 
-      <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-[#D9E5F7] px-4 py-1.5 font-[Cairo] text-[12px] font-bold text-[#6B7280]">
+      <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-[#DCEBFF] px-4 py-1.5 font-[Cairo] text-[12px] font-bold text-[#003469]">
         <span className="w-1.5 h-1.5 rounded-full bg-current" />
         {familyInfo.status}
       </span>
@@ -142,21 +141,20 @@ function PageHeader() {
   );
 }
 
-function HiddenAlert() {
+function PendingAlert() {
   return (
-    <div className="mt-7 rounded-[9px] bg-[#D5E7FF] border-l-[5px] border-[#7E8EA6] px-5 py-4 flex items-center gap-4">
+    <div className="mt-7 rounded-[9px] bg-[#D5E7FF] border-r-[5px] border-[#2563EB] px-5 py-4 flex items-center gap-4">
       <div className="w-[44px] h-[44px] rounded-full bg-white/65 flex items-center justify-center shrink-0">
-        <MdVisibilityOff className="text-[#6B7280] text-[24px]" />
+        <MdHourglassBottom className="text-[#003469] text-[25px]" />
       </div>
 
       <div className="text-right">
-        <p className="font-[Cairo] text-[14px] font-bold text-[#374151]">
-          حالة العائلة: مخفية
+        <p className="font-[Cairo] text-[18px] font-bold text-[#003469]">
+          حالة العائلة: قيد المراجعة
         </p>
 
-        <p className="mt-1 font-[Cairo] text-[12px] sm:text-[13px] leading-6 text-[#6B7280]">
-          تم إخفاء بيانات هذه العائلة من القوائم العامة، ولا يمكن الوصول إليها
-          إلا من قبل المسؤولين المخولين.
+        <p className="mt-1 font-[Cairo] text-[12px] sm:text-[13px] leading-6 text-[#4B5563]">
+          جاري التحقق من المستندات والبيانات المقدمة من قبل فريق الإشراف.
         </p>
       </div>
     </div>
@@ -186,7 +184,9 @@ function FamilyInfoCard() {
           المعلومات العامة
         </h3>
 
-        <MdInfoOutline className="text-[#003469] text-[22px]" />
+        <span className="w-[30px] h-[30px] rounded-full bg-[#EAF2FF] flex items-center justify-center shrink-0">
+          <MdInfoOutline className="text-[#003469] text-[20px]" />
+        </span>
       </div>
 
       <div className="mt-7 grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-6">
@@ -223,17 +223,17 @@ function FamilyInfoCard() {
 function DocumentsCard() {
   return (
     <section className="bg-white border border-[#C9D2E3] rounded-[14px] px-5 py-6 shadow-sm h-full min-h-[360px]">
-      <div className="flex items-center  gap-2">
-  <span className="w-[30px] h-[30px] rounded-full bg-[#EAF2FF] flex items-center justify-center shrink-0">
-    <MdVerifiedUser className="text-[#003469] text-[20px]" />
-  </span>
+      <div className="flex items-center gap-2">
+        <span className="w-[30px] h-[30px] rounded-full bg-[#EAF2FF] flex items-center justify-center shrink-0">
+          <MdVerifiedUser className="text-[#003469] text-[20px]" />
+        </span>
 
-  <h3 className="font-[Cairo] text-[16px] font-bold text-[#374151] whitespace-nowrap">
-    إثبات حالة العائلة
-  </h3>
-</div>
+        <h3 className="font-[Cairo] text-[16px] font-bold text-[#374151] whitespace-nowrap">
+          إثبات حالة العائلة
+        </h3>
+      </div>
 
-      <div className="mt-8">
+      <div className="mt-8 max-w-[280px] mx-auto">
         {documents.map((doc) => (
           <div
             key={doc.name}
@@ -338,7 +338,7 @@ function OrphanCard({ orphan }) {
   );
 }
 
-function FamilyDetailsPage() {
+function PendingFamilyDetailsPage() {
   const [openSidebar, setOpenSidebar] = useState(false);
 
   return (
@@ -358,14 +358,14 @@ function FamilyDetailsPage() {
 
             <PageHeader />
 
-            <HiddenAlert />
+            <PendingAlert />
 
             <section className="mt-8 grid grid-cols-1 lg:grid-cols-[1fr_330px] gap-6 items-stretch">
               <FamilyInfoCard />
               <DocumentsCard />
             </section>
 
-            <section className="mt-12">
+            <section className="mt-10">
               <div className="flex items-center justify-between gap-3 mb-6">
                 <div className="flex items-center gap-2">
                   <MdFamilyRestroom className="text-[#003469] text-[25px]" />
@@ -395,4 +395,4 @@ function FamilyDetailsPage() {
   );
 }
 
-export default FamilyDetailsPage;
+export default PendingFamilyDetailsPage;

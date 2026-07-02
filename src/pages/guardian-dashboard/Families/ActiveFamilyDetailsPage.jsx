@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
 
 import {
@@ -6,18 +7,21 @@ import {
   MdNotificationsNone,
   MdPerson,
   MdKeyboardArrowLeft,
-  MdVisibilityOff,
   MdInfoOutline,
-
+  MdVerifiedUser,
   MdPictureAsPdf,
+  MdLocationOn,
   MdFamilyRestroom,
   MdOutlineRemoveRedEye,
-  MdVerifiedUser
+  MdEdit,
+  MdCheckCircle,
+  MdAdd,
+  MdPersonAddAlt1,
 } from "react-icons/md";
 
 const familyInfo = {
   title: "عائلة المرحوم أحمد جابر العتيبي",
-  status: "مخفية",
+  status: "نشطة",
   guardianName: "أحمد جابر العتيبي رحمه الله",
   city: "الرياض - حي اليرموك",
   address: "شارع خالد بن الوليد، مبنى ٤٤، شقة ١٢",
@@ -64,7 +68,7 @@ const orphans = [
     gender: "ذكر",
     education: "تمهيدي",
     idNumber: "118****321",
-    status: "تحت السن الدراسي",
+    status: "تحت الدعم الدراسي",
     avatarBg: "bg-[#EAF2FF]",
   },
 ];
@@ -128,35 +132,50 @@ function Breadcrumb() {
 }
 
 function PageHeader() {
+  const navigate = useNavigate();
+
   return (
     <section className="mt-3 text-right">
-      <h2 className="font-[Cairo] text-[25px] sm:text-[34px] lg:text-[39px] font-bold text-[#111827] leading-tight">
-        {familyInfo.title}
-      </h2>
+      <div className="flex flex-col gap-3">
+        <h2 className="font-[Cairo] text-[25px] sm:text-[34px] lg:text-[39px] font-bold text-[#111827] leading-tight">
+          {familyInfo.title}
+        </h2>
 
-      <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-[#D9E5F7] px-4 py-1.5 font-[Cairo] text-[12px] font-bold text-[#6B7280]">
-        <span className="w-1.5 h-1.5 rounded-full bg-current" />
-        {familyInfo.status}
-      </span>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#D9F7F1] px-4 py-1.5 font-[Cairo] text-[12px] font-bold text-[#008C78]">
+            <span className="w-1.5 h-1.5 rounded-full bg-current" />
+            {familyInfo.status}
+          </span>
+
+          <button
+            type="button"
+            onClick={() => navigate("/families/edit")}
+            className="h-[32px] rounded-full border border-[#D8E0EA] bg-white px-4 font-[Cairo] text-[12px] font-bold text-[#374151] flex items-center gap-2 hover:bg-[#F8FAFC] transition"
+          >
+            <MdEdit className="text-[15px]" />
+            تعديل البيانات
+          </button>
+        </div>
+      </div>
     </section>
   );
 }
 
-function HiddenAlert() {
+function ActiveAlert() {
   return (
-    <div className="mt-7 rounded-[9px] bg-[#D5E7FF] border-l-[5px] border-[#7E8EA6] px-5 py-4 flex items-center gap-4">
-      <div className="w-[44px] h-[44px] rounded-full bg-white/65 flex items-center justify-center shrink-0">
-        <MdVisibilityOff className="text-[#6B7280] text-[24px]" />
+    <div className="mt-7 rounded-[9px] bg-[#7EE5D8] px-5 py-4 flex items-center gap-4">
+      <div className="w-[44px] h-[44px] rounded-full bg-white/55 flex items-center justify-center shrink-0">
+        <MdCheckCircle className="text-[#007B83] text-[25px]" />
       </div>
 
       <div className="text-right">
-        <p className="font-[Cairo] text-[14px] font-bold text-[#374151]">
-          حالة العائلة: مخفية
+        <p className="font-[Cairo] text-[18px] font-bold text-[#374151]">
+          حالة العائلة: نشطة ومعتمدة
         </p>
 
-        <p className="mt-1 font-[Cairo] text-[12px] sm:text-[13px] leading-6 text-[#6B7280]">
-          تم إخفاء بيانات هذه العائلة من القوائم العامة، ولا يمكن الوصول إليها
-          إلا من قبل المسؤولين المخولين.
+        <p className="mt-1 font-[Cairo] text-[12px] sm:text-[13px] leading-6 text-[#4B5563]">
+          تم التحقق من كافة المستندات المطلوبة، العائلة مؤهلة للحصول على الدعم
+          الدوري.
         </p>
       </div>
     </div>
@@ -186,7 +205,9 @@ function FamilyInfoCard() {
           المعلومات العامة
         </h3>
 
-        <MdInfoOutline className="text-[#003469] text-[22px]" />
+        <span className="w-[30px] h-[30px] rounded-full bg-[#EAF2FF] flex items-center justify-center shrink-0">
+          <MdInfoOutline className="text-[#003469] text-[20px]" />
+        </span>
       </div>
 
       <div className="mt-7 grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-6">
@@ -224,16 +245,16 @@ function DocumentsCard() {
   return (
     <section className="bg-white border border-[#C9D2E3] rounded-[14px] px-5 py-6 shadow-sm h-full min-h-[360px]">
       <div className="flex items-center  gap-2">
-  <span className="w-[30px] h-[30px] rounded-full bg-[#EAF2FF] flex items-center justify-center shrink-0">
-    <MdVerifiedUser className="text-[#003469] text-[20px]" />
-  </span>
+        <span className="w-[30px] h-[30px] rounded-full bg-[#EAF2FF] flex items-center justify-center shrink-0">
+          <MdVerifiedUser className="text-[#003469] text-[20px]" />
+        </span>
 
-  <h3 className="font-[Cairo] text-[16px] font-bold text-[#374151] whitespace-nowrap">
-    إثبات حالة العائلة
-  </h3>
-</div>
+        <h3 className="font-[Cairo] text-[16px] font-bold text-[#374151] whitespace-nowrap">
+          إثبات حالة العائلة
+        </h3>
+      </div>
 
-      <div className="mt-8">
+      <div className="mt-8 max-w-[280px] mx-auto">
         {documents.map((doc) => (
           <div
             key={doc.name}
@@ -338,7 +359,7 @@ function OrphanCard({ orphan }) {
   );
 }
 
-function FamilyDetailsPage() {
+function ActiveFamilyDetailsPage() {
   const [openSidebar, setOpenSidebar] = useState(false);
 
   return (
@@ -358,14 +379,24 @@ function FamilyDetailsPage() {
 
             <PageHeader />
 
-            <HiddenAlert />
+            <ActiveAlert />
 
             <section className="mt-8 grid grid-cols-1 lg:grid-cols-[1fr_330px] gap-6 items-stretch">
               <FamilyInfoCard />
               <DocumentsCard />
             </section>
 
-            <section className="mt-12">
+            <section className="mt-8">
+              <button
+                type="button"
+                className="h-[44px] rounded-[8px] bg-[#003469] text-white font-[Cairo] text-[14px] font-bold px-5 flex items-center gap-2 hover:bg-[#053c74] transition shadow-sm"
+              >
+                <MdPersonAddAlt1 className="text-[20px]" />
+                إضافة يتيم جديد
+              </button>
+            </section>
+
+            <section className="mt-5">
               <div className="flex items-center justify-between gap-3 mb-6">
                 <div className="flex items-center gap-2">
                   <MdFamilyRestroom className="text-[#003469] text-[25px]" />
@@ -395,4 +426,4 @@ function FamilyDetailsPage() {
   );
 }
 
-export default FamilyDetailsPage;
+export default ActiveFamilyDetailsPage;

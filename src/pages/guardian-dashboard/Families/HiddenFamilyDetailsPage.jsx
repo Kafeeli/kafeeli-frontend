@@ -8,11 +8,10 @@ import {
   MdKeyboardArrowLeft,
   MdVisibilityOff,
   MdInfoOutline,
-
+  MdVerifiedUser,
   MdPictureAsPdf,
   MdFamilyRestroom,
   MdOutlineRemoveRedEye,
-  MdVerifiedUser
 } from "react-icons/md";
 
 const familyInfo = {
@@ -144,13 +143,13 @@ function PageHeader() {
 
 function HiddenAlert() {
   return (
-    <div className="mt-7 rounded-[9px] bg-[#D5E7FF] border-l-[5px] border-[#7E8EA6] px-5 py-4 flex items-center gap-4">
+    <div className="mt-7 rounded-[9px] bg-[#D5E7FF] border-r-[5px] border-[#7E8EA6] px-5 py-4 flex items-center gap-4">
       <div className="w-[44px] h-[44px] rounded-full bg-white/65 flex items-center justify-center shrink-0">
         <MdVisibilityOff className="text-[#6B7280] text-[24px]" />
       </div>
 
       <div className="text-right">
-        <p className="font-[Cairo] text-[14px] font-bold text-[#374151]">
+        <p className="font-[Cairo] text-[18px] font-bold text-[#374151]">
           حالة العائلة: مخفية
         </p>
 
@@ -186,7 +185,9 @@ function FamilyInfoCard() {
           المعلومات العامة
         </h3>
 
-        <MdInfoOutline className="text-[#003469] text-[22px]" />
+        <span className="w-[30px] h-[30px] rounded-full bg-[#EAF2FF] flex items-center justify-center shrink-0">
+          <MdInfoOutline className="text-[#003469] text-[20px]" />
+        </span>
       </div>
 
       <div className="mt-7 grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-6">
@@ -223,17 +224,17 @@ function FamilyInfoCard() {
 function DocumentsCard() {
   return (
     <section className="bg-white border border-[#C9D2E3] rounded-[14px] px-5 py-6 shadow-sm h-full min-h-[360px]">
-      <div className="flex items-center  gap-2">
-  <span className="w-[30px] h-[30px] rounded-full bg-[#EAF2FF] flex items-center justify-center shrink-0">
-    <MdVerifiedUser className="text-[#003469] text-[20px]" />
-  </span>
+      <div className="flex items-center gap-2">
+        <span className="w-[30px] h-[30px] rounded-full bg-[#EAF2FF] flex items-center justify-center shrink-0">
+          <MdVerifiedUser className="text-[#003469] text-[20px]" />
+        </span>
 
-  <h3 className="font-[Cairo] text-[16px] font-bold text-[#374151] whitespace-nowrap">
-    إثبات حالة العائلة
-  </h3>
-</div>
+        <h3 className="font-[Cairo] text-[16px] font-bold text-[#374151] whitespace-nowrap">
+          إثبات حالة العائلة
+        </h3>
+      </div>
 
-      <div className="mt-8">
+      <div className="mt-8 max-w-[280px] mx-auto">
         {documents.map((doc) => (
           <div
             key={doc.name}
@@ -338,7 +339,7 @@ function OrphanCard({ orphan }) {
   );
 }
 
-function FamilyDetailsPage() {
+function HiddenFamilyDetailsPage() {
   const [openSidebar, setOpenSidebar] = useState(false);
 
   return (
@@ -365,7 +366,7 @@ function FamilyDetailsPage() {
               <DocumentsCard />
             </section>
 
-            <section className="mt-12">
+            <section className="mt-10">
               <div className="flex items-center justify-between gap-3 mb-6">
                 <div className="flex items-center gap-2">
                   <MdFamilyRestroom className="text-[#003469] text-[25px]" />
@@ -394,5 +395,4 @@ function FamilyDetailsPage() {
     </div>
   );
 }
-
-export default FamilyDetailsPage;
+export default HiddenFamilyDetailsPage;
