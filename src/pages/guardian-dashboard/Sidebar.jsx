@@ -12,51 +12,40 @@ import {
   MdSettings,
 } from "react-icons/md";
 
-import kafeeliLogo from "../../assets/kafeeli-removebg-preview1.png";
+import kafeeliLogo from "../../assets/kafeeli-logo.png";
 
-function Sidebar({ openSidebar, setOpenSidebar, activeItem = "ملفي الشخصي" }) {
+function Sidebar({ openSidebar, setOpenSidebar, activeItem = "الملف الشخصي" }) {
   const menuItems = [
-    {
-      title: "لوحة التحكم",
-      icon: <MdDashboard />,
-    },
-    {
-      title: "ملفي الشخصي",
-      icon: <MdPerson />,
-    },
-    {
-      title: "وثائقي",
-      icon: <MdDescription />,
-    },
-    {
-      title: "العائلات",
-      icon: <MdFamilyRestroom />,
-    },
-    {
-      title: "الأيتام",
-      icon: <MdPerson />,
-    },
-    {
-      title: "المحفظة",
-      icon: <MdAccountBalanceWallet />,
-    },
-    {
-      title: "المدفوعات",
-      icon: <MdPayments />,
-    },
-    {
-      title: "التحديثات الدورية",
-      icon: <MdPublishedWithChanges />,
-    },
-    {
-      title: "التنبيهات",
-      icon: <MdNotificationsNone />,
-    },
-    {
-      title: "الإعدادات",
-      icon: <MdSettings />,
-    },
+    { title: "نظرة عامة", icon: <MdDashboard /> },
+    { title: "الملف الشخصي", icon: <MdPerson /> },
+    { title: "الوثائق", icon: <MdDescription /> },
+    { title: "العائلات", icon: <MdFamilyRestroom /> },
+    { title: "الأيتام", icon: <MdPerson /> },
+    { title: "المحفظة", icon: <MdAccountBalanceWallet /> },
+    { title: "المدفوعات", icon: <MdPayments /> },
+    { title: "التحديثات الدورية", icon: <MdPublishedWithChanges /> },
+    { title: "التنبيهات", icon: <MdNotificationsNone /> },
   ];
+
+  const isActive = (title) => activeItem === title;
+
+  const itemClasses = (active) => `
+  w-full min-h-[48px] py-3
+  flex items-center gap-3
+  px-4
+  rounded-xl
+  font-[Cairo]
+  text-[14px]
+  leading-6 
+  transition-all duration-200
+  cursor-pointer
+  shrink-0
+  ${
+    active
+      ? "bg-[#47DBE0] text-[#003469] font-bold shadow-md"
+      : "text-white/90 hover:bg-white/10 hover:text-white"
+  }
+`;
 
   return (
     <>
@@ -70,98 +59,124 @@ function Sidebar({ openSidebar, setOpenSidebar, activeItem = "ملفي الشخ�
       <aside
         className={`
           fixed top-0 right-0 z-50
-          w-[256px] h-screen
+          w-[85vw] max-w-[256px]
+          sm:w-[240px] lg:w-[256px]
+          h-screen h-[100dvh]
           bg-[#003469]
           border-l border-[#C2C6D2]
           flex flex-col
-          pt-4 pb-5
-          overflow-y-auto overflow-x-hidden
+          py-3 sm:py-4
+          overflow-hidden
           transition-transform duration-300
           ${openSidebar ? "translate-x-0" : "translate-x-full"}
           lg:translate-x-0
         `}
       >
         {/* Close button - Mobile */}
-        <div className="lg:hidden flex justify-start px-4 mb-4">
+        <div className="lg:hidden flex justify-start px-3 sm:px-4 mb-1 shrink-0">
           <button
             onClick={() => setOpenSidebar(false)}
-            className="w-9 h-9 rounded-lg border border-white/30 flex items-center justify-center text-white cursor-pointer"
+            className="w-8 h-8 rounded-lg border border-white/30 flex items-center justify-center text-white cursor-pointer"
           >
-            <MdClose className="text-xl" />
+            <MdClose className="text-lg" />
           </button>
         </div>
 
-        {/* Top Content */}
-        <div className="flex flex-col gap-0">
-          {/* Logo */}
-          <div className="flex flex-col items-center justify-center px-4 -mt-2">
-            <div className="w-[72px] h-[72px] rounded-full bg-white/15 flex items-center justify-center mb-5">
+        {/* Logo */}
+        <div className="flex flex-col items-center justify-center px-4 py-3 shrink-0">
+          <div className="text-center mb-2">
+            <div className="w-24 h-24 bg-white/20 rounded-full mx-auto mb-2 flex items-center justify-center overflow-hidden">
               <img
-                src={kafeeliLogo}
-                alt="Kafeeli Logo"
-                className="w-[90px] h-[90px] object-contain"
+                src="/src/assets/title.png"
+                alt="كفيلي"
+                className="w-30 h-30 object-contain mt-3"
               />
-            </div>
-
-            <div className="w-fit h-auto flex flex-col items-center justify-center gap-5 text-center">
-              <h2 className="font-[Cairo] font-bold text-[23px] leading-[3px] tracking-[0px] text-center text-[#FFDEAA]">
-                كفيلي
-              </h2>
-
-              <p className="font-[Cairo] font-normal text-[14px] leading-[16px] tracking-[0px] text-center text-[#e6ecf7] whitespace-nowrap">
-                لوحة الإدارة الذكية
-              </p>
             </div>
           </div>
 
-          {/* Menu */}
-          <nav className="px-4 flex-1 mt-2">
-            <hr className="border-white/25 mb-2" />
+          <h2 className="font-[Cairo] font-bold text-[18px] sm:text-[20px] lg:text-[22px] tracking-[0px] text-center text-[#FFDEAA] mb-2">
+            كفيلي
+          </h2>
 
-            <div className="space-y-[0px]">
-              {menuItems.map((item) => {
-                const isActive = activeItem === item.title;
-
-                return (
-                  <button
-                    key={item.title}
-                    onClick={() => setOpenSidebar(false)}
-                    className={`
-                      w-full h-[27px]
-                      flex items-center gap-3
-                      px-3 rounded-[6px]
-                      font-[Cairo] text-[12px] leading-[20px]
-                      text-right transition cursor-pointer
-                      ${
-                        isActive
-                          ? "bg-[#47DBE0] text-[#003469] font-bold"
-                          : "text-white/85 font-normal hover:bg-white/10 hover:text-white"
-                      }
-                    `}
-                  >
-                    <span
-                      className={`
-                        text-[16px] flex items-center shrink-0
-                        ${isActive ? "text-[#003469]" : "text-white/85"}
-                      `}
-                    >
-                      {item.icon}
-                    </span>
-
-                    <span className="truncate">{item.title}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </nav>
+          <p className="font-[Cairo] font-normal text-[11px] sm:text-[12px] lg:text-[13px] leading-[16px] tracking-[0px] text-center text-[#e6ecf7] whitespace-nowrap">
+            لوحة الإدارة الذكية
+          </p>
         </div>
 
-        {/* Logout */}
-        <div className="mt-2 border-t border-white/25 px-4 pt-4">
-          <button className="w-full h-[25px] flex items-center gap-3 px-3 rounded-[6px] font-[Cairo] text-[12px] leading-[20px] text-white/90 hover:bg-white/10 transition cursor-pointer">
-            <MdLogout className="text-[15px]" />
-            <span>تسجيل الخروج</span>
-          </button>
+        <hr className="border-white/25 mx-4 my-2 shrink-0" />
+
+        {/* Menu - takes remaining space, no scroll */}
+        <nav
+          className="
+    flex-1
+    overflow-y-auto
+    px-4
+    py-3
+    space-y-2
+    scrollbar-thin
+    scrollbar-thumb-white/20
+    scrollbar-track-transparent
+  "
+        >
+          {menuItems.map((item) => (
+            <button
+              key={item.title}
+              onClick={() => setOpenSidebar(false)}
+              className={itemClasses(isActive(item.title))}
+            >
+              <span
+                className={`text-[20px] sm:text-[16px] lg:text-[18px] flex items-center shrink-0 ${
+                  isActive(item.title) ? "text-[#003469]" : "text-white/85"
+                }`}
+              >
+                {item.icon}
+              </span>
+              <span className="flex-1 text-right leading-normal">
+                {item.title}
+              </span>
+            </button>
+          ))}
+        </nav>
+
+        {/* Bottom: Settings + Logout */}
+        <div className="mt-auto px-3 sm:px-4 pb-1 shrink-0">
+          {/* خط فوق الإعدادات */}
+          <div className="border-t border-white/20 pt-3">
+            <button
+              onClick={() => setOpenSidebar(false)}
+              className={itemClasses(isActive("الإعدادات"))}
+            >
+              <span
+                className={`text-[15px] sm:text-[16px] lg:text-[18px] flex items-center shrink-0 ${
+                  isActive("الإعدادات") ? "text-[#003469]" : "text-white/85"
+                }`}
+              >
+                <MdSettings />
+              </span>
+              <span>الإعدادات</span>
+            </button>
+          </div>
+
+          {/* خط فوق تسجيل الخروج - نفس ستايل الخط اللي فوق الإعدادات */}
+          <div className="border-t border-white/20 mt-2 pt-2">
+            <button
+              onClick={() => setOpenSidebar(false)}
+              className="
+        w-full h-6
+        flex items-center gap-2.5 sm:gap-3
+        px-2.5 sm:px-3 rounded-[8px]
+        font-[Cairo] text-[11px] sm:text-[12px] lg:text-[13px] leading-[18px]
+        text-white/85 font-normal text-right
+        hover:bg-red-500/10 hover:text-red-400
+        transition cursor-pointer shrink-0
+      "
+            >
+              <span className="text-[15px] sm:text-[16px] lg:text-[18px] flex items-center shrink-0">
+                <MdLogout />
+              </span>
+              <span>تسجيل الخروج</span>
+            </button>
+          </div>
         </div>
       </aside>
     </>
