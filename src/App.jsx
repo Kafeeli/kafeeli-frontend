@@ -10,25 +10,22 @@ import InvalidEmail from "./pages/InvalidEmail";
 import SideBar from "./pages/admin-dashboard/sideBar"
 import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 import LandingPage from "./pages/LandingPage";
-
 import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
 import ProfilePage from "./pages/sponsor-dashboard/profileDashboard";
-
 import GuardianProfile from "./pages/GuardianProfile";
-
 import ErrorPage from "./pages/guardian-dashboard/Families/ErrorStates";
 import FamilyAccessPendingPage from "./pages/guardian-dashboard/Families/FamilyAccessPendingPage";
 import NoFamiliesPage from "./pages/guardian-dashboard/Families/NoFamiliesPage";
 import AddFamilyPage from "./pages/guardian-dashboard/Families/AddFamilyPage";
 import ManagingFamilyCards from "./pages/guardian-dashboard/Families/ManagingFamilyCards";
 import FamilyDetailsPage from "./pages/guardian-dashboard/Families/FamilyDetailsPage";
-import ActiveFamilyDetailsPage from "./pages/guardian-dashboard/Families/ActiveFamilyDetailsPage";
-import HiddenFamilyDetailsPage from "./pages/guardian-dashboard/Families/HiddenFamilyDetailsPage";
-import PendingFamilyDetailsPage from "./pages/guardian-dashboard/Families/PendingFamilyDetailsPage";
-import StoppedFamilyDetailsPage from "./pages/guardian-dashboard/Families/StoppedFamilyDetailsPage";
-import NeedsEditFamilyDetailsPage from "./pages/guardian-dashboard/Families/NeedsEditFamilyDetailsPage";
-import FamilyEditPage from "./pages/guardian-dashboard/Families/FamilyEditPage";
-import NeedsEditFamilyEditPage from "./pages/guardian-dashboard/Families/NeedsEditFamilyEditPage";
+import ActiveFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/ActiveFamilyDetailsPage";
+import HiddenFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/HiddenFamilyDetailsPage";
+import PendingFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/PendingFamilyDetailsPage";
+import StoppedFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/StoppedFamilyDetailsPage";
+import NeedsEditFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/NeedsEditFamilyDetailsPage";
+import FamilyEditPage from "./pages/guardian-dashboard/Families/status/FamilyEditPage";
+import NeedsEditFamilyEditPage from "./pages/guardian-dashboard/Families/status/NeedsEditFamilyEditPage";
 
 function PageWrapper({ children }) {
   return (
@@ -121,46 +118,7 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-        <Route
-       path="/families/pending-details"
-       element={
-          <PageWrapper>
-            <PendingFamilyDetailsPage />
-          </PageWrapper>
-       }
-      />
-      <Route
-      path="/families/stopped-details"
-      element={
-      <PageWrapper>
-         <StoppedFamilyDetailsPage />
-      </PageWrapper>
-      }
-      />
-      <Route
-       path="/families/needs-edit-details"
-        element={
-        <PageWrapper>
-          <NeedsEditFamilyDetailsPage />
-        </PageWrapper>
-        }
-      />
-      <Route
-        path="/families/edit"
-        element={
-          <PageWrapper>
-            <FamilyEditPage />
-          </PageWrapper>
-        }
-      />
-      <Route
-  path="/families/needs-edit/edit"
-  element={
-    <PageWrapper>
-      <NeedsEditFamilyEditPage />
-    </PageWrapper>
-  }
-/>
+      
 
         <Route
           path="/invalid-Email"
@@ -236,6 +194,8 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
+        {/* الحالاات */}
+        {/* حالة العائلة نشطة  */}
           <Route
           path="/families/active-details"
           element={
@@ -244,6 +204,61 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
+          
+      {/* تعديل بيانات نشطة */}
+      <Route
+        path="/families/edit"
+        element={
+          <PageWrapper>
+            <FamilyEditPage />
+          </PageWrapper>
+        }
+      />
+      {/* تعديل ايرور */}
+      <Route
+        path="/families/needs-edit/edit"
+          element={
+        <PageWrapper>
+            <NeedsEditFamilyEditPage />
+        </PageWrapper>
+        }
+      />
+      {/* حالة موقوفة */}
+      <Route
+      path="/families/stopped-details"
+      element={
+      <PageWrapper>
+         <StoppedFamilyDetailsPage />
+      </PageWrapper>
+      }
+      />
+      {/* قيد المراجعة */}
+       <Route
+       path="/families/pending-details"
+       element={
+          <PageWrapper>
+            <PendingFamilyDetailsPage />
+          </PageWrapper>
+       }
+      />
+      {/* حالة مخفية */}
+      <Route
+        path="/families/hidden-details"
+        element={
+          <PageWrapper>
+            <HiddenFamilyDetailsPage />
+          </PageWrapper>
+       }
+      />
+      {/* تحتاج تعديل */}
+       <Route
+       path="/families/needs-edit-details"
+        element={
+        <PageWrapper>
+          <NeedsEditFamilyDetailsPage />
+        </PageWrapper>
+        }
+      />
 
         <Route
           path="/families/error"
@@ -261,14 +276,7 @@ function AnimatedRoutes() {
         </PageWrapper>
       }
       />
-      <Route
-        path="/families/hidden-details"
-        element={
-          <PageWrapper>
-            <HiddenFamilyDetailsPage />
-          </PageWrapper>
-       }
-      />
+      
 
         {/* Old routes redirects */}
         <Route

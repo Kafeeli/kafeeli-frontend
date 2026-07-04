@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../Sidebar";
+import Sidebar from "../../Sidebar";
 
 import {
   MdMenu,
@@ -8,12 +8,12 @@ import {
   MdPerson,
   MdKeyboardArrowLeft,
   MdWarningAmber,
+  MdInfoOutline,
   MdFolderOpen,
   MdPictureAsPdf,
   MdVisibility,
   MdDownload,
   MdSend,
-  MdEditNote,
 } from "react-icons/md";
 
 function TopNavbar({ setOpenSidebar }) {
@@ -81,34 +81,35 @@ function PageHeader() {
         تعديل بيانات العائلة
       </h2>
 
-      <div className="mt-4 flex flex-wrap items-center gap-3">
+      <div className="mt-3 flex flex-wrap items-center gap-3">
         <p className="font-[Cairo] text-[14px] sm:text-[16px] text-[#6B7280]">
           عائلة المرحوم أحمد جابر العتيبي
         </p>
 
-        <span className="inline-flex items-center gap-1 rounded-full bg-[#FEE2E2] px-4 py-1.5 font-[Cairo] text-[12px] font-bold text-[#D11F1F]">
+        <span className="inline-flex items-center gap-1 rounded-full bg-[#D9F7F1] px-4 py-1.5 font-[Cairo] text-[12px] font-bold text-[#008C78]">
           <span className="w-1.5 h-1.5 rounded-full bg-current" />
-          تحتاج تعديل
+          نشطة
         </span>
       </div>
     </section>
   );
 }
 
-function NeedsEditBanner() {
+function WarningBanner() {
   return (
-    <div className="mt-7 rounded-[9px] bg-[#FFDADA] border-r-[5px] border-[#D11F1F] px-5 py-4 flex items-center gap-4">
-      <div className="w-[44px] h-[44px] rounded-full bg-white/65 flex items-center justify-center shrink-0">
-        <MdWarningAmber className="text-[#D11F1F] text-[25px]" />
+    <div className="mt-7 rounded-[9px] bg-[#FFF9D8] border-r-[5px] border-[#D99A00] px-5 py-4 flex items-center gap-4">
+      <div className="w-[42px] h-[42px] rounded-full bg-white/70 flex items-center justify-center shrink-0">
+        <MdWarningAmber className="text-[#B77900] text-[24px]" />
       </div>
 
       <div className="text-right">
-        <p className="font-[Cairo] text-[18px] font-bold text-[#B91C1C]">
-          حالة العائلة: تحتاج تعديل
+        <p className="font-[Cairo] text-[18px] font-bold text-[#B77900]">
+          تنبيه قبل حفظ التعديلات
         </p>
 
-        <p className="mt-1 font-[Cairo] text-[12px] sm:text-[13px] leading-6 text-[#B91C1C]">
-          يرجى مراجعة الملاحظات وتحديث البيانات المطلوبة لاستكمال الملف.
+        <p className="mt-1 font-[Cairo] text-[12px] sm:text-[13px] leading-6 text-[#8A5A00]">
+          بعد حفظ التعديلات ستعود حالة الطلب إلى قيد المراجعة، ولن تظهر
+          العائلة للرعاة حتى تعتمد الإدارة التعديلات مرة أخرى.
         </p>
       </div>
     </div>
@@ -141,7 +142,7 @@ function TextArea({ value, onChange }) {
       value={value}
       onChange={onChange}
       rows={5}
-      className="w-full min-h-[120px] resize-none rounded-[8px] border border-[#CBD5E1] bg-white px-4 py-3 text-right font-[Cairo] text-[13px] leading-7 text-[#374151] outline-none transition focus:border-[#003469] focus:ring-2 focus:ring-[#003469]/10"
+      className="w-full min-h-[120px] resize-none rounded-[8px] border border-[#CBD5E1] bg-white px-4 py-3 text-right font-[Cairo] text-[13px] leading-7 text-[#374151] placeholder:text-[#9CA3AF] outline-none transition focus:border-[#003469] focus:ring-2 focus:ring-[#003469]/10"
     />
   );
 }
@@ -154,7 +155,7 @@ function BasicInfoForm({ formData, setFormData }) {
           المعلومات الأساسية
         </h3>
 
-        <MdEditNote className="text-[#003469] text-[22px]" />
+        <MdInfoOutline className="text-[#003469] text-[22px]" />
       </div>
 
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -197,7 +198,6 @@ function BasicInfoForm({ formData, setFormData }) {
                 setFormData({ ...formData, monthlyNeed: e.target.value })
               }
             />
-
             <span className="absolute left-4 top-1/2 -translate-y-1/2 font-[Cairo] text-[12px] text-[#6B7280]">
               ILS
             </span>
@@ -294,7 +294,7 @@ function ActionBar({ onCancel, onSubmit }) {
   );
 }
 
-function NeedsEditFamilyEditPage() {
+function FamilyEditPage() {
   const [openSidebar, setOpenSidebar] = useState(false);
   const navigate = useNavigate();
 
@@ -332,7 +332,7 @@ function NeedsEditFamilyEditPage() {
 
             <PageHeader />
 
-            <NeedsEditBanner />
+            <WarningBanner />
 
             <form
               noValidate
@@ -358,4 +358,4 @@ function NeedsEditFamilyEditPage() {
   );
 }
 
-export default NeedsEditFamilyEditPage;
+export default FamilyEditPage;

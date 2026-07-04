@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Sidebar from "../Sidebar";
+import Sidebar from "../../Sidebar";
 
 import {
   MdMenu,
@@ -12,13 +11,12 @@ import {
   MdPictureAsPdf,
   MdFamilyRestroom,
   MdOutlineRemoveRedEye,
-  MdWarningAmber,
-  MdEdit,
+  MdBlock,
 } from "react-icons/md";
 
 const familyInfo = {
   title: "عائلة المرحوم أحمد جابر العتيبي",
-  status: "تحتاج تعديل",
+  status: "موقوفة",
   guardianName: "أحمد جابر العتيبي رحمه الله",
   city: "الرياض - حي اليرموك",
   address: "شارع خالد بن الوليد، مبنى ٤٤، شقة ١٢",
@@ -129,47 +127,34 @@ function Breadcrumb() {
 }
 
 function PageHeader() {
-  const navigate = useNavigate();
-
   return (
     <section className="mt-3 text-right">
       <h2 className="font-[Cairo] text-[25px] sm:text-[34px] lg:text-[39px] font-bold text-[#111827] leading-tight">
         {familyInfo.title}
       </h2>
 
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <span className="inline-flex items-center gap-1 rounded-full bg-[#FEE2E2] px-4 py-1.5 font-[Cairo] text-[12px] font-bold text-[#D11F1F]">
-          <span className="w-1.5 h-1.5 rounded-full bg-current" />
-          {familyInfo.status}
-        </span>
-
-        <button
-          type="button"
-          onClick={() => navigate("/families/needs-edit/edit")}
-          className="h-[32px] rounded-full border border-[#003469] bg-white px-4 font-[Cairo] text-[12px] font-bold text-[#003469] flex items-center gap-2 hover:bg-[#F8FAFC] transition"
-        >
-          <MdEdit className="text-[15px]" />
-          تعديل البيانات
-        </button>
-      </div>
+      <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-[#FEE2E2] px-4 py-1.5 font-[Cairo] text-[12px] font-bold text-[#D11F1F]">
+        <span className="w-1.5 h-1.5 rounded-full bg-current" />
+        {familyInfo.status}
+      </span>
     </section>
   );
 }
 
-function NeedsEditAlert() {
+function StoppedAlert() {
   return (
-    <div className="mt-7 rounded-[9px] bg-[#FFDADA] border-r-[5px] border-[#D11F1F] px-5 py-4 flex items-center gap-4 ">
-      <div className="w-[44px] h-[44px] rounded-full bg-white/65 flex items-center justify-center shrink-0 font-bold">
-        <MdWarningAmber className="text-[#D11F1F] text-[25px]" />
+    <div className="mt-7 rounded-[9px] bg-[#FFDADA] border-r-[5px] border-[#D11F1F] px-5 py-4 flex items-center gap-4">
+      <div className="w-[44px] h-[44px] rounded-full bg-white/65 flex items-center justify-center shrink-0">
+        <MdBlock className="text-[#D11F1F] text-[25px]" />
       </div>
 
       <div className="text-right">
-        <p className="font-[Cairo] text-[18px] font-bold text-[#B91C1C]">
-          حالة العائلة: تحتاج تعديل
+        <p className="font-[Cairo] text-[14px] font-bold text-[#B91C1C] text-[18px]">
+          حالة العائلة: موقوفة
         </p>
 
         <p className="mt-1 font-[Cairo] text-[12px] sm:text-[13px] leading-6 text-[#B91C1C]">
-          يرجى مراجعة الملاحظات وتحديث البيانات المطلوبة لاستكمال الملف.
+          تم إيقاف الدعم مؤقتًا بسبب استيفاء الشروط أو انتهاء صلاحية المستندات.
         </p>
       </div>
     </div>
@@ -353,7 +338,7 @@ function OrphanCard({ orphan }) {
   );
 }
 
-function NeedsEditFamilyDetailsPage() {
+function StoppedFamilyDetailsPage() {
   const [openSidebar, setOpenSidebar] = useState(false);
 
   return (
@@ -373,7 +358,7 @@ function NeedsEditFamilyDetailsPage() {
 
             <PageHeader />
 
-            <NeedsEditAlert />
+            <StoppedAlert />
 
             <section className="mt-8 grid grid-cols-1 lg:grid-cols-[1fr_330px] gap-6 items-stretch">
               <FamilyInfoCard />
@@ -410,4 +395,4 @@ function NeedsEditFamilyDetailsPage() {
   );
 }
 
-export default NeedsEditFamilyDetailsPage;
+export default StoppedFamilyDetailsPage;
