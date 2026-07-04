@@ -23,7 +23,6 @@ import { useState } from "react";
 import { FiMenu } from "react-icons/fi";
 import Sidebar from "./sideBar";
 
-
 const cardShadow = "shadow-[0_2px_10px_rgba(31,41,55,0.06)]";
 
 const overviewCards = [
@@ -153,11 +152,15 @@ function StatCard({ card, index }) {
       {card.warning && (
         <span className="absolute right-6 top-9 h-2.5 w-2.5 rounded-full bg-[#B07B11]" />
       )}
-      <div className={`mb-5 grid h-10 w-10 place-items-center rounded-md ${card.tone}`}>
+      <div
+        className={`mb-5 grid h-10 w-10 place-items-center rounded-md ${card.tone}`}
+      >
         <card.icon className="text-2xl" />
       </div>
       <p className="mb-2 text-[15px] leading-6 text-[#6B7280]">{card.title}</p>
-      <strong className="text-lg font-extrabold text-[#1F2937]">{card.value}</strong>
+      <strong className="text-lg font-extrabold text-[#1F2937]">
+        {card.value}
+      </strong>
     </motion.div>
   );
 }
@@ -173,17 +176,23 @@ function QueueCard({ item, index }) {
     >
       <div className="mb-6 flex items-start justify-between gap-4">
         <div className="text-right">
-          <h4 className="text-xl font-extrabold text-[#1F2937]">{item.title}</h4>
+          <h4 className="text-xl font-extrabold text-[#1F2937]">
+            {item.title}
+          </h4>
           <p className="mt-1 text-sm text-[#6B7280]">{item.subtitle}</p>
         </div>
-        <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-full ${item.iconTone}`}>
+        <div
+          className={`grid h-12 w-12 shrink-0 place-items-center rounded-full ${item.iconTone}`}
+        >
           <item.icon className="text-2xl" />
         </div>
       </div>
       <div className="flex items-end justify-between gap-4">
         <div className="flex items-end gap-3">
           <span className="text-sm text-[#6B7280]">{item.meta}</span>
-          <strong className="text-3xl font-extrabold text-[#1F2937]">{item.count}</strong>
+          <strong className="text-3xl font-extrabold text-[#1F2937]">
+            {item.count}
+          </strong>
         </div>
         <button className="rounded-md bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#08386B] cursor-pointer">
           عرض التفاصيل
@@ -195,11 +204,17 @@ function QueueCard({ item, index }) {
 
 function FamilyCard() {
   return (
-    <article className={`rounded-lg border border-gray-300 bg-white p-6 ${cardShadow}`}>
+    <article
+      className={`rounded-lg border border-gray-300 bg-white p-6 ${cardShadow}`}
+    >
       <div className="mb-7 flex items-start justify-between gap-4">
         <div className="text-right">
-          <h4 className="text-xl font-extrabold text-[#1F2937]">ملفات العائلات</h4>
-          <p className="mt-1 text-sm text-[#6B7280]">مراجعة الوضع الاجتماعي والاقتصادي الشامل</p>
+          <h4 className="text-xl font-extrabold text-[#1F2937]">
+            ملفات العائلات
+          </h4>
+          <p className="mt-1 text-sm text-[#6B7280]">
+            مراجعة الوضع الاجتماعي والاقتصادي الشامل
+          </p>
         </div>
         <div className="grid h-12 w-12 place-items-center rounded-full bg-gray-200 text-[#1F2937]">
           <HiOutlineUsers className="text-2xl" />
@@ -211,7 +226,9 @@ function FamilyCard() {
             <span
               key={label}
               className={`grid h-8 w-8 place-items-center rounded-full border-2 border-white text-[10px] font-bold ${
-                index === 2 ? "bg-[#0D4B8E] text-white" : "bg-gray-200 text-[#6B7280]"
+                index === 2
+                  ? "bg-[#0D4B8E] text-white"
+                  : "bg-gray-200 text-[#6B7280]"
               }`}
             >
               {label}
@@ -231,8 +248,12 @@ function EmptyCard() {
     <div className="grid min-h-[176px] place-items-center rounded-lg border border-dashed border-gray-300 bg-white/40 p-6 text-center">
       <div>
         <FiCheckCircle className="mx-auto mb-4 text-4xl text-gray-400" />
-        <h4 className="text-lg font-extrabold text-[#1F2937]">لا توجد طلبات أيتام معلقة</h4>
-        <p className="mt-2 text-sm text-gray-400">تم إكمال مراجعة كافة ملفات الأيتام المسجلة حالياً</p>
+        <h4 className="text-lg font-extrabold text-[#1F2937]">
+          لا توجد طلبات أيتام معلقة
+        </h4>
+        <p className="mt-2 text-sm text-gray-400">
+          تم إكمال مراجعة كافة ملفات الأيتام المسجلة حالياً
+        </p>
       </div>
     </div>
   );
@@ -263,12 +284,16 @@ function QuickActions() {
 
 function LogsTable() {
   return (
-    <section className={`mt-20 overflow-hidden rounded-lg border border-gray-300 bg-white ${cardShadow}`}>
+    <section
+      className={`mt-20 overflow-hidden rounded-lg border border-gray-300 bg-white ${cardShadow}`}
+    >
       <div className="flex items-center justify-between px-6 py-6">
         <button className="font-extrabold text-[#08386B] transition hover:text-[#0D4B8E]">
           تحميل التقرير الكامل
         </button>
-        <h3 className="text-lg font-extrabold text-[#08386B]">آخر سجلات النظام</h3>
+        <h3 className="text-lg font-extrabold text-[#08386B]">
+          آخر سجلات النظام
+        </h3>
       </div>
       <div className="overflow-x-auto scrollbar-thin">
         <table className="w-full min-w-[760px] text-right">
@@ -288,13 +313,17 @@ function LogsTable() {
                     <span className="grid h-9 w-9 place-items-center rounded-full bg-[#0D4B8E]/10 text-xs font-extrabold text-[#0D4B8E]">
                       {log.avatar}
                     </span>
-                    <strong className="whitespace-nowrap text-base text-[#1F2937]">{log.manager}</strong>
+                    <strong className="whitespace-nowrap text-base text-[#1F2937]">
+                      {log.manager}
+                    </strong>
                   </div>
                 </td>
                 <td className="px-6 py-5 text-[#1F2937]">{log.event}</td>
                 <td className="px-6 py-5 text-[#6B7280]">{log.time}</td>
                 <td className="px-6 py-5">
-                  <span className={`inline-flex rounded-full px-4 py-1.5 text-sm font-extrabold ${log.statusClass}`}>
+                  <span
+                    className={`inline-flex rounded-full px-4 py-1.5 text-sm font-extrabold ${log.statusClass}`}
+                  >
                     {log.status}
                   </span>
                 </td>
@@ -312,28 +341,13 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex min-h-screen bg-[#F8F9FA]" dir="rtl">
-
-      {/* Sidebar - desktop */}
-      <div className="hidden lg:flex lg:flex-col lg:h-screen lg:sticky lg:top-0">
-        <Sidebar />
-      </div>
-
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-30 bg-black/30 backdrop-blur-sm lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Mobile Sidebar drawer */}
-      <div className={'fixed top-0 right-0 z-40 h-full transition-transform duration-300 lg:hidden ' + (sidebarOpen ? 'translate-x-0' : 'translate-x-full')}>
-        <Sidebar onClose={() => setSidebarOpen(false)} />
-      </div>
-
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        onOpen={() => setSidebarOpen(true)}
+      />
       {/* Main */}
       <div className="flex flex-1 flex-col min-w-0">
-
         {/* Header */}
         <header className="h-16 sm:h-20 flex items-center justify-between px-4 sm:px-6 bg-white border-b border-[#E5E7EB] sticky top-0 z-20">
           <button
@@ -364,8 +378,12 @@ export default function AdminDashboard() {
 
         <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="mb-6">
-            <h1 className="text-xl sm:text-2xl font-extrabold text-[#0D4B8E]">نظرة عامة على النظام</h1>
-            <p className="text-xs sm:text-sm text-[#6B7280]">آخر تحديث: منذ دقيقتين</p>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-[#0D4B8E]">
+              نظرة عامة على النظام
+            </h1>
+            <p className="text-xs sm:text-sm text-[#6B7280]">
+              آخر تحديث: منذ دقيقتين
+            </p>
           </div>
 
           <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4 sm:gap-6">
@@ -395,7 +413,6 @@ export default function AdminDashboard() {
               © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
             </p>
           </footer>
-       
         </main>
       </div>
     </div>
