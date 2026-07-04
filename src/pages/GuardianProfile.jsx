@@ -37,9 +37,51 @@ import { FaRestroom, FaUserTie } from "react-icons/fa";
 import { IoEarthSharp } from "react-icons/io5";
 
 import personalImage from "../assets/personal.jpg";
-
+import TransferDataSection from "../components/TransferDataSection";
 function GuardianProfile() {
+  const [showTransferModal, setShowTransferModal] = useState(false);
   const [openSidebar, setOpenSidebar] = useState(false);
+  const transferStatus = "approved";
+  // جرّبي القيم:
+  // "empty"
+  // "pendingReview"
+  // "needsUpdate"
+  // "approved"
+
+  const hasPersonalData = true;
+  const hasTransferData = transferStatus !== "empty";
+
+  const transferMobileStatus = {
+    empty: {
+      label: "غير مضافة",
+      badgeClass: "bg-gray-100 text-gray-600",
+      title: "تفاصيل التحويل",
+      desc: "لم يتم إضافة بيانات التحويل بعد",
+    },
+
+    pendingReview: {
+      label: "قيد المراجعة",
+      badgeClass: "bg-[#FFE7B8] text-[#9A6700]",
+      title: "تفاصيل التحويل",
+      desc: "تم إرسال بيانات التحويل وهي بانتظار مراجعة الإدارة",
+    },
+
+    needsUpdate: {
+      label: "يحتاج تعديل",
+      badgeClass: "bg-[#FFE7B8] text-[#9A6700]",
+      title: "تفاصيل التحويل",
+      desc: "تحتاج بيانات التحويل إلى تعديل من قبل المستخدم",
+    },
+
+    approved: {
+      label: "معتمد",
+      badgeClass: "bg-[#DDFBFB] text-[#018B8F]",
+      title: "تفاصيل التحويل",
+      desc: "تم اعتماد بيانات التحويل من قبل الإدارة",
+    },
+  };
+
+  const currentTransferMobile = transferMobileStatus[transferStatus];
 
   const verificationStatus = "Approved";
 
@@ -574,7 +616,9 @@ function GuardianProfile() {
             </div>
           </div>
         </main>
-
+        <div className="order-4 xl:order-3 w-full max-w-full overflow-x-hidden px-3 sm:px-6 lg:px-0">
+          <TransferDataSection initialStatus="empty" />
+        </div>
         {/* Mobile Main Content - شكل الموبايل فقط */}
         <main className="lg:hidden px-2 pt-3 pb-5">
           <div className="w-full max-w-[340px] mx-auto space-y-3">
@@ -626,7 +670,7 @@ function GuardianProfile() {
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <div className="rounded-[5px] bg-[#F3F4F5] px-2 py-2">
                   <p className="text-[9px] text-[#737782] leading-4">
-                    حالة الحساب
+                    حالة الحسابٍ
                   </p>
                   <p className="text-[10px] font-bold text-red-600 leading-4">
                     معلق

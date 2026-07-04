@@ -31,4 +31,71 @@ body {
   button:disabled {
     @apply cursor-not-allowed;
   }
+}html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* نخلي TransferDataSection responsive حسب عرض السكشن نفسه */
+.transfer-section {
+  container-type: inline-size;
+}
+.transfer-modal {
+  overflow: visible !important;
+}
+
+@container (max-width: 520px) {
+  .transfer-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .transfer-header-text {
+    width: 100% !important;
+    text-align: right !important;
+  }
+
+  .transfer-status-badge {
+    align-self: flex-start !important;
+  }
+
+  .transfer-grid-2,
+  .transfer-grid-3,
+  .transfer-needs-grid,
+  .transfer-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .transfer-info-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px !important;
+  }
+
+  .transfer-alert {
+    flex-direction: column !important;
+    text-align: center !important;
+  }
+
+  .transfer-modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: calc(100vh - 32px) !important;
+  }
+
+  .transfer-buttons {
+    flex-direction: column-reverse !important;
+    align-items: stretch !important;
+  }
+
+  .transfer-buttons button {
+    width: 100% !important;
+  }
 }
