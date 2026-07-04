@@ -7,6 +7,7 @@ import EmailVerificationSuccess from "./pages/EmailVerificationSuccess";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
+import SideBar from "./pages/admin-dashboard/sideBar"
 import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 import LandingPage from "./pages/LandingPage";
 import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
@@ -61,6 +62,14 @@ function AnimatedRoutes() {
           element={
             <PageWrapper>
               <Login />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/Side-bar"
+          element={
+            <PageWrapper>
+              <SideBar />
             </PageWrapper>
           }
         />

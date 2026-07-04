@@ -1,8 +1,6 @@
-import { FiX, FiSettings, FiLogOut } from "react-icons/fi";
+import { FiX, FiSettings, FiLogOut, FiMenu } from "react-icons/fi";
 import { FiClock } from "react-icons/fi";
-import {
-  HiOutlineIdentification,
-} from "react-icons/hi2";
+import { HiOutlineIdentification } from "react-icons/hi2";
 import {
   MdDashboard,
   MdOutlineFamilyRestroom,
@@ -22,60 +20,170 @@ const sidebarItems = [
   { label: "سجلات المدير", icon: TbReportAnalytics },
 ];
 
-function Sidebar({ onClose }) {
+function SidebarContent({ onItemClick }) {
   return (
-    <aside className="w-64 h-screen flex flex-col bg-[#F9FAFB] border-l border-[#E5E7EB]">
-      
+    <>
       {/* Logo */}
-      <div className="flex flex-col items-center justify-center py-6 border-b border-[#E5E7EB] shrink-0 relative">
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="absolute top-3 left-3 grid h-8 w-8 place-items-center rounded-full hover:bg-gray-200 text-gray-500 hover:text-red-500 transition"
-          >
-            <FiX className="text-xl" />
-          </button>
-        )}
-        <img
-          src="/src/assets/mainLogo.png"
-          className="h-24 sm:h-32 object-contain"
-        />
-        <p className="text-xs text-gray-500 mt-2 text-center">
-          لوحة الإدارة الذكية
-        </p>
-      </div>
+      <div className="flex flex-col items-center justify-center px-4 py-3 shrink-0">
+          <div className="text-center mb-2">
+            <div className="w-[100px] h-[100px] bg-white/20 rounded-full mx-auto mb-2 flex items-center justify-center overflow-hidden">
+              <img
+                src="/src/assets/title.png"
+                alt="كفيلي"
+                className="w[140px] h-[140px] object-contain mt-4"
+              />
+            </div>
+          </div>
+
+          <h2 className="font-[Cairo] font-bold text-[18px] sm:text-[20px] lg:text-[22px] tracking-[0px] text-center text-[#FFDEAA] mb-2">
+            كفيلي
+          </h2>
+
+          <p className="font-[Cairo] font-normal text-[11px] sm:text-[12px] lg:text-[13px] leading-[16px] tracking-[0px] text-center text-[#e6ecf7] whitespace-nowrap">
+            لوحة الإدارة الذكية
+          </p>
+        </div>
+
+      <hr className="border-white/25 mx-4 my-2 shrink-0" />
 
       {/* Menu */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-hidden">
-        {sidebarItems.map(function(item) {
+      <nav
+        className="
+          flex-1
+          overflow-y-auto
+          px-4
+          py-3
+          space-y-2
+          scrollbar-thin
+          scrollbar-thumb-white/20
+          scrollbar-track-transparent
+          hover:scrollbar-thumb-white/40
+        "
+      >
+        {sidebarItems.map(function (item) {
           return (
             <button
               key={item.label}
-              onClick={onClose}
-              className={item.active
-                ? 'flex items-center gap-3 w-full px-4 py-2.5 rounded-md text-sm font-bold transition cursor-pointer bg-[#7DDCE0] text-[#08386B]'
-                : 'flex items-center gap-3 w-full px-4 py-2.5 rounded-md text-sm font-bold transition cursor-pointer text-gray-600 hover:bg-white hover:text-[#0D4B8E]'
+              onClick={onItemClick}
+              className={
+                item.active
+                  ? "w-full min-h-[48px] py-3 flex items-center gap-3 px-4 rounded-xl font-[Cairo] text-[14px] leading-6 transition-all duration-200 cursor-pointer shrink-0 bg-[#47DBE0] text-[#003469] font-bold shadow-md"
+                  : "w-full min-h-[48px] py-3 flex items-center gap-3 px-4 rounded-xl font-[Cairo] text-[14px] leading-6 transition-all duration-200 cursor-pointer shrink-0 text-white/90 hover:bg-white/10 hover:text-white"
               }
             >
-              <item.icon className="text-xl shrink-0" />
-              <span>{item.label}</span>
+              <span
+                className={`text-[18px] flex items-center shrink-0 ${
+                  item.active ? "text-[#003469]" : "text-white/85"
+                }`}
+              >
+                <item.icon />
+              </span>
+              <span className="flex-1 text-right">{item.label}</span>
             </button>
-          )
+          );
         })}
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-[#E5E7EB] p-3 shrink-0">
-        <button className="flex items-center justify-between w-full px-4 py-2.5 text-sm text-gray-600 hover:text-[#0D4B8E] hover:bg-white rounded-md transition cursor-pointer">
-          <span>الإعدادات</span>
-          <FiSettings />
-        </button>
-        <button className="flex items-center justify-between w-full px-4 py-2.5 mt-1 text-sm font-bold text-red-500 hover:bg-red-50 rounded-md transition cursor-pointer">
-          <span>تسجيل الخروج</span>
-          <FiLogOut className="text-base" />
-        </button>
+      <div className="mt-auto px-3 sm:px-4 pb-2 shrink-0">
+        <div className="border-t border-white/20 pt-3">
+          <button
+            onClick={onItemClick}
+            className="w-full min-h-[48px] py-3 flex items-center gap-3 px-4 rounded-xl font-[Cairo] text-[14px] leading-6 transition-all duration-200 cursor-pointer shrink-0 text-white/90 hover:bg-white/10 hover:text-white"
+          >
+            <span className="text-[18px] flex items-center text-white/85 shrink-0">
+              <FiSettings />
+            </span>
+            <span className="flex-1 text-right">الإعدادات</span>
+          </button>
+        </div>
+
+        <div className="border-t border-white/20 mt-2 pt-2">
+          <button
+            className="
+              w-full h-5
+              flex items-center gap-2.5 sm:gap-3
+              px-2.5 sm:px-3 rounded-[8px]
+              font-[Cairo] text-[11px] sm:text-[12px] lg:text-[13px] leading-[18px]
+              text-white/85 font-normal text-right
+              hover:bg-red-500/10 hover:text-red-400
+              transition cursor-pointer shrink-0
+            "
+          >
+            <span className="text-[15px] sm:text-[16px] lg:text-[18px] flex items-center shrink-0">
+              <FiLogOut />
+            </span>
+            <span>تسجيل الخروج</span>
+          </button>
+        </div>
       </div>
-    </aside>
+    </>
+  );
+}
+
+function Sidebar({ isOpen, onClose, onOpen }) {
+  return (
+    <>
+      {/* ===== نسخة الديسكتوب ===== */}
+      <aside className="hidden lg:flex lg:flex-col w-64 h-screen sticky top-0 bg-[#003469] border-l border-[#C2C6D2] shrink-0 py-4">
+        <SidebarContent />
+      </aside>
+
+      {/* ===== نسخة الموبايل ===== */}
+
+      {/* Hamburger - يظهر بس لما السايدبار مسكر */}
+      {!isOpen && onOpen && (
+        <button
+          onClick={onOpen}
+          className="
+            lg:hidden fixed top-4 right-4 z-50
+            w-10 h-10 rounded-lg
+            bg-[#003469] border border-white/30
+            flex items-center justify-center
+            text-white shadow-md cursor-pointer
+          "
+          aria-label="فتح القائمة"
+        >
+          <FiMenu className="text-xl" />
+        </button>
+      )}
+
+      {/* Overlay */}
+      {isOpen && (
+        <div
+          onClick={onClose}
+          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+        />
+      )}
+
+      <aside
+        className={`
+          lg:hidden
+          fixed top-0 right-0 z-50
+          w-[85vw] max-w-[256px] sm:w-[240px]
+          h-screen h-[100dvh]
+          bg-[#003469]
+          border-l border-[#C2C6D2]
+          flex flex-col
+          py-3 sm:py-4
+          overflow-hidden
+          transition-transform duration-300
+          ${isOpen ? "translate-x-0" : "translate-x-full"}
+        `}
+      >
+        <div className="flex justify-start px-3 sm:px-4 mb-1 shrink-0">
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-lg border border-white/30 flex items-center justify-center text-white cursor-pointer"
+            aria-label="إغلاق القائمة"
+          >
+            <FiX className="text-lg" />
+          </button>
+        </div>
+
+        <SidebarContent onItemClick={onClose} />
+      </aside>
+    </>
   );
 }
 
