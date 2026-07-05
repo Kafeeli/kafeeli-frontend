@@ -134,7 +134,7 @@ export default function EmailVerification() {
         localStorage.removeItem("pendingVerificationEmail");
 
         setTimeout(() => {
-          navigate("/login");
+          navigate("/email-verified-success", { replace: true });
         }, 2000);
       } catch (error) {
         console.log("Status:", error.response?.status);

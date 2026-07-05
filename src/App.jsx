@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+
 import Login from "./pages/Login";
 import RegistrationPage from "./pages/RegistrationPage";
 import EmailVerification from "./pages/EmailVerification";
@@ -7,11 +8,15 @@ import EmailVerificationSuccess from "./pages/EmailVerificationSuccess";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
-import SideBar from "./pages/admin-dashboard/sideBar"
+
+import SideBar from "./pages/admin-dashboard/sideBar";
 import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
+
 import LandingPage from "./pages/LandingPage";
+
 import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
 import ProfilePage from "./pages/sponsor-dashboard/profileDashboard";
+
 import GuardianProfile from "./pages/GuardianProfile";
 import ErrorPage from "./pages/guardian-dashboard/Families/ErrorStates";
 import FamilyAccessPendingPage from "./pages/guardian-dashboard/Families/FamilyAccessPendingPage";
@@ -19,6 +24,7 @@ import NoFamiliesPage from "./pages/guardian-dashboard/Families/NoFamiliesPage";
 import AddFamilyPage from "./pages/guardian-dashboard/Families/AddFamilyPage";
 import ManagingFamilyCards from "./pages/guardian-dashboard/Families/ManagingFamilyCards";
 import FamilyDetailsPage from "./pages/guardian-dashboard/Families/FamilyDetailsPage";
+
 import ActiveFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/ActiveFamilyDetailsPage";
 import HiddenFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/HiddenFamilyDetailsPage";
 import PendingFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/PendingFamilyDetailsPage";
@@ -46,7 +52,10 @@ function AnimatedRoutes() {
 
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
+      <Routes
+        location={location}
+        key={`${location.pathname}${location.search}`}
+      >
         {/* Auth */}
         <Route
           path="/"
@@ -65,14 +74,6 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-        <Route
-          path="/Side-bar"
-          element={
-            <PageWrapper>
-              <SideBar />
-            </PageWrapper>
-          }
-        />
 
         <Route
           path="/register"
@@ -83,16 +84,55 @@ function AnimatedRoutes() {
           }
         />
 
-        <Route path="/verify-email" element={<EmailVerification />} />
-        <Route path="/email-verified" element={<EmailVerification />} />
+        {/* صفحة انتظار التحقق بعد التسجيل */}
+        <Route
+          path="/verify-email"
+          element={
+            <PageWrapper>
+              <EmailVerification />
+            </PageWrapper>
+          }
+        />
 
+        {/* رابط التحقق القادم من الإيميل */}
         <Route
           path="/email-verified"
+          element={
+            <PageWrapper>
+              <EmailVerification />
+            </PageWrapper>
+          }
+        />
+
+        {/* صفحة نجاح التحقق */}
+        <Route
+          path="/email-verified-success"
           element={
             <PageWrapper>
               <EmailVerificationSuccess />
             </PageWrapper>
           }
+        />
+
+        {/* دعم الراوت القديم لو كان مستخدم */}
+        <Route
+          path="/email-verifiedSuccess"
+          element={<Navigate to="/email-verified-success" replace />}
+        />
+
+        <Route
+          path="/invalid-email"
+          element={
+            <PageWrapper>
+              <InvalidEmail />
+            </PageWrapper>
+          }
+        />
+
+        {/* دعم الراوت القديم بحرف E كبير */}
+        <Route
+          path="/invalid-Email"
+          element={<Navigate to="/invalid-email" replace />}
         />
 
         <Route
@@ -112,13 +152,12 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-      
 
         <Route
-          path="/invalid-Email"
+          path="/Side-bar"
           element={
             <PageWrapper>
-              <InvalidEmail />
+              <SideBar />
             </PageWrapper>
           }
         />
@@ -188,9 +227,8 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-        {/* الحالاات */}
-        {/* حالة العائلة نشطة  */}
-          <Route
+
+        <Route
           path="/families/active-details"
           element={
             <PageWrapper>
@@ -198,61 +236,60 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-          
-      {/* تعديل بيانات نشطة */}
-      <Route
-        path="/families/edit"
-        element={
-          <PageWrapper>
-            <FamilyEditPage />
-          </PageWrapper>
-        }
-      />
-      {/* تعديل ايرور */}
-      <Route
-        path="/families/needs-edit/edit"
+
+        <Route
+          path="/families/edit"
           element={
-        <PageWrapper>
-            <NeedsEditFamilyEditPage />
-        </PageWrapper>
-        }
-      />
-      {/* حالة موقوفة */}
-      <Route
-      path="/families/stopped-details"
-      element={
-      <PageWrapper>
-         <StoppedFamilyDetailsPage />
-      </PageWrapper>
-      }
-      />
-      {/* قيد المراجعة */}
-       <Route
-       path="/families/pending-details"
-       element={
-          <PageWrapper>
-            <PendingFamilyDetailsPage />
-          </PageWrapper>
-       }
-      />
-      {/* حالة مخفية */}
-      <Route
-        path="/families/hidden-details"
-        element={
-          <PageWrapper>
-            <HiddenFamilyDetailsPage />
-          </PageWrapper>
-       }
-      />
-      {/* تحتاج تعديل */}
-       <Route
-       path="/families/needs-edit-details"
-        element={
-        <PageWrapper>
-          <NeedsEditFamilyDetailsPage />
-        </PageWrapper>
-        }
-      />
+            <PageWrapper>
+              <FamilyEditPage />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/families/needs-edit/edit"
+          element={
+            <PageWrapper>
+              <NeedsEditFamilyEditPage />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/families/stopped-details"
+          element={
+            <PageWrapper>
+              <StoppedFamilyDetailsPage />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/families/pending-details"
+          element={
+            <PageWrapper>
+              <PendingFamilyDetailsPage />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/families/hidden-details"
+          element={
+            <PageWrapper>
+              <HiddenFamilyDetailsPage />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/families/needs-edit-details"
+          element={
+            <PageWrapper>
+              <NeedsEditFamilyDetailsPage />
+            </PageWrapper>
+          }
+        />
 
         <Route
           path="/families/error"
@@ -262,15 +299,15 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
+
         <Route
-        path="/families/details"
-        element={
-        <PageWrapper>
-          <FamilyDetailsPage />
-        </PageWrapper>
-      }
-      />
-      
+          path="/families/details"
+          element={
+            <PageWrapper>
+              <FamilyDetailsPage />
+            </PageWrapper>
+          }
+        />
 
         {/* Old routes redirects */}
         <Route
