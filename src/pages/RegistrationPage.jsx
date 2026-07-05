@@ -61,8 +61,7 @@ export default function RegistrationPage() {
 
   const accountTypeMap = {
     sponsor: 1,
-    guardian:2,
-    
+    guardian: 2,
   };
 
   const roles = [
@@ -208,7 +207,7 @@ export default function RegistrationPage() {
     const data = error.response?.data;
 
     if (!data) {
-      return "حدث خطأ في الاتصال بالخادم";
+      return error.message || "حدث خطأ في الاتصال بالخادم";
     }
 
     return extractErrors(data) || "فشل إنشاء الحساب، حاول مرة أخرى";
@@ -216,6 +215,11 @@ export default function RegistrationPage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
+
+    setErrors((prev) => ({
+      ...prev,
+      api: "",
+    }));
 
     if (!validateForm()) {
       return;
@@ -251,9 +255,9 @@ export default function RegistrationPage() {
 
       const result = await authApi.register(registerPayload);
 
-      console.log("Register success:", result);
+      console.log("Register response:", result);
 
-      if (result?.success === false) {
+      if (result?.success !== true) {
         setErrors((prev) => ({
           ...prev,
           api: extractErrors(result) || "فشل إنشاء الحساب",
@@ -410,6 +414,7 @@ export default function RegistrationPage() {
                     onChange={handleChange}
                     placeholder="محمد"
                     className={inputClass(errors.firstName)}
+                    disabled={isSubmitting}
                   />
                   <FieldError message={errors.firstName} />
                 </div>
@@ -423,6 +428,7 @@ export default function RegistrationPage() {
                     onChange={handleChange}
                     placeholder="أحمد"
                     className={inputClass(errors.fatherName)}
+                    disabled={isSubmitting}
                   />
                   <FieldError message={errors.fatherName} />
                 </div>
@@ -436,6 +442,7 @@ export default function RegistrationPage() {
                     onChange={handleChange}
                     placeholder="محمود"
                     className={inputClass(errors.grandFatherName)}
+                    disabled={isSubmitting}
                   />
                   <FieldError message={errors.grandFatherName} />
                 </div>
@@ -449,6 +456,7 @@ export default function RegistrationPage() {
                     onChange={handleChange}
                     placeholder="الأسعد"
                     className={inputClass(errors.familyName)}
+                    disabled={isSubmitting}
                   />
                   <FieldError message={errors.familyName} />
                 </div>
@@ -462,12 +470,13 @@ export default function RegistrationPage() {
                     onChange={handleChange}
                     placeholder="example@mail.com"
                     className={inputClass(errors.email)}
+                    disabled={isSubmitting}
                   />
                   <FieldError message={errors.email} />
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <FieldLabel required >رقم الهاتف</FieldLabel>
+                  <FieldLabel required>رقم الهاتف</FieldLabel>
                   <input
                     name="phone"
                     type="tel"
@@ -475,6 +484,7 @@ export default function RegistrationPage() {
                     onChange={handleChange}
                     placeholder="+97059XXXXXXX"
                     className={inputClass(errors.phone)}
+                    disabled={isSubmitting}
                   />
                   <FieldError message={errors.phone} />
                 </div>
@@ -497,8 +507,11 @@ export default function RegistrationPage() {
                       value={formData.city}
                       onChange={handleChange}
                       className={`w-full ${inputClass(errors.city)}`}
+                      disabled={isSubmitting}
                     >
-                      <option value="" hidden>اختر المدينة</option>
+                      <option value="" hidden>
+                        اختر المدينة
+                      </option>
                       <option value="غزة">غزة</option>
                       <option value="خان يونس">خان يونس</option>
                       <option value="بيت لاهيا">بيت لاهيا</option>
@@ -518,8 +531,11 @@ export default function RegistrationPage() {
                       value={formData.gender}
                       onChange={handleChange}
                       className={`w-full ${inputClass(errors.gender)}`}
+                      disabled={isSubmitting}
                     >
-                      <option value="" hidden>اختر</option>
+                      <option value="" hidden>
+                        اختر
+                      </option>
                       <option value="ذكر">ذكر</option>
                       <option value="أنثى">أنثى</option>
                     </select>
@@ -535,6 +551,7 @@ export default function RegistrationPage() {
                     value={formData.birthDate}
                     onChange={handleChange}
                     className={inputClass(errors.birthDate)}
+                    disabled={isSubmitting}
                   />
                   <FieldError message={errors.birthDate} />
                 </div>
@@ -552,16 +569,19 @@ export default function RegistrationPage() {
                     value={formData.password}
                     onChange={handleChange}
                     className={`w-full ${inputClass(errors.password)}`}
+                    disabled={isSubmitting}
                   />
 
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute left-3 top-3 cursor-pointer text-gray-400"
+                    disabled={isSubmitting}
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
+
                 <FieldError message={errors.password} />
               </div>
 
@@ -575,16 +595,19 @@ export default function RegistrationPage() {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     className={`w-full ${inputClass(errors.confirmPassword)}`}
+                    disabled={isSubmitting}
                   />
 
                   <button
                     type="button"
                     onClick={() => setShowConfirm(!showConfirm)}
                     className="absolute left-3 top-3 cursor-pointer text-gray-400"
+                    disabled={isSubmitting}
                   >
                     {showConfirm ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
+
                 <FieldError message={errors.confirmPassword} />
               </div>
 

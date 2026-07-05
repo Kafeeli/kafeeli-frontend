@@ -1,10 +1,34 @@
-// services/authApi.js
+// // services/authApi.js
+// import axios from "axios";
+
+// const api = axios.create({
+//   baseURL: import.meta.env.VITE_API_BASE_URL,
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+// });
+// export default api
+// import axios from "axios";
+
+// const api = axios.create({
+//   baseURL: import.meta.env.VITE_API_BASE_URL,
+//   headers: {
+//     "Content-Type": "application/json",
+//   },
+// });
+
+// export default api;
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/backend";
+
+console.log("API BASE URL:", API_BASE_URL);
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
-export default api
+
+export default api;
