@@ -10,7 +10,7 @@ import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
 import LandingPage from "./pages/LandingPage";
 import GuardianProfile from "./pages/GuardianProfile";
-
+import GuardianDashboard from "./pages/GuardianDashboard";
 
 function PageWrapper({ children }) {
   return (
@@ -23,7 +23,6 @@ function PageWrapper({ children }) {
     >
       {children}
     </motion.div>
-    
   );
 }
 
@@ -41,14 +40,14 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-        <Route 
-  path="/landing-page" 
-  element={
-    <div dir="rtl" className="min-h-screen bg-gray-50">
-      <LandingPage />
-    </div>
-  } 
-/>
+        <Route
+          path="/landing-page"
+          element={
+            <div dir="rtl" className="min-h-screen bg-gray-50">
+              <LandingPage />
+            </div>
+          }
+        />
 
         <Route
           path="/login"
@@ -67,7 +66,7 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-
+        <Route path="/guardian-dashboard" element={<GuardianDashboard />} />
         <Route
           path="/verify-email"
           element={
@@ -140,15 +139,14 @@ function AnimatedRoutes() {
           }
         />
         <Route
-  path="/guardian-profile"
-  element={
-    <PageWrapper>
-      <GuardianProfile />
-    </PageWrapper>
-  }
-/>
+          path="/guardian-profile"
+          element={
+            <PageWrapper>
+              <GuardianProfile />
+            </PageWrapper>
+          }
+        />
       </Routes>
-      
     </AnimatePresence>
   );
 }
