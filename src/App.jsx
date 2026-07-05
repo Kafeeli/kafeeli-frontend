@@ -83,14 +83,8 @@ function AnimatedRoutes() {
           }
         />
 
-        <Route
-          path="/verify-email"
-          element={
-            <PageWrapper>
-              <EmailVerification />
-            </PageWrapper>
-          }
-        />
+        <Route path="/verify-email" element={<EmailVerification />} />
+        <Route path="/email-verified" element={<EmailVerification />} />
 
         <Route
           path="/email-verified"

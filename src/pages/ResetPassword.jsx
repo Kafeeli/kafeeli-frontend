@@ -49,8 +49,8 @@ function ResetPassword() {
 
   return (
     <div dir="rtl" className="min-h-screen bg-[#f6f8fb] flex flex-col">
-      <header className="w-full bg-white border-b border-gray-200 flex justify-center">
-        <div className="w-full max-w-[1280px] h-[79px] flex items-center justify-between px-8">
+      <header className="flex items-center justify-between px-8 py-1 bg-gray-50 shadow-sm">
+        <div className="w-full h-[79px] flex items-center justify-between px-8">
           <img src={logo} alt="logo" className="w-[109px] h-[55px] object-contain" />
           <h1 className="font-[Cairo] font-bold text-2xl leading-6 text-[#0b4f93]">
             كفيلي
