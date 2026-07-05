@@ -4,40 +4,148 @@ import kafeeli from "../assets/kafeeli.png";
 import { MdOutlineMailOutline } from "react-icons/md";
 import { LuLock } from "react-icons/lu";
 import { TbShieldCheck, TbScan } from "react-icons/tb";
-// import { FaEye, FaEyeSlash, FaArrowLeft } from "react-icons/fa";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
+import { authApi } from "../services/authApi";
+
 function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorType, setErrorType] = useState("");
+
+  const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e) => {
-  e.preventDefault();
+  function getApiErrorMessage(error) {
+    const data = error.response?.data;
 
-  if (!email || !password) {
-    setErrorType("empty");
-    return;
+    if (!data) {
+      return "حدث خطأ في الاتصال بالخادم";
+    }
+
+    if (Array.isArray(data.errors) && data.errors.length > 0) {
+      return data.errors.join("\n");
+    }
+
+    if (data.errors && typeof data.errors === "object") {
+      return Object.values(data.errors).flat().join("\n");
+    }
+
+    if (typeof data.errors === "string") {
+      return data.errors;
+    }
+
+    if (data.message) {
+      return data.message;
+    }
+
+    if (data.title) {
+      return data.title;
+    }
+
+    return "فشل تسجيل الدخول، تأكد من البريد الإلكتروني وكلمة المرور";
   }
 
-  const response = {
-    success: true,
-    role: "Sponsor",
-    error: null,
+  function getResultErrorMessage(result) {
+    if (Array.isArray(result?.errors) && result.errors.length > 0) {
+      return result.errors.join("\n");
+    }
+
+    if (result?.errors && typeof result.errors === "object") {
+      return Object.values(result.errors).flat().join("\n");
+    }
+
+    if (typeof result?.errors === "string") {
+      return result.errors;
+    }
+
+    if (result?.message) {
+      return result.message;
+    }
+
+    return "فشل تسجيل الدخول، تأكد من البريد الإلكتروني وكلمة المرور";
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    setErrorMessage("");
+
+    if (!email.trim() || !password) {
+      setErrorMessage("الرجاء تعبئة جميع الحقول");
+      return;
+    }
+
+    const loginPayload = {
+      email: email.trim(),
+      password: password,
+    };
+
+    try {
+      setIsSubmitting(true);
+
+      console.log("Login payload:", JSON.stringify(loginPayload, null, 2));
+
+      const result = await authApi.login(loginPayload);
+
+      console.log("Login response:", result);
+
+      if (result?.success !== true) {
+        setErrorMessage(getResultErrorMessage(result));
+        return;
+      }
+
+      const token =
+        result?.data?.token ||
+        result?.data?.accessToken ||
+        result?.data?.access_token ||
+        result?.token ||
+        result?.accessToken ||
+        result?.access_token;
+
+      const refreshToken =
+        result?.data?.refreshToken ||
+        result?.data?.refresh_token ||
+        result?.refreshToken ||
+        result?.refresh_token;
+
+      const user =
+        result?.data?.user ||
+        result?.user ||
+        result?.data;
+
+      if (!token) {
+        setErrorMessage("تم تسجيل الدخول بنجاح لكن لم يتم استلام رمز الدخول من الخادم");
+        return;
+      }
+
+      localStorage.setItem("token", token);
+
+      if (refreshToken) {
+        localStorage.setItem("refreshToken", refreshToken);
+      }
+
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+
+      navigate("/landing-page");
+    } catch (error) {
+      console.log("Status:", error.response?.status);
+      console.log(
+        "Backend error:",
+        JSON.stringify(error.response?.data, null, 2)
+      );
+
+      setErrorMessage(getApiErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-
-  setErrorType("");
-
-  if (response.success) {
-    navigate("/landing-page"); // أو "/landing" أو أي مسار محدد عندك لصفحة الـ landing
-  }
-};
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row overflow-y-auto">
-      {/* الصورة شمال */}
       <div
         className="hidden md:flex w-1/2 max-md:w-full max-md:min-h-[350px] bg-cover bg-center relative justify-center items-center"
         style={{ backgroundImage: `url(${kafeeli})` }}
@@ -68,7 +176,6 @@ function Login() {
         </div>
       </div>
 
-      {/* الفورم يمين */}
       <div
         dir="rtl"
         className="w-full md:w-1/2 bg-[#f5f6f8] flex justify-center items-center pt-18 md:pt-0"
@@ -92,9 +199,14 @@ function Login() {
                 type="email"
                 placeholder="example@domain.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full h-12 border border-[#d8dbe2] rounded-md bg-[#f5f6fa] pr-[45px] pl-[45px] outline-none focus:border-[#003469]"
+                disabled={isSubmitting}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setErrorMessage("");
+                }}
+                className="w-full h-12 border border-[#d8dbe2] rounded-md bg-[#f5f6fa] pr-[45px] pl-[45px] outline-none focus:border-[#003469] disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
+
               <MdOutlineMailOutline className="absolute right-[15px] top-1/2 -translate-y-1/2 text-[#7d8492] text-lg" />
             </div>
 
@@ -107,38 +219,52 @@ function Login() {
                 type={showPassword ? "text" : "password"}
                 placeholder="********"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full h-12 border border-[#d8dbe2] rounded-md bg-[#f5f6fa] pr-[45px] pl-[45px] outline-none focus:border-[#003469]"
+                disabled={isSubmitting}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setErrorMessage("");
+                }}
+                className="w-full h-12 border border-[#d8dbe2] rounded-md bg-[#f5f6fa] pr-[45px] pl-[45px] outline-none focus:border-[#003469] disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
 
               <LuLock className="absolute right-[15px] top-1/2 -translate-y-1/2 text-[#7d8492] text-lg" />
 
-              <div
+              <button
+                type="button"
+                disabled={isSubmitting}
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute left-[15px] top-1/2 -translate-y-1/2 text-[#7d8492] text-lg cursor-pointer"
+                className="absolute left-[15px] top-1/2 -translate-y-1/2 text-[#7d8492] text-lg cursor-pointer disabled:cursor-not-allowed"
               >
                 {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
-              </div>
+              </button>
             </div>
 
             <a
-              href="forgot-password"
+              href="/forgot-password"
               className="text-[#00696E] text-[14px] no-underline hover:text-[#008b8b] duration-200"
             >
               نسيت كلمة المرور؟
             </a>
 
-            {errorType === "empty" && (
-              <div className="mt-3 bg-red-100 text-red-600 p-3 rounded-md text-sm">
-                الرجاء تعبئة جميع الحقول
+            {errorMessage && (
+              <div
+                dir="rtl"
+                className="mt-3 bg-red-50 border border-red-200 text-red-600 p-3 rounded-md text-sm leading-7 whitespace-pre-wrap text-right"
+              >
+                {errorMessage}
               </div>
             )}
 
             <button
               type="submit"
-              className="w-full mt-[18px] h-[45px] border-none rounded-md bg-[#003469] text-white text-[15px] cursor-pointer hover:bg-[#002850]"
+              disabled={isSubmitting}
+              className={`w-full mt-[18px] h-[45px] border-none rounded-md bg-[#003469] text-white text-[15px] hover:bg-[#002850] ${
+                isSubmitting
+                  ? "opacity-70 cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
             >
-              تسجيل الدخول
+              {isSubmitting ? "جارٍ تسجيل الدخول..." : "تسجيل الدخول"}
             </button>
           </form>
 
@@ -156,9 +282,11 @@ function Login() {
             <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
               سياسة الخصوصية
             </a>
+
             <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
               الشروط والأحكام
             </a>
+
             <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
               اتصل بنا
             </a>
