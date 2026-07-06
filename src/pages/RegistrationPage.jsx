@@ -513,7 +513,7 @@ export default function RegistrationPage() {
                         اختر المدينة
                       </option>
                       <option value="غزة">غزة</option>
-                      <option value="خان يونس">خان يونس</option>
+                      <option value="خانيونس">خان يونس</option>
                       <option value="بيت لاهيا">بيت لاهيا</option>
                       <option value="بيت حانون">بيت حانون</option>
                       <option value="نصيرات">نصيرات</option>
