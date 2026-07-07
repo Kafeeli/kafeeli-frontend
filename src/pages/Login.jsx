@@ -18,10 +18,13 @@ function Login() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSendingVerification, setIsSendingVerification] = useState(false);
 
   function extractMessage(data) {
-    if (!data) {
-      return "";
+    if (!data) return "";
+
+    if (data.message) {
+      return data.message;
     }
 
     if (Array.isArray(data.errors) && data.errors.length > 0) {
@@ -34,10 +37,6 @@ function Login() {
 
     if (typeof data.errors === "string") {
       return data.errors;
-    }
-
-    if (data.message) {
-      return data.message;
     }
 
     if (data.title) {
@@ -54,7 +53,10 @@ function Login() {
       return "حدث خطأ في الاتصال بالخادم";
     }
 
-    return extractMessage(data) || "فشل تسجيل الدخول، تأكد من البريد الإلكتروني وكلمة المرور";
+    return (
+      extractMessage(data) ||
+      "فشل تسجيل الدخول، تأكد من البريد الإلكتروني وكلمة المرور"
+    );
   }
 
   function getResultErrorMessage(result) {
@@ -76,13 +78,42 @@ function Login() {
     );
   }
 
-  function handleUnconfirmedEmail(message) {
+  async function handleUnconfirmedEmail(apiMessage) {
     const cleanEmail = email.trim();
 
     localStorage.setItem("pendingVerificationEmail", cleanEmail);
 
     setNeedsVerification(true);
-    setErrorMessage(message || "يرجى تأكيد بريدك الإلكتروني قبل تسجيل الدخول");
+    setIsSendingVerification(true);
+    setErrorMessage(
+      `${apiMessage}\nسيتم إرسال رابط تحقق جديد وتحويلك إلى صفحة التحقق.`
+    );
+
+    try {
+      const payload = {
+        email: cleanEmail,
+      };
+
+      console.log("Send verification email payload:", payload);
+
+      const resendResult = await authApi.sendResendEmailConfirmation(payload);
+
+      console.log("Send verification email response:", resendResult);
+    } catch (resendError) {
+      console.log("Resend verification status:", resendError.response?.status);
+      console.log(
+        "Resend verification error:",
+        JSON.stringify(resendError.response?.data, null, 2)
+      );
+    } finally {
+      setTimeout(() => {
+        navigate(`/verify-email?email=${encodeURIComponent(cleanEmail)}`, {
+          state: {
+            email: cleanEmail,
+          },
+        });
+      }, 1200);
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -90,6 +121,7 @@ function Login() {
 
     setErrorMessage("");
     setNeedsVerification(false);
+    setIsSendingVerification(false);
 
     if (!email.trim() || !password) {
       setErrorMessage("الرجاء تعبئة جميع الحقول");
@@ -117,7 +149,7 @@ function Login() {
         const apiMessage = getResultErrorMessage(result);
 
         if (isEmailNotConfirmed(apiMessage)) {
-          handleUnconfirmedEmail(apiMessage);
+          await handleUnconfirmedEmail(apiMessage);
           return;
         }
 
@@ -168,8 +200,10 @@ function Login() {
 
       const apiMessage = getApiErrorMessage(error);
 
+      console.log("Displayed error:", apiMessage);
+
       if (isEmailNotConfirmed(apiMessage)) {
-        handleUnconfirmedEmail(apiMessage);
+        await handleUnconfirmedEmail(apiMessage);
         return;
       }
 
@@ -178,14 +212,6 @@ function Login() {
       setIsSubmitting(false);
     }
   };
-
-  function goToInvalidEmailPage() {
-    const cleanEmail = email.trim();
-
-    localStorage.setItem("pendingVerificationEmail", cleanEmail);
-
-    navigate(`/invalid-email?email=${encodeURIComponent(cleanEmail)}`);
-  }
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row overflow-y-auto">
@@ -242,11 +268,12 @@ function Login() {
                 type="email"
                 placeholder="example@domain.com"
                 value={email}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isSendingVerification}
                 onChange={(e) => {
                   setEmail(e.target.value);
                   setErrorMessage("");
                   setNeedsVerification(false);
+                  setIsSendingVerification(false);
                 }}
                 className="w-full h-12 border border-[#d8dbe2] rounded-md bg-[#f5f6fa] pr-[45px] pl-[45px] outline-none focus:border-[#003469] disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
@@ -263,11 +290,12 @@ function Login() {
                 type={showPassword ? "text" : "password"}
                 placeholder="********"
                 value={password}
-                disabled={isSubmitting}
+                disabled={isSubmitting || isSendingVerification}
                 onChange={(e) => {
                   setPassword(e.target.value);
                   setErrorMessage("");
                   setNeedsVerification(false);
+                  setIsSendingVerification(false);
                 }}
                 className="w-full h-12 border border-[#d8dbe2] rounded-md bg-[#f5f6fa] pr-[45px] pl-[45px] outline-none focus:border-[#003469] disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
@@ -276,7 +304,7 @@ function Login() {
 
               <button
                 type="button"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isSendingVerification}
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute left-[15px] top-1/2 -translate-y-1/2 text-[#7d8492] text-lg cursor-pointer disabled:cursor-not-allowed"
               >
@@ -300,30 +328,24 @@ function Login() {
                     : "bg-red-50 border-red-200 text-red-600"
                 }`}
               >
-                <div>{errorMessage}</div>
-
-                {needsVerification && (
-                  <button
-                    type="button"
-                    onClick={goToInvalidEmailPage}
-                    className="mt-3 w-full h-10 rounded-md bg-[#003469] text-white hover:bg-[#002850] cursor-pointer"
-                  >
-                    إعادة إرسال رابط التحقق
-                  </button>
-                )}
+                {errorMessage}
               </div>
             )}
 
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || isSendingVerification}
               className={`w-full mt-[18px] h-[45px] border-none rounded-md bg-[#003469] text-white text-[15px] hover:bg-[#002850] ${
-                isSubmitting
+                isSubmitting || isSendingVerification
                   ? "opacity-70 cursor-not-allowed"
                   : "cursor-pointer"
               }`}
             >
-              {isSubmitting ? "جارٍ تسجيل الدخول..." : "تسجيل الدخول"}
+              {isSendingVerification
+                ? "جارٍ إرسال رابط التحقق..."
+                : isSubmitting
+                  ? "جارٍ تسجيل الدخول..."
+                  : "تسجيل الدخول"}
             </button>
           </form>
 
