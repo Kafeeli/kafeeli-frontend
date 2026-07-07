@@ -32,9 +32,9 @@ export default function EmailVerification() {
     <>
       <header className="bg-white border-b border-gray-200 px-8 py-1" dir="rtl">
         <div className="w-full mx-auto flex items-center justify-between">
-          <a href="">
+          <button onClick={() => navigate("/")} className="cursor-pointer">
             <img src={logo} alt="logo" className="w-20 h-19" />
-          </a>
+          </button>
           <h1 className="text-[24px] font-bold text-[#003469] hidden md:block">
             كفيلي
           </h1>

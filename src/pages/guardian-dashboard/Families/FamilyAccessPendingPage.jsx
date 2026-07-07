@@ -20,7 +20,7 @@ function TopNavbar({ setOpenSidebar }) {
   return (
     <header
       dir="rtl"
-      className="h-[56px] bg-white border-b border-[#DDE2EA] shadow-sm px-3 sm:px-6"
+      className="h-[60px] bg-white border-b border-[#DDE2EA] shadow-sm px-3 sm:px-6"
     >
       <div className="h-full flex items-center justify-between gap-3">
         {/* يمين الهيدر */}
@@ -35,7 +35,8 @@ function TopNavbar({ setOpenSidebar }) {
           </button>
 
           <h1 className="font-[Cairo] text-[15px] font-bold text-[#003469] whitespace-nowrap shrink-0">
-عائلاتي          </h1>
+            عائلاتي
+          </h1>
 
           <div className="h-6 w-px bg-[#DDE2EA] shrink-0" />
 
@@ -126,12 +127,16 @@ function StepCard({ status, title, description, icon }) {
       <div className="flex items-center justify-center gap-2">
         <span className={`text-[22px] ${selected.icon}`}>{icon}</span>
 
-        <h3 className={`font-[Cairo] text-[14px] sm:text-[15px] font-bold ${selected.title}`}>
+        <h3
+          className={`font-[Cairo] text-[14px] sm:text-[15px] font-bold ${selected.title}`}
+        >
           {title}
         </h3>
       </div>
 
-      <p className={`mt-2 font-[Cairo] text-[12px] sm:text-[13px] leading-6 ${selected.text}`}>
+      <p
+        className={`mt-2 font-[Cairo] text-[12px] sm:text-[13px] leading-6 ${selected.text}`}
+      >
         {description}
       </p>
     </div>
@@ -210,8 +215,8 @@ function FamilyAccessPendingPage() {
               </h2>
 
               <p className="mt-4 max-w-[600px] mx-auto font-[Cairo] text-[13px] sm:text-[15px] leading-8 text-[#6B7280]">
-                يجب اعتماد حسابك ووثائقك من الإدارة قبل إضافة عائلات جديدة.
-                هذه الخطوة ضرورية لضمان جودة البيانات وحماية المساعدات المقدمة.
+                يجب اعتماد حسابك ووثائقك من الإدارة قبل إضافة عائلات جديدة. هذه
+                الخطوة ضرورية لضمان جودة البيانات وحماية المساعدات المقدمة.
               </p>
 
               <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -236,7 +241,7 @@ function FamilyAccessPendingPage() {
             </section>
           </div>
         </main>
-         <footer className="mt-10 sm:mt-14 lg:mt-20 border-t border-[#E5E7EB] text-center px-4">
+        <footer className="mt-10 sm:mt-14 lg:mt-20 border-t border-[#E5E7EB] text-center px-4">
           <p className="text-xs sm:text-sm text-[#6B7280] mt-4 mb-4">
             © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
           </p>

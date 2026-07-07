@@ -1,3 +1,4 @@
+import usePageTitle from "./hooks/usePageTitle";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Login from "./pages/Login";
@@ -7,7 +8,7 @@ import EmailVerificationSuccess from "./pages/EmailVerificationSuccess";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
-import SideBar from "./pages/admin-dashboard/sideBar"
+import SideBar from "./pages/admin-dashboard/sideBar";
 import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 import LandingPage from "./pages/LandingPage";
 import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
@@ -26,6 +27,8 @@ import StoppedFamilyDetailsPage from "./pages/guardian-dashboard/Families/status
 import NeedsEditFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/NeedsEditFamilyDetailsPage";
 import FamilyEditPage from "./pages/guardian-dashboard/Families/status/FamilyEditPage";
 import NeedsEditFamilyEditPage from "./pages/guardian-dashboard/Families/status/NeedsEditFamilyEditPage";
+import Error404 from "./pages/error404";
+import Error401 from "./pages/auth401";
 
 function PageWrapper({ children }) {
   return (
@@ -42,6 +45,7 @@ function PageWrapper({ children }) {
 }
 
 function AnimatedRoutes() {
+  usePageTitle();
   const location = useLocation();
 
   return (
@@ -118,7 +122,6 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-      
 
         <Route
           path="/invalid-Email"
@@ -133,9 +136,11 @@ function AnimatedRoutes() {
         <Route
           path="/landing-page"
           element={
-            <div dir="rtl" className="min-h-screen bg-gray-50">
-              <LandingPage />
-            </div>
+            <PageWrapper>
+              <div dir="rtl" className="min-h-screen bg-gray-50">
+                <LandingPage />
+              </div>
+            </PageWrapper>
           }
         />
 
@@ -143,18 +148,22 @@ function AnimatedRoutes() {
         <Route
           path="/main"
           element={
-            <div dir="rtl" className="min-h-screen bg-gray-50">
-              <MainDashBoard />
-            </div>
+            <PageWrapper>
+              <div dir="rtl" className="min-h-screen bg-gray-50">
+                <MainDashBoard />
+              </div>
+            </PageWrapper>
           }
         />
 
         <Route
           path="/profile"
           element={
-            <div dir="rtl" className="min-h-screen bg-gray-50">
-              <ProfilePage />
-            </div>
+            <PageWrapper>
+              <div dir="rtl" className="min-h-screen bg-gray-50">
+                <ProfilePage />
+              </div>
+            </PageWrapper>
           }
         />
 
@@ -196,7 +205,7 @@ function AnimatedRoutes() {
         />
         {/* الحالاات */}
         {/* حالة العائلة نشطة  */}
-          <Route
+        <Route
           path="/families/active-details"
           element={
             <PageWrapper>
@@ -204,61 +213,61 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-          
-      {/* تعديل بيانات نشطة */}
-      <Route
-        path="/families/edit"
-        element={
-          <PageWrapper>
-            <FamilyEditPage />
-          </PageWrapper>
-        }
-      />
-      {/* تعديل ايرور */}
-      <Route
-        path="/families/needs-edit/edit"
+
+        {/* تعديل بيانات نشطة */}
+        <Route
+          path="/families/edit"
           element={
-        <PageWrapper>
-            <NeedsEditFamilyEditPage />
-        </PageWrapper>
-        }
-      />
-      {/* حالة موقوفة */}
-      <Route
-      path="/families/stopped-details"
-      element={
-      <PageWrapper>
-         <StoppedFamilyDetailsPage />
-      </PageWrapper>
-      }
-      />
-      {/* قيد المراجعة */}
-       <Route
-       path="/families/pending-details"
-       element={
-          <PageWrapper>
-            <PendingFamilyDetailsPage />
-          </PageWrapper>
-       }
-      />
-      {/* حالة مخفية */}
-      <Route
-        path="/families/hidden-details"
-        element={
-          <PageWrapper>
-            <HiddenFamilyDetailsPage />
-          </PageWrapper>
-       }
-      />
-      {/* تحتاج تعديل */}
-       <Route
-       path="/families/needs-edit-details"
-        element={
-        <PageWrapper>
-          <NeedsEditFamilyDetailsPage />
-        </PageWrapper>
-        }
-      />
+            <PageWrapper>
+              <FamilyEditPage />
+            </PageWrapper>
+          }
+        />
+        {/* تعديل ايرور */}
+        <Route
+          path="/families/needs-edit/edit"
+          element={
+            <PageWrapper>
+              <NeedsEditFamilyEditPage />
+            </PageWrapper>
+          }
+        />
+        {/* حالة موقوفة */}
+        <Route
+          path="/families/stopped-details"
+          element={
+            <PageWrapper>
+              <StoppedFamilyDetailsPage />
+            </PageWrapper>
+          }
+        />
+        {/* قيد المراجعة */}
+        <Route
+          path="/families/pending-details"
+          element={
+            <PageWrapper>
+              <PendingFamilyDetailsPage />
+            </PageWrapper>
+          }
+        />
+        {/* حالة مخفية */}
+        <Route
+          path="/families/hidden-details"
+          element={
+            <PageWrapper>
+              <HiddenFamilyDetailsPage />
+            </PageWrapper>
+          }
+        />
+        {/* تحتاج تعديل */}
+        <Route
+          path="/families/needs-edit-details"
+          element={
+            <PageWrapper>
+              <NeedsEditFamilyDetailsPage />
+            </PageWrapper>
+          }
+        />
 
         <Route
           path="/families/error"
@@ -269,14 +278,13 @@ function AnimatedRoutes() {
           }
         />
         <Route
-        path="/families/details"
-        element={
-        <PageWrapper>
-          <FamilyDetailsPage />
-        </PageWrapper>
-      }
-      />
-      
+          path="/families/details"
+          element={
+            <PageWrapper>
+              <FamilyDetailsPage />
+            </PageWrapper>
+          }
+        />
 
         {/* Old routes redirects */}
         <Route
@@ -337,6 +345,23 @@ function AnimatedRoutes() {
           element={
             <PageWrapper>
               <GuardianProfile />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/error-404"
+          element={
+            <PageWrapper>
+              <Error404 />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/auth-401"
+          element={
+            <PageWrapper>
+              <Error401 />
             </PageWrapper>
           }
         />

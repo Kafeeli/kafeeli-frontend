@@ -15,25 +15,25 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!email || !password) {
-    setErrorType("empty");
-    return;
-  }
+    if (!email || !password) {
+      setErrorType("empty");
+      return;
+    }
 
-  const response = {
-    success: true,
-    role: "Sponsor",
-    error: null,
+    const response = {
+      success: true,
+      role: "Sponsor",
+      error: null,
+    };
+
+    setErrorType("");
+
+    if (response.success) {
+      navigate("/landing-page"); // أو "/landing" أو أي مسار محدد عندك لصفحة الـ landing
+    }
   };
-
-  setErrorType("");
-
-  if (response.success) {
-    navigate("/landing-page"); // أو "/landing" أو أي مسار محدد عندك لصفحة الـ landing
-  }
-};
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row overflow-y-auto">
@@ -121,12 +121,13 @@ function Login() {
               </div>
             </div>
 
-            <a
-              href="forgot-password"
-              className="text-[#00696E] text-[14px] no-underline hover:text-[#008b8b] duration-200"
+            <button
+              type="button"
+              onClick={() => navigate("/forgot-password")}
+              className="text-[#00696E] text-[14px] hover:text-[#008b8b] duration-200 cursor-pointer"
             >
               نسيت كلمة المرور؟
-            </a>
+            </button>
 
             {errorType === "empty" && (
               <div className="mt-3 bg-red-100 text-red-600 p-3 rounded-md text-sm">
@@ -144,12 +145,13 @@ function Login() {
 
           <div className="text-center mt-[25px] text-[#666]">
             ليس لديك حساب ؟
-            <a
-              href="/register"
-              className="text-[#00696E] no-underline font-semibold hover:cursor-pointer hover:text-[#008b8b] duration-200 ml-[5px]"
+            <button
+              type="button"
+              onClick={() => navigate("/register")}
+              className="text-[#00696E] font-semibold hover:text-[#008b8b] duration-200 ml-[5px] cursor-pointer"
             >
               أنشئ حساباً جديداً
-            </a>
+            </button>
           </div>
 
           <div className="mt-[30px] pt-5 border-t border-[#ececec] flex justify-center gap-[15px] flex-wrap">
