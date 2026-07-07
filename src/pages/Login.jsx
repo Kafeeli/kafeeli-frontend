@@ -14,14 +14,14 @@ function Login() {
   const [password, setPassword] = useState("");
 
   const [errorMessage, setErrorMessage] = useState("");
+  const [needsVerification, setNeedsVerification] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function getApiErrorMessage(error) {
-    const data = error.response?.data;
-
+  function extractMessage(data) {
     if (!data) {
-      return "حدث خطأ في الاتصال بالخادم";
+      return "";
     }
 
     if (Array.isArray(data.errors) && data.errors.length > 0) {
@@ -44,33 +44,52 @@ function Login() {
       return data.title;
     }
 
-    return "فشل تسجيل الدخول، تأكد من البريد الإلكتروني وكلمة المرور";
+    return "";
+  }
+
+  function getApiErrorMessage(error) {
+    const data = error.response?.data;
+
+    if (!data) {
+      return "حدث خطأ في الاتصال بالخادم";
+    }
+
+    return extractMessage(data) || "فشل تسجيل الدخول، تأكد من البريد الإلكتروني وكلمة المرور";
   }
 
   function getResultErrorMessage(result) {
-    if (Array.isArray(result?.errors) && result.errors.length > 0) {
-      return result.errors.join("\n");
-    }
+    return (
+      extractMessage(result) ||
+      "فشل تسجيل الدخول، تأكد من البريد الإلكتروني وكلمة المرور"
+    );
+  }
 
-    if (result?.errors && typeof result.errors === "object") {
-      return Object.values(result.errors).flat().join("\n");
-    }
+  function isEmailNotConfirmed(message) {
+    if (!message) return false;
 
-    if (typeof result?.errors === "string") {
-      return result.errors;
-    }
+    return (
+      message.includes("تأكيد بريدك الإلكتروني") ||
+      message.includes("تأكيد البريد الإلكتروني") ||
+      message.includes("قبل تسجيل الدخول") ||
+      message.includes("غير مؤكد") ||
+      message.includes("غير مفعل")
+    );
+  }
 
-    if (result?.message) {
-      return result.message;
-    }
+  function handleUnconfirmedEmail(message) {
+    const cleanEmail = email.trim();
 
-    return "فشل تسجيل الدخول، تأكد من البريد الإلكتروني وكلمة المرور";
+    localStorage.setItem("pendingVerificationEmail", cleanEmail);
+
+    setNeedsVerification(true);
+    setErrorMessage(message || "يرجى تأكيد بريدك الإلكتروني قبل تسجيل الدخول");
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     setErrorMessage("");
+    setNeedsVerification(false);
 
     if (!email.trim() || !password) {
       setErrorMessage("الرجاء تعبئة جميع الحقول");
@@ -85,14 +104,24 @@ function Login() {
     try {
       setIsSubmitting(true);
 
-      console.log("Login payload:", JSON.stringify(loginPayload, null, 2));
+      console.log("Login payload:", {
+        email: loginPayload.email,
+        password: "[hidden]",
+      });
 
       const result = await authApi.login(loginPayload);
 
       console.log("Login response:", result);
 
       if (result?.success !== true) {
-        setErrorMessage(getResultErrorMessage(result));
+        const apiMessage = getResultErrorMessage(result);
+
+        if (isEmailNotConfirmed(apiMessage)) {
+          handleUnconfirmedEmail(apiMessage);
+          return;
+        }
+
+        setErrorMessage(apiMessage);
         return;
       }
 
@@ -110,13 +139,12 @@ function Login() {
         result?.refreshToken ||
         result?.refresh_token;
 
-      const user =
-        result?.data?.user ||
-        result?.user ||
-        result?.data;
+      const user = result?.data?.user || result?.user || result?.data;
 
       if (!token) {
-        setErrorMessage("تم تسجيل الدخول بنجاح لكن لم يتم استلام رمز الدخول من الخادم");
+        setErrorMessage(
+          "تم تسجيل الدخول بنجاح لكن لم يتم استلام رمز الدخول من الخادم"
+        );
         return;
       }
 
@@ -138,11 +166,26 @@ function Login() {
         JSON.stringify(error.response?.data, null, 2)
       );
 
-      setErrorMessage(getApiErrorMessage(error));
+      const apiMessage = getApiErrorMessage(error);
+
+      if (isEmailNotConfirmed(apiMessage)) {
+        handleUnconfirmedEmail(apiMessage);
+        return;
+      }
+
+      setErrorMessage(apiMessage);
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  function goToInvalidEmailPage() {
+    const cleanEmail = email.trim();
+
+    localStorage.setItem("pendingVerificationEmail", cleanEmail);
+
+    navigate(`/invalid-email?email=${encodeURIComponent(cleanEmail)}`);
+  }
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row overflow-y-auto">
@@ -203,6 +246,7 @@ function Login() {
                 onChange={(e) => {
                   setEmail(e.target.value);
                   setErrorMessage("");
+                  setNeedsVerification(false);
                 }}
                 className="w-full h-12 border border-[#d8dbe2] rounded-md bg-[#f5f6fa] pr-[45px] pl-[45px] outline-none focus:border-[#003469] disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
@@ -223,6 +267,7 @@ function Login() {
                 onChange={(e) => {
                   setPassword(e.target.value);
                   setErrorMessage("");
+                  setNeedsVerification(false);
                 }}
                 className="w-full h-12 border border-[#d8dbe2] rounded-md bg-[#f5f6fa] pr-[45px] pl-[45px] outline-none focus:border-[#003469] disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
@@ -249,9 +294,23 @@ function Login() {
             {errorMessage && (
               <div
                 dir="rtl"
-                className="mt-3 bg-red-50 border border-red-200 text-red-600 p-3 rounded-md text-sm leading-7 whitespace-pre-wrap text-right"
+                className={`mt-3 border p-3 rounded-md text-sm leading-7 whitespace-pre-wrap text-right ${
+                  needsVerification
+                    ? "bg-blue-50 border-blue-200 text-blue-700"
+                    : "bg-red-50 border-red-200 text-red-600"
+                }`}
               >
-                {errorMessage}
+                <div>{errorMessage}</div>
+
+                {needsVerification && (
+                  <button
+                    type="button"
+                    onClick={goToInvalidEmailPage}
+                    className="mt-3 w-full h-10 rounded-md bg-[#003469] text-white hover:bg-[#002850] cursor-pointer"
+                  >
+                    إعادة إرسال رابط التحقق
+                  </button>
+                )}
               </div>
             )}
 
