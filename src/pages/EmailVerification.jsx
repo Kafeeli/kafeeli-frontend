@@ -86,16 +86,38 @@ export default function EmailVerification() {
     return "حدث خطأ، حاول مرة أخرى";
   }
 
-  useEffect(() => {
-    if (!tokenFromUrl) return;
-    if (didVerifyRef.current) return;
+ useEffect(() => {
+  if (!tokenFromUrl) return;
+  if (didVerifyRef.current) return;
 
-    didVerifyRef.current = true;
+  didVerifyRef.current = true;
 
-    async function verifyEmailFromLink() {
-      const decodedToken = decodeVerificationToken(tokenFromUrl);
+  async function verifyEmailFromLink() {
+    const decodedToken = decodeVerificationToken(tokenFromUrl);
 
-      // if (!userIdFromUrl || !decodedToken) {
+    const currentEmail =
+      emailFromUrl ||
+      email ||
+      localStorage.getItem("pendingVerificationEmail") ||
+      "";
+
+    if (!userIdFromUrl || !decodedToken) {
+      navigate(
+        `/invalid-email?email=${encodeURIComponent(currentEmail)}`,
+        {
+          replace: true,
+        }
+      );
+      return;
+    }
+
+
+    const payload = {
+      userId: userIdFromUrl,
+      token: decodedToken,
+    };
+
+A      // if (!userIdFromUrl || !decodedToken) {
       //   navigate(
       //     `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`
       //   );
@@ -109,24 +131,19 @@ export default function EmailVerification() {
   return;
 }
 
-      const payload = {
+    try {
+      setIsVerifying(true);
+      setMessage("");
+      setMessageType("");
+
+
+      console.log("Verify email payload:", {
         userId: userIdFromUrl,
-        token: decodedToken,
-      };
+        token: "[hidden]",
+      });
 
-      try {
-        setIsVerifying(true);
-        setMessage("");
-        setMessageType("");
 
-        console.log("Verify email payload:", {
-          userId: userIdFromUrl,
-          token: "[hidden]",
-        });
-
-        const result = await authApi.verifyEmail(payload);
-
-        console.log("Verify email success:", result);
+      const result = await authApi.verifyEmail(payload);
 
         // if (result?.success !== true) {
         //   navigate(
@@ -142,10 +159,13 @@ export default function EmailVerification() {
   return;
 }
 
-        setMessage(result?.message || "تم تفعيل الحساب بنجاح");
-        setMessageType("success");
+      console.log(
+        "Verify email response:",
+        result
+      );
 
-        localStorage.removeItem("pendingVerificationEmail");
+
+      if (result?.success === true) {
 
         setTimeout(() => {
           navigate("/email-verified-success", { replace: true });
@@ -195,10 +215,57 @@ export default function EmailVerification() {
       finally {
         setIsVerifying(false);
       }
-    }
 
-    verifyEmailFromLink();
-  }, [tokenFromUrl, userIdFromUrl, emailFromUrl, email, navigate]);
+
+      navigate(
+        `/invalid-email?email=${encodeURIComponent(currentEmail)}`,
+        {
+          replace: true,
+        }
+      );
+
+
+    } catch (error) {
+
+      console.log(
+        "Verify email status:",
+        error.response?.status
+      );
+
+
+      console.log(
+        "Verify email error:",
+        JSON.stringify(
+          error.response?.data,
+          null,
+          2
+        )
+      );
+
+
+      navigate(
+        `/invalid-email?email=${encodeURIComponent(currentEmail)}`,
+        {
+          replace: true,
+        }
+      );
+
+
+    } finally {
+      setIsVerifying(false);
+    }
+  }
+
+
+  verifyEmailFromLink();
+
+}, [
+  tokenFromUrl,
+  userIdFromUrl,
+  emailFromUrl,
+  email,
+  navigate,
+]);
 
   async function handleResend() {
     if (cooldown > 0 || isSubmitting || isVerifying) return;
