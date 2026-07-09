@@ -140,10 +140,15 @@ export default function RegistrationPage() {
       newErrors.email = "البريد الإلكتروني غير صحيح";
     }
 
+    // if (!formData.phone.trim()) {
+    //   newErrors.phone = "رقم الهاتف مطلوب";
+    // } else if (!/^\+97059\d{7}$/.test(formData.phone.trim())) {
+    //   newErrors.phone = "رقم الجوال يجب أن يكون بالصيغة +97059XXXXXXX";
+    // }
     if (!formData.phone.trim()) {
-      newErrors.phone = "رقم الهاتف مطلوب";
-    } else if (!/^\+97059\d{7}$/.test(formData.phone.trim())) {
-      newErrors.phone = "رقم الجوال يجب أن يكون بالصيغة +97059XXXXXXX";
+    newErrors.phone = "رقم الهاتف مطلوب";
+    } else if (!/^\+9705[69]\d{7}$/.test(formData.phone.trim())) {
+     newErrors.phone = "رقم الجوال يجب أن يكون بالصيغة +97056XXXXXXX أو +97059XXXXXXX";
     }
 
     if (!formData.city) {
