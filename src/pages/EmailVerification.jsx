@@ -117,7 +117,7 @@ export default function EmailVerification() {
       token: decodedToken,
     };
 
-A      // if (!userIdFromUrl || !decodedToken) {
+     // if (!userIdFromUrl || !decodedToken) {
       //   navigate(
       //     `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`
       //   );
@@ -170,6 +170,7 @@ A      // if (!userIdFromUrl || !decodedToken) {
         setTimeout(() => {
           navigate("/email-verified-success", { replace: true });
         }, 2000);
+          return;
       } 
       // catch (error) {
       //   console.log("Status:", error.response?.status);
@@ -182,7 +183,7 @@ A      // if (!userIdFromUrl || !decodedToken) {
       //     `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`
       //   );
       // } 
-      catch (error) {
+    }catch (error) {
   console.log("Status:", error.response?.status);
   console.log(
     "Backend error:",
@@ -211,49 +212,11 @@ A      // if (!userIdFromUrl || !decodedToken) {
 
   setMessage("حدث خطأ أثناء تأكيد البريد الإلكتروني، حاول مرة أخرى");
   setMessageType("error");
+  return; // تمت إضافتها لمنع تنفيذ navigate تحت وتفويت رسالة الخطأ على المستخدم
 }
       finally {
         setIsVerifying(false);
       }
-
-
-      navigate(
-        `/invalid-email?email=${encodeURIComponent(currentEmail)}`,
-        {
-          replace: true,
-        }
-      );
-
-
-    } catch (error) {
-
-      console.log(
-        "Verify email status:",
-        error.response?.status
-      );
-
-
-      console.log(
-        "Verify email error:",
-        JSON.stringify(
-          error.response?.data,
-          null,
-          2
-        )
-      );
-
-
-      navigate(
-        `/invalid-email?email=${encodeURIComponent(currentEmail)}`,
-        {
-          replace: true,
-        }
-      );
-
-
-    } finally {
-      setIsVerifying(false);
-    }
   }
 
 
