@@ -117,6 +117,19 @@ export default function EmailVerification() {
       token: decodedToken,
     };
 
+     // if (!userIdFromUrl || !decodedToken) {
+      //   navigate(
+      //     `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`
+      //   );
+      //   return;
+      // }
+      if (!userIdFromUrl || !decodedToken) {
+  navigate(
+    `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`,
+    { replace: true }
+  );
+  return;
+}
 
     try {
       setIsVerifying(true);
@@ -132,6 +145,19 @@ export default function EmailVerification() {
 
       const result = await authApi.verifyEmail(payload);
 
+        // if (result?.success !== true) {
+        //   navigate(
+        //     `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`
+        //   );
+        //   return;
+        // }
+          if (result?.success !== true) {
+  navigate(
+    `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`,
+    { replace: true }
+  );
+  return;
+}
 
       console.log(
         "Verify email response:",
@@ -141,59 +167,56 @@ export default function EmailVerification() {
 
       if (result?.success === true) {
 
-        localStorage.removeItem(
-          "pendingVerificationEmail"
-        );
+        setTimeout(() => {
+          navigate("/email-verified-success", { replace: true });
+        }, 2000);
+          return;
+      } 
+      // catch (error) {
+      //   console.log("Status:", error.response?.status);
+      //   console.log(
+      //     "Backend error:",
+      //     JSON.stringify(error.response?.data, null, 2)
+      //   );
 
+      //   navigate(
+      //     `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`
+      //   );
+      // } 
+    }catch (error) {
+  console.log("Status:", error.response?.status);
+  console.log(
+    "Backend error:",
+    JSON.stringify(error.response?.data, null, 2)
+  );
 
-        navigate(
-          "/email-verified-success",
-          {
-            replace: true,
-          }
-        );
+  const status = error.response?.status;
 
-        return;
+  const apiMessage =
+    error.response?.data?.message?.toLowerCase() || "";
+
+  if (
+    status === 400 ||
+    apiMessage.includes("token") ||
+    apiMessage.includes("expired") ||
+    apiMessage.includes("invalid") ||
+    apiMessage.includes("confirmation")
+  ) {
+    navigate(
+      `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`,
+      { replace: true }
+    );
+
+    return;
+  }
+
+  setMessage("حدث خطأ أثناء تأكيد البريد الإلكتروني، حاول مرة أخرى");
+  setMessageType("error");
+  return; // تمت إضافتها لمنع تنفيذ navigate تحت وتفويت رسالة الخطأ على المستخدم
+}
+      finally {
+        setIsVerifying(false);
       }
-
-
-      navigate(
-        `/invalid-email?email=${encodeURIComponent(currentEmail)}`,
-        {
-          replace: true,
-        }
-      );
-
-
-    } catch (error) {
-
-      console.log(
-        "Verify email status:",
-        error.response?.status
-      );
-
-
-      console.log(
-        "Verify email error:",
-        JSON.stringify(
-          error.response?.data,
-          null,
-          2
-        )
-      );
-
-
-      navigate(
-        `/invalid-email?email=${encodeURIComponent(currentEmail)}`,
-        {
-          replace: true,
-        }
-      );
-
-
-    } finally {
-      setIsVerifying(false);
-    }
   }
 
 
@@ -251,7 +274,8 @@ export default function EmailVerification() {
 
       setTimeout(() => setSent(false), 3000);
       setCooldown(30);
-    } catch (error) {
+    } 
+    catch (error) {
       console.log("Status:", error.response?.status);
       console.log(
         "Backend error:",
@@ -260,7 +284,8 @@ export default function EmailVerification() {
 
       setMessage(getApiErrorMessage(error));
       setMessageType("error");
-    } finally {
+    }
+     finally {
       setIsSubmitting(false);
     }
   }
