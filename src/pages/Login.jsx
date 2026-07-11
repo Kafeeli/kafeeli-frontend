@@ -34,14 +34,19 @@ function Login() {
     if (data.errors && typeof data.errors === "object") {
       return Object.values(data.errors).flat().join("\n");
     }
+    return "";
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (!email || !password) {
-      setErrorType("empty");
+      setErrorMessage("الرجاء إدخال البريد الإلكتروني وكلمة المرور");
       return;
     }
+
+    setErrorMessage("");
+    setIsSubmitting(true);
 
     const response = {
       success: true,
@@ -49,10 +54,12 @@ function Login() {
       error: null,
     };
 
-    setErrorType("");
+    setIsSubmitting(false);
 
     if (response.success) {
-      navigate("/landing-page"); // أو "/landing" أو أي مسار محدد عندك لصفحة الـ landing
+      navigate("/landing-page"); 
+    } else {
+      setErrorMessage(extractMessage(response.error));
     }
   };
 
