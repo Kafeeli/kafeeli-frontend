@@ -33,7 +33,7 @@ export default function EmailVerification() {
     emailFromUrl ||
     localStorage.getItem("pendingVerificationEmail") ||
     "";
-
+// تعليق تجربة 
   const [email, setEmail] = useState(initialEmail);
   const [sent, setSent] = useState(false);
   const [cooldown, setCooldown] = useState(0);
