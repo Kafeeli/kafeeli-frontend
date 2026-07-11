@@ -14,7 +14,7 @@ import {
 
 function TopNavbar({ setOpenSidebar }) {
   return (
-    <header className="min-h-[52px] bg-white border-b border-[#DDE2EA] shadow-sm flex items-center justify-between gap-3 px-4 py-2 sm:px-6">
+    <header className="min-h-[60px] bg-white border-b border-[#DDE2EA] shadow-sm flex items-center justify-between gap-3 px-4 py-2 sm:px-6">
       <div className="flex items-center gap-3 min-w-0">
         <button
           type="button"
@@ -26,7 +26,7 @@ function TopNavbar({ setOpenSidebar }) {
         </button>
 
         <h1 className="font-[Cairo] text-[14px] sm:text-[18px] lg:text-[20px] font-bold text-[#003469] truncate">
-          عائلتي
+          عائلاتي
         </h1>
       </div>
 
@@ -114,9 +114,7 @@ function TextInput({
       </div>
 
       {error && (
-        <p className="mt-1 font-[Cairo] text-[12px] text-[#D11F1F]">
-          {error}
-        </p>
+        <p className="mt-1 font-[Cairo] text-[12px] text-[#D11F1F]">{error}</p>
       )}
     </div>
   );
@@ -143,9 +141,7 @@ function SelectInput({ name, value, onChange, error }) {
       </select>
 
       {error && (
-        <p className="mt-1 font-[Cairo] text-[12px] text-[#D11F1F]">
-          {error}
-        </p>
+        <p className="mt-1 font-[Cairo] text-[12px] text-[#D11F1F]">{error}</p>
       )}
     </div>
   );
@@ -168,9 +164,7 @@ function TextArea({ name, value, onChange, error }) {
       />
 
       {error && (
-        <p className="mt-1 font-[Cairo] text-[12px] text-[#D11F1F]">
-          {error}
-        </p>
+        <p className="mt-1 font-[Cairo] text-[12px] text-[#D11F1F]">{error}</p>
       )}
     </div>
   );
@@ -205,9 +199,7 @@ function UploadBox({ file, onChange, error }) {
       </label>
 
       {error && (
-        <p className="mt-1 font-[Cairo] text-[12px] text-[#D11F1F]">
-          {error}
-        </p>
+        <p className="mt-1 font-[Cairo] text-[12px] text-[#D11F1F]">{error}</p>
       )}
     </div>
   );

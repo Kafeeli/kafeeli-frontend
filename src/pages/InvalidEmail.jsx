@@ -167,28 +167,17 @@ function InvalidEmail() {
     <div className="min-h-screen flex flex-col">
 
       <header className="flex items-center justify-between px-4 md:px-8 py-1 bg-gray-50 shadow-sm">
-
-        <a href="/">
-          <img
-            src={logo}
-            alt="logo"
-            className="w-20 h-19"
-          />
-        </a>
-
-
-        <h1 className="text-lg md:text-2xl font-bold text-[#003469]">
+        <button onClick={() => navigate("/")} className="cursor-pointer">
+          <img src={logo} alt="logo" className="w-20 h-19" />
+        </button>
+        <h1 className="text-lg md:text-2xl font-bold text-[#003469] hidden md:block">
           كفيلي
         </h1>
-
-
-        <a href="/login">
-          <p className="text-gray-700">
+        <button onClick={() => navigate("/login")} className="cursor-pointer">
+          <p className="text-navy-800 font-medium text-sm md:text-base">
             تسجيل دخول
           </p>
-        </a>
-
-
+        </button>
       </header>
 
 

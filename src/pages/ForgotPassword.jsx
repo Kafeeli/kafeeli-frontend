@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { MdOutlineMail } from "react-icons/md";
 import { FaArrowRight } from "react-icons/fa";
-import { authApi } from "../services/authApi";
+import { useNavigate } from "react-router-dom";
 
 function ForgotPassword() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
@@ -169,13 +170,13 @@ function ForgotPassword() {
         )}
 
         <div className="flex justify-center">
-          <a
-            href="/"
-            className="flex items-center gap-2 mt-6 text-[#424750] text-sm hover:text-[#0D4B8E] hover:underline w-fit"
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 mt-6 text-[#424750] text-sm hover:text-[#0D4B8E] hover:underline w-fit cursor-pointer"
           >
             <FaArrowRight />
             العودة إلى تسجيل الدخول
-          </a>
+          </button>
         </div>
       </div>
 

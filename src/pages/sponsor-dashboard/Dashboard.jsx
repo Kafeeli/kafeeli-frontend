@@ -18,22 +18,22 @@ function Dashboard() {
 
   // بيانات الحساب - لاحقاً رح تجي من API بدل ما تكون ثابتة هون
   const [accountData] = useState({
-    emailVerified: true, // true = موثّق / false = غير موثق
-    accountStatus: "active", // 'active' = نشط / 'suspended' = موقوف
+    emailVerified: true,
+    accountStatus: "active",
     accountType: "كفيل",
   });
 
   return (
     <div className="flex min-h-screen bg-gray-50" dir="rtl">
+      {/* Sidebar */}
       <Sidebar
-        activePath="/main"
-        isOpen={isSidebarOpen}
-        onClose={function () {
-          setIsSidebarOpen(false);
-        }}
+        activeItem="نظرة عامة"
+        openSidebar={isSidebarOpen}
+        setOpenSidebar={setIsSidebarOpen}
       />
 
-      <div className="flex-1 flex flex-col overflow-auto">
+      {/* تم إضافة lg:mr-64 هنا لمنع السايد بار الـ fixed من تغطية المحتوى على الديسكتوب */}
+      <div className="flex-1 flex flex-col overflow-auto lg:mr-64">
         {/* Navbar */}
         <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -330,6 +330,7 @@ function Dashboard() {
             </div>
           </div>
         </main>
+
         <footer className="mt-20 py-2 border-t border-[#E5E7EB] text-center">
           <p className="text-sm text-[#6B7280] mt-4">
             © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة

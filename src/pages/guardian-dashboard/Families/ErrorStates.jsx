@@ -14,7 +14,7 @@ import {
 
 function TopNavbar({ setOpenSidebar }) {
   return (
-    <header className="min-h-[52px] bg-white border-b border-[#DDE2EA] shadow-sm flex items-center justify-between gap-3 px-4 py-2 sm:px-6">
+    <header className="min-h-[60px] bg-white border-b border-[#DDE2EA] shadow-sm flex items-center justify-between gap-3 px-4 py-2 sm:px-6">
       <div className="flex items-center gap-2 min-w-0">
         <button
           type="button"

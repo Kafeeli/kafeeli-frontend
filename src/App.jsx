@@ -1,3 +1,4 @@
+import usePageTitle from "./hooks/usePageTitle";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -8,7 +9,6 @@ import EmailVerificationSuccess from "./pages/EmailVerificationSuccess";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
-
 import SideBar from "./pages/admin-dashboard/sideBar";
 import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 
@@ -32,6 +32,8 @@ import StoppedFamilyDetailsPage from "./pages/guardian-dashboard/Families/status
 import NeedsEditFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/NeedsEditFamilyDetailsPage";
 import FamilyEditPage from "./pages/guardian-dashboard/Families/status/FamilyEditPage";
 import NeedsEditFamilyEditPage from "./pages/guardian-dashboard/Families/status/NeedsEditFamilyEditPage";
+import Error404 from "./pages/error404";
+import Error401 from "./pages/auth401";
 
 function PageWrapper({ children }) {
   return (
@@ -48,6 +50,7 @@ function PageWrapper({ children }) {
 }
 
 function AnimatedRoutes() {
+  usePageTitle();
   const location = useLocation();
 
   return (
@@ -166,9 +169,11 @@ function AnimatedRoutes() {
         <Route
           path="/landing-page"
           element={
-            <div dir="rtl" className="min-h-screen bg-gray-50">
-              <LandingPage />
-            </div>
+            <PageWrapper>
+              <div dir="rtl" className="min-h-screen bg-gray-50">
+                <LandingPage />
+              </div>
+            </PageWrapper>
           }
         />
 
@@ -176,18 +181,22 @@ function AnimatedRoutes() {
         <Route
           path="/main"
           element={
-            <div dir="rtl" className="min-h-screen bg-gray-50">
-              <MainDashBoard />
-            </div>
+            <PageWrapper>
+              <div dir="rtl" className="min-h-screen bg-gray-50">
+                <MainDashBoard />
+              </div>
+            </PageWrapper>
           }
         />
 
         <Route
           path="/profile"
           element={
-            <div dir="rtl" className="min-h-screen bg-gray-50">
-              <ProfilePage />
-            </div>
+            <PageWrapper>
+              <div dir="rtl" className="min-h-screen bg-gray-50">
+                <ProfilePage />
+              </div>
+            </PageWrapper>
           }
         />
 
@@ -227,7 +236,8 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-
+        {/* الحالاات */}
+        {/* حالة العائلة نشطة  */}
         <Route
           path="/families/active-details"
           element={
@@ -237,6 +247,7 @@ function AnimatedRoutes() {
           }
         />
 
+        {/* تعديل بيانات نشطة */}
         <Route
           path="/families/edit"
           element={
@@ -245,7 +256,7 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-
+        {/* تعديل ايرور */}
         <Route
           path="/families/needs-edit/edit"
           element={
@@ -254,7 +265,7 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-
+        {/* حالة موقوفة */}
         <Route
           path="/families/stopped-details"
           element={
@@ -263,7 +274,7 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-
+        {/* قيد المراجعة */}
         <Route
           path="/families/pending-details"
           element={
@@ -272,7 +283,7 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-
+        {/* حالة مخفية */}
         <Route
           path="/families/hidden-details"
           element={
@@ -281,7 +292,7 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-
+        {/* تحتاج تعديل */}
         <Route
           path="/families/needs-edit-details"
           element={
@@ -368,6 +379,23 @@ function AnimatedRoutes() {
           element={
             <PageWrapper>
               <GuardianProfile />
+            </PageWrapper>
+          }
+        />
+        <Route
+          path="/error-404"
+          element={
+            <PageWrapper>
+              <Error404 />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/auth-401"
+          element={
+            <PageWrapper>
+              <Error401 />
             </PageWrapper>
           }
         />

@@ -35,181 +35,24 @@ function Login() {
       return Object.values(data.errors).flat().join("\n");
     }
 
-    if (typeof data.errors === "string") {
-      return data.errors;
-    }
-
-    if (data.title) {
-      return data.title;
-    }
-
-    return "";
-  }
-
-  function getApiErrorMessage(error) {
-    const data = error.response?.data;
-
-    if (!data) {
-      return "حدث خطأ في الاتصال بالخادم";
-    }
-
-    return (
-      extractMessage(data) ||
-      "فشل تسجيل الدخول، تأكد من البريد الإلكتروني وكلمة المرور"
-    );
-  }
-
-  function getResultErrorMessage(result) {
-    return (
-      extractMessage(result) ||
-      "فشل تسجيل الدخول، تأكد من البريد الإلكتروني وكلمة المرور"
-    );
-  }
-
-  function isEmailNotConfirmed(message) {
-    if (!message) return false;
-
-    return (
-      message.includes("تأكيد بريدك الإلكتروني") ||
-      message.includes("تأكيد البريد الإلكتروني") ||
-      message.includes("قبل تسجيل الدخول") ||
-      message.includes("غير مؤكد") ||
-      message.includes("غير مفعل")
-    );
-  }
-
-  async function handleUnconfirmedEmail(apiMessage) {
-    const cleanEmail = email.trim();
-
-    localStorage.setItem("pendingVerificationEmail", cleanEmail);
-
-    setNeedsVerification(true);
-    setIsSendingVerification(true);
-    setErrorMessage(
-      `${apiMessage}\nسيتم إرسال رابط تحقق جديد وتحويلك إلى صفحة التحقق.`
-    );
-
-    try {
-      const payload = {
-        email: cleanEmail,
-      };
-
-      console.log("Send verification email payload:", payload);
-
-      const resendResult = await authApi.sendResendEmailConfirmation(payload);
-
-      console.log("Send verification email response:", resendResult);
-    } catch (resendError) {
-      console.log("Resend verification status:", resendError.response?.status);
-      console.log(
-        "Resend verification error:",
-        JSON.stringify(resendError.response?.data, null, 2)
-      );
-    } finally {
-      setTimeout(() => {
-        navigate(`/verify-email?email=${encodeURIComponent(cleanEmail)}`, {
-          state: {
-            email: cleanEmail,
-          },
-        });
-      }, 1200);
-    }
-  }
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    setErrorMessage("");
-    setNeedsVerification(false);
-    setIsSendingVerification(false);
-
-    if (!email.trim() || !password) {
-      setErrorMessage("الرجاء تعبئة جميع الحقول");
+    if (!email || !password) {
+      setErrorType("empty");
       return;
     }
 
-    const loginPayload = {
-      email: email.trim(),
-      password: password,
+    const response = {
+      success: true,
+      role: "Sponsor",
+      error: null,
     };
 
-    try {
-      setIsSubmitting(true);
+    setErrorType("");
 
-      console.log("Login payload:", {
-        email: loginPayload.email,
-        password: "[hidden]",
-      });
-
-      const result = await authApi.login(loginPayload);
-
-      console.log("Login response:", result);
-
-      if (result?.success !== true) {
-        const apiMessage = getResultErrorMessage(result);
-
-        if (isEmailNotConfirmed(apiMessage)) {
-          await handleUnconfirmedEmail(apiMessage);
-          return;
-        }
-
-        setErrorMessage(apiMessage);
-        return;
-      }
-
-      const token =
-        result?.data?.token ||
-        result?.data?.accessToken ||
-        result?.data?.access_token ||
-        result?.token ||
-        result?.accessToken ||
-        result?.access_token;
-
-      const refreshToken =
-        result?.data?.refreshToken ||
-        result?.data?.refresh_token ||
-        result?.refreshToken ||
-        result?.refresh_token;
-
-      const user = result?.data?.user || result?.user || result?.data;
-
-      if (!token) {
-        setErrorMessage(
-          "تم تسجيل الدخول بنجاح لكن لم يتم استلام رمز الدخول من الخادم"
-        );
-        return;
-      }
-
-      localStorage.setItem("token", token);
-
-      if (refreshToken) {
-        localStorage.setItem("refreshToken", refreshToken);
-      }
-
-      if (user) {
-        localStorage.setItem("user", JSON.stringify(user));
-      }
-
-      navigate("/landing-page");
-    } catch (error) {
-      console.log("Status:", error.response?.status);
-      console.log(
-        "Backend error:",
-        JSON.stringify(error.response?.data, null, 2)
-      );
-
-      const apiMessage = getApiErrorMessage(error);
-
-      console.log("Displayed error:", apiMessage);
-
-      if (isEmailNotConfirmed(apiMessage)) {
-        await handleUnconfirmedEmail(apiMessage);
-        return;
-      }
-
-      setErrorMessage(apiMessage);
-    } finally {
-      setIsSubmitting(false);
+    if (response.success) {
+      navigate("/landing-page"); // أو "/landing" أو أي مسار محدد عندك لصفحة الـ landing
     }
   };
 
@@ -312,12 +155,13 @@ function Login() {
               </button>
             </div>
 
-            <a
-              href="/forgot-password"
-              className="text-[#00696E] text-[14px] no-underline hover:text-[#008b8b] duration-200"
+            <button
+              type="button"
+              onClick={() => navigate("/forgot-password")}
+              className="text-[#00696E] text-[14px] hover:text-[#008b8b] duration-200 cursor-pointer"
             >
               نسيت كلمة المرور؟
-            </a>
+            </button>
 
             {errorMessage && (
               <div
@@ -351,12 +195,13 @@ function Login() {
 
           <div className="text-center mt-[25px] text-[#666]">
             ليس لديك حساب ؟
-            <a
-              href="/register"
-              className="text-[#00696E] no-underline font-semibold hover:cursor-pointer hover:text-[#008b8b] duration-200 ml-[5px]"
+            <button
+              type="button"
+              onClick={() => navigate("/register")}
+              className="text-[#00696E] font-semibold hover:text-[#008b8b] duration-200 ml-[5px] cursor-pointer"
             >
               أنشئ حساباً جديداً
-            </a>
+            </button>
           </div>
 
           <div className="mt-[30px] pt-5 border-t border-[#ececec] flex justify-center gap-[15px] flex-wrap">

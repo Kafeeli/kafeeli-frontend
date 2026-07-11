@@ -172,7 +172,8 @@ export default function RegistrationPage() {
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = "تأكيد كلمة المرور مطلوب";
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "كلمة المرور وتأكيد كلمة المرور غير متطابقتين";
+      newErrors.confirmPassword =
+        "كلمة المرور وتأكيد كلمة المرور غير متطابقتين";
     }
 
     setErrors(newErrors);
@@ -297,19 +298,17 @@ export default function RegistrationPage() {
   return (
     <>
       <header className="flex items-center justify-between px-8 py-1 bg-gray-50 shadow-sm">
-        <a href="/">
+        <button onClick={() => navigate("/")} className="cursor-pointer">
           <img src={logo} alt="logo" className="w-20 h-19" />
-        </a>
+        </button>
 
         <h1 className="text-[24px] font-bold text-[#003469] hidden md:block">
           كفيلي
         </h1>
 
-        <a href="/">
-          <p className="text-navy-800 font-medium md:text-[16px]">
-            تسجيل دخول
-          </p>
-        </a>
+        <button onClick={() => navigate("/")} className="cursor-pointer">
+          <p className="text-navy-800 font-medium md:text-[16px]">تسجيل دخول</p>
+        </button>
       </header>
 
       <main>

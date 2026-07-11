@@ -68,7 +68,7 @@ const Header = () => {
                 <a
                   key={link.label}
                   href={link.href}
-                  className={`relative text-sm font-medium transition-colors duration-200 ${
+                  className={`relative font-medium transition-colors duration-200 ${
                     link.active
                       ? 'text-blue-900 font-semibold'
                       : 'text-gray-600 hover:text-blue-900'
@@ -84,7 +84,7 @@ const Header = () => {
 
             {/* Desktop CTA */}
             <div className="hidden lg:block">
-              <button className="bg-blue-900 cursor-pointer hover:bg-blue-800 text-white px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-900/20 active:scale-95">
+              <button className="bg-blue-900 cursor-pointer hover:bg-blue-800 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-900/20 active:scale-95">
                 تبرع الآن
               </button>
             </div>

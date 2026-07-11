@@ -1,9 +1,33 @@
 @import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap");
 
-body {
-  font-family: "Cairo", sans-serif;
-}
 @import "tailwindcss";
+
+/* -------------------- Base Styles -------------------- */
+
+@layer base {
+  html,
+  body,
+  #root {
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+    font-family: "Cairo", sans-serif;
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+
+  button:disabled {
+    @apply cursor-not-allowed;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+/* -------------------- Animations -------------------- */
 
 @keyframes floatIn {
   0% {
@@ -23,33 +47,18 @@ body {
 .confetti-dot {
   animation: floatIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
-@layer base {
-  button {
-    @apply cursor-pointer;
-  }
 
-  button:disabled {
-    @apply cursor-not-allowed;
-  }
-}html,
-body,
-#root {
-  width: 100%;
-  min-height: 100%;
-  overflow-x: hidden;
-}
+/* -------------------- Transfer Section -------------------- */
 
-* {
-  box-sizing: border-box;
-}
-
-/* نخلي TransferDataSection responsive حسب عرض السكشن نفسه */
 .transfer-section {
   container-type: inline-size;
 }
+
 .transfer-modal {
   overflow: visible !important;
 }
+
+/* -------------------- Container Query -------------------- */
 
 @container (max-width: 520px) {
   .transfer-header {
