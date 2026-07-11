@@ -1,6 +1,7 @@
 import usePageTitle from "./hooks/usePageTitle";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+
 import Login from "./pages/Login";
 import RegistrationPage from "./pages/RegistrationPage";
 import EmailVerification from "./pages/EmailVerification";
@@ -10,9 +11,12 @@ import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
 import SideBar from "./pages/admin-dashboard/sideBar";
 import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
+
 import LandingPage from "./pages/LandingPage";
+
 import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
 import ProfilePage from "./pages/sponsor-dashboard/profileDashboard";
+
 import GuardianProfile from "./pages/GuardianProfile";
 import ErrorPage from "./pages/guardian-dashboard/Families/ErrorStates";
 import FamilyAccessPendingPage from "./pages/guardian-dashboard/Families/FamilyAccessPendingPage";
@@ -20,6 +24,7 @@ import NoFamiliesPage from "./pages/guardian-dashboard/Families/NoFamiliesPage";
 import AddFamilyPage from "./pages/guardian-dashboard/Families/AddFamilyPage";
 import ManagingFamilyCards from "./pages/guardian-dashboard/Families/ManagingFamilyCards";
 import FamilyDetailsPage from "./pages/guardian-dashboard/Families/FamilyDetailsPage";
+
 import ActiveFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/ActiveFamilyDetailsPage";
 import HiddenFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/HiddenFamilyDetailsPage";
 import PendingFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/PendingFamilyDetailsPage";
@@ -50,7 +55,10 @@ function AnimatedRoutes() {
 
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
+      <Routes
+        location={location}
+        key={`${location.pathname}${location.search}`}
+      >
         {/* Auth */}
         <Route
           path="/"
@@ -69,14 +77,6 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-        <Route
-          path="/Side-bar"
-          element={
-            <PageWrapper>
-              <SideBar />
-            </PageWrapper>
-          }
-        />
 
         <Route
           path="/register"
@@ -87,6 +87,7 @@ function AnimatedRoutes() {
           }
         />
 
+        {/* صفحة انتظار التحقق بعد التسجيل */}
         <Route
           path="/verify-email"
           element={
@@ -96,13 +97,45 @@ function AnimatedRoutes() {
           }
         />
 
+        {/* رابط التحقق القادم من الإيميل */}
         <Route
           path="/email-verified"
+          element={
+            <PageWrapper>
+              <EmailVerification />
+            </PageWrapper>
+          }
+        />
+
+        {/* صفحة نجاح التحقق */}
+        <Route
+          path="/email-verified-success"
           element={
             <PageWrapper>
               <EmailVerificationSuccess />
             </PageWrapper>
           }
+        />
+
+        {/* دعم الراوت القديم لو كان مستخدم */}
+        <Route
+          path="/email-verifiedSuccess"
+          element={<Navigate to="/email-verified-success" replace />}
+        />
+
+        <Route
+          path="/invalid-email"
+          element={
+            <PageWrapper>
+              <InvalidEmail />
+            </PageWrapper>
+          }
+        />
+
+        {/* دعم الراوت القديم بحرف E كبير */}
+        <Route
+          path="/invalid-Email"
+          element={<Navigate to="/invalid-email" replace />}
         />
 
         <Route
@@ -124,10 +157,10 @@ function AnimatedRoutes() {
         />
 
         <Route
-          path="/invalid-Email"
+          path="/Side-bar"
           element={
             <PageWrapper>
-              <InvalidEmail />
+              <SideBar />
             </PageWrapper>
           }
         />
@@ -277,6 +310,7 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
+
         <Route
           path="/families/details"
           element={

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaCheckCircle, FaEye, FaEyeSlash, FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { authApi } from "../services/authApi";
 
 import logo from "../assets/title.png";
 import guardianIcon from "../assets/guardian-icon.png";
@@ -40,6 +41,7 @@ export default function RegistrationPage() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -56,6 +58,11 @@ export default function RegistrationPage() {
   });
 
   const [errors, setErrors] = useState({});
+
+  const accountTypeMap = {
+    sponsor: 1,
+    guardian: 2,
+  };
 
   const roles = [
     {
@@ -98,6 +105,7 @@ export default function RegistrationPage() {
     setErrors((prev) => ({
       ...prev,
       [name]: "",
+      api: "",
     }));
   }
 
@@ -128,12 +136,19 @@ export default function RegistrationPage() {
 
     if (!formData.email.trim()) {
       newErrors.email = "البريد الإلكتروني مطلوب";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       newErrors.email = "البريد الإلكتروني غير صحيح";
     }
 
+    // if (!formData.phone.trim()) {
+    //   newErrors.phone = "رقم الهاتف مطلوب";
+    // } else if (!/^\+97059\d{7}$/.test(formData.phone.trim())) {
+    //   newErrors.phone = "رقم الجوال يجب أن يكون بالصيغة +97059XXXXXXX";
+    // }
     if (!formData.phone.trim()) {
-      newErrors.phone = "رقم الهاتف مطلوب";
+    newErrors.phone = "رقم الهاتف مطلوب";
+    } else if (!/^\+9705[69]\d{7}$/.test(formData.phone.trim())) {
+     newErrors.phone = "رقم الجوال يجب أن يكون بالصيغة +97056XXXXXXX أو +97059XXXXXXX";
     }
 
     if (!formData.city) {
@@ -166,14 +181,118 @@ export default function RegistrationPage() {
     return selected && Object.keys(newErrors).length === 0;
   }
 
-  function handleSubmit(event) {
+  function extractErrors(data) {
+    if (!data) {
+      return "";
+    }
+
+    if (Array.isArray(data.errors) && data.errors.length > 0) {
+      return data.errors.join("\n");
+    }
+
+    if (data.errors && typeof data.errors === "object") {
+      return Object.values(data.errors).flat().join("\n");
+    }
+
+    if (typeof data.errors === "string") {
+      return data.errors;
+    }
+
+    if (data.message) {
+      return data.message;
+    }
+
+    if (data.title) {
+      return data.title;
+    }
+
+    return "";
+  }
+
+  function getApiErrorMessage(error) {
+    const data = error.response?.data;
+
+    if (!data) {
+      return error.message || "حدث خطأ في الاتصال بالخادم";
+    }
+
+    return extractErrors(data) || "فشل إنشاء الحساب، حاول مرة أخرى";
+  }
+
+  async function handleSubmit(event) {
     event.preventDefault();
+
+    setErrors((prev) => ({
+      ...prev,
+      api: "",
+    }));
 
     if (!validateForm()) {
       return;
     }
 
-    navigate("/verify-email");
+    const accountType = accountTypeMap[selected];
+
+    if (!accountType) {
+      setRoleError("نوع الحساب غير صحيح");
+      return;
+    }
+
+    const registerPayload = {
+      accountType,
+      firstName: formData.firstName.trim(),
+      fatherName: formData.fatherName.trim(),
+      grandfatherName: formData.grandFatherName.trim(),
+      familyName: formData.familyName.trim(),
+      email: formData.email.trim(),
+      phoneNumber: formData.phone.trim(),
+      password: formData.password,
+      confirmPassword: formData.confirmPassword,
+      dateOfBirth: `${formData.birthDate}T00:00:00`,
+      gender: formData.gender === "ذكر" ? 1 : 2,
+      city: formData.city,
+      country: "فلسطين",
+    };
+
+    try {
+      setIsSubmitting(true);
+
+      console.log("Register payload:", JSON.stringify(registerPayload, null, 2));
+
+      const result = await authApi.register(registerPayload);
+
+      console.log("Register response:", result);
+
+      if (result?.success !== true) {
+        setErrors((prev) => ({
+          ...prev,
+          api: extractErrors(result) || "فشل إنشاء الحساب",
+        }));
+
+        return;
+      }
+
+      localStorage.setItem("pendingVerificationEmail", formData.email.trim());
+
+      navigate("/verify-email", {
+        state: {
+          email: formData.email.trim(),
+        },
+      });
+    } catch (error) {
+      console.log("Status:", error.response?.status);
+      console.log(
+        "Backend error:",
+        JSON.stringify(error.response?.data, null, 2)
+      );
+
+      setErrors((prev) => ({
+        ...prev,
+        api: getApiErrorMessage(error),
+      }));
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -248,6 +367,7 @@ export default function RegistrationPage() {
                     onClick={() => {
                       setSelected(role.id);
                       setRoleError("");
+                      setErrors((prev) => ({ ...prev, api: "" }));
                     }}
                     className={`flex-1 rounded-xl p-5 cursor-pointer relative transition-all text-right ${
                       isSelected
@@ -298,6 +418,7 @@ export default function RegistrationPage() {
                     onChange={handleChange}
                     placeholder="محمد"
                     className={inputClass(errors.firstName)}
+                    disabled={isSubmitting}
                   />
                   <FieldError message={errors.firstName} />
                 </div>
@@ -311,6 +432,7 @@ export default function RegistrationPage() {
                     onChange={handleChange}
                     placeholder="أحمد"
                     className={inputClass(errors.fatherName)}
+                    disabled={isSubmitting}
                   />
                   <FieldError message={errors.fatherName} />
                 </div>
@@ -324,6 +446,7 @@ export default function RegistrationPage() {
                     onChange={handleChange}
                     placeholder="محمود"
                     className={inputClass(errors.grandFatherName)}
+                    disabled={isSubmitting}
                   />
                   <FieldError message={errors.grandFatherName} />
                 </div>
@@ -337,6 +460,7 @@ export default function RegistrationPage() {
                     onChange={handleChange}
                     placeholder="الأسعد"
                     className={inputClass(errors.familyName)}
+                    disabled={isSubmitting}
                   />
                   <FieldError message={errors.familyName} />
                 </div>
@@ -350,6 +474,7 @@ export default function RegistrationPage() {
                     onChange={handleChange}
                     placeholder="example@mail.com"
                     className={inputClass(errors.email)}
+                    disabled={isSubmitting}
                   />
                   <FieldError message={errors.email} />
                 </div>
@@ -361,8 +486,9 @@ export default function RegistrationPage() {
                     type="tel"
                     value={formData.phone}
                     onChange={handleChange}
-                    placeholder="+970"
+                    placeholder="+97059XXXXXXX"
                     className={inputClass(errors.phone)}
+                    disabled={isSubmitting}
                   />
                   <FieldError message={errors.phone} />
                 </div>
@@ -385,10 +511,13 @@ export default function RegistrationPage() {
                       value={formData.city}
                       onChange={handleChange}
                       className={`w-full ${inputClass(errors.city)}`}
+                      disabled={isSubmitting}
                     >
-                      <option value="">اختر المدينة</option>
+                      <option value="" hidden>
+                        اختر المدينة
+                      </option>
                       <option value="غزة">غزة</option>
-                      <option value="خان يونس">خان يونس</option>
+                      <option value="خانيونس">خان يونس</option>
                       <option value="بيت لاهيا">بيت لاهيا</option>
                       <option value="بيت حانون">بيت حانون</option>
                       <option value="نصيرات">نصيرات</option>
@@ -406,8 +535,11 @@ export default function RegistrationPage() {
                       value={formData.gender}
                       onChange={handleChange}
                       className={`w-full ${inputClass(errors.gender)}`}
+                      disabled={isSubmitting}
                     >
-                      <option value="">اختر</option>
+                      <option value="" hidden>
+                        اختر
+                      </option>
                       <option value="ذكر">ذكر</option>
                       <option value="أنثى">أنثى</option>
                     </select>
@@ -423,6 +555,7 @@ export default function RegistrationPage() {
                     value={formData.birthDate}
                     onChange={handleChange}
                     className={inputClass(errors.birthDate)}
+                    disabled={isSubmitting}
                   />
                   <FieldError message={errors.birthDate} />
                 </div>
@@ -440,16 +573,19 @@ export default function RegistrationPage() {
                     value={formData.password}
                     onChange={handleChange}
                     className={`w-full ${inputClass(errors.password)}`}
+                    disabled={isSubmitting}
                   />
 
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute left-3 top-3 cursor-pointer text-gray-400"
+                    disabled={isSubmitting}
                   >
                     {showPassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
+
                 <FieldError message={errors.password} />
               </div>
 
@@ -463,25 +599,39 @@ export default function RegistrationPage() {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     className={`w-full ${inputClass(errors.confirmPassword)}`}
+                    disabled={isSubmitting}
                   />
 
                   <button
                     type="button"
                     onClick={() => setShowConfirm(!showConfirm)}
                     className="absolute left-3 top-3 cursor-pointer text-gray-400"
+                    disabled={isSubmitting}
                   >
                     {showConfirm ? <FaEyeSlash /> : <FaEye />}
                   </button>
                 </div>
+
                 <FieldError message={errors.confirmPassword} />
               </div>
+
+              {errors.api && (
+                <pre className="text-sm text-red-600 text-right mt-4 max-w-lg mx-auto w-full whitespace-pre-wrap">
+                  {errors.api}
+                </pre>
+              )}
 
               <div className="mt-4 max-w-lg mx-auto w-full">
                 <button
                   type="submit"
-                  className="w-full bg-[#0D4B8E] text-white rounded-lg cursor-pointer p-3 font-bold flex items-center hover:bg-[#1b5695] justify-center gap-2 shadow-[0_4px_6px_-4px_rgba(13,75,142,0.2),0_10px_15px_-3px_rgba(13,75,142,0.2)]"
+                  disabled={isSubmitting}
+                  className={`w-full bg-[#0D4B8E] text-white rounded-lg p-3 font-bold flex items-center justify-center gap-2 shadow-[0_4px_6px_-4px_rgba(13,75,142,0.2),0_10px_15px_-3px_rgba(13,75,142,0.2)] ${
+                    isSubmitting
+                      ? "opacity-70 cursor-not-allowed"
+                      : "cursor-pointer hover:bg-[#1b5695]"
+                  }`}
                 >
-                  إنشاء حساب
+                  {isSubmitting ? "جارٍ إنشاء الحساب..." : "إنشاء حساب"}
                   <FaArrowLeft />
                 </button>
 
@@ -509,9 +659,11 @@ export default function RegistrationPage() {
           <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
             اتصل بنا
           </a>
+
           <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
             الشروط والأحكام
           </a>
+
           <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
             سياسة الخصوصية
           </a>

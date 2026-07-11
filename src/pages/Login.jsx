@@ -4,15 +4,36 @@ import kafeeli from "../assets/kafeeli.png";
 import { MdOutlineMailOutline } from "react-icons/md";
 import { LuLock } from "react-icons/lu";
 import { TbShieldCheck, TbScan } from "react-icons/tb";
-// import { FaEye, FaEyeSlash, FaArrowLeft } from "react-icons/fa";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
+import { authApi } from "../services/authApi";
+
 function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errorType, setErrorType] = useState("");
+
+  const [errorMessage, setErrorMessage] = useState("");
+  const [needsVerification, setNeedsVerification] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSendingVerification, setIsSendingVerification] = useState(false);
+
+  function extractMessage(data) {
+    if (!data) return "";
+
+    if (data.message) {
+      return data.message;
+    }
+
+    if (Array.isArray(data.errors) && data.errors.length > 0) {
+      return data.errors.join("\n");
+    }
+
+    if (data.errors && typeof data.errors === "object") {
+      return Object.values(data.errors).flat().join("\n");
+    }
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -37,7 +58,6 @@ function Login() {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row overflow-y-auto">
-      {/* الصورة شمال */}
       <div
         className="hidden md:flex w-1/2 max-md:w-full max-md:min-h-[350px] bg-cover bg-center relative justify-center items-center"
         style={{ backgroundImage: `url(${kafeeli})` }}
@@ -68,7 +88,6 @@ function Login() {
         </div>
       </div>
 
-      {/* الفورم يمين */}
       <div
         dir="rtl"
         className="w-full md:w-1/2 bg-[#f5f6f8] flex justify-center items-center pt-18 md:pt-0"
@@ -92,9 +111,16 @@ function Login() {
                 type="email"
                 placeholder="example@domain.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full h-12 border border-[#d8dbe2] rounded-md bg-[#f5f6fa] pr-[45px] pl-[45px] outline-none focus:border-[#003469]"
+                disabled={isSubmitting || isSendingVerification}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  setErrorMessage("");
+                  setNeedsVerification(false);
+                  setIsSendingVerification(false);
+                }}
+                className="w-full h-12 border border-[#d8dbe2] rounded-md bg-[#f5f6fa] pr-[45px] pl-[45px] outline-none focus:border-[#003469] disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
+
               <MdOutlineMailOutline className="absolute right-[15px] top-1/2 -translate-y-1/2 text-[#7d8492] text-lg" />
             </div>
 
@@ -107,18 +133,26 @@ function Login() {
                 type={showPassword ? "text" : "password"}
                 placeholder="********"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full h-12 border border-[#d8dbe2] rounded-md bg-[#f5f6fa] pr-[45px] pl-[45px] outline-none focus:border-[#003469]"
+                disabled={isSubmitting || isSendingVerification}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  setErrorMessage("");
+                  setNeedsVerification(false);
+                  setIsSendingVerification(false);
+                }}
+                className="w-full h-12 border border-[#d8dbe2] rounded-md bg-[#f5f6fa] pr-[45px] pl-[45px] outline-none focus:border-[#003469] disabled:bg-gray-100 disabled:cursor-not-allowed"
               />
 
               <LuLock className="absolute right-[15px] top-1/2 -translate-y-1/2 text-[#7d8492] text-lg" />
 
-              <div
+              <button
+                type="button"
+                disabled={isSubmitting || isSendingVerification}
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute left-[15px] top-1/2 -translate-y-1/2 text-[#7d8492] text-lg cursor-pointer"
+                className="absolute left-[15px] top-1/2 -translate-y-1/2 text-[#7d8492] text-lg cursor-pointer disabled:cursor-not-allowed"
               >
                 {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
-              </div>
+              </button>
             </div>
 
             <button
@@ -129,17 +163,33 @@ function Login() {
               نسيت كلمة المرور؟
             </button>
 
-            {errorType === "empty" && (
-              <div className="mt-3 bg-red-100 text-red-600 p-3 rounded-md text-sm">
-                الرجاء تعبئة جميع الحقول
+            {errorMessage && (
+              <div
+                dir="rtl"
+                className={`mt-3 border p-3 rounded-md text-sm leading-7 whitespace-pre-wrap text-right ${
+                  needsVerification
+                    ? "bg-blue-50 border-blue-200 text-blue-700"
+                    : "bg-red-50 border-red-200 text-red-600"
+                }`}
+              >
+                {errorMessage}
               </div>
             )}
 
             <button
               type="submit"
-              className="w-full mt-[18px] h-[45px] border-none rounded-md bg-[#003469] text-white text-[15px] cursor-pointer hover:bg-[#002850]"
+              disabled={isSubmitting || isSendingVerification}
+              className={`w-full mt-[18px] h-[45px] border-none rounded-md bg-[#003469] text-white text-[15px] hover:bg-[#002850] ${
+                isSubmitting || isSendingVerification
+                  ? "opacity-70 cursor-not-allowed"
+                  : "cursor-pointer"
+              }`}
             >
-              تسجيل الدخول
+              {isSendingVerification
+                ? "جارٍ إرسال رابط التحقق..."
+                : isSubmitting
+                  ? "جارٍ تسجيل الدخول..."
+                  : "تسجيل الدخول"}
             </button>
           </form>
 
@@ -158,9 +208,11 @@ function Login() {
             <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
               سياسة الخصوصية
             </a>
+
             <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
               الشروط والأحكام
             </a>
+
             <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
               اتصل بنا
             </a>
