@@ -33,7 +33,7 @@ export default function EmailVerification() {
     emailFromUrl ||
     localStorage.getItem("pendingVerificationEmail") ||
     "";
-// تعليق تجربة 
+
   const [email, setEmail] = useState(initialEmail);
   const [sent, setSent] = useState(false);
   const [cooldown, setCooldown] = useState(0);
@@ -86,149 +86,90 @@ export default function EmailVerification() {
     return "حدث خطأ، حاول مرة أخرى";
   }
 
- useEffect(() => {
-  if (!tokenFromUrl) return;
-  if (didVerifyRef.current) return;
+  useEffect(() => {
+    if (!tokenFromUrl) return;
+    if (didVerifyRef.current) return;
 
-  didVerifyRef.current = true;
+    didVerifyRef.current = true;
 
-  async function verifyEmailFromLink() {
-    const decodedToken = decodeVerificationToken(tokenFromUrl);
+    async function verifyEmailFromLink() {
+      const decodedToken = decodeVerificationToken(tokenFromUrl);
 
-    const currentEmail =
-      emailFromUrl ||
-      email ||
-      localStorage.getItem("pendingVerificationEmail") ||
-      "";
+      const currentEmail =
+        emailFromUrl ||
+        email ||
+        localStorage.getItem("pendingVerificationEmail") ||
+        "";
 
-    if (!userIdFromUrl || !decodedToken) {
-      navigate(
-        `/invalid-email?email=${encodeURIComponent(currentEmail)}`,
-        {
-          replace: true,
-        }
-      );
-      return;
-    }
-
-
-    const payload = {
-      userId: userIdFromUrl,
-      token: decodedToken,
-    };
-
-     // if (!userIdFromUrl || !decodedToken) {
-      //   navigate(
-      //     `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`
-      //   );
-      //   return;
-      // }
       if (!userIdFromUrl || !decodedToken) {
-  navigate(
-    `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`,
-    { replace: true }
-  );
-  return;
-}
+        navigate(`/invalid-email?email=${encodeURIComponent(currentEmail)}`, {
+          replace: true,
+        });
+        return;
+      }
 
-    try {
-      setIsVerifying(true);
-      setMessage("");
-      setMessageType("");
-
-
-      console.log("Verify email payload:", {
+      const payload = {
         userId: userIdFromUrl,
-        token: "[hidden]",
-      });
+        token: decodedToken,
+      };
 
+      try {
+        setIsVerifying(true);
+        setMessage("");
+        setMessageType("");
 
-      const result = await authApi.verifyEmail(payload);
+        console.log("Verify email payload:", {
+          userId: userIdFromUrl,
+          token: "[hidden]",
+        });
 
-        // if (result?.success !== true) {
-        //   navigate(
-        //     `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`
-        //   );
-        //   return;
-        // }
-          if (result?.success !== true) {
-  navigate(
-    `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`,
-    { replace: true }
-  );
-  return;
-}
+        const result = await authApi.verifyEmail(payload);
 
-      console.log(
-        "Verify email response:",
-        result
-      );
+        console.log("Verify email response:", result);
 
+        if (result?.success === true) {
+          setTimeout(() => {
+            navigate("/email-verified-success", { replace: true });
+          }, 2000);
+        } else {
+          navigate(
+            `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`,
+            { replace: true }
+          );
+        }
+      } catch (error) {
+        console.log("Status:", error.response?.status);
+        console.log(
+          "Backend error:",
+          JSON.stringify(error.response?.data, null, 2)
+        );
 
-      if (result?.success === true) {
+        const status = error.response?.status;
+        const apiMessage = error.response?.data?.message?.toLowerCase() || "";
 
-        setTimeout(() => {
-          navigate("/email-verified-success", { replace: true });
-        }, 2000);
+        if (
+          status === 400 ||
+          apiMessage.includes("token") ||
+          apiMessage.includes("expired") ||
+          apiMessage.includes("invalid") ||
+          apiMessage.includes("confirmation")
+        ) {
+          navigate(
+            `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`,
+            { replace: true }
+          );
           return;
-      } 
-      // catch (error) {
-      //   console.log("Status:", error.response?.status);
-      //   console.log(
-      //     "Backend error:",
-      //     JSON.stringify(error.response?.data, null, 2)
-      //   );
+        }
 
-      //   navigate(
-      //     `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`
-      //   );
-      // } 
-    }catch (error) {
-  console.log("Status:", error.response?.status);
-  console.log(
-    "Backend error:",
-    JSON.stringify(error.response?.data, null, 2)
-  );
-
-  const status = error.response?.status;
-
-  const apiMessage =
-    error.response?.data?.message?.toLowerCase() || "";
-
-  if (
-    status === 400 ||
-    apiMessage.includes("token") ||
-    apiMessage.includes("expired") ||
-    apiMessage.includes("invalid") ||
-    apiMessage.includes("confirmation")
-  ) {
-    navigate(
-      `/invalid-email?email=${encodeURIComponent(emailFromUrl || email)}`,
-      { replace: true }
-    );
-
-    return;
-  }
-
-  setMessage("حدث خطأ أثناء تأكيد البريد الإلكتروني، حاول مرة أخرى");
-  setMessageType("error");
-  return; // تمت إضافتها لمنع تنفيذ navigate تحت وتفويت رسالة الخطأ على المستخدم
-}
-      finally {
+        setMessage("حدث خطأ أثناء تأكيد البريد الإلكتروني، حاول مرة أخرى");
+        setMessageType("error");
+      } finally {
         setIsVerifying(false);
       }
-  }
+    }
 
-
-  verifyEmailFromLink();
-
-}, [
-  tokenFromUrl,
-  userIdFromUrl,
-  emailFromUrl,
-  email,
-  navigate,
-]);
+    verifyEmailFromLink();
+  }, [tokenFromUrl, userIdFromUrl, emailFromUrl, email, navigate]);
 
   async function handleResend() {
     if (cooldown > 0 || isSubmitting || isVerifying) return;
@@ -274,8 +215,7 @@ export default function EmailVerification() {
 
       setTimeout(() => setSent(false), 3000);
       setCooldown(30);
-    } 
-    catch (error) {
+    } catch (error) {
       console.log("Status:", error.response?.status);
       console.log(
         "Backend error:",
@@ -284,8 +224,7 @@ export default function EmailVerification() {
 
       setMessage(getApiErrorMessage(error));
       setMessageType("error");
-    }
-     finally {
+    } finally {
       setIsSubmitting(false);
     }
   }
