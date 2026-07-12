@@ -40,17 +40,13 @@ function Login() {
     try {
       const response = await authApi.login({ email, password });
 
-      // تحقق من حالة الإيميل غير مفعل
-      const errorMsg = response?.message || response?.error?.message || "";
-      const errorCode = response?.code || response?.error?.code || "";
-
       if (response?.success) {
         navigate("/landing-page");
-      } else if (errorCode === "EMAIL_NOT_VERIFIED" || errorMsg.toLowerCase().includes("verify")) {
-        // لو الايميل غير مفعل خليه يروح لصفحة التحقق
+      } else if (response?.code === "EMAIL_NOT_VERIFIED" || response?.message?.toLowerCase().includes("verify")) {
+        // إذا البريد غير مفعل، ارسل مباشرة لصفحة email-verified
         navigate(`/email-verified?email=${encodeURIComponent(email)}`);
       } else {
-        setErrorMessage(errorMsg || "حدث خطأ أثناء تسجيل الدخول");
+        setErrorMessage(extractMessage(response));
       }
     } catch (err) {
       setErrorMessage(err.response?.data?.message || "حدث خطأ أثناء تسجيل الدخول، حاول مرة أخرى");
@@ -152,6 +148,14 @@ function Login() {
                 {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
               </button>
             </div>
+
+            <button
+              type="button"
+              onClick={() => navigate("/forgot-password")}
+              className="text-[#00696E] text-[14px] hover:text-[#008b8b] duration-200 cursor-pointer mb-3"
+            >
+              نسيت كلمة المرور؟
+            </button>
 
             {needsVerification && (
               <button
