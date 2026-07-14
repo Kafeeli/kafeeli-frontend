@@ -15,9 +15,9 @@ import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 import LandingPage from "./pages/LandingPage";
 
 import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
-import ProfilePage from "./pages/sponsor-dashboard/profileDashboard";
+import SponsorProfile  from "./pages/sponsor-dashboard/profileDashboard";
 
-import GuardianProfile from "./pages/GuardianProfile";
+import GuardianProfile from "./pages/guardian-dashboard/GuardianProfile";
 import ErrorPage from "./pages/guardian-dashboard/Families/ErrorStates";
 import FamilyAccessPendingPage from "./pages/guardian-dashboard/Families/FamilyAccessPendingPage";
 import NoFamiliesPage from "./pages/guardian-dashboard/Families/NoFamiliesPage";
@@ -190,11 +190,11 @@ function AnimatedRoutes() {
         />
 
         <Route
-          path="/profile"
+          path="/sponsorProfile"
           element={
             <PageWrapper>
               <div dir="rtl" className="min-h-screen bg-gray-50">
-                <ProfilePage />
+              <SponsorProfile />
               </div>
             </PageWrapper>
           }

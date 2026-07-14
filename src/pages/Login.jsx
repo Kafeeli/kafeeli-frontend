@@ -27,34 +27,72 @@ function Login() {
     return "";
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!email || !password) {
-      setErrorMessage("الرجاء إدخال البريد الإلكتروني وكلمة المرور");
-      return;
-    }
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!email || !password) {
+  //     setErrorMessage("الرجاء إدخال البريد الإلكتروني وكلمة المرور");
+  //     return;
+  //   }
 
-    setErrorMessage("");
-    setIsSubmitting(true);
+  //   setErrorMessage("");
+  //   setIsSubmitting(true);
 
-    try {
-      const response = await authApi.login({ email, password });
+  //   try {
+  //     const response = await authApi.login({ email, password });
 
-      if (response?.success) {
-        navigate("/landing-page");
-      } else if (response?.code === "EMAIL_NOT_VERIFIED" || response?.message?.toLowerCase().includes("verify")) {
-        // إذا البريد غير مفعل، ارسل مباشرة لصفحة email-verified
-        navigate(`/email-verified?email=${encodeURIComponent(email)}`);
+  //     if (response?.success) {
+  //       navigate("/landing-page");
+  //     } else if (response?.code === "EMAIL_NOT_VERIFIED" || response?.message?.toLowerCase().includes("verify")) {
+  //       // إذا البريد غير مفعل، ارسل مباشرة لصفحة email-verified
+  //       navigate(`/email-verified?email=${encodeURIComponent(email)}`);
+  //     } else {
+  //       setErrorMessage(extractMessage(response));
+  //     }
+  //   } catch (err) {
+  //     setErrorMessage(err.response?.data?.message || "حدث خطأ أثناء تسجيل الدخول، حاول مرة أخرى");
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!email || !password) {
+    setErrorMessage("الرجاء إدخال البريد الإلكتروني وكلمة المرور");
+    return;
+  }
+
+  setErrorMessage("");
+  setIsSubmitting(true);
+
+  try {
+    const response = await authApi.login({ email, password });
+
+    if (response?.success) {
+      // حفظ بيانات الجلسة بالـ localStorage
+      localStorage.setItem("token", response.data.accessToken);
+      localStorage.setItem("refreshToken", response.data.refreshToken);
+      localStorage.setItem("user", JSON.stringify(response.data));
+
+      const role = response.data?.role?.toLowerCase(); // "guardian" أو "sponsor"
+
+      if (role === "guardian") {
+        navigate("/guardian-profile");
+      } else if (role === "sponsor") {
+        navigate("/main");
       } else {
-        setErrorMessage(extractMessage(response));
+        navigate("/landing-page");
       }
-    } catch (err) {
-      setErrorMessage(err.response?.data?.message || "حدث خطأ أثناء تسجيل الدخول، حاول مرة أخرى");
-    } finally {
-      setIsSubmitting(false);
+    } else if (response?.code === "EMAIL_NOT_VERIFIED" || response?.message?.toLowerCase().includes("verify")) {
+      navigate(`/email-verified?email=${encodeURIComponent(email)}`);
+    } else {
+      setErrorMessage(extractMessage(response));
     }
-  };
-
+  } catch (err) {
+    setErrorMessage(err.response?.data?.message || "حدث خطأ أثناء تسجيل الدخول، حاول مرة أخرى");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
   const handleResendVerification = async () => {
     if (!email) return;
     setIsSendingVerification(true);
