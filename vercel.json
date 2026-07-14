@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/backend/:path*",
-      "destination": "http://kafeeli.runasp.net/:path*"
+      "destination": "https://kafeeli.runasp.net/:path*"
     },
     {
       "source": "/(.*)",
