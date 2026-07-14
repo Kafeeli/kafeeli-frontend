@@ -1,5 +1,4 @@
 import {
-  MdCheckCircle,
   MdOutlineAccountBalance,
   MdAccessTime,
   MdWarningAmber,
@@ -8,24 +7,19 @@ import {
 import { LuPencil } from "react-icons/lu";
 import { isWallet } from "./TransferDataModal";
 
-export const DEFAULT_TRANSFER_DATA = {
-  bankName: "محفظة PALPAY",
-  accountName: "أحمد العلي",
-  accountNumber: "059 **** 456",
-  iban: "SA60 ***** ***** ***** 4592",
-  branch: "الفرع الرئيسي",
-};
-
-export const APPROVED_TRANSFER_DATA = {
-  bankName: "البنك الإسلامي العربي",
-  accountName: "أحمد العلي",
-  accountNumber: "**** **** **** 2040",
-  iban: "SA60 ***** ***** **** 8892",
-  branch: "فرع غزة - الرمال",
-};
-
+/**
+ * status: "empty" | "pendingReview" | "needsUpdate" | "approved"
+ * data: { bankName, accountHolderName, accountNumberMasked, ibanMasked, branchName } | null
+ * reviewReason: نص ملاحظة الإدارة (يظهر بحالة needsUpdate فقط) — راجع من الـ API (reviewReason)
+ *
+ * ملاحظة: الـ API الحقيقي (PUT /api/v1/guardians/me/bank-accounts/{id}) بيسمح بالتعديل
+ * فقط لما تكون حالة الحساب "NeedsUpdate". لهيك زر التعديل هون بيظهر بس بهاي الحالة،
+ * حتى ما نعرض زر بيرجع 403 لو ضغط عليه المستخدم بحالة "معتمد".
+ */
 const TransferDataSection = ({
   status = "empty",
+  data = null,
+  reviewReason = "",
   onAdd,
   onEdit,
   compact = false,
@@ -73,11 +67,16 @@ const TransferDataSection = ({
       title: "تفاصيل التحويل",
       desc: "تم اعتماد بيانات التحويل من قبل الإدارة",
       showAddButton: false,
-      showEditButton: true,
+      // التعديل غير مسموح من الـ API إلا بحالة "يحتاج تعديل"، فما منعرض الزر هون
+      showEditButton: false,
     },
   };
 
   const current = statusConfig[status];
+  // data.canEdit راجع صراحة من السيرفر وهو الأدق؛ إذا مش موجود (undefined) منرجع
+  // لمنطق الحالة الافتراضي كـ fallback
+  const showEditButton =
+    data?.canEdit !== undefined ? data.canEdit : current.showEditButton;
 
   // Compact Mobile Mode
   if (compact) {
@@ -105,7 +104,7 @@ const TransferDataSection = ({
         </div>
 
         <div className="p-3 space-y-2">
-          {status === "empty" ? (
+          {status === "empty" || !data ? (
             <button
               onClick={onAdd}
               className="w-full h-[36px] rounded-[6px] border-2 border-dashed border-[#D0D5DD] bg-white text-[#003469] text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-[#F5F8FB] hover:border-[#003469] transition cursor-pointer"
@@ -116,30 +115,21 @@ const TransferDataSection = ({
           ) : (
             <>
               <MobileRow
-                label={
-                  isWallet(DEFAULT_TRANSFER_DATA.bankName) ? "المحفظة" : "البنك"
-                }
-                value={DEFAULT_TRANSFER_DATA.bankName}
+                label={(data.isWalletProvider ?? isWallet(data.bankName)) ? "المحفظة" : "البنك"}
+                value={data.bankName}
               />
+              <MobileRow label="صاحب الحساب" value={data.accountHolderName} />
               <MobileRow
-                label="صاحب الحساب"
-                value={DEFAULT_TRANSFER_DATA.accountName}
-              />
-              <MobileRow
-                label={
-                  isWallet(DEFAULT_TRANSFER_DATA.bankName)
-                    ? "رقم المحفظة"
-                    : "رقم الحساب"
-                }
-                value={DEFAULT_TRANSFER_DATA.accountNumber}
+                label={(data.isWalletProvider ?? isWallet(data.bankName)) ? "رقم المحفظة" : "رقم الحساب"}
+                value={data.accountNumberMasked}
               />
               <MobileRow
                 label="رقم الآيبان (IBAN)"
-                value={DEFAULT_TRANSFER_DATA.iban}
+                value={data.ibanMasked}
                 mono
               />
 
-              {current.showEditButton && (
+              {showEditButton && (
                 <button
                   onClick={onEdit}
                   className="w-full h-[36px] mt-2 rounded-[6px] bg-[#003469] text-white text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-[#002b57] transition cursor-pointer"
@@ -184,10 +174,17 @@ const TransferDataSection = ({
       </div>
 
       <div className="p-4 sm:p-6">
-        {status === "empty" && <EmptyState onAdd={onAdd} />}
-        {status === "needsUpdate" && <NeedsUpdateState onEdit={onEdit} />}
-        {status === "pendingReview" && <PendingReviewState />}
-        {status === "approved" && <ApprovedState onEdit={onEdit} />}
+        {(status === "empty" || !data) && <EmptyState onAdd={onAdd} />}
+        {status === "needsUpdate" && data && (
+          <NeedsUpdateState
+            data={data}
+            reviewReason={reviewReason}
+            onEdit={onEdit}
+            showEditButton={showEditButton}
+          />
+        )}
+        {status === "pendingReview" && data && <PendingReviewState data={data} />}
+        {status === "approved" && data && <ApprovedState data={data} />}
       </div>
     </section>
   );
@@ -235,28 +232,20 @@ const EmptyState = ({ onAdd }) => (
   </div>
 );
 
-const NeedsUpdateState = ({ onEdit }) => (
+const NeedsUpdateState = ({ data, reviewReason, onEdit, showEditButton = true }) => (
   <div className="space-y-6">
     <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5">
       <FieldRow
-        label={isWallet(DEFAULT_TRANSFER_DATA.bankName) ? "المحفظة" : "البنك"}
-        value={DEFAULT_TRANSFER_DATA.bankName}
+        label={(data.isWalletProvider ?? isWallet(data.bankName)) ? "المحفظة" : "البنك"}
+        value={data.bankName}
       />
-      <FieldRow label="صاحب الحساب" value={DEFAULT_TRANSFER_DATA.accountName} />
+      <FieldRow label="صاحب الحساب" value={data.accountHolderName} />
       <FieldRow
-        label={
-          isWallet(DEFAULT_TRANSFER_DATA.bankName)
-            ? "رقم المحفظة"
-            : "رقم الحساب"
-        }
-        value={DEFAULT_TRANSFER_DATA.accountNumber}
+        label={(data.isWalletProvider ?? isWallet(data.bankName)) ? "رقم المحفظة" : "رقم الحساب"}
+        value={data.accountNumberMasked}
       />
-      <FieldRow
-        label="رقم الآيبان (IBAN)"
-        value={DEFAULT_TRANSFER_DATA.iban}
-        mono
-      />
-      <FieldRow label="الفرع" value={DEFAULT_TRANSFER_DATA.branch} />
+      <FieldRow label="رقم الآيبان (IBAN)" value={data.ibanMasked} mono />
+      <FieldRow label="الفرع" value={data.branchName} />
     </div>
 
     <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 flex items-start gap-3">
@@ -266,8 +255,8 @@ const NeedsUpdateState = ({ onEdit }) => (
           ملاحظة الإدارة
         </h4>
         <p className="mt-1 text-[13px] leading-[22px] text-red-700">
-          يرجى التأكد من رقم الهاتف المرتبط بالمحفظة أو تعديل الحساب لتصحيح
-          التضارب.
+          {reviewReason ||
+            "يرجى مراجعة بيانات التحويل وتعديلها حسب الحاجة."}
         </p>
       </div>
     </div>
@@ -276,40 +265,33 @@ const NeedsUpdateState = ({ onEdit }) => (
       <p className="text-[11px] text-[#6B7280] leading-5">
         بعد التعديل، ستعود البيانات تلقائياً إلى مرحلة المراجعة والتدقيق.
       </p>
-      <button
-        onClick={onEdit}
-        className="h-[40px] px-5 rounded-md bg-[#003469] text-white text-[13px] font-bold flex items-center justify-center gap-2 shadow-sm hover:bg-[#002b57] hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200 cursor-pointer"
-      >
-        <LuPencil className="text-[14px]" />
-        تعديل بيانات التحويل
-      </button>
+      {showEditButton && (
+        <button
+          onClick={onEdit}
+          className="h-[40px] px-5 rounded-md bg-[#003469] text-white text-[13px] font-bold flex items-center justify-center gap-2 shadow-sm hover:bg-[#002b57] hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200 cursor-pointer"
+        >
+          <LuPencil className="text-[14px]" />
+          تعديل بيانات التحويل
+        </button>
+      )}
     </div>
   </div>
 );
 
-const PendingReviewState = () => (
+const PendingReviewState = ({ data }) => (
   <div className="space-y-6">
-    {/* Grid محسّن وموزع بشكل متناسق ومحاذى لليمين بنسبة 100% */}
     <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5">
       <FieldRow
-        label={isWallet(DEFAULT_TRANSFER_DATA.bankName) ? "المحفظة" : "البنك"}
-        value={DEFAULT_TRANSFER_DATA.bankName}
+        label={(data.isWalletProvider ?? isWallet(data.bankName)) ? "المحفظة" : "البنك"}
+        value={data.bankName}
       />
-      <FieldRow label="صاحب الحساب" value={DEFAULT_TRANSFER_DATA.accountName} />
+      <FieldRow label="صاحب الحساب" value={data.accountHolderName} />
       <FieldRow
-        label={
-          isWallet(DEFAULT_TRANSFER_DATA.bankName)
-            ? "رقم المحفظة"
-            : "رقم الحساب"
-        }
-        value={DEFAULT_TRANSFER_DATA.accountNumber}
+        label={(data.isWalletProvider ?? isWallet(data.bankName)) ? "رقم المحفظة" : "رقم الحساب"}
+        value={data.accountNumberMasked}
       />
-      <FieldRow
-        label="رقم الآيبان (IBAN)"
-        value={DEFAULT_TRANSFER_DATA.iban}
-        mono
-      />
-      <FieldRow label="الفرع" value={DEFAULT_TRANSFER_DATA.branch} />
+      <FieldRow label="رقم الآيبان (IBAN)" value={data.ibanMasked} mono />
+      <FieldRow label="الفرع" value={data.branchName} />
     </div>
 
     <div className="rounded-lg border border-[#9EE8E8] bg-[#DDFBFB] px-4 py-3 flex items-start gap-3">
@@ -327,31 +309,20 @@ const PendingReviewState = () => (
   </div>
 );
 
-const ApprovedState = ({ onEdit }) => (
+const ApprovedState = ({ data }) => (
   <div className="space-y-6">
     <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-5">
       <FieldRow
-        label={isWallet(APPROVED_TRANSFER_DATA.bankName) ? "المحفظة" : "البنك"}
-        value={APPROVED_TRANSFER_DATA.bankName}
+        label={(data.isWalletProvider ?? isWallet(data.bankName)) ? "المحفظة" : "البنك"}
+        value={data.bankName}
       />
+      <FieldRow label="صاحب الحساب" value={data.accountHolderName} />
       <FieldRow
-        label="صاحب الحساب"
-        value={APPROVED_TRANSFER_DATA.accountName}
+        label={(data.isWalletProvider ?? isWallet(data.bankName)) ? "رقم المحفظة" : "رقم الحساب"}
+        value={data.accountNumberMasked}
       />
-      <FieldRow
-        label={
-          isWallet(APPROVED_TRANSFER_DATA.bankName)
-            ? "رقم المحفظة"
-            : "رقم الحساب"
-        }
-        value={APPROVED_TRANSFER_DATA.accountNumber}
-      />
-      <FieldRow
-        label="رقم الآيبان (IBAN)"
-        value={APPROVED_TRANSFER_DATA.iban}
-        mono
-      />
-      <FieldRow label="الفرع" value={APPROVED_TRANSFER_DATA.branch} />
+      <FieldRow label="رقم الآيبان (IBAN)" value={data.ibanMasked} mono />
+      <FieldRow label="الفرع" value={data.branchName} />
     </div>
 
     <div className="rounded-lg border border-[#9EE8E8] bg-[#DDFBFB] px-4 py-3 flex items-start gap-3">
@@ -366,26 +337,11 @@ const ApprovedState = ({ onEdit }) => (
         </p>
       </div>
     </div>
-
-    <div className="pt-4 border-t border-[#E5E7EB] flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-      <p className="text-[11px] text-[#6B7280] leading-5">
-        تنبيه: في حال قمت بتعديل البيانات المعتمدة، ستدخل الحسابات في طور
-        المراجعة مرة أخرى.
-      </p>
-      <button
-        onClick={onEdit}
-        className="h-[40px] px-5 rounded-md bg-[#003469] text-white text-[13px] font-bold flex items-center justify-center gap-2 shadow-sm hover:bg-[#002b57] hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200 cursor-pointer"
-      >
-        <LuPencil className="text-[14px]" />
-        تعديل البيانات المعتمدة
-      </button>
-    </div>
   </div>
 );
 
 /* 
-  هنا يكمن السحر! تم تحويل التوزيع ليصبح رأسي (العنوان فوق والقيمة تحت)
-  لتحقيق تماسك بصري كامل مريح ومحاذى لليمين تماماً كما يظهر في لوحات التحكم الاحترافية.
+  توزيع رأسي (العنوان فوق والقيمة تحت) لتحقيق تماسك بصري كامل محاذى لليمين.
 */
 const FieldRow = ({ label, value, mono = false, className = "" }) => (
   <div className={`flex flex-col items-start gap-1.5 text-right ${className}`}>
