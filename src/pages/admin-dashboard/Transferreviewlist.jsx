@@ -16,7 +16,7 @@ import {
   MdWarningAmber,
   MdRefresh,
 } from "react-icons/md";
-import AdminLayout from "./AdminLayout";
+import AdminLayout from "./Adminlayout";
 import TransferDetailsModal from "./TransferDetailsModal";
 
 const cardShadow = "shadow-[0_2px_10px_rgba(31,41,55,0.06)]";
