@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ChangePasswordModal from "../pages/guardian-dashboard/ChangePasswordModal";
+import ChangePasswordModal from "./ChangePasswordModal";
 
 import {
   // إدارة القوائم والهيدر
@@ -33,16 +33,12 @@ import { LuPencil } from "react-icons/lu";
 import { FaRestroom, FaUserTie } from "react-icons/fa";
 import { IoEarthSharp } from "react-icons/io5";
 
-// استيراد الملفات الخارجية المنفصلة التابعة لمشروعك
-import Sidebar from "../pages/guardian-dashboard/Sidebar";
-import TransferDataSection from "../pages/guardian-dashboard/TransferDataSection";
-import TransferDataModal from "../pages/guardian-dashboard/TransferDataModal";
+import Sidebar from "./Sidebar";
+import TransferDataSection from "./TransferDataSection";
+import TransferDataModal from "./TransferDataModal";
 
-import personalImage from "../assets/personal.jpg";
-
-/* ========================================================================== */
+import personalImage from "../../assets/personal.jpg";
 /* ⚙️ الإعدادات العامة ومصدر البيانات الموحد                                */
-/* ========================================================================== */
 const INITIAL_TRANSFER_STATUS = "empty";
 
 const USER_PROFILE_DATA = {

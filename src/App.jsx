@@ -11,13 +11,11 @@ import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
 import SideBar from "./pages/admin-dashboard/sideBar";
 import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
-
+import TransferReviewList from "./pages/admin-dashboard/TransferReviewList";
 import LandingPage from "./pages/LandingPage";
-
 import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
 import ProfilePage from "./pages/sponsor-dashboard/profileDashboard";
-
-import GuardianProfile from "./pages/GuardianProfile";
+import GuardianProfile from "./pages/guardian-dashboard/GuardianProfile";
 import ErrorPage from "./pages/guardian-dashboard/Families/ErrorStates";
 import FamilyAccessPendingPage from "./pages/guardian-dashboard/Families/FamilyAccessPendingPage";
 import NoFamiliesPage from "./pages/guardian-dashboard/Families/NoFamiliesPage";
@@ -370,6 +368,16 @@ function AnimatedRoutes() {
           element={
             <PageWrapper>
               <AdminDashboard />
+            </PageWrapper>
+          }
+        />
+
+        {/* ✅ صفحة مراجعة بيانات التحويل (الأدمن) */}
+        <Route
+          path="/admin-dashboard/transfer-review"
+          element={
+            <PageWrapper>
+              <TransferReviewList />
             </PageWrapper>
           }
         />
