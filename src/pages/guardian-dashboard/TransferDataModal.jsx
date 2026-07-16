@@ -10,6 +10,7 @@ import {
   MdOutlineContentCopy,
   MdKeyboardArrowDown,
   MdCheckCircle,
+  MdErrorOutline,
 } from "react-icons/md";
 
 export const BANK_OPTIONS = [
@@ -30,32 +31,45 @@ export const isWallet = (bankName) => {
   return WALLET_KEYWORDS.some((kw) => bankName.includes(kw));
 };
 
+// يفكك أي شكل أخطاء راجع من الـ API
+function flattenServerErrors(errors) {
+  if (!errors) return [];
+  if (Array.isArray(errors)) return errors.flatMap(flattenServerErrors);
+  if (typeof errors === "object") return Object.values(errors).flatMap(flattenServerErrors);
+  return [String(errors)];
+}
+
 const TransferDataModal = ({
   mode = "add",
   onClose,
-  onSubmit,
+  onSubmit, // async (formData) => يرمي error لو فشل، الأب مسؤول عن استدعاء الـ API الفعلي
   initialData = null,
 }) => {
   const [formData, setFormData] = useState({
     bankName: "",
-    accountName: "",
+    accountHolderName: "",
     accountNumber: "",
     iban: "",
-    branch: "",
+    branchName: "",
   });
 
   const [errors, setErrors] = useState({});
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [serverError, setServerError] = useState(null);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
     if (mode === "edit" && initialData) {
+      // ⚠️ accountNumber و iban ما بيترجعوا من السيرفر إلا مقنّعين (مثلاً "**** 456")
+      // فما منقدر نعبّي فيهم القيمة الحقيقية. منسيبهم فاضيين ونطلب من المستخدم
+      // يدخل القيمة الكاملة من جديد، ومنعرض القيمة المقنّعة كتلميح (placeholder) بس.
       setFormData({
         bankName: initialData.bankName || "",
-        accountName: initialData.accountName || "",
-        accountNumber: initialData.accountNumber || "",
-        iban: initialData.iban || "",
-        branch: initialData.branch || "",
+        accountHolderName: initialData.accountHolderName || "",
+        accountNumber: "",
+        iban: "",
+        branchName: initialData.branchName || "",
       });
     }
   }, [mode, initialData]);
@@ -74,14 +88,14 @@ const TransferDataModal = ({
     }
   }, [dropdownOpen]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = {};
 
     if (!formData.bankName) {
       newErrors.bankName = "يرجى اختيار البنك أو المحفظة";
     }
-    if (!formData.accountName.trim()) {
-      newErrors.accountName = "يرجى إدخال اسم صاحب الحساب";
+    if (!formData.accountHolderName.trim()) {
+      newErrors.accountHolderName = "يرجى إدخال اسم صاحب الحساب";
     }
     if (!formData.accountNumber.trim()) {
       newErrors.accountNumber = isWallet(formData.bankName)
@@ -91,14 +105,37 @@ const TransferDataModal = ({
     if (!formData.iban.trim()) {
       newErrors.iban = "يرجى إدخال رقم IBAN";
     }
-    if (!formData.branch.trim()) {
-      newErrors.branch = "يرجى إدخال اسم الفرع";
+    if (!formData.branchName.trim()) {
+      newErrors.branchName = "يرجى إدخال اسم الفرع";
     }
 
     setErrors(newErrors);
+    setServerError(null);
 
-    if (Object.keys(newErrors).length === 0) {
-      onSubmit?.(formData);
+    if (Object.keys(newErrors).length > 0) return;
+
+    setSubmitting(true);
+    try {
+      await onSubmit?.(formData);
+      // النجاح يُغلق المودال، هذا مسؤولية الأب (بيستدعي onClose بعد نجاح الـ API)
+    } catch (err) {
+      const status = err?.response?.status;
+      const responseData = err?.response?.data || {};
+      const details = [responseData.message, ...flattenServerErrors(responseData.errors)].filter(Boolean);
+
+      if (status === 400) {
+        setServerError(details.length ? details.join(" - ") : "تحقق من صحة البيانات المدخلة.");
+      } else if (status === 401) {
+        setServerError("انتهت صلاحية الجلسة، الرجاء تسجيل الدخول من جديد.");
+      } else if (status === 403) {
+        setServerError("لا يمكن تعديل هذا الحساب حاليًا (مسموح فقط عندما تطلب الإدارة التعديل).");
+      } else if (status === 404) {
+        setServerError("لم يتم العثور على حساب التحويل.");
+      } else {
+        setServerError(details.length ? details.join(" - ") : "تعذر حفظ بيانات التحويل، حاول مجددًا.");
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -118,15 +155,23 @@ const TransferDataModal = ({
     ? "رقم الهاتف المرتبط بالمحفظة"
     : "رقم الحساب";
 
-  const accountNumberPlaceholder = accountIsWallet
-    ? "مثال: 0591234567"
-    : "أدخل رقم الحساب ";
+  const accountNumberPlaceholder =
+    mode === "edit" && initialData?.accountNumberMasked
+      ? `الحالي: ${initialData.accountNumberMasked} — أدخل الرقم الكامل الجديد`
+      : accountIsWallet
+        ? "مثال: 0591234567"
+        : "أدخل رقم الحساب ";
+
+  const ibanPlaceholder =
+    mode === "edit" && initialData?.ibanMasked
+      ? `الحالي: ${initialData.ibanMasked}`
+      : "PS00 0000 0000...";
 
   return (
     <div
       dir="rtl"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-6 animate-fadeIn"
-      onClick={onClose}
+      onClick={submitting ? undefined : onClose}
     >
       <div
         className="relative bg-white rounded-xl shadow-2xl w-full max-w-[520px] max-h-[90vh] overflow-y-auto animate-slideUp"
@@ -139,7 +184,8 @@ const TransferDataModal = ({
           </h2>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#6B7280] hover:bg-gray-100 transition cursor-pointer"
+            disabled={submitting}
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-[#6B7280] hover:bg-gray-100 transition cursor-pointer disabled:cursor-not-allowed"
             aria-label="إغلاق"
           >
             <MdClose className="text-[20px]" />
@@ -148,6 +194,13 @@ const TransferDataModal = ({
 
         {/* Content */}
         <div className="px-6 py-5 space-y-5">
+          {serverError && (
+            <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <MdErrorOutline className="text-lg shrink-0" />
+              <p>{serverError}</p>
+            </div>
+          )}
+
           {/* Bank / Wallet Dropdown */}
           <div>
             <label className="block text-right text-[13px] font-bold text-[#003469] mb-2">
@@ -158,9 +211,10 @@ const TransferDataModal = ({
               <button
                 type="button"
                 onClick={() => setDropdownOpen(!dropdownOpen)}
+                disabled={submitting}
                 className={`w-full h-12 rounded-lg border ${
                   errors.bankName ? "border-red-400" : "border-[#D0D5DD]"
-                } bg-white pr-12 pl-4 text-right text-[13px] outline-none focus:border-[#003469] focus:ring-2 focus:ring-blue-100 transition flex items-center justify-between cursor-pointer`}
+                } bg-white pr-12 pl-4 text-right text-[13px] outline-none focus:border-[#003469] focus:ring-2 focus:ring-blue-100 transition flex items-center justify-between cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-50`}
               >
                 <span
                   className={
@@ -229,7 +283,7 @@ const TransferDataModal = ({
             )}
           </div>
 
-          {/* Account Name */}
+          {/* Account Holder Name */}
           <div>
             <label className="block text-right text-[13px] font-bold text-[#003469] mb-2">
               اسم صاحب الحساب
@@ -238,19 +292,20 @@ const TransferDataModal = ({
             <div className="relative">
               <input
                 type="text"
-                value={formData.accountName}
-                onChange={(e) => updateField("accountName", e.target.value)}
+                value={formData.accountHolderName}
+                onChange={(e) => updateField("accountHolderName", e.target.value)}
+                disabled={submitting}
                 placeholder="أدخل الاسم الرباعي كما هو مسجل بالبنك"
                 className={`w-full h-12 rounded-lg border ${
-                  errors.accountName ? "border-red-400" : "border-[#D0D5DD]"
-                } bg-white pr-12 pl-4 text-right text-[13px] text-[#003469] outline-none placeholder:text-[#9CA3AF] focus:border-[#003469] focus:ring-2 focus:ring-blue-100 transition`}
+                  errors.accountHolderName ? "border-red-400" : "border-[#D0D5DD]"
+                } bg-white pr-12 pl-4 text-right text-[13px] text-[#003469] outline-none placeholder:text-[#9CA3AF] focus:border-[#003469] focus:ring-2 focus:ring-blue-100 transition disabled:bg-gray-50`}
               />
               <MdOutlinePerson className="absolute right-4 top-1/2 -translate-y-1/2 text-[#003469] text-[18px] pointer-events-none" />
             </div>
 
-            {errors.accountName && (
+            {errors.accountHolderName && (
               <p className="mt-1 text-[11px] text-red-500 text-right">
-                {errors.accountName}
+                {errors.accountHolderName}
               </p>
             )}
           </div>
@@ -268,10 +323,11 @@ const TransferDataModal = ({
                   type="text"
                   value={formData.iban}
                   onChange={(e) => updateField("iban", e.target.value)}
-                  placeholder="PS00 0000 0000..."
+                  disabled={submitting}
+                  placeholder={ibanPlaceholder}
                   className={`w-full h-12 rounded-lg border ${
                     errors.iban ? "border-red-400" : "border-[#D0D5DD]"
-                  } bg-white pr-12 pl-10 text-left dir-ltr text-[13px] font-mono text-[#003469] outline-none placeholder:text-[#9CA3AF] focus:border-[#003469] focus:ring-2 focus:ring-blue-100 transition`}
+                  } bg-white pr-12 pl-10 text-left dir-ltr text-[13px] font-mono text-[#003469] outline-none placeholder:text-[#9CA3AF] focus:border-[#003469] focus:ring-2 focus:ring-blue-100 transition disabled:bg-gray-50`}
                 />
                 <MdAccountBalance className="absolute right-4 top-1/2 -translate-y-1/2 text-[#003469] text-[18px] pointer-events-none" />
                 <MdOutlineContentCopy className="absolute left-4 top-1/2 -translate-y-1/2 text-[#003469] text-[16px] cursor-pointer hover:text-[#018B8F] transition" />
@@ -296,10 +352,11 @@ const TransferDataModal = ({
                   inputMode={accountIsWallet ? "tel" : "numeric"}
                   value={formData.accountNumber}
                   onChange={(e) => updateField("accountNumber", e.target.value)}
+                  disabled={submitting}
                   placeholder={accountNumberPlaceholder}
                   className={`w-full h-12 rounded-lg border ${
                     errors.accountNumber ? "border-red-400" : "border-[#D0D5DD]"
-                  } bg-white pr-12 pl-4 text-right text-[13px] text-[#003469] outline-none placeholder:text-[#9CA3AF] focus:border-[#003469] focus:ring-2 focus:ring-blue-100 transition`}
+                  } bg-white pr-12 pl-4 text-right text-[13px] text-[#003469] outline-none placeholder:text-[#9CA3AF] focus:border-[#003469] focus:ring-2 focus:ring-blue-100 transition disabled:bg-gray-50`}
                 />
                 <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#003469] font-bold text-[14px] pointer-events-none">
                   {accountIsWallet ? (
@@ -327,19 +384,20 @@ const TransferDataModal = ({
             <div className="relative">
               <input
                 type="text"
-                value={formData.branch}
-                onChange={(e) => updateField("branch", e.target.value)}
+                value={formData.branchName}
+                onChange={(e) => updateField("branchName", e.target.value)}
+                disabled={submitting}
                 placeholder="مثال: الفرع الرئيسي، أو فرع الرمال"
                 className={`w-full h-12 rounded-lg border ${
-                  errors.branch ? "border-red-400" : "border-[#D0D5DD]"
-                } bg-white pr-12 pl-4 text-right text-[13px] text-[#003469] outline-none placeholder:text-[#9CA3AF] focus:border-[#003469] focus:ring-2 focus:ring-blue-100 transition`}
+                  errors.branchName ? "border-red-400" : "border-[#D0D5DD]"
+                } bg-white pr-12 pl-4 text-right text-[13px] text-[#003469] outline-none placeholder:text-[#9CA3AF] focus:border-[#003469] focus:ring-2 focus:ring-blue-100 transition disabled:bg-gray-50`}
               />
               <MdOutlineLocationOn className="absolute right-4 top-1/2 -translate-y-1/2 text-[#003469] text-[18px] pointer-events-none" />
             </div>
 
-            {errors.branch && (
+            {errors.branchName && (
               <p className="mt-1 text-[11px] text-red-500 text-right">
-                {errors.branch}
+                {errors.branchName}
               </p>
             )}
           </div>
@@ -358,17 +416,21 @@ const TransferDataModal = ({
         <div className="sticky bottom-0 bg-white border-t border-[#E5E7EB] px-6 py-4 flex items-center justify-start gap-3">
           <button
             onClick={onClose}
-            className="h-[40px] min-w-[100px] px-6 rounded-md border border-[#D0D5DD] bg-white text-[#111827] text-[13px] font-bold hover:bg-gray-50 transition cursor-pointer"
+            disabled={submitting}
+            className="h-[40px] min-w-[100px] px-6 rounded-md border border-[#D0D5DD] bg-white text-[#111827] text-[13px] font-bold hover:bg-gray-50 transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
             إلغاء
           </button>
 
           <button
             onClick={handleSubmit}
-            className="h-[40px] min-w-[140px] px-6 rounded-md bg-[#003469] text-white text-[13px] font-bold flex items-center justify-center gap-2 shadow-sm hover:bg-[#002b57] hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200 cursor-pointer"
+            disabled={submitting}
+            className="h-[40px] min-w-[140px] px-6 rounded-md bg-[#003469] text-white text-[13px] font-bold flex items-center justify-center gap-2 shadow-sm hover:bg-[#002b57] hover:-translate-y-[1px] active:translate-y-0 transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
           >
-            <span>إرسال للمراجعة</span>
-            <span className="text-[11px] scale-x-[-1] inline-block">◀</span>
+            <span>{submitting ? "جارٍ الإرسال..." : "إرسال للمراجعة"}</span>
+            {!submitting && (
+              <span className="text-[11px] scale-x-[-1] inline-block">◀</span>
+            )}
           </button>
         </div>
       </div>

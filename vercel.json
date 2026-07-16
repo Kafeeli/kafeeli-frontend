@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/backend/:path*",
+      "destination": "https://kafeeli.runasp.net/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

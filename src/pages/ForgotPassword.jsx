@@ -2,45 +2,17 @@ import { useState } from "react";
 import { MdOutlineMail } from "react-icons/md";
 import { FaArrowRight } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { authApi } from "../services/authApi";
 
 function ForgotPassword() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
-  const [messageType, setMessageType] = useState("");
+  const [messageType, setMessageType] = useState(""); // "success" أو "error"
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function getApiErrorMessage(error) {
-    const data = error.response?.data;
-
-    if (!data) {
-      return error.message || "حدث خطأ في الاتصال بالخادم";
-    }
-
-    if (data.message) {
-      return data.message;
-    }
-
-    if (data.title) {
-      return data.title;
-    }
-
-    if (Array.isArray(data.errors)) {
-      return data.errors.join("\n");
-    }
-
-    if (data.errors) {
-      return JSON.stringify(data.errors, null, 2);
-    }
-
-    return "فشل إرسال رابط إعادة التعيين، حاول مرة أخرى";
-  }
-
-  async function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log("Forgot password submit clicked");
-
     setMessage("");
     setMessageType("");
 
@@ -50,51 +22,31 @@ function ForgotPassword() {
       return;
     }
 
-    if (!authApi?.forgetPassword) {
-      setMessage("خطأ في الربط: authApi.forgetPassword غير موجودة");
-      setMessageType("error");
-      console.error("authApi.forgetPassword is not defined:", authApi);
-      return;
-    }
-
-    const payload = {
-      email: email.trim(),
-    };
-
     try {
       setIsSubmitting(true);
+      const res = await authApi.forgetPassword({ email: email.trim() });
 
-      console.log("Forgot password payload:", JSON.stringify(payload, null, 2));
-
-      const result = await authApi.forgetPassword(payload);
-
-      console.log("Forgot password success:", result);
-
-      if (result?.success === false) {
-        setMessage(result?.message || "فشل إرسال رابط إعادة التعيين");
+      if (res?.success === false) {
+        setMessage(res?.message || "فشل إرسال رابط إعادة التعيين");
         setMessageType("error");
-        return;
+      } else {
+        setMessage(
+          res?.message ||
+            "إذا كان البريد الإلكتروني مسجلاً، سيتم إرسال تعليمات إعادة تعيين كلمة المرور إليه."
+        );
+        setMessageType("success");
       }
-
-      setMessage(
-        result?.message ||
-          "إذا كان البريد الإلكتروني مسجلاً، سيتم إرسال تعليمات إعادة تعيين كلمة المرور إليه."
-      );
-      setMessageType("success");
     } catch (error) {
       console.error("Forgot password error:", error);
-      console.log("Status:", error.response?.status);
-      console.log(
-        "Backend error:",
-        JSON.stringify(error.response?.data, null, 2)
+      setMessage(
+        error.response?.data?.message ||
+          "حدث خطأ أثناء إرسال رابط إعادة التعيين"
       );
-
-      setMessage(getApiErrorMessage(error));
       setMessageType("error");
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div
@@ -105,7 +57,6 @@ function ForgotPassword() {
         <h2 className="text-[#003469] mt-1 text-[32px] font-bold mb-2">
           كفيلي
         </h2>
-
         <p className="text-[#424750] text-sm mt-0">
           استعادة الوصول إلى حسابك بكل أمان
         </p>
@@ -133,14 +84,9 @@ function ForgotPassword() {
               placeholder="example@domain.com"
               value={email}
               disabled={isSubmitting}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setMessage("");
-                setMessageType("");
-              }}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full h-[42px] border border-[#C2C6D2] rounded-[5px] outline-none text-sm pr-14 pl-4 disabled:bg-gray-100 disabled:cursor-not-allowed"
             />
-
             <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#C2C6D2] text-[22px]">
               <MdOutlineMail />
             </span>
@@ -171,7 +117,7 @@ function ForgotPassword() {
 
         <div className="flex justify-center">
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/login")}
             className="flex items-center gap-2 mt-6 text-[#424750] text-sm hover:text-[#0D4B8E] hover:underline w-fit cursor-pointer"
           >
             <FaArrowRight />

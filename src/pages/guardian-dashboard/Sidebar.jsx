@@ -1,4 +1,5 @@
-import { Link, useLocation } from "react-router-dom"; // 👈 استيراد أدوات الملاحة والمسار
+import { Link, useLocation, useNavigate } from "react-router-dom"; // 👈 استيراد أدوات الملاحة والمسار
+import { useState } from "react";
 import {
   MdClose,
   MdLogout,
@@ -13,8 +14,13 @@ import {
   MdSettings,
 } from "react-icons/md";
 
+import { authApi } from "../../services/authApi";
+import kafeeliLogo from "../../assets/kafeeli-logo.png";
+
 function Sidebar({ openSidebar, setOpenSidebar }) {
   const location = useLocation(); // 👈 قراءة المسار المفتوح في المتصفح حالياً
+  const navigate = useNavigate();
+  const [loggingOut, setLoggingOut] = useState(false);
 
   // 💡 أضفنا حقل الـ path لربط الأقسام بشكل موحد
   const menuItems = [
@@ -66,6 +72,31 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
     }
   `;
 
+  /* ---------------------------- تسجيل الخروج ---------------------------- */
+  const handleLogout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    try {
+      // بيلغي الـ refreshToken من طرف السيرفر (best-effort). حتى لو فشل الطلب
+      // (مثلاً التوكن منتهي أصلاً أو في مشكلة اتصال)، لازم نكمل ونسجل خروج
+      // محليًا، لأنه بقاء التوكن بالمتصفح أخطر من فشل نداء واحد للسيرفر.
+      if (refreshToken) {
+        await authApi.logout(refreshToken);
+      }
+    } catch (err) {
+      console.error("Logout API call failed, clearing session locally anyway:", err);
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      setOpenSidebar(false);
+      setLoggingOut(false);
+      navigate("/login", { replace: true });
+    }
+  };
+
   return (
     <>
       {openSidebar && (
@@ -106,7 +137,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
           <div className="text-center mb-2">
             <div className="w-24 h-24 bg-white/20 rounded-full mx-auto mb-2 flex items-center justify-center overflow-hidden">
               <img
-                src="/src/assets/title.png"
+                src={kafeeliLogo}
                 alt="كفيلي"
                 className="w-30 h-30 object-contain mt-1"
               />
@@ -181,7 +212,8 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
 
           <div className="border-t border-white/20 mt-2 pt-2">
             <button
-              onClick={() => setOpenSidebar(false)}
+              onClick={handleLogout}
+              disabled={loggingOut}
               className="
                 w-full h-6
                 flex items-center gap-2.5 sm:gap-3
@@ -190,12 +222,13 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
                 text-white/85 font-normal text-right
                 hover:bg-red-500/10 hover:text-red-400
                 transition cursor-pointer shrink-0
+                disabled:opacity-60 disabled:cursor-not-allowed
               "
             >
               <span className="text-[15px] sm:text-[16px] lg:text-[18px] flex items-center shrink-0">
                 <MdLogout />
               </span>
-              <span>تسجيل الخروج</span>
+              <span>{loggingOut ? "جارٍ تسجيل الخروج..." : "تسجيل الخروج"}</span>
             </button>
           </div>
         </div>
