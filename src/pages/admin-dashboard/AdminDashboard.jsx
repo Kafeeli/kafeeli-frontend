@@ -1,27 +1,16 @@
 import { motion } from "framer-motion";
-import {
-  FiBell,
-  FiCheckCircle,
-  FiClock,
-  FiShield,
-  FiUser,
-} from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import { FiCheckCircle, FiClock, FiShield } from "react-icons/fi";
 import {
   HiOutlineBuildingLibrary,
   HiOutlineDocumentText,
   HiOutlineIdentification,
   HiOutlineUsers,
 } from "react-icons/hi2";
-import {
-  MdDashboard,
-  MdOutlineFamilyRestroom,
-  MdOutlineVolunteerActivism,
-} from "react-icons/md";
+import { MdOutlineVolunteerActivism } from "react-icons/md";
 import { PiBaby, PiFileText, PiMoneyWavy, PiUsersThree } from "react-icons/pi";
 import { TbReportAnalytics } from "react-icons/tb";
-import { useState } from "react";
-import { FiMenu } from "react-icons/fi";
-import Sidebar from "./sideBar";
+import AdminLayout from "./Adminlayout";
 
 const cardShadow = "shadow-[0_2px_10px_rgba(31,41,55,0.06)]";
 
@@ -145,9 +134,8 @@ function StatCard({ card, index }) {
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className={`relative flex min-h-[162px] flex-col items-center justify-center rounded-lg border bg-white p-5 text-center ${cardShadow} ${
-        card.warning ? "border-[#F0C86A]" : "border-[#E5E7EB]"
-      }`}
+      className={`relative flex min-h-[162px] flex-col items-center justify-center rounded-lg border bg-white p-5 text-center ${cardShadow} ${card.warning ? "border-[#F0C86A]" : "border-[#E5E7EB]"
+        }`}
     >
       {card.warning && (
         <span className="absolute right-6 top-9 h-2.5 w-2.5 rounded-full bg-[#B07B11]" />
@@ -202,12 +190,47 @@ function QueueCard({ item, index }) {
   );
 }
 
-function FamilyCard() {
+function TransferPendingCard({ onReviewClick }) {
   return (
     <article
       className={`rounded-lg border border-gray-300 bg-white p-6 ${cardShadow}`}
     >
       <div className="mb-7 flex items-start justify-between gap-4">
+        <div className="text-right">
+          <h4 className="text-xl font-extrabold text-[#1F2937]">
+            بيانات التحويل بانتظار المراجعة
+          </h4>
+          <p className="mt-1 text-sm leading-6 text-[#6B7280]">
+            راجع بيانات الحسابات البنكية والمحافظ الإلكترونية المضافة من
+            الأوصياء قبل اعتمادها.
+          </p>
+        </div>
+        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-[#0D4B8E]/10 text-[#0D4B8E]">
+          <HiOutlineBuildingLibrary className="text-2xl" />
+        </div>
+      </div>
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-end gap-2">
+          <strong className="text-3xl font-extrabold text-[#1F2937]">08</strong>
+          <span className="text-sm text-[#6B7280]">طلب جديد</span>
+        </div>
+        <button
+          onClick={onReviewClick}
+          className="rounded-md border-2 border-[#0D4B8E] px-7 py-2.5 text-sm font-extrabold text-[#0D4B8E] transition hover:bg-[#0D4B8E] hover:text-white cursor-pointer"
+        >
+          مراجعة الآن
+        </button>
+      </div>
+    </article>
+  );
+}
+
+function FamilyCard() {
+  return (
+    <article
+      className={`rounded-lg border border-gray-300 bg-white p-6 ${cardShadow}`}
+    >
+      <div className="mb-14 flex items-start justify-between gap-4">
         <div className="text-right">
           <h4 className="text-xl font-extrabold text-[#1F2937]">
             ملفات العائلات
@@ -225,11 +248,10 @@ function FamilyCard() {
           {["GA", "SK", "+12"].map((label, index) => (
             <span
               key={label}
-              className={`grid h-8 w-8 place-items-center rounded-full border-2 border-white text-[10px] font-bold ${
-                index === 2
+              className={`grid h-8 w-8 place-items-center rounded-full border-2 border-white text-[10px] font-bold ${index === 2
                   ? "bg-[#0D4B8E] text-white"
                   : "bg-gray-200 text-[#6B7280]"
-              }`}
+                }`}
             >
               {label}
             </span>
@@ -267,11 +289,10 @@ function QuickActions() {
         {quickActions.map((action) => (
           <button
             key={action.label}
-            className={`flex min-h-12 items-center justify-center gap-3 rounded-lg border px-5 py-3 text-base font-extrabold cursor-pointer ${cardShadow} transition ${
-              action.featured
+            className={`flex min-h-12 items-center justify-center gap-3 rounded-lg border px-5 py-3 text-base font-extrabold cursor-pointer ${cardShadow} transition ${action.featured
                 ? "border-[#2DBCC3] bg-[#7DDCE0] text-[#08386B] hover:bg-[#2DBCC3]"
                 : "border-gray-300 bg-white text-[#1F2937] hover:border-[#0D4B8E] hover:text-[#0D4B8E]"
-            } ${action.featured ? "sm:col-span-2 lg:col-start-2" : ""}`}
+              } ${action.featured ? "sm:col-span-2 lg:col-start-2" : ""}`}
           >
             <span>{action.label}</span>
             <action.icon className="text-2xl text-[#0D4B8E]" />
@@ -337,84 +358,53 @@ function LogsTable() {
 }
 
 export default function AdminDashboard() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
-    <div className="flex min-h-screen bg-[#F8F9FA]" dir="rtl">
-      <Sidebar
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        onOpen={() => setSidebarOpen(true)}
-      />
-      {/* Main */}
-      <div className="flex flex-1 flex-col min-w-0">
-        {/* Header */}
-        <header className="h-16 sm:h-20 flex items-center justify-between px-4 sm:px-6 bg-white border-b border-[#E5E7EB] sticky top-0 z-20">
-          <button
-            className="lg:hidden grid h-9 w-9 place-items-center rounded-full hover:bg-gray-100"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <FiMenu className="text-xl text-[#0D4B8E]" />
-          </button>
-
-          <h2 className="text-[12px] sm:text-lg font-bold text-[#0D4B8E] truncate">
-            اهلاً بك Admin في لوحة التحكم
-          </h2>
-
-          <div className="flex items-center gap-3 sm:gap-4">
-            <button className="relative grid h-9 w-9 sm:h-10 sm:w-10 place-items-center rounded-full hover:bg-gray-100">
-              <FiBell className="text-lg sm:text-xl" />
-              <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full" />
-            </button>
-            <div className="hidden sm:block text-right">
-              <p className="font-bold text-sm">أحمد محمد</p>
-              <p className="text-xs text-gray-500">مدير النظام الأعلى</p>
-            </div>
-            <div className="grid h-8 w-8 sm:h-9 sm:w-9 place-items-center border rounded-full border-[#0D4B8E]">
-              <FiUser />
-            </div>
-          </div>
-        </header>
-
-        <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="mb-6">
-            <h1 className="text-xl sm:text-2xl font-extrabold text-[#0D4B8E]">
-              نظرة عامة على النظام
-            </h1>
-            <p className="text-xs sm:text-sm text-[#6B7280]">
-              آخر تحديث: منذ دقيقتين
-            </p>
-          </div>
-
-          <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4 sm:gap-6">
-            {overviewCards.map((card, index) => (
-              <StatCard key={card.title} card={card} index={index} />
-            ))}
-          </section>
-
-          <section className="mt-10">
-            <SectionTitle>طوابير المراجعة النشطة</SectionTitle>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-              {queues.map((item, index) => (
-                <QueueCard key={item.title} item={item} index={index} />
-              ))}
-            </div>
-            <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <FamilyCard />
-              <EmptyCard />
-            </div>
-          </section>
-
-          <QuickActions />
-          <LogsTable />
-
-          <footer className="mt-20 py-2 border-t border-[#E5E7EB] text-center">
-            <p className="text-sm text-[#6B7280] mt-4">
-              © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
-            </p>
-          </footer>
-        </main>
+    <AdminLayout title="أهلاً بك Admin في لوحة التحكم">
+      <div className="mb-6">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-[#0D4B8E]">
+          نظرة عامة على النظام
+        </h1>
+        <p className="text-xs sm:text-sm text-[#6B7280]">
+          آخر تحديث: منذ دقيقتين
+        </p>
       </div>
-    </div>
+
+      <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-6 gap-4 sm:gap-6">
+        {overviewCards.map((card, index) => (
+          <StatCard key={card.title} card={card} index={index} />
+        ))}
+      </section>
+
+      <section className="mt-10">
+        <SectionTitle>طوابير المراجعة النشطة</SectionTitle>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+          {queues.map((item, index) => (
+            <QueueCard key={item.title} item={item} index={index} />
+          ))}
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <TransferPendingCard
+            onReviewClick={() => navigate("/admin-dashboard/transfer-review")}
+          />
+          <FamilyCard />
+        </div>
+
+        <div className="mt-4">
+          <EmptyCard />
+        </div>
+      </section>
+
+      <QuickActions />
+      <LogsTable />
+
+      <footer className="mt-20 py-2 border-t border-[#E5E7EB] text-center">
+        <p className="text-sm text-[#6B7280] mt-4">
+          © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
+        </p>
+      </footer>
+    </AdminLayout>
   );
 }

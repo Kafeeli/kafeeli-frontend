@@ -25,24 +25,24 @@ function SidebarContent({ onItemClick }) {
     <>
       {/* Logo */}
       <div className="flex flex-col items-center justify-center px-4 py-3 shrink-0">
-          <div className="text-center mb-2">
-            <div className="w-[100px] h-[100px] bg-white/20 rounded-full mx-auto mb-2 flex items-center justify-center overflow-hidden">
-              <img
-                src="/src/assets/title.png"
-                alt="كفيلي"
-                className="w[140px] h-[140px] object-contain mt-4"
-              />
-            </div>
+        <div className="text-center mb-2">
+          <div className="w-[100px] h-[100px] bg-white/20 rounded-full mx-auto mb-2 flex items-center justify-center overflow-hidden">
+            <img
+              src="/src/assets/title.png"
+              alt="كفيلي"
+              className="w[140px] h-[140px] object-contain mt-2"
+            />
           </div>
-
-          <h2 className="font-[Cairo] font-bold text-[18px] sm:text-[20px] lg:text-[22px] tracking-[0px] text-center text-[#FFDEAA] mb-2">
-            كفيلي
-          </h2>
-
-          <p className="font-[Cairo] font-normal text-[11px] sm:text-[12px] lg:text-[13px] leading-[16px] tracking-[0px] text-center text-[#e6ecf7] whitespace-nowrap">
-            لوحة الإدارة الذكية
-          </p>
         </div>
+
+        <h2 className="font-[Cairo] font-bold text-[18px] sm:text-[20px] lg:text-[22px] tracking-[0px] text-center text-[#FFDEAA] mb-2">
+          كفيلي
+        </h2>
+
+        <p className="font-[Cairo] font-normal text-[11px] sm:text-[12px] lg:text-[13px] leading-[16px] tracking-[0px] text-center text-[#e6ecf7] whitespace-nowrap">
+          لوحة الإدارة الذكية
+        </p>
+      </div>
 
       <hr className="border-white/25 mx-4 my-2 shrink-0" />
 

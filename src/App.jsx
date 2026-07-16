@@ -11,9 +11,8 @@ import ResetPassword from "./pages/ResetPassword";
 import InvalidEmail from "./pages/InvalidEmail";
 import SideBar from "./pages/admin-dashboard/sideBar";
 import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
-
+import TransferReviewList from "./pages/admin-dashboard/Transferreviewlist";
 import LandingPage from "./pages/LandingPage";
-
 import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
 import SponsorProfile  from "./pages/sponsor-dashboard/profileDashboard";
 
@@ -370,6 +369,16 @@ function AnimatedRoutes() {
           element={
             <PageWrapper>
               <AdminDashboard />
+            </PageWrapper>
+          }
+        />
+
+        {/* ✅ صفحة مراجعة بيانات التحويل (الأدمن) */}
+        <Route
+          path="/admin-dashboard/transfer-review"
+          element={
+            <PageWrapper>
+              <TransferReviewList />
             </PageWrapper>
           }
         />
