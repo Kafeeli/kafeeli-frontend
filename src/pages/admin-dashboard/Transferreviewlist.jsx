@@ -17,7 +17,7 @@ import {
   MdRefresh,
 } from "react-icons/md";
 import AdminLayout from "./Adminlayout";
-import TransferDetailsModal from "./TransferDetailsModal";
+// import TransferDetailsModal from "./TransferDetailsModal";
 
 const cardShadow = "shadow-[0_2px_10px_rgba(31,41,55,0.06)]";
 const ITEMS_PER_PAGE = 4;
