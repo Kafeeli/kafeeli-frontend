@@ -3,10 +3,7 @@ import { MdClose, MdCloudUpload, MdBadge, MdErrorOutline } from "react-icons/md"
 
 /**
  * مودال رفع/إرفاق وثيقة واحد قابل لإعادة الاستخدام لكل أنواع الوثائق.
- * لو نوع الوثيقة "nationalId" منظهر حقل إضافي "رقم الهوية" فوق منطقة الرفع،
- * أي نوع تاني منعرض منطقة الرفع فقط.
- *
- * onSubmit(payload) — الأب مسؤول عن التصرف بالبيانات (محاكاة محلية هلق، API لاحقًا)
+ * يدعم الصور، PDF، والفيديو حسب نوع الوثيقة.
  */
 const DocumentUploadModal = ({ doc, onClose, onSubmit }) => {
   const [idNumber, setIdNumber] = useState("");
@@ -17,12 +14,14 @@ const DocumentUploadModal = ({ doc, onClose, onSubmit }) => {
   const fileInputRef = useRef(null);
 
   const needsIdNumber = doc?.key === "nationalId";
-  const acceptAttr = doc?.isVideo
+  const isVideo = doc?.isVideo ?? false;
+
+  const acceptAttr = isVideo
     ? "video/mp4,video/quicktime,video/webm"
     : "image/jpeg,image/png,application/pdf";
-  const maxSizeMB = doc?.maxSizeMB || (doc?.isVideo ? 15 : 5);
 
-  const uploadHintTitle = doc?.isVideo
+  const maxSizeMB = doc?.maxSizeMB || (isVideo ? 15 : 5);
+  const uploadHintTitle = isVideo
     ? "ارفع الفيديو"
     : needsIdNumber
       ? "ارفع صورة الهوية"
@@ -31,15 +30,15 @@ const DocumentUploadModal = ({ doc, onClose, onSubmit }) => {
   const validateAndSetFile = (candidateFile) => {
     if (!candidateFile) return;
 
-    const allowedTypes = doc?.isVideo
+    const allowedTypes = isVideo
       ? ["video/mp4", "video/quicktime", "video/webm"]
       : ["image/jpeg", "image/png", "application/pdf"];
 
     if (!allowedTypes.includes(candidateFile.type)) {
       setError(
-        doc?.isVideo
-          ? "الصيغ المسموحة فقط: MP4, MOV, WEBM"
-          : "الصيغ المسموحة فقط: JPG, PNG, PDF"
+        isVideo
+          ? "امتداد الفيديو يجب أن يكون MP4 أو MOV أو WEBM"
+          : "امتداد الملف يجب أن يكون JPG أو JPEG أو PNG أو PDF"
       );
       return;
     }
@@ -77,7 +76,10 @@ const DocumentUploadModal = ({ doc, onClose, onSubmit }) => {
     setError("");
     setSubmitting(true);
     try {
-      await onSubmit?.({ file, idNumber: needsIdNumber ? idNumber.trim() : undefined });
+      await onSubmit?.({
+        file,
+        idNumber: needsIdNumber ? idNumber.trim() : undefined
+      });
     } catch (err) {
       const status = err?.response?.status;
       const apiErrors = err?.response?.data?.errors;
@@ -86,12 +88,14 @@ const DocumentUploadModal = ({ doc, onClose, onSubmit }) => {
         setError(
           Array.isArray(apiErrors) && apiErrors.length
             ? apiErrors.join(" - ")
-            : apiMessage || "تحقق من صحة الملف ورقم الهوية."
+            : apiMessage || (isVideo
+              ? "تحقق من صحة ملف الفيديو."
+              : "تحقق من صحة الملف ورقم الهوية.")
         );
       } else if (status === 401) {
         setError("انتهت صلاحية الجلسة، الرجاء تسجيل الدخول من جديد.");
       } else {
-        setError("تعذر رفع الملف، حاول مجددًا.");
+        setError(isVideo ? "فشل رفع الفيديو، حاول مجددًا." : "تعذر رفع الملف، حاول مجددًا.");
       }
     } finally {
       setSubmitting(false);
@@ -118,9 +122,7 @@ const DocumentUploadModal = ({ doc, onClose, onSubmit }) => {
           >
             <MdClose className="text-[20px]" />
           </button>
-          <h2 className="text-[15px] font-bold text-[#003469]">
-            تفاصيل الوثيقة
-          </h2>
+          <h2 className="text-[15px] font-bold text-[#003469]">تفاصيل الوثيقة</h2>
         </div>
 
         {/* Body */}
@@ -155,17 +157,11 @@ const DocumentUploadModal = ({ doc, onClose, onSubmit }) => {
             </div>
           )}
 
-          {/* منطقة السحب والإفلات */}
+          {/* Dropzone */}
           <div
-            onDragEnter={(e) => {
-              e.preventDefault();
-              setDragActive(true);
-            }}
+            onDragEnter={(e) => { e.preventDefault(); setDragActive(true); }}
             onDragOver={(e) => e.preventDefault()}
-            onDragLeave={(e) => {
-              e.preventDefault();
-              setDragActive(false);
-            }}
+            onDragLeave={(e) => { e.preventDefault(); setDragActive(false); }}
             onDrop={handleDrop}
             onClick={() => !submitting && fileInputRef.current?.click()}
             className={`rounded-lg border-2 border-dashed ${
@@ -179,7 +175,9 @@ const DocumentUploadModal = ({ doc, onClose, onSubmit }) => {
             <p className="text-[11px] text-[#9CA3AF]">
               {file
                 ? "اضغط لاختيار ملف آخر"
-                : "اسحب الملف هنا أو انقر لاختياره"}
+                : isVideo
+                  ? "اسحب الفيديو هنا أو انقر لاختياره"
+                  : "اسحب الملف هنا أو انقر لاختياره"}
             </p>
 
             <input
@@ -203,7 +201,7 @@ const DocumentUploadModal = ({ doc, onClose, onSubmit }) => {
             disabled={submitting}
             className="flex-1 h-11 rounded-md bg-[#003469] text-white text-[13px] font-bold hover:bg-[#002b57] transition cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            {submitting ? "جارٍ الإرفاق..." : "إرفاق"}
+            {submitting ? (isVideo ? "جارٍ رفع الفيديو..." : "جارٍ الإرفاق...") : "إرفاق"}
           </button>
           <button
             onClick={onClose}
