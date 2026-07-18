@@ -1,33 +1,39 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
+import { useFamily } from "../../../hooks/useFamily";
+import { FAMILY_STATUS_CONFIG } from "../../../config/familyStatus";
 
 import {
   MdMenu,
   MdNotificationsNone,
   MdPerson,
   MdKeyboardArrowLeft,
-  MdVisibilityOff,
   MdInfoOutline,
+  MdVerifiedUser,
   MdPictureAsPdf,
   MdFamilyRestroom,
   MdOutlineRemoveRedEye,
-  MdVerifiedUser,
+  MdEdit,
+  MdPersonAdd,
 } from "react-icons/md";
 
-const familyInfo = {
+/* ========================================================================== */
+/* 🔌 بيانات وهمية (mock) — بتتعوض ببيانات GET /families/{id} الحقيقية لاحقًا */
+/* ========================================================================== */
+const MOCK_FAMILY = {
   title: "عائلة المرحوم أحمد جابر العتيبي",
-  status: "مخفية",
-  guardianName: "أحمد جابر العتيبي رحمه الله",
+  headOfHouseholdName: "أحمد جابر العتيبي رحمه الله",
   city: "الرياض - حي اليرموك",
   address: "شارع خالد بن الوليد، مبنى ٤٤، شقة ١٢",
-  monthlyNeed: "4,500 ريال سعودي",
+  monthlyNeedAmount: 4500,
   createdAt: "12 يناير 2023",
   updatedAt: "05 مايو 2024",
   description:
     "عائلة مكوّنة من أم و3 أيتام، يسكنون في شقة مستأجرة. مصدر الدخل الوحيد هو معاش الضمان الاجتماعي. تحتاج العائلة لدعم في الرسوم المدرسية والمستلزمات الطبية للأم، والحالة مستقرة دراسياً للأبناء.",
 };
 
-const documents = [
+const MOCK_DOCUMENTS = [
   {
     name: "شهادة_وفاة_أحمد_العتيبي.pdf",
     size: "1.2 MB",
@@ -35,7 +41,7 @@ const documents = [
   },
 ];
 
-const orphans = [
+const MOCK_ORPHANS = [
   {
     name: "فهد أحمد العتيبي",
     relation: "ابن المرحوم أحمد العتيبي",
@@ -68,9 +74,12 @@ const orphans = [
   },
 ];
 
+/* ========================================================================== */
+/* 🧩 مكونات مشتركة (نفسها حرفيًا بكل الحالات الخمسة الأصلية)                */
+/* ========================================================================== */
 function TopNavbar({ setOpenSidebar }) {
   return (
-    <header className="min-h-[60px] bg-white border-b border-[#DDE2EA] shadow-sm flex items-center justify-between gap-3 px-4 py-2 sm:px-6">
+    <header className="min-h-[52px] bg-white border-b border-[#DDE2EA] shadow-sm flex items-center justify-between gap-3 px-4 py-2 sm:px-6">
       <div className="flex items-center gap-3 min-w-0">
         <button
           type="button"
@@ -126,36 +135,55 @@ function Breadcrumb() {
   );
 }
 
-function PageHeader() {
+function PageHeader({ family, config, showEditButton, onEditClick }) {
   return (
     <section className="mt-3 text-right">
       <h2 className="font-[Cairo] text-[25px] sm:text-[34px] lg:text-[39px] font-bold text-[#111827] leading-tight">
-        {familyInfo.title}
+        {family.title}
       </h2>
 
-      <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-[#D9E5F7] px-4 py-1.5 font-[Cairo] text-[12px] font-bold text-[#6B7280]">
-        <span className="w-1.5 h-1.5 rounded-full bg-current" />
-        {familyInfo.status}
-      </span>
+      <div className="mt-2 flex flex-wrap items-center gap-3">
+        <span
+          className={`inline-flex items-center gap-1 rounded-full px-4 py-1.5 font-[Cairo] text-[12px] font-bold ${config.badgeClass}`}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-current" />
+          {config.badgeLabel}
+        </span>
+
+        {showEditButton && (
+          <button
+            type="button"
+            onClick={onEditClick}
+            className="inline-flex items-center gap-1.5 rounded-full border border-[#D0D5DD] bg-white px-3.5 py-1.5 font-[Cairo] text-[12px] font-bold text-[#003469] hover:bg-[#F5F8FB] transition"
+          >
+            <MdEdit className="text-[14px]" />
+            تعديل البيانات
+          </button>
+        )}
+      </div>
     </section>
   );
 }
 
-function HiddenAlert() {
+function StatusAlert({ config }) {
+  const Icon = config.banner.icon;
   return (
-    <div className="mt-7 rounded-[9px] bg-[#D5E7FF] border-l-[5px] border-[#7E8EA6] px-5 py-4 flex items-center gap-4">
-      <div className="w-[44px] h-[44px] rounded-full bg-white/65 flex items-center justify-center shrink-0">
-        <MdVisibilityOff className="text-[#6B7280] text-[24px]" />
+    <div
+      className={`mt-7 rounded-[9px] ${config.banner.bgClass} border-r-[5px] ${config.banner.borderClass} px-5 py-4 flex items-center gap-4`}
+    >
+      <div
+        className={`w-[44px] h-[44px] rounded-full ${config.banner.iconWrapClass} flex items-center justify-center shrink-0`}
+      >
+        <Icon className={`${config.banner.iconClass} text-[24px]`} />
       </div>
 
       <div className="text-right">
-        <p className="font-[Cairo] text-[14px] font-bold text-[#374151]">
-          حالة العائلة: مخفية
+        <p className={`font-[Cairo] text-[18px] font-bold ${config.banner.titleClass}`}>
+          {config.banner.title}
         </p>
 
-        <p className="mt-1 font-[Cairo] text-[12px] sm:text-[13px] leading-6 text-[#6B7280]">
-          تم إخفاء بيانات هذه العائلة من القوائم العامة، ولا يمكن الوصول إليها
-          إلا من قبل المسؤولين المخولين.
+        <p className={`mt-1 font-[Cairo] text-[12px] sm:text-[13px] leading-6 ${config.banner.descClass}`}>
+          {config.banner.description}
         </p>
       </div>
     </div>
@@ -177,7 +205,7 @@ function InfoItem({ label, value, highlight }) {
   );
 }
 
-function FamilyInfoCard() {
+function FamilyInfoCard({ family }) {
   return (
     <section className="bg-white border border-[#C9D2E3] rounded-[12px] px-6 py-6 shadow-sm">
       <div className="flex items-center justify-between gap-3">
@@ -185,33 +213,29 @@ function FamilyInfoCard() {
           المعلومات العامة
         </h3>
 
-        <MdInfoOutline className="text-[#003469] text-[22px]" />
+        <span className="w-[30px] h-[30px] rounded-full bg-[#EAF2FF] flex items-center justify-center shrink-0">
+          <MdInfoOutline className="text-[#003469] text-[20px]" />
+        </span>
       </div>
 
       <div className="mt-7 grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-6">
-        <InfoItem label="اسم رب الأسرة" value={familyInfo.guardianName} />
-        <InfoItem label="المدينة والمنطقة" value={familyInfo.city} />
-        <InfoItem label="العنوان التفصيلي" value={familyInfo.address} />
+        <InfoItem label="اسم رب الأسرة" value={family.headOfHouseholdName} />
+        <InfoItem label="المدينة والمنطقة" value={family.city} />
+        <InfoItem label="العنوان التفصيلي" value={family.address} />
       </div>
 
       <div className="mt-7 grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-6 border-b border-[#D8DEE9] pb-6">
-        <InfoItem
-          label="الاحتياج الشهري المقدر"
-          value={familyInfo.monthlyNeed}
-          highlight
-        />
-        <InfoItem label="تاريخ الإنشاء" value={familyInfo.createdAt} />
-        <InfoItem label="آخر تحديث" value={familyInfo.updatedAt} />
+        <InfoItem label="الاحتياج الشهري المقدر" value={family.monthlyNeedAmount + " ILS"} highlight />
+        <InfoItem label="تاريخ الإنشاء" value={family.createdAt} />
+        <InfoItem label="آخر تحديث" value={family.updatedAt} />
       </div>
 
       <div className="mt-7">
-        <p className="font-[Cairo] text-[12px] text-[#6B7280] mb-3">
-          وصف الحالة
-        </p>
+        <p className="font-[Cairo] text-[12px] text-[#6B7280] mb-3">وصف الحالة</p>
 
         <div className="rounded-[10px] bg-[#F7F8FC] px-6 py-5">
           <p className="font-[Cairo] text-[14px] sm:text-[15px] leading-9 text-[#6B7280]">
-            {familyInfo.description}
+            {family.description}
           </p>
         </div>
       </div>
@@ -219,10 +243,10 @@ function FamilyInfoCard() {
   );
 }
 
-function DocumentsCard() {
+function DocumentsCard({ documents }) {
   return (
     <section className="bg-white border border-[#C9D2E3] rounded-[14px] px-5 py-6 shadow-sm h-full min-h-[360px]">
-      <div className="flex items-center  gap-2">
+      <div className="flex items-center gap-2">
         <span className="w-[30px] h-[30px] rounded-full bg-[#EAF2FF] flex items-center justify-center shrink-0">
           <MdVerifiedUser className="text-[#003469] text-[20px]" />
         </span>
@@ -232,7 +256,7 @@ function DocumentsCard() {
         </h3>
       </div>
 
-      <div className="mt-8">
+      <div className="mt-8 max-w-[280px] mx-auto">
         {documents.map((doc) => (
           <div
             key={doc.name}
@@ -249,13 +273,14 @@ function DocumentsCard() {
                 </p>
 
                 <p className="mt-1 font-[Cairo] text-[10px] text-[#6B7280] whitespace-nowrap">
-                  {doc.date} - PDF - {doc.size}
+                  {doc.date} - PDF{doc.size ? ` - ${doc.size}` : ""}
                 </p>
               </div>
             </div>
 
             <button
               type="button"
+              onClick={() => doc.accessEndpoint && window.open(doc.accessEndpoint, "_blank")}
               className="mt-4 w-full h-[42px] rounded-[8px] bg-[#DCE8FF] text-[#003469] font-[Cairo] text-[14px] font-bold hover:bg-[#C9DCFF] transition"
             >
               عرض المستند
@@ -308,9 +333,7 @@ function OrphanCard({ orphan }) {
         </div>
 
         <div className="px-4 py-3 border-l border-[#EEF1F5]">
-          <p className="font-[Cairo] text-[11px] text-[#6B7280]">
-            المستوى التعليمي
-          </p>
+          <p className="font-[Cairo] text-[11px] text-[#6B7280]">المستوى التعليمي</p>
           <p className="mt-1 font-[Cairo] text-[14px] font-bold text-[#111827]">
             {orphan.education}
           </p>
@@ -337,8 +360,64 @@ function OrphanCard({ orphan }) {
   );
 }
 
-function FamilyDetailsPage() {
+/* ========================================================================== */
+/* 📄 الصفحة الموحدة — بتاخد status وبتغيّر شكلها تلقائيًا                    */
+/* ========================================================================== */
+function FamilyDetailsPage({
+  // props اختيارية للاستخدام المباشر/الاختبار؛ إذا انبعتوا بيتجاوزوا بيانات الـ API
+  status: statusProp,
+  family: familyProp,
+  documents: documentsProp,
+  orphans = MOCK_ORPHANS, // 🔌 لسا mock — ما في endpoint مؤكد لأيتام عائلة معينة بعد
+  onEditClick,
+  onAddOrphanClick,
+}) {
   const [openSidebar, setOpenSidebar] = useState(false);
+  const { familyId } = useParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const { family: fetchedFamily, loading, error } = useFamily(familyId);
+
+  // 🔌 مؤقتًا (لحد ما يجهز API فعليًا بكل مكان بيستخدمه): تقدر تجرب أي حالة
+  // عن طريق الرابط، مثال: /families/123?status=stopped
+  const previewStatus = searchParams.get("status");
+
+  const family = familyProp || fetchedFamily || MOCK_FAMILY;
+  const documents =
+    documentsProp ||
+    (family.hasFatherDeathCertificate
+      ? [
+          {
+            name: family.fatherDeathCertificateFileName || "شهادة وفاة",
+            date: family.createdAt ? new Date(family.createdAt).toLocaleDateString("ar-EG") : "",
+            size: "",
+            accessEndpoint: family.fatherDeathCertificateAccessEndpoint,
+          },
+        ]
+      : MOCK_DOCUMENTS);
+  const status = statusProp || previewStatus || family.statusKey || "pending";
+  const config = FAMILY_STATUS_CONFIG[status] || FAMILY_STATUS_CONFIG.pending;
+
+  // canEdit/canAddOrphan راجعين صراحة من الـ API — أدق من تخمينهم حسب الحالة بس
+  const showEditButton = family.canEdit ?? (status === "active" || status === "needsEdit");
+  const showAddOrphanButton = family.canAddOrphan ?? status === "active";
+
+  if (loading) {
+    return (
+      <div dir="rtl" className="min-h-screen bg-[#F6F7F9] font-[Cairo] flex items-center justify-center">
+        <p className="text-[#003469] font-bold">جارٍ تحميل بيانات العائلة...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div dir="rtl" className="min-h-screen bg-[#F6F7F9] font-[Cairo] flex items-center justify-center">
+        <p className="text-red-600 font-bold">تعذر تحميل بيانات العائلة، حاول مجددًا.</p>
+      </div>
+    );
+  }
 
   return (
     <div dir="rtl" className="min-h-screen bg-[#F6F7F9] font-[Cairo]">
@@ -355,17 +434,22 @@ function FamilyDetailsPage() {
           <div className="w-full max-w-[1220px] mx-auto">
             <Breadcrumb />
 
-            <PageHeader />
+            <PageHeader
+              family={family}
+              config={config}
+              showEditButton={showEditButton}
+              onEditClick={onEditClick || (() => navigate(`/families/${familyId}/edit`))}
+            />
 
-            <HiddenAlert />
+            <StatusAlert config={config} />
 
             <section className="mt-8 grid grid-cols-1 lg:grid-cols-[1fr_330px] gap-6 items-stretch">
-              <FamilyInfoCard />
-              <DocumentsCard />
+              <FamilyInfoCard family={family} />
+              <DocumentsCard documents={documents} />
             </section>
 
-            <section className="mt-12">
-              <div className="flex items-center justify-between gap-3 mb-6">
+            <section className="mt-10">
+              <div className="flex items-center justify-between gap-3 mb-6 flex-wrap">
                 <div className="flex items-center gap-2">
                   <MdFamilyRestroom className="text-[#003469] text-[25px]" />
 
@@ -373,6 +457,17 @@ function FamilyDetailsPage() {
                     الأيتام التابعون للعائلة ({orphans.length})
                   </h3>
                 </div>
+
+                {showAddOrphanButton && (
+                  <button
+                    type="button"
+                    onClick={onAddOrphanClick}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-[#008C78] text-white px-4 py-2 font-[Cairo] text-[13px] font-bold hover:bg-[#007566] transition"
+                  >
+                    <MdPersonAdd className="text-[16px]" />
+                    إضافة يتيم جديد
+                  </button>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-stretch">

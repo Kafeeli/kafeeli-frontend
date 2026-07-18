@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
 
 import {
@@ -186,13 +187,14 @@ function ProgressSteps() {
 
 function FamilyAccessPendingPage() {
   const [openSidebar, setOpenSidebar] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div dir="rtl" className="min-h-screen bg-[#F6F7F9] font-[Cairo]">
       <Sidebar
         openSidebar={openSidebar}
         setOpenSidebar={setOpenSidebar}
-        activeItem="عائلتي"
+        activeItem="العائلات"
       />
 
       <div className="min-h-screen lg:mr-[256px] flex flex-col">
@@ -222,6 +224,7 @@ function FamilyAccessPendingPage() {
               <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <button
                   type="button"
+                  onClick={() => navigate("/guardian-documents")}
                   className="w-full sm:w-[260px] h-[54px] rounded-[10px] bg-[#003469] text-white font-[Cairo] text-[15px] font-bold flex items-center justify-center gap-3 hover:bg-[#004B8F] transition shadow-sm hover:shadow-md"
                 >
                   <MdDescription className="text-[21px]" />
@@ -230,6 +233,7 @@ function FamilyAccessPendingPage() {
 
                 <button
                   type="button"
+                  onClick={() => navigate("/guardian-profile")}
                   className="w-full sm:w-[260px] h-[54px] rounded-[10px] bg-[#F1F3F6] border border-[#C8CED8] text-[#4B5563] font-[Cairo] text-[15px] font-bold flex items-center justify-center gap-3 hover:bg-[#E5E7EB] transition shadow-sm hover:shadow-md"
                 >
                   <MdManageAccounts className="text-[21px]" />

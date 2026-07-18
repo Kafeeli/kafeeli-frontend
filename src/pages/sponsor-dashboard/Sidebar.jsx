@@ -42,7 +42,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
     {
       title: "العائلات",
       icon: <MdFamilyRestroom />,
-      path: "/families", // 👈 يطابق الـ Route الموجود في App.jsx
+      path: "/familiesSponsor", // 👈 يطابق الـ Route الموجود في App.jsx
     },
     {
       title: "الأيتام",
