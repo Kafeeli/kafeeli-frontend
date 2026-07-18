@@ -14,23 +14,18 @@ import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 import TransferReviewList from "./pages/admin-dashboard/Transferreviewlist";
 import LandingPage from "./pages/LandingPage";
 import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
-import SponsorProfile  from "./pages/sponsor-dashboard/profileDashboard";
+import SponsorProfile from "./pages/sponsor-dashboard/profileDashboard";
 
 import GuardianProfile from "./pages/guardian-dashboard/GuardianProfile";
-import ErrorPage from "./pages/guardian-dashboard/Families/ErrorStates";
-import FamilyAccessPendingPage from "./pages/guardian-dashboard/Families/FamilyAccessPendingPage";
-import NoFamiliesPage from "./pages/guardian-dashboard/Families/NoFamiliesPage";
-import AddFamilyPage from "./pages/guardian-dashboard/Families/AddFamilyPage";
-import ManagingFamilyCards from "./pages/guardian-dashboard/Families/ManagingFamilyCards";
-import FamilyDetailsPage from "./pages/guardian-dashboard/Families/FamilyDetailsPage";
+import GuardianDocuments from "./pages/guardian-dashboard/GuardianDocuments";
 
-import ActiveFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/ActiveFamilyDetailsPage";
-import HiddenFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/HiddenFamilyDetailsPage";
-import PendingFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/PendingFamilyDetailsPage";
-import StoppedFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/StoppedFamilyDetailsPage";
-import NeedsEditFamilyDetailsPage from "./pages/guardian-dashboard/Families/status/NeedsEditFamilyDetailsPage";
-import FamilyEditPage from "./pages/guardian-dashboard/Families/status/FamilyEditPage";
-import NeedsEditFamilyEditPage from "./pages/guardian-dashboard/Families/status/NeedsEditFamilyEditPage";
+// 🔌 صفحات العائلات (الوصي) — بعد التوحيد، صار عندنا صفحة وحدة لكل حالة
+// بدل ملف منفصل لكل حالة (كانت جوّا Families/status/ وصارت محذوفة).
+import ManagingFamilyCards from "./pages/guardian-dashboard/Families/ManagingFamilyCards";
+import AddFamilyPage from "./pages/guardian-dashboard/Families/AddFamilyPage";
+import FamilyDetailsPage from "./pages/guardian-dashboard/Families/FamilyDetailsPage";
+import FamilyEditPage from "./pages/guardian-dashboard/Families/FamilyEditPage";
+
 import Error404 from "./pages/error404";
 import Error401 from "./pages/auth401";
 
@@ -193,18 +188,22 @@ function AnimatedRoutes() {
           element={
             <PageWrapper>
               <div dir="rtl" className="min-h-screen bg-gray-50">
-              <SponsorProfile />
+                <SponsorProfile />
               </div>
             </PageWrapper>
           }
         />
 
-        {/* Guardian Families Pages */}
+        {/* ============================================================ */}
+        {/* Guardian Families Pages — موحّدة وديناميكية (بدل صفحة لكل حالة) */}
+        {/* ============================================================ */}
+
+        {/* قائمة العائلات — نفسها بتتصرف حسب الحالة (تحميل/خطأ/غير مؤهل/فاضية/فيها عائلات) */}
         <Route
           path="/families"
           element={
             <PageWrapper>
-              <NoFamiliesPage />
+              <ManagingFamilyCards />
             </PageWrapper>
           }
         />
@@ -218,100 +217,9 @@ function AnimatedRoutes() {
           }
         />
 
+        {/* تفاصيل عائلة معينة — الحالة (نشطة/موقوفة/مخفية...) بتحدد شكل الصفحة تلقائيًا */}
         <Route
-          path="/families/manage"
-          element={
-            <PageWrapper>
-              <ManagingFamilyCards />
-            </PageWrapper>
-          }
-        />
-
-        <Route
-          path="/families/access-pending"
-          element={
-            <PageWrapper>
-              <FamilyAccessPendingPage />
-            </PageWrapper>
-          }
-        />
-        {/* الحالاات */}
-        {/* حالة العائلة نشطة  */}
-        <Route
-          path="/families/active-details"
-          element={
-            <PageWrapper>
-              <ActiveFamilyDetailsPage />
-            </PageWrapper>
-          }
-        />
-
-        {/* تعديل بيانات نشطة */}
-        <Route
-          path="/families/edit"
-          element={
-            <PageWrapper>
-              <FamilyEditPage />
-            </PageWrapper>
-          }
-        />
-        {/* تعديل ايرور */}
-        <Route
-          path="/families/needs-edit/edit"
-          element={
-            <PageWrapper>
-              <NeedsEditFamilyEditPage />
-            </PageWrapper>
-          }
-        />
-        {/* حالة موقوفة */}
-        <Route
-          path="/families/stopped-details"
-          element={
-            <PageWrapper>
-              <StoppedFamilyDetailsPage />
-            </PageWrapper>
-          }
-        />
-        {/* قيد المراجعة */}
-        <Route
-          path="/families/pending-details"
-          element={
-            <PageWrapper>
-              <PendingFamilyDetailsPage />
-            </PageWrapper>
-          }
-        />
-        {/* حالة مخفية */}
-        <Route
-          path="/families/hidden-details"
-          element={
-            <PageWrapper>
-              <HiddenFamilyDetailsPage />
-            </PageWrapper>
-          }
-        />
-        {/* تحتاج تعديل */}
-        <Route
-          path="/families/needs-edit-details"
-          element={
-            <PageWrapper>
-              <NeedsEditFamilyDetailsPage />
-            </PageWrapper>
-          }
-        />
-
-        <Route
-          path="/families/error"
-          element={
-            <PageWrapper>
-              <ErrorPage />
-            </PageWrapper>
-          }
-        />
-
-        <Route
-          path="/families/details"
+          path="/families/:familyId"
           element={
             <PageWrapper>
               <FamilyDetailsPage />
@@ -319,10 +227,27 @@ function AnimatedRoutes() {
           }
         />
 
+        {/* تعديل بيانات عائلة معينة — نفس المبدأ */}
+        <Route
+          path="/families/:familyId/edit"
+          element={
+            <PageWrapper>
+              <FamilyEditPage />
+            </PageWrapper>
+          }
+        />
+
+        <Route path="/guardian-documents" element={<GuardianDocuments />} />
+
         {/* Old routes redirects */}
         <Route
           path="/Mange"
-          element={<Navigate to="/families/manage" replace />}
+          element={<Navigate to="/families" replace />}
+        />
+
+        <Route
+          path="/families/manage"
+          element={<Navigate to="/families" replace />}
         />
 
         <Route
@@ -336,13 +261,13 @@ function AnimatedRoutes() {
         />
 
         <Route
-          path="/family-access-pending"
-          element={<Navigate to="/families/access-pending" replace />}
+          path="/familiesGuardian"
+          element={<Navigate to="/families" replace />}
         />
 
         <Route
-          path="/error-Page"
-          element={<Navigate to="/families/error" replace />}
+          path="/family-access-pending"
+          element={<Navigate to="/families" replace />}
         />
 
         {/* Dashboards */}

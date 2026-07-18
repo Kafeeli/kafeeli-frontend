@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
+import { familyApi } from "../../../services/familyApi";
 
 import {
   MdMenu,
@@ -10,6 +11,7 @@ import {
   MdLocationOn,
   MdOutlineUploadFile,
   MdSend,
+  MdErrorOutline,
 } from "react-icons/md";
 
 function TopNavbar({ setOpenSidebar }) {
@@ -79,16 +81,7 @@ function FieldLabel({ children, required }) {
   );
 }
 
-function TextInput({
-  name,
-  value,
-  onChange,
-  placeholder,
-  icon,
-  error,
-  type = "text",
-  min,
-}) {
+function TextInput({ name, value, onChange, placeholder, icon, error, type = "text", min, disabled }) {
   return (
     <div>
       <div className="relative">
@@ -99,7 +92,8 @@ function TextInput({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full h-[48px] rounded-[8px] border bg-white px-4 text-right font-[Cairo] text-[13px] text-[#374151] placeholder:text-[#9CA3AF] outline-none transition focus:ring-2 ${
+          disabled={disabled}
+          className={`w-full h-[48px] rounded-[8px] border bg-white px-4 text-right font-[Cairo] text-[13px] text-[#374151] placeholder:text-[#9CA3AF] outline-none transition focus:ring-2 disabled:bg-gray-50 ${
             error
               ? "border-[#D11F1F] focus:border-[#D11F1F] focus:ring-[#D11F1F]/10"
               : "border-[#CBD5E1] focus:border-[#003469] focus:ring-[#003469]/10"
@@ -120,14 +114,15 @@ function TextInput({
   );
 }
 
-function SelectInput({ name, value, onChange, error }) {
+function SelectInput({ name, value, onChange, error, disabled }) {
   return (
     <div>
       <select
         name={name}
         value={value}
         onChange={onChange}
-        className={`w-full h-[48px] rounded-[8px] border bg-white px-4 font-[Cairo] text-[13px] text-[#374151] outline-none transition focus:ring-2 ${
+        disabled={disabled}
+        className={`w-full h-[48px] rounded-[8px] border bg-white px-4 font-[Cairo] text-[13px] text-[#374151] outline-none transition focus:ring-2 disabled:bg-gray-50 ${
           error
             ? "border-[#D11F1F] focus:border-[#D11F1F] focus:ring-[#D11F1F]/10"
             : "border-[#CBD5E1] focus:border-[#003469] focus:ring-[#003469]/10"
@@ -147,16 +142,17 @@ function SelectInput({ name, value, onChange, error }) {
   );
 }
 
-function TextArea({ name, value, onChange, error }) {
+function TextArea({ name, value, onChange, error, disabled }) {
   return (
     <div>
       <textarea
         name={name}
         value={value}
         onChange={onChange}
+        disabled={disabled}
         rows={5}
         placeholder="اكتب تفاصيل عن وضع العائلة المعيشي وعدد الأفراد..."
-        className={`w-full min-h-[120px] resize-none rounded-[8px] border bg-white px-4 py-3 text-right font-[Cairo] text-[13px] text-[#374151] placeholder:text-[#9CA3AF] outline-none transition focus:ring-2 ${
+        className={`w-full min-h-[120px] resize-none rounded-[8px] border bg-white px-4 py-3 text-right font-[Cairo] text-[13px] text-[#374151] placeholder:text-[#9CA3AF] outline-none transition focus:ring-2 disabled:bg-gray-50 ${
           error
             ? "border-[#D11F1F] focus:border-[#D11F1F] focus:ring-[#D11F1F]/10"
             : "border-[#CBD5E1] focus:border-[#003469] focus:ring-[#003469]/10"
@@ -170,19 +166,20 @@ function TextArea({ name, value, onChange, error }) {
   );
 }
 
-function UploadBox({ file, onChange, error }) {
+function UploadBox({ file, onChange, error, disabled }) {
   return (
     <div>
       <label
         className={`h-[150px] rounded-[10px] border bg-white hover:bg-[#F8FBFF] transition cursor-pointer flex flex-col items-center justify-center text-center px-4 ${
           error ? "border-[#D11F1F]" : "border-[#BFD0E6]"
-        }`}
+        } ${disabled ? "opacity-60 cursor-not-allowed" : ""}`}
       >
         <input
           type="file"
           className="hidden"
           accept=".pdf,.jpg,.jpeg,.png"
           onChange={onChange}
+          disabled={disabled}
         />
 
         <div className="w-[56px] h-[56px] rounded-full bg-[#D9FBF4] flex items-center justify-center mb-3">
@@ -208,16 +205,19 @@ function UploadBox({ file, onChange, error }) {
 function AddFamilyForm() {
   const navigate = useNavigate();
 
+  // 🔌 أسماء الحقول هون صارت مطابقة تمامًا لحقول POST /api/v1/guardians/me/families
   const [formData, setFormData] = useState({
-    guardianName: "",
+    headOfHouseholdName: "",
     city: "",
-    monthlyIncome: "",
+    monthlyNeedAmount: "",
     address: "",
-    description: "",
-    deathCertificate: null,
+    caseDescription: "",
+    fatherDeathCertificate: null,
   });
 
   const [errors, setErrors] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+  const [serverError, setServerError] = useState(null);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -238,52 +238,52 @@ function AddFamilyForm() {
 
     setFormData((prevData) => ({
       ...prevData,
-      deathCertificate: file || null,
+      fatherDeathCertificate: file || null,
     }));
 
     setErrors((prevErrors) => ({
       ...prevErrors,
-      deathCertificate: "",
+      fatherDeathCertificate: "",
     }));
   }
 
   function validateForm() {
     const newErrors = {};
 
-    if (!formData.guardianName.trim()) {
-      newErrors.guardianName = "اسم رب الأسرة مطلوب";
+    if (!formData.headOfHouseholdName.trim()) {
+      newErrors.headOfHouseholdName = "اسم رب الأسرة مطلوب";
     }
 
     if (!formData.city) {
       newErrors.city = "المدينة مطلوبة";
     }
 
-    if (!formData.monthlyIncome.trim()) {
-      newErrors.monthlyIncome = "الدخل الشهري مطلوب";
+    if (!formData.monthlyNeedAmount.toString().trim()) {
+      newErrors.monthlyNeedAmount = "الاحتياج الشهري مطلوب";
     }
 
     if (!formData.address.trim()) {
       newErrors.address = "العنوان مطلوب";
     }
 
-    if (!formData.description.trim()) {
-      newErrors.description = "وصف الحالة مطلوب";
+    if (!formData.caseDescription.trim()) {
+      newErrors.caseDescription = "وصف الحالة مطلوب";
     }
 
-    if (!formData.deathCertificate) {
-      newErrors.deathCertificate = "شهادة وفاة رب الأسرة مطلوبة";
+    if (!formData.fatherDeathCertificate) {
+      newErrors.fatherDeathCertificate = "شهادة وفاة رب الأسرة مطلوبة";
     }
 
-    if (formData.deathCertificate) {
+    if (formData.fatherDeathCertificate) {
       const maxSize = 5 * 1024 * 1024;
       const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
 
-      if (!allowedTypes.includes(formData.deathCertificate.type)) {
-        newErrors.deathCertificate = "نوع الملف يجب أن يكون PDF أو JPG أو PNG";
+      if (!allowedTypes.includes(formData.fatherDeathCertificate.type)) {
+        newErrors.fatherDeathCertificate = "نوع الملف يجب أن يكون PDF أو JPG أو PNG";
       }
 
-      if (formData.deathCertificate.size > maxSize) {
-        newErrors.deathCertificate = "حجم الملف يجب ألا يتجاوز 5MB";
+      if (formData.fatherDeathCertificate.size > maxSize) {
+        newErrors.fatherDeathCertificate = "حجم الملف يجب ألا يتجاوز 5MB";
       }
     }
 
@@ -292,16 +292,34 @@ function AddFamilyForm() {
     return Object.keys(newErrors).length === 0;
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
-    if (!validateForm()) {
-      return;
+    if (!validateForm()) return;
+
+    setSubmitting(true);
+    setServerError(null);
+
+    try {
+      const res = await familyApi.createFamily(formData);
+      const newFamilyId = res?.data?.familyId;
+      // بعد الإرسال الناجح، العائلة بتصير Pending تلقائيًا — نوجّه لصفحة تفاصيلها
+      navigate(newFamilyId ? `/families/${newFamilyId}` : "/families");
+    } catch (err) {
+      const status = err?.response?.status;
+      const apiErrors = err?.response?.data?.errors;
+      if (status === 400) {
+        setServerError(
+          Array.isArray(apiErrors) && apiErrors.length ? apiErrors.join(" - ") : "تحقق من صحة البيانات المدخلة."
+        );
+      } else if (status === 403) {
+        setServerError("حسابك غير مؤهل لإضافة عائلة حاليًا.");
+      } else {
+        setServerError("تعذر إرسال بيانات العائلة، حاول مجددًا.");
+      }
+    } finally {
+      setSubmitting(false);
     }
-
-    console.log("Family form submitted:", formData);
-
-    navigate("/families/access-pending");
   }
 
   return (
@@ -310,15 +328,23 @@ function AddFamilyForm() {
       noValidate
       className="mt-7 bg-white border border-[#CBD5E1] rounded-[10px] shadow-[0_1px_3px_rgba(16,24,40,0.04)] p-5 sm:p-7 lg:p-8"
     >
+      {serverError && (
+        <div className="mb-6 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <MdErrorOutline className="text-lg shrink-0" />
+          <p>{serverError}</p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="md:col-span-2">
           <FieldLabel required>اسم رب الأسرة المتوفي </FieldLabel>
           <TextInput
-            name="guardianName"
-            value={formData.guardianName}
+            name="headOfHouseholdName"
+            value={formData.headOfHouseholdName}
             onChange={handleChange}
             placeholder="الاسم الرباعي كما هو في الهوية"
-            error={errors.guardianName}
+            error={errors.headOfHouseholdName}
+            disabled={submitting}
           />
         </div>
 
@@ -329,19 +355,21 @@ function AddFamilyForm() {
             value={formData.city}
             onChange={handleChange}
             error={errors.city}
+            disabled={submitting}
           />
         </div>
 
         <div>
-          <FieldLabel required>الدخل الشهري (شيكل)</FieldLabel>
+          <FieldLabel required>الاحتياج الشهري المقدّر (شيكل)</FieldLabel>
           <TextInput
-            name="monthlyIncome"
+            name="monthlyNeedAmount"
             type="number"
             min="0"
-            value={formData.monthlyIncome}
+            value={formData.monthlyNeedAmount}
             onChange={handleChange}
             placeholder="مثال: 3500"
-            error={errors.monthlyIncome}
+            error={errors.monthlyNeedAmount}
+            disabled={submitting}
           />
         </div>
 
@@ -354,25 +382,28 @@ function AddFamilyForm() {
             placeholder="الحي، الشارع، رقم المنزل"
             icon={<MdLocationOn />}
             error={errors.address}
+            disabled={submitting}
           />
         </div>
 
         <div className="md:col-span-2">
           <FieldLabel required>وصف الحالة</FieldLabel>
           <TextArea
-            name="description"
-            value={formData.description}
+            name="caseDescription"
+            value={formData.caseDescription}
             onChange={handleChange}
-            error={errors.description}
+            error={errors.caseDescription}
+            disabled={submitting}
           />
         </div>
 
         <div className="md:col-span-2">
           <FieldLabel required>شهادة وفاة رب الأسرة</FieldLabel>
           <UploadBox
-            file={formData.deathCertificate}
+            file={formData.fatherDeathCertificate}
             onChange={handleFileChange}
-            error={errors.deathCertificate}
+            error={errors.fatherDeathCertificate}
+            disabled={submitting}
           />
         </div>
       </div>
@@ -381,17 +412,19 @@ function AddFamilyForm() {
         <button
           type="button"
           onClick={() => navigate("/families")}
-          className="h-[52px] rounded-[9px] bg-[#D7E7FF] text-[#374151] font-[Cairo] text-[15px] font-bold hover:bg-[#C9DCF7] transition"
+          disabled={submitting}
+          className="h-[52px] rounded-[9px] bg-[#D7E7FF] text-[#374151] font-[Cairo] text-[15px] font-bold hover:bg-[#C9DCF7] transition disabled:opacity-60 disabled:cursor-not-allowed"
         >
           إلغاء
         </button>
 
         <button
           type="submit"
-          className="h-[52px] rounded-[9px] bg-[#003469] text-white font-[Cairo] text-[15px] font-bold hover:bg-[#053c74] transition shadow-[0_6px_14px_rgba(0,62,168,0.18)] flex items-center justify-center gap-2"
+          disabled={submitting}
+          className="h-[52px] rounded-[9px] bg-[#003469] text-white font-[Cairo] text-[15px] font-bold hover:bg-[#053c74] transition shadow-[0_6px_14px_rgba(0,62,168,0.18)] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           <MdSend className="text-[20px]" />
-          حفظ وإرسال للمراجعة
+          {submitting ? "جارٍ الإرسال..." : "حفظ وإرسال للمراجعة"}
         </button>
       </div>
     </form>

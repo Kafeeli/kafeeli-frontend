@@ -30,7 +30,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
     {
       title: "العائلات",
       icon: <MdFamilyRestroom />,
-      path: "/guardian-families",
+      path: "/families",
     },
     { title: "الأيتام", icon: <MdPerson />, path: "/guardian-orphans" },
     {
