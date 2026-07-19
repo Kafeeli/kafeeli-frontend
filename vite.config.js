@@ -12,7 +12,7 @@ export default defineConfig({
     },
     proxy: {
       "/backend": {
-        target: "http://kafeeli.runasp.net",
+        target: "https://kafeeli.runasp.net",
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/backend/, ""),
