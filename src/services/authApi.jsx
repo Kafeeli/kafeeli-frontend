@@ -140,3 +140,20 @@ export const authApi = {
     return response.data;
   },
 };
+// api.interceptors.response.use(
+//   response => response,
+//   async error => {
+//     const originalRequest = error.config;
+//     if (error.response?.status === 401 && !originalRequest._retry) {
+//       originalRequest._retry = true;
+//       const refreshToken = localStorage.getItem("refreshToken");
+//       if (refreshToken) {
+//         const res = await authApi.refreshToken({ refreshToken });
+//         localStorage.setItem("token", res.accessToken);
+//         originalRequest.headers['Authorization'] = `Bearer ${res.accessToken}`;
+//         return api(originalRequest);
+//       }
+//     }
+//     return Promise.reject(error);
+//   }
+// );

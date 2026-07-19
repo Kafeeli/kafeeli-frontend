@@ -69,19 +69,35 @@ const handleSubmit = async (e) => {
 
     if (response?.success) {
       // حفظ بيانات الجلسة بالـ localStorage
+      // localStorage.setItem("token", response.data.accessToken);
+      // localStorage.setItem("refreshToken", response.data.refreshToken);
+      // localStorage.setItem("user", JSON.stringify(response.data));
+
+      // const role = response.data?.role?.toLowerCase(); // "guardian" أو "sponsor"
+
+      // if (role === "guardian") {
+      //   navigate("/guardian-profile");
+      // } else if (role === "sponsor") {
+      //   navigate("/main");
+      // } else {
+      //   navigate("/landing-page");
+      // }
       localStorage.setItem("token", response.data.accessToken);
-      localStorage.setItem("refreshToken", response.data.refreshToken);
-      localStorage.setItem("user", JSON.stringify(response.data));
+localStorage.setItem("refreshToken", response.data.refreshToken);
+localStorage.setItem("user", JSON.stringify(response.data));
 
-      const role = response.data?.role?.toLowerCase(); // "guardian" أو "sponsor"
+// التوجيه حسب نوع الحساب
+const role = response.data.role;
 
-      if (role === "guardian") {
-        navigate("/guardian-profile");
-      } else if (role === "sponsor") {
-        navigate("/main");
-      } else {
-        navigate("/landing-page");
-      }
+if (role === "SuperAdmin" || role === "Admin") {
+  navigate("/admin-dashboard/transfer-review");
+} else if (role === "Guardian") {
+  navigate("/guardian-profile");
+} else if (role === "Sponsor") {
+  navigate("/sponsorProfile");
+} else {
+  navigate("/landing-page");
+}
     } else if (response?.code === "EMAIL_NOT_VERIFIED" || response?.message?.toLowerCase().includes("verify")) {
       navigate(`/email-verified?email=${encodeURIComponent(email)}`);
     } else {
