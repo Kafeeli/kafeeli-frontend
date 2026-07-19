@@ -18,21 +18,13 @@ import {
 import Sidebar from "./Sidebar";
 import DocumentUploadModal from "./DocumentUploadModal";
 import personalImage from "../../assets/personal.jpg";
+import { guardianApi } from "../../services/guardianApi";
 import { guardianDocumentsApi } from "../../services/guardianDocumentsApi";
 import {
   DOCUMENT_TYPE_NAME_TO_KEY,
   mapDocumentStatus,
-} from "../../config/documentTypeConfig"
+} from "../../config/documentTypeConfig";
 
-/* ========================================================================== */
-/* ⚙️ البيانات الثابتة لكل خانة وثيقة (عنوان، وصف، أيقونة، حدود الملف)      */
-/* ========================================================================== */
-/**
- * هاد ميتاداتا العرض بس (مش من الـ API — الـ API بيرجع بس حالة/معرّف/اسم ملف).
- * الحدود (الصيغ والحجم) مأخوذة حرفيًا من وصف POST endpoint:
- * - الهوية/حجة الوصاية/إقرار الحضانة: PDF, JPG, JPEG, PNG حتى 5MB
- * - فيديو السيلفي: MP4, MOV, WEBM حتى 15MB ومدة أقصاها 5 ثوان
- */
 const DOCUMENT_META = {
   nationalId: {
     title: "الهوية الشخصية ورقمها",
@@ -69,8 +61,6 @@ const DOCUMENT_META = {
   },
 };
 
-// نفس ترتيب العرض المتفق عليه (RTL: الهوية أعلى يمين، حجة الوصاية أعلى يسار،
-// فيديو سيلفي تحت يمين، إقرار الحضانة تحت يسار)
 const DISPLAY_ORDER = [
   "nationalId",
   "guardianshipDeed",
@@ -101,8 +91,6 @@ const STATUS_CONFIG = {
   },
 };
 
-// يبني شكل الصفحة الداخلي (key, status, rejectionReason, documentId, canReupload)
-// من استجابة GET الحقيقية + ميتاداتا العرض الثابتة
 function buildDocumentsFromApi(apiDocuments) {
   const byKey = {};
   (apiDocuments || []).forEach((d) => {
@@ -139,7 +127,21 @@ function GuardianDocuments() {
   const [loadError, setLoadError] = useState(null);
   const [activeUploadDoc, setActiveUploadDoc] = useState(null);
   const [viewingDocId, setViewingDocId] = useState(null);
+  const [guardianName, setGuardianName] = useState("");
+  const [guardianImage, setGuardianImage] = useState(null);
 
+  // جلب بيانات الوصي (الاسم والصورة)
+  useEffect(() => {
+    guardianApi
+      .getProfile()
+      .then((res) => {
+        setGuardianName(res?.data?.fullName || "");
+        setGuardianImage(res?.data?.profileImageUrl || null);
+      })
+      .catch(() => {});
+  }, []);
+
+  // جلب الوثائق
   const fetchDocuments = async () => {
     setLoading(true);
     setLoadError(null);
@@ -171,7 +173,6 @@ function GuardianDocuments() {
     setActiveUploadDoc(doc);
   };
 
-  // POST /api/v1/guardians/me/documents الفعلي
   const handleUploadSubmit = async ({ file, idNumber }) => {
     const res = await guardianDocumentsApi.uploadDocument({
       documentTypeKey: activeUploadDoc.key,
@@ -185,7 +186,10 @@ function GuardianDocuments() {
         doc.key === activeUploadDoc.key
           ? {
               ...doc,
-              status: mapDocumentStatus(apiDoc?.hasCurrentDocument ?? true, apiDoc?.verificationStatus),
+              status: mapDocumentStatus(
+                apiDoc?.hasCurrentDocument ?? true,
+                apiDoc?.verificationStatus
+              ),
               rejectionReason: "",
               documentId: apiDoc?.documentId || doc.documentId,
               canReupload: apiDoc?.canReupload ?? doc.canReupload,
@@ -196,7 +200,6 @@ function GuardianDocuments() {
     setActiveUploadDoc(null);
   };
 
-  // GET /api/v1/guardians/me/documents/{documentId}/file — بيفتح الملف كـ blob بتبويب جديد
   const handleViewDocument = async (doc) => {
     if (!doc.documentId || viewingDocId) return;
     setViewingDocId(doc.key);
@@ -204,7 +207,6 @@ function GuardianDocuments() {
       const blob = await guardianDocumentsApi.getDocumentFile(doc.documentId);
       const url = URL.createObjectURL(blob);
       window.open(url, "_blank");
-      // نأخر تحرير الرابط شوي لإعطاء المتصفح فرصة يفتح التبويب قبل ما ينلغى
       setTimeout(() => URL.revokeObjectURL(url), 30000);
     } catch (err) {
       alert("تعذر فتح الملف، حاول مجددًا.");
@@ -215,15 +217,23 @@ function GuardianDocuments() {
 
   if (loading) {
     return (
-      <div dir="rtl" className="min-h-screen bg-[#f8fafc] flex items-center justify-center font-[Cairo,sans-serif]">
-        <p className="text-[#003469] font-bold text-sm animate-pulse">جارٍ تحميل بيانات الوثائق...</p>
+      <div
+        dir="rtl"
+        className="min-h-screen bg-[#f8fafc] flex items-center justify-center font-[Cairo,sans-serif]"
+      >
+        <p className="text-[#003469] font-bold text-sm animate-pulse">
+          جارٍ تحميل بيانات الوثائق...
+        </p>
       </div>
     );
   }
 
   if (loadError) {
     return (
-      <div dir="rtl" className="min-h-screen bg-[#f8fafc] flex items-center justify-center font-[Cairo,sans-serif] p-4">
+      <div
+        dir="rtl"
+        className="min-h-screen bg-[#f8fafc] flex items-center justify-center font-[Cairo,sans-serif] p-4"
+      >
         <div className="bg-white border border-red-200 rounded-xl p-6 max-w-md text-center space-y-3">
           <MdErrorOutline className="text-red-500 text-4xl mx-auto" />
           <p className="text-[#111827] font-bold text-sm">{loadError}</p>
@@ -240,7 +250,6 @@ function GuardianDocuments() {
       <Sidebar openSidebar={openSidebar} setOpenSidebar={setOpenSidebar} />
 
       <div className="flex-1 min-w-0 w-full lg:mr-[255px] flex flex-col justify-between">
-        {/* ---------------------------- Top Navbar ---------------------------- */}
         <header className="w-full h-[64px] bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 z-20 sticky top-0">
           <div className="flex items-center gap-3">
             <button
@@ -257,13 +266,13 @@ function GuardianDocuments() {
           <div dir="ltr" className="flex items-center gap-4 shrink-0">
             <div className="flex items-center gap-2.5">
               <img
-                src={personalImage}
+                src={guardianImage || personalImage}
                 alt="صورة المستخدم"
                 className="w-9 h-9 rounded-full object-cover border border-slate-200"
               />
               <div dir="rtl" className="text-right hidden sm:block">
                 <h3 className="font-bold text-[13px] text-[#111827] leading-tight">
-                  أحمد العلي
+                  {guardianName || "الوصي"}
                 </h3>
                 <p className="text-[11px] text-gray-500">الوصي المعتمد</p>
               </div>
@@ -276,17 +285,16 @@ function GuardianDocuments() {
           </div>
         </header>
 
-        {/* ============================== Main ============================== */}
         <main className="p-4 sm:p-6 flex-1">
           <div className="max-w-6xl mx-auto space-y-6">
-            {/* عنوان الصفحة + بادج الحالة الإجمالية */}
             <div className="flex items-center justify-between gap-4 flex-wrap">
               <div>
                 <h2 className="text-[18px] sm:text-[20px] font-bold text-[#003469]">
                   إدارة الوثائق
                 </h2>
                 <p className="text-[13px] text-[#6B7280] mt-1">
-                  يرجى رفع المستندات الثبوتية المطلوبة لتتمكن من تفعيل كامل ميزات حسابك.
+                  يرجى رفع المستندات الثبوتية المطلوبة لتتمكن من تفعيل كامل
+                  ميزات حسابك.
                 </p>
               </div>
 
@@ -298,7 +306,6 @@ function GuardianDocuments() {
               </span>
             </div>
 
-            {/* بطاقات الملخص */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
               <SummaryCard
                 label="إجمالي الوثائق"
@@ -326,7 +333,6 @@ function GuardianDocuments() {
               />
             </div>
 
-            {/* إشعار الخصوصية */}
             <div className="rounded-lg bg-white border border-[#E2E8F0] px-4 py-3.5 flex items-center gap-3">
               <div className="w-9 h-9 rounded-lg bg-[#F3F4F5] flex items-center justify-center shrink-0">
                 <MdLockOutline className="text-[#003469] text-[18px]" />
@@ -336,12 +342,12 @@ function GuardianDocuments() {
                   حماية البيانات والخصوصية
                 </h4>
                 <p className="text-[12px] text-[#6B7280] mt-0.5 leading-5">
-                  الوثائق المرفوعة يتم تخزينها بشكل مشفر وآمن، ولا تظهر لأي ملف شخصي عام.
+                  الوثائق المرفوعة يتم تخزينها بشكل مشفر وآمن، ولا تظهر لأي ملف
+                  شخصي عام.
                 </p>
               </div>
             </div>
 
-            {/* شبكة بطاقات الوثائق */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {documents.map((doc) => (
                 <DocumentCard
@@ -374,9 +380,6 @@ function GuardianDocuments() {
   );
 }
 
-/* ========================================================================== */
-/* 🧩 بطاقة ملخص رقمية (إجمالي / قيد المراجعة / تم الاعتماد / تحتاج تعديل)   */
-/* ========================================================================== */
 const SummaryCard = ({ label, value, icon: Icon, accentClass }) => (
   <div className="bg-white rounded-xl border border-[#E2E8F0] p-4 flex flex-col items-center justify-center text-center gap-1.5">
     <Icon className={`text-[22px] ${accentClass}`} />
@@ -387,20 +390,17 @@ const SummaryCard = ({ label, value, icon: Icon, accentClass }) => (
   </div>
 );
 
-/* ========================================================================== */
-/* 🧩 بطاقة وثيقة واحدة، شكلها بيتغير حسب الحالة                              */
-/* ========================================================================== */
 const DocumentCard = ({ doc, onUploadClick, onViewClick, viewing }) => {
   const Icon = doc.icon;
   const config = STATUS_CONFIG[doc.status];
   const StatusIcon = config.icon;
 
-  // بالحالتين notUploaded و needsUpdate، الرفع مسموح دايمًا. لباقي الحالات
-  // (Pending/Approved) الرفع مقفول إلا لو الـ API صراحة رجّع canReupload=true
   const showUploadButton =
     doc.status === "notUploaded" ||
     doc.status === "needsUpdate" ||
-    (doc.status !== "notUploaded" && doc.canReupload && doc.status !== "approved");
+    (doc.status !== "notUploaded" &&
+      doc.canReupload &&
+      doc.status !== "approved");
 
   return (
     <div className="bg-white rounded-xl border border-[#D8DEE8] p-4 sm:p-5 flex flex-col gap-4">
@@ -447,15 +447,20 @@ const DocumentCard = ({ doc, onUploadClick, onViewClick, viewing }) => {
         </button>
       )}
 
-      {!showUploadButton && (doc.status === "pendingReview" || doc.status === "approved") && (
-        <button
-          onClick={onViewClick}
-          disabled={viewing}
-          className="mt-auto h-10 rounded-md border border-[#D0D5DD] bg-white text-[#003469] text-[13px] font-bold flex items-center justify-center gap-2 hover:bg-[#F5F8FB] transition cursor-pointer disabled:opacity-60"
-        >
-          {viewing ? "جارٍ الفتح..." : doc.isVideo ? "عرض الفيديو" : "عرض الوثيقة"}
-        </button>
-      )}
+      {!showUploadButton &&
+        (doc.status === "pendingReview" || doc.status === "approved") && (
+          <button
+            onClick={onViewClick}
+            disabled={viewing}
+            className="mt-auto h-10 rounded-md border border-[#D0D5DD] bg-white text-[#003469] text-[13px] font-bold flex items-center justify-center gap-2 hover:bg-[#F5F8FB] transition cursor-pointer disabled:opacity-60"
+          >
+            {viewing
+              ? "جارٍ الفتح..."
+              : doc.isVideo
+                ? "عرض الفيديو"
+                : "عرض الوثيقة"}
+          </button>
+        )}
     </div>
   );
 };
