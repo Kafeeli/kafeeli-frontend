@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FiX, FiSettings, FiLogOut, FiMenu } from "react-icons/fi";
 import { FiClock } from "react-icons/fi";
@@ -12,6 +14,7 @@ import {
 } from "react-icons/md";
 import { PiBaby, PiMoneyWavy } from "react-icons/pi";
 import { TbReportAnalytics } from "react-icons/tb";
+import { authApi } from "../../services/authApi";
 
 /*
   ✅ كل عنصر إله "path" صار مرتبط فعليًا براوت حقيقي بالتطبيق.
@@ -19,17 +22,8 @@ import { TbReportAnalytics } from "react-icons/tb";
   تظهر بالقائمة بس بدون تنقل فعلي لحد ما نبني صفحتها.
 */
 const sidebarItems = [
-  { label: "لوحة المراجعة", icon: MdDashboard, path: "/admin-dashboard" },
-  {
-    label: "التحويلات البنكية",
-    icon: HiOutlineBuildingLibrary,
-    path: "/admin-dashboard/transfer-review",
-  },
-  {
-    label: "الأوصياء",
-    icon: HiOutlineIdentification,
-    path: "/admin-dashboard/guardian-document-reviews",
-  },
+  { label: "لوحة المراجعة", icon: MdDashboard, active: true },
+  { label: "الأوصياء", icon: HiOutlineIdentification },
   { label: "الكفلاء", icon: MdOutlineVolunteerActivism },
   {
     label: "العائلات",
@@ -43,16 +37,6 @@ const sidebarItems = [
 ];
 
 function SidebarContent({ onItemClick }) {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const handleItemClick = (item) => {
-    if (item.path) {
-      navigate(item.path);
-    }
-    onItemClick?.();
-  };
-
   return (
     <>
       {/* Logo */}
@@ -134,6 +118,8 @@ function SidebarContent({ onItemClick }) {
 
         <div className="border-t border-white/20 mt-2 pt-2">
           <button
+            onClick={handleLogout}
+            disabled={loggingOut}
             className="
               w-full h-5
               flex items-center gap-2.5 sm:gap-3
@@ -142,12 +128,13 @@ function SidebarContent({ onItemClick }) {
               text-white/85 font-normal text-right
               hover:bg-red-500/10 hover:text-red-400
               transition cursor-pointer shrink-0
+              disabled:opacity-50 disabled:cursor-not-allowed
             "
           >
             <span className="text-[15px] sm:text-[16px] lg:text-[18px] flex items-center shrink-0">
               <FiLogOut />
             </span>
-            <span>تسجيل الخروج</span>
+            <span>{loggingOut ? "جارٍ الخروج..." : "تسجيل الخروج"}</span>
           </button>
         </div>
       </div>
