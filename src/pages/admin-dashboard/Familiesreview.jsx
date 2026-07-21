@@ -20,7 +20,7 @@ import {
   LoadingState,
   EmptyState,
   ErrorState,
-} from "./AdminStates";
+} from "./Adminstates";
 import { STATUS_MAP } from "./Adminstates";
 import FamilyDetailsModal from "./modals/FamilyDetailsModal";
 
