@@ -21,7 +21,7 @@ import {
   EmptyState,
   ErrorState,
 } from "./AdminStates";
-import { STATUS_MAP } from "./familyStatus";
+import { STATUS_MAP } from "./Adminstates";
 import FamilyDetailsModal from "./modals/FamilyDetailsModal";
 
 const cardShadow = "shadow-[0_2px_10px_rgba(31,41,55,0.06)]";
