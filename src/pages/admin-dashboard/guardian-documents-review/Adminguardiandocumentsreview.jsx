@@ -11,9 +11,9 @@ import {
   MdOutlineEditNote,
   MdOutlineCancel,
 } from "react-icons/md";
-import ApproveDocumentConfirmationModal from "./ApprovedocumentconfirmationModal";
-import NeedsUpdateDocumentModal from "./NeedsupdatedocumentModal";
-import RejectDocumentModal from "./RejectdocumentModal";
+import ApproveDocumentConfirmationModal from "./Approvedocumentconfirmationmodal";
+import NeedsUpdateDocumentModal from "./Needsupdatedocumentmodal";
+import RejectDocumentModal from "./Rejectdocumentmodal";
 import AdminLayout from "../Adminlayout";
 
 // ===== MOCK DATA =====
