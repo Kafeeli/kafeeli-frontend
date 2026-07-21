@@ -14,8 +14,8 @@ import {
   MdShieldMoon,
   MdOutlineEditNote,
 } from "react-icons/md";
-import ApproveConfirmModal from "./ApproveConfirmModal";
-import RequestEditModal from "./RequestEditModal";
+import ApproveConfirmModal from "./ApproveconfirmModal";
+import RequestEditModal from "./Requesteditmodal";
 
 function InfoCard({ label, value, icon: Icon, mono = false }) {
   return (
