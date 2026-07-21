@@ -134,8 +134,9 @@ function StatCard({ card, index }) {
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05 }}
-      className={`relative flex min-h-[162px] flex-col items-center justify-center rounded-lg border bg-white p-5 text-center ${cardShadow} ${card.warning ? "border-[#F0C86A]" : "border-[#E5E7EB]"
-        }`}
+      className={`relative flex min-h-[162px] flex-col items-center justify-center rounded-lg border bg-white p-5 text-center ${cardShadow} ${
+        card.warning ? "border-[#F0C86A]" : "border-[#E5E7EB]"
+      }`}
     >
       {card.warning && (
         <span className="absolute right-6 top-9 h-2.5 w-2.5 rounded-full bg-[#B07B11]" />
@@ -248,10 +249,11 @@ function FamilyCard() {
           {["GA", "SK", "+12"].map((label, index) => (
             <span
               key={label}
-              className={`grid h-8 w-8 place-items-center rounded-full border-2 border-white text-[10px] font-bold ${index === 2
+              className={`grid h-8 w-8 place-items-center rounded-full border-2 border-white text-[10px] font-bold ${
+                index === 2
                   ? "bg-[#0D4B8E] text-white"
                   : "bg-gray-200 text-[#6B7280]"
-                }`}
+              }`}
             >
               {label}
             </span>
@@ -289,10 +291,11 @@ function QuickActions() {
         {quickActions.map((action) => (
           <button
             key={action.label}
-            className={`flex min-h-12 items-center justify-center gap-3 rounded-lg border px-5 py-3 text-base font-extrabold cursor-pointer ${cardShadow} transition ${action.featured
+            className={`flex min-h-12 items-center justify-center gap-3 rounded-lg border px-5 py-3 text-base font-extrabold cursor-pointer ${cardShadow} transition ${
+              action.featured
                 ? "border-[#2DBCC3] bg-[#7DDCE0] text-[#08386B] hover:bg-[#2DBCC3]"
                 : "border-gray-300 bg-white text-[#1F2937] hover:border-[#0D4B8E] hover:text-[#0D4B8E]"
-              } ${action.featured ? "sm:col-span-2 lg:col-start-2" : ""}`}
+            } ${action.featured ? "sm:col-span-2 lg:col-start-2" : ""}`}
           >
             <span>{action.label}</span>
             <action.icon className="text-2xl text-[#0D4B8E]" />

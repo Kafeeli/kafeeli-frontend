@@ -1,6 +1,10 @@
+import { useNavigate, useLocation } from "react-router-dom";
 import { FiX, FiSettings, FiLogOut, FiMenu } from "react-icons/fi";
 import { FiClock } from "react-icons/fi";
-import { HiOutlineIdentification } from "react-icons/hi2";
+import {
+  HiOutlineBuildingLibrary,
+  HiOutlineIdentification,
+} from "react-icons/hi2";
 import {
   MdDashboard,
   MdOutlineFamilyRestroom,
@@ -9,11 +13,29 @@ import {
 import { PiBaby, PiMoneyWavy } from "react-icons/pi";
 import { TbReportAnalytics } from "react-icons/tb";
 
+/*
+  ✅ كل عنصر إله "path" صار مرتبط فعليًا براوت حقيقي بالتطبيق.
+  العناصر اللي لسا ما إلها صفحة جاهزة (path غير موجود) بتضل
+  تظهر بالقائمة بس بدون تنقل فعلي لحد ما نبني صفحتها.
+*/
 const sidebarItems = [
-  { label: "لوحة المراجعة", icon: MdDashboard, active: true },
-  { label: "الأوصياء", icon: HiOutlineIdentification },
+  { label: "لوحة المراجعة", icon: MdDashboard, path: "/admin-dashboard" },
+  {
+    label: "التحويلات البنكية",
+    icon: HiOutlineBuildingLibrary,
+    path: "/admin-dashboard/transfer-review",
+  },
+  {
+    label: "الأوصياء",
+    icon: HiOutlineIdentification,
+    path: "/admin-dashboard/guardian-document-reviews",
+  },
   { label: "الكفلاء", icon: MdOutlineVolunteerActivism },
-  { label: "العائلات", icon: MdOutlineFamilyRestroom },
+  {
+    label: "العائلات",
+    icon: MdOutlineFamilyRestroom,
+    path: "/admin-dashboard/families",
+  },
   { label: "الأيتام", icon: PiBaby },
   { label: "المدفوعات", icon: PiMoneyWavy },
   { label: "التحديثات الدورية", icon: FiClock },
@@ -21,6 +43,16 @@ const sidebarItems = [
 ];
 
 function SidebarContent({ onItemClick }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleItemClick = (item) => {
+    if (item.path) {
+      navigate(item.path);
+    }
+    onItemClick?.();
+  };
+
   return (
     <>
       {/* Logo */}
@@ -61,19 +93,21 @@ function SidebarContent({ onItemClick }) {
         "
       >
         {sidebarItems.map(function (item) {
+          const isActive = item.path && location.pathname === item.path;
+
           return (
             <button
               key={item.label}
-              onClick={onItemClick}
+              onClick={() => handleItemClick(item)}
               className={
-                item.active
+                isActive
                   ? "w-full min-h-[48px] py-3 flex items-center gap-3 px-4 rounded-xl font-[Cairo] text-[14px] leading-6 transition-all duration-200 cursor-pointer shrink-0 bg-[#47DBE0] text-[#003469] font-bold shadow-md"
                   : "w-full min-h-[48px] py-3 flex items-center gap-3 px-4 rounded-xl font-[Cairo] text-[14px] leading-6 transition-all duration-200 cursor-pointer shrink-0 text-white/90 hover:bg-white/10 hover:text-white"
               }
             >
               <span
                 className={`text-[18px] flex items-center shrink-0 ${
-                  item.active ? "text-[#003469]" : "text-white/85"
+                  isActive ? "text-[#003469]" : "text-white/85"
                 }`}
               >
                 <item.icon />

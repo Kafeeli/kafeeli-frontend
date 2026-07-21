@@ -17,7 +17,7 @@ import {
   MdRefresh,
 } from "react-icons/md";
 import AdminLayout from "./Adminlayout";
-// import TransferDetailsModal from "./TransferDetailsModal";
+import TransferDetailsModal from "./modals/TransferDetailsModal";
 
 const cardShadow = "shadow-[0_2px_10px_rgba(31,41,55,0.06)]";
 const ITEMS_PER_PAGE = 4;
@@ -408,6 +408,12 @@ export default function TransferReviewList() {
           onRequestEdit={handleRequestEdit}
         />
       )}
+
+      <footer className="mt-20 py-2 border-t border-[#E5E7EB] text-center">
+        <p className="text-sm text-[#6B7280] mt-4">
+          © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
+        </p>
+      </footer>
     </AdminLayout>
   );
 }
