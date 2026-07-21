@@ -15,7 +15,7 @@ import {
   MdOutlineWarningAmber,
 } from "react-icons/md";
 import FamilyDecisionModal from "./Familydecisionmodal";
-import { STATUS_MAP } from "../familystatus";
+import { STATUS_MAP } from "../Familystatus";
 
 function InfoCard({ label, value, icon: Icon, mono = false }) {
   return (
