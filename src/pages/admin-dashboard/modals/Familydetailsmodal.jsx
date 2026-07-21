@@ -14,8 +14,8 @@ import {
   MdShieldMoon,
   MdOutlineWarningAmber,
 } from "react-icons/md";
-import FamilyDecisionModal from "./FamilyDecisionModal";
-import { STATUS_MAP } from "../familyStatus";
+import FamilyDecisionModal from "./Familydecisionmodal";
+import { STATUS_MAP } from "../familystatus";
 
 function InfoCard({ label, value, icon: Icon, mono = false }) {
   return (
