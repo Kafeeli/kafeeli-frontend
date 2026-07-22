@@ -14,6 +14,7 @@ import {
 import { PiBaby, PiMoneyWavy } from "react-icons/pi";
 import { TbReportAnalytics } from "react-icons/tb";
 import { authApi } from "../../services/authApi";
+import kafeeliLogo from "../../assets/kafeeli-logo.png";
 
 const sidebarItems = [
   { label: "لوحة المراجعة", icon: MdDashboard, path: "/admin-dashboard" },
