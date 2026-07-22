@@ -12,6 +12,8 @@ import InvalidEmail from "./pages/InvalidEmail";
 import SideBar from "./pages/admin-dashboard/sideBar";
 import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 import TransferReviewList from "./pages/admin-dashboard/Transferreviewlist";
+import FamiliesReview from "./pages/admin-dashboard/Familiesreview";
+import AdminGuardianDocumentsReviewPage from "./pages/admin-dashboard/guardian-documents-review/Adminguardiandocumentsreview";
 import LandingPage from "./pages/LandingPage";
 import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
 import SponsorProfile from "./pages/sponsor-dashboard/profileDashboard";
@@ -240,10 +242,7 @@ function AnimatedRoutes() {
         <Route path="/guardian-documents" element={<GuardianDocuments />} />
 
         {/* Old routes redirects */}
-        <Route
-          path="/Mange"
-          element={<Navigate to="/families" replace />}
-        />
+        <Route path="/Mange" element={<Navigate to="/families" replace />} />
 
         <Route
           path="/families/manage"
@@ -289,6 +288,10 @@ function AnimatedRoutes() {
           }
         />
 
+        {/* ============================================================ */}
+        {/* Admin Dashboard Routes */}
+        {/* ============================================================ */}
+
         <Route
           path="/admin-dashboard"
           element={
@@ -304,6 +307,26 @@ function AnimatedRoutes() {
           element={
             <PageWrapper>
               <TransferReviewList />
+            </PageWrapper>
+          }
+        />
+
+        {/* ✨ صفحة مراجعة العائلات (الأدمن) */}
+        <Route
+          path="/admin-dashboard/families"
+          element={
+            <PageWrapper>
+              <FamiliesReview />
+            </PageWrapper>
+          }
+        />
+
+        {/* ✨ صفحة مراجعة وثائق الأوصياء (الأدمن) — جديد! */}
+        <Route
+          path="/admin-dashboard/guardian-document-reviews"
+          element={
+            <PageWrapper>
+              <AdminGuardianDocumentsReviewPage />
             </PageWrapper>
           }
         />
