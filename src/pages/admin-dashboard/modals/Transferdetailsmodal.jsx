@@ -13,8 +13,8 @@ import {
   MdShieldMoon,
   MdOutlineEditNote,
 } from "react-icons/md";
-import ApproveConfirmModal from "../Approveconfirmmodal";
-import RequestEditModal from "../Requesteditmodal";
+import ApproveConfirmModal from "./Approveconfirmmodal";
+import RequestEditModal from "./Requesteditmodal";
 
 /* ==================== ترجمة حالة التحقق لعرض عربي مناسب ==================== */
 const STATUS_LABELS = {
