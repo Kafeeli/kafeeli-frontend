@@ -7,8 +7,8 @@
 export const DOCUMENT_TYPE_NAME_TO_KEY = {
   NationalIdImage: "nationalId",
   GuardianshipDeed: "guardianshipDeed",
-  CustodyDeclaration: "custodyDeclaration",
-  SelfieVideo: "selfieVideo",
+  CustodyDocument: "custodyDeclaration",      // كان CustodyDeclaration
+  SelfieVideoWithId: "selfieVideo",            // كان SelfieVideo
 };
 
 /**
