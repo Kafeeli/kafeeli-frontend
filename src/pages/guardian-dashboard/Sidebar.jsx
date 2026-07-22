@@ -136,11 +136,11 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
         <div className="flex flex-col items-center justify-center px-4 py-3 shrink-0">
           <div className="text-center mb-2">
             <div className="text-center mb-2">
-          <div className="w-[100px] h-[100px] bg-white/20 rounded-full mx-auto mb-2 flex items-center justify-center overflow-hidden">
+          <div className="w-[100px] h-[100px] bg-white/20 rounded-full mx-auto mb-2 flex items-center justify-center ">
             <img
-              src="/src/assets/title.png"
+              src={kafeeliLogo}
               alt="كفيلي"
-              className="w[140px] h-[140px] object-contain mt-2"
+              className="w-[140px] h-[140px] object-contain mt-2 scale-[1.4]"
             />
           </div>
         </div>
