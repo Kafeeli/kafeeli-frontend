@@ -1,5 +1,6 @@
-import { Link, useLocation, useNavigate } from "react-router-dom"; // 👈 استيراد أدوات الراوتر
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+
 import {
   MdClose,
   MdLogout,
@@ -15,14 +16,13 @@ import {
 } from "react-icons/md";
 
 import { authApi } from "../../services/authApi";
-// import kafeeliLogo from "../../assets/kafeeli-logo.png";
+import kafeeliLogo from "../../assets/kafeeli-logo.png";
 
 function Sidebar({ openSidebar, setOpenSidebar }) {
-  const location = useLocation(); // 👈 الحصول على الرابط الحالي للمتصفح
+  const location = useLocation();
   const navigate = useNavigate();
   const [loggingOut, setLoggingOut] = useState(false);
 
-  // 💡 أضفنا حقل الـ path لكل عنصر ليطابق الروابط في ملف App.jsx
   const menuItems = [
     {
       title: "نظرة عامة",
@@ -42,7 +42,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
     {
       title: "العائلات",
       icon: <MdFamilyRestroom />,
-      path: "/familiesSponsor", // 👈 يطابق الـ Route الموجود في App.jsx
+      path: "/familiesSponsor",
     },
     {
       title: "الأيتام",
@@ -71,7 +71,6 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
     },
   ];
 
-  // 👈 المقارنة تتم الآن بناءً على رابط الصفحة الحالية تلقائياً
   const isActive = (path) => location.pathname === path;
 
   const itemClasses = (active) => `
@@ -92,34 +91,35 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
     }
   `;
 
-  /* ---------------------------- تسجيل الخروج ---------------------------- */
   const handleLogout = async () => {
     if (loggingOut) return;
+
     setLoggingOut(true);
 
     const refreshToken = localStorage.getItem("refreshToken");
 
     try {
-      // بيلغي الـ refreshToken من طرف السيرفر (best-effort). حتى لو فشل الطلب
-      // (مثلاً التوكن منتهي أصلاً أو في مشكلة اتصال)، لازم نكمل ونسجل خروج
-      // محليًا، لأنه بقاء التوكن بالمتصفح أخطر من فشل نداء واحد للسيرفر.
       if (refreshToken) {
         await authApi.logout(refreshToken);
       }
-    } catch (err) {
-      console.error("Logout API call failed, clearing session locally anyway:", err);
+    } catch (error) {
+      console.error(
+        "Logout API call failed, clearing session locally anyway:",
+        error
+      );
     } finally {
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
+
       setOpenSidebar(false);
       setLoggingOut(false);
+
       navigate("/login", { replace: true });
     }
   };
 
   return (
     <>
-      {/* Overlay */}
       {openSidebar && (
         <div
           onClick={() => setOpenSidebar(false)}
@@ -143,9 +143,9 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
           lg:translate-x-0
         `}
       >
-        {/* Close */}
         <div className="lg:hidden flex justify-start px-3 sm:px-4 mb-1 shrink-0">
           <button
+            type="button"
             onClick={() => setOpenSidebar(false)}
             className="w-8 h-8 rounded-lg border border-white/30 flex items-center justify-center text-white"
           >
@@ -153,16 +153,15 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
           </button>
         </div>
 
-        {/* Logo */}
         <div className="flex flex-col items-center justify-center px-4 py-3 shrink-0">
           <div className="text-center mb-2">
-            <div className="w-[100px] h-[100px] bg-white/20 rounded-full mx-auto mb-2 flex items-center justify-center overflow-hidden">
-            <img
-              src="/src/assets/title.png"
-              alt="كفيلي"
-              className="w[140px] h-[140px] object-contain mt-2"
-            />
-          </div>
+            <div className="w-[100px] h-[100px] bg-white/20 rounded-full mx-auto mb-2 flex items-center justify-center ">
+              <img
+                src={kafeeliLogo}
+                alt="كفيلي"
+                className="w-[140px] h-[140px] object-contain mt-2 scale-[1.4]"
+              />
+            </div>
           </div>
 
           <h2 className="font-[Cairo] font-bold text-[18px] sm:text-[20px] lg:text-[22px] tracking-[0px] text-center text-[#FFDEAA] mb-2">
@@ -176,44 +175,47 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
 
         <hr className="border-white/25 mx-4 my-2 shrink-0" />
 
-        {/* MENU */}
         <nav className="flex-1 overflow-y-auto px-4 py-3 space-y-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/40">
           {menuItems.map((item) => (
             <Link
               key={item.title}
-              to={item.path} // 👈 يوجه للصفحة المطلوبة
+              to={item.path}
               onClick={() => setOpenSidebar(false)}
-              className={itemClasses(isActive(item.path))} // 👈 يتحقق إذا كان الرابط نشطاً
+              className={itemClasses(isActive(item.path))}
             >
               <span
                 className={`text-[18px] flex items-center ${
-                  isActive(item.path) ? "text-[#003469]" : "text-white/85"
+                  isActive(item.path)
+                    ? "text-[#003469]"
+                    : "text-white/85"
                 }`}
               >
                 {item.icon}
               </span>
+
               <span className="flex-1 text-right">{item.title}</span>
             </Link>
           ))}
         </nav>
 
-        {/* Bottom */}
         <div className="mt-auto px-3 sm:px-4 pb-2 shrink-0">
           <div className="border-t border-white/20 pt-3">
             <Link
-              to="/sponsor-settings" // 👈 رابط الإعدادات
+              to="/sponsor-settings"
               onClick={() => setOpenSidebar(false)}
               className={itemClasses(isActive("/sponsor-settings"))}
             >
               <span className="text-[18px] flex items-center text-white/85">
                 <MdSettings />
               </span>
+
               <span className="flex-1 text-right">الإعدادات</span>
             </Link>
           </div>
 
           <div className="border-t border-white/20 mt-2 pt-2">
             <button
+              type="button"
               onClick={handleLogout}
               disabled={loggingOut}
               className="w-full h-6 flex items-center gap-2.5 sm:gap-3 px-2.5 sm:px-3 rounded-[8px] font-[Cairo] text-[11px] sm:text-[12px] lg:text-[13px] leading-[18px] text-white/85 font-normal text-right hover:bg-red-500/10 hover:text-red-400 transition cursor-pointer shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -221,7 +223,10 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
               <span className="text-[15px] sm:text-[16px] lg:text-[18px] flex items-center shrink-0">
                 <MdLogout />
               </span>
-              <span>{loggingOut ? "جارٍ تسجيل الخروج..." : "تسجيل الخروج"}</span>
+
+              <span>
+                {loggingOut ? "جارٍ تسجيل الخروج..." : "تسجيل الخروج"}
+              </span>
             </button>
           </div>
         </div>
