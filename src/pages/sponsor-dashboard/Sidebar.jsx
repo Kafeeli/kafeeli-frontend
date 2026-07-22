@@ -15,7 +15,7 @@ import {
 } from "react-icons/md";
 
 import { authApi } from "../../services/authApi";
-import kafeeliLogo from "../../assets/kafeeli-logo.png";
+// import kafeeliLogo from "../../assets/kafeeli-logo.png";
 
 function Sidebar({ openSidebar, setOpenSidebar }) {
   const location = useLocation(); // 👈 الحصول على الرابط الحالي للمتصفح
@@ -158,7 +158,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
           <div className="text-center mb-2">
             <div className="w-[100px] h-[100px] bg-white/20 rounded-full mx-auto mb-2 flex items-center justify-center overflow-hidden">
             <img
-              src={kafeeliLogo}
+              src="/src/assets/title.png"
               alt="كفيلي"
               className="w[140px] h-[140px] object-contain mt-2"
             />
