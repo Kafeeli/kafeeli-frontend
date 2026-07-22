@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useNavigate, useLocation } from "react-router-dom";
 import { FiX, FiSettings, FiLogOut, FiMenu } from "react-icons/fi";
 import { FiClock } from "react-icons/fi";
 import {
@@ -22,14 +21,15 @@ import { authApi } from "../../services/authApi";
   تظهر بالقائمة بس بدون تنقل فعلي لحد ما نبني صفحتها.
 */
 const sidebarItems = [
-  { label: "لوحة المراجعة", icon: MdDashboard, active: true },
+  { label: "لوحة المراجعة", icon: MdDashboard, path: "/admin-dashboard" },
+  {
+    label: "التحويلات البنكية",
+    icon: HiOutlineBuildingLibrary,
+    path: "/admin-dashboard/transfer-review",
+  },
   { label: "الأوصياء", icon: HiOutlineIdentification },
   { label: "الكفلاء", icon: MdOutlineVolunteerActivism },
-  {
-    label: "العائلات",
-    icon: MdOutlineFamilyRestroom,
-    path: "/admin-dashboard/families",
-  },
+  { label: "العائلات", icon: MdOutlineFamilyRestroom },
   { label: "الأيتام", icon: PiBaby },
   { label: "المدفوعات", icon: PiMoneyWavy },
   { label: "التحديثات الدورية", icon: FiClock },
@@ -37,6 +37,36 @@ const sidebarItems = [
 ];
 
 function SidebarContent({ onItemClick }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const handleItemClick = (item) => {
+    if (item.path) {
+      navigate(item.path);
+    }
+    onItemClick?.();
+  };
+
+  const handleLogout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    const refreshToken = localStorage.getItem("refreshToken");
+    try {
+      if (refreshToken) {
+        await authApi.logout(refreshToken);
+      }
+    } catch (err) {
+      console.error("Logout failed, clearing session anyway:", err);
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+      setLoggingOut(false);
+      navigate("/login", { replace: true });
+    }
+  };
+
   return (
     <>
       {/* Logo */}
