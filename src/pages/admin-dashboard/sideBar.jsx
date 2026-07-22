@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { FiX, FiSettings, FiLogOut, FiMenu } from "react-icons/fi";
 import { FiClock } from "react-icons/fi";
@@ -12,12 +13,8 @@ import {
 } from "react-icons/md";
 import { PiBaby, PiMoneyWavy } from "react-icons/pi";
 import { TbReportAnalytics } from "react-icons/tb";
+import { authApi } from "../../services/authApi";
 
-/*
-  ✅ كل عنصر إله "path" صار مرتبط فعليًا براوت حقيقي بالتطبيق.
-  العناصر اللي لسا ما إلها صفحة جاهزة (path غير موجود) بتضل
-  تظهر بالقائمة بس بدون تنقل فعلي لحد ما نبني صفحتها.
-*/
 const sidebarItems = [
   { label: "لوحة المراجعة", icon: MdDashboard, path: "/admin-dashboard" },
   {
@@ -45,12 +42,32 @@ const sidebarItems = [
 function SidebarContent({ onItemClick }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [loggingOut, setLoggingOut] = useState(false);
 
   const handleItemClick = (item) => {
     if (item.path) {
       navigate(item.path);
     }
     onItemClick?.();
+  };
+
+  const handleLogout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    const refreshToken = localStorage.getItem("refreshToken");
+    try {
+      if (refreshToken) {
+        await authApi.logout(refreshToken);
+      }
+    } catch (err) {
+      console.error("Logout failed, clearing session anyway:", err);
+    } finally {
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+      setLoggingOut(false);
+      navigate("/login", { replace: true });
+    }
   };
 
   return (
@@ -117,6 +134,7 @@ function SidebarContent({ onItemClick }) {
           );
         })}
       </nav>
+
       {/* Footer */}
       <div className="mt-auto px-3 sm:px-4 pb-2 shrink-0">
         <div className="border-t border-white/20 pt-3">
@@ -133,6 +151,8 @@ function SidebarContent({ onItemClick }) {
 
         <div className="border-t border-white/20 mt-2 pt-2">
           <button
+            onClick={handleLogout}
+            disabled={loggingOut}
             className="
               w-full h-5
               flex items-center gap-2.5 sm:gap-3
@@ -141,12 +161,13 @@ function SidebarContent({ onItemClick }) {
               text-white/85 font-normal text-right
               hover:bg-red-500/10 hover:text-red-400
               transition cursor-pointer shrink-0
+              disabled:opacity-50 disabled:cursor-not-allowed
             "
           >
             <span className="text-[15px] sm:text-[16px] lg:text-[18px] flex items-center shrink-0">
               <FiLogOut />
             </span>
-            <span>تسجيل الخروج</span>
+            <span>{loggingOut ? "جارٍ الخروج..." : "تسجيل الخروج"}</span>
           </button>
         </div>
       </div>
