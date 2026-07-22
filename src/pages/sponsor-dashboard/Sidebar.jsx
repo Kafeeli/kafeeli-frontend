@@ -15,7 +15,7 @@ import {
 } from "react-icons/md";
 
 import { authApi } from "../../services/authApi";
-import kafeeliLogo from "../../assets/kafeeli-logo.png";
+// import kafeeliLogo from "../../assets/kafeeli-logo.png";
 
 function Sidebar({ openSidebar, setOpenSidebar }) {
   const location = useLocation(); // 👈 الحصول على الرابط الحالي للمتصفح
