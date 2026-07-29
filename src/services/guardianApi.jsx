@@ -29,4 +29,14 @@ export const guardianApi = {
     });
     return response.data;
   },
+  checkNationalIdAvailability: async (nationalId) => {
+  const response = await api.post(
+    "/api/v1/guardians/me/national-id/check-availability",
+    {
+      nationalId,
+    }
+  );
+
+  return response.data;
+},
 };

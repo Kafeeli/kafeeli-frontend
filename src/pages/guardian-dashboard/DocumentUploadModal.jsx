@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { MdClose, MdCloudUpload, MdBadge, MdErrorOutline } from "react-icons/md";
+import { guardianApi } from "../../services/guardianApi";
 
 /**
  * مودال رفع/إرفاق وثيقة واحد قابل لإعادة الاستخدام لكل أنواع الوثائق.
@@ -63,45 +64,110 @@ const DocumentUploadModal = ({ doc, onClose, onSubmit }) => {
     validateAndSetFile(e.dataTransfer.files?.[0]);
   };
 
-  const handleSubmit = async () => {
-    if (needsIdNumber && !idNumber.trim()) {
-      setError("يرجى إدخال رقم الهوية");
-      return;
-    }
-    if (!file) {
-      setError("يرجى إرفاق الملف المطلوب");
-      return;
-    }
+  // const handleSubmit = async () => {
+  //   if (needsIdNumber && !idNumber.trim()) {
+  //     setError("يرجى إدخال رقم الهوية");
+  //     return;
+  //   }
+  //   if (!file) {
+  //     setError("يرجى إرفاق الملف المطلوب");
+  //     return;
+  //   }
 
-    setError("");
-    setSubmitting(true);
-    try {
-      await onSubmit?.({
-        file,
-        idNumber: needsIdNumber ? idNumber.trim() : undefined
-      });
-    } catch (err) {
-      const status = err?.response?.status;
-      const apiErrors = err?.response?.data?.errors;
-      const apiMessage = err?.response?.data?.message;
-      if (status === 400) {
+  //   setError("");
+  //   setSubmitting(true);
+  //   try {
+  //     await onSubmit?.({
+  //       file,
+  //       idNumber: needsIdNumber ? idNumber.trim() : undefined
+  //     });
+  //   } catch (err) {
+  //     const status = err?.response?.status;
+  //     const apiErrors = err?.response?.data?.errors;
+  //     const apiMessage = err?.response?.data?.message;
+  //     if (status === 400) {
+  //       setError(
+  //         Array.isArray(apiErrors) && apiErrors.length
+  //           ? apiErrors.join(" - ")
+  //           : apiMessage || (isVideo
+  //             ? "تحقق من صحة ملف الفيديو."
+  //             : "تحقق من صحة الملف ورقم الهوية.")
+  //       );
+  //     } else if (status === 401) {
+  //       setError("انتهت صلاحية الجلسة، الرجاء تسجيل الدخول من جديد.");
+  //     } else {
+  //       setError(isVideo ? "فشل رفع الفيديو، حاول مجددًا." : "تعذر رفع الملف، حاول مجددًا.");
+  //     }
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
+    const handleSubmit = async () => {
+  if (needsIdNumber && !idNumber.trim()) {
+    setError("يرجى إدخال رقم الهوية");
+    return;
+  }
+
+  if (!file) {
+    setError("يرجى إرفاق الملف المطلوب");
+    return;
+  }
+
+  setError("");
+  setSubmitting(true);
+
+  try {
+
+    // فحص رقم الهوية قبل الرفع
+    if (needsIdNumber) {
+      const check = await guardianApi.checkNationalIdAvailability(
+        idNumber.trim()
+      );
+
+      if (!check?.success) {
         setError(
-          Array.isArray(apiErrors) && apiErrors.length
-            ? apiErrors.join(" - ")
-            : apiMessage || (isVideo
-              ? "تحقق من صحة ملف الفيديو."
-              : "تحقق من صحة الملف ورقم الهوية.")
+          check?.message || 
+          "لا يمكن استخدام رقم الهوية هذا."
         );
-      } else if (status === 401) {
-        setError("انتهت صلاحية الجلسة، الرجاء تسجيل الدخول من جديد.");
-      } else {
-        setError(isVideo ? "فشل رفع الفيديو، حاول مجددًا." : "تعذر رفع الملف، حاول مجددًا.");
+        return;
       }
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
+      if (!check.data?.isValid || !check.data?.isAvailable) {
+        setError(
+          check.data?.message ||
+          "رقم الهوية غير صالح أو مستخدم مسبقاً."
+        );
+        return;
+      }
+    }
+
+
+    // إذا نجح الفحص نكمل رفع الملف
+    await onSubmit?.({
+      file,
+      idNumber: needsIdNumber ? idNumber.trim() : undefined,
+    });
+
+
+  } catch (err) {
+
+    const apiMessage =
+      err?.response?.data?.message ||
+      err?.response?.data?.errors?.join(" - ");
+
+    if (err?.response?.status === 401) {
+      setError("انتهت الجلسة، سجل الدخول مرة أخرى.");
+    } else {
+      setError(
+        apiMessage ||
+        "حدث خطأ أثناء التحقق من البيانات."
+      );
+    }
+
+  } finally {
+    setSubmitting(false);
+  }
+};
   return (
     <div
       dir="rtl"

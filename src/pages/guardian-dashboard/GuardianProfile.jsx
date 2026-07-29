@@ -90,11 +90,21 @@ const CITY_OPTIONS = [
   "رفح",
   "جباليا",
 ];
-
 const VERIFICATION_LABELS = {
-  Verified: { text: "موثق", className: "bg-teal-50 text-teal-700" },
-  Pending: { text: "قيد المراجعة", className: "bg-amber-50 text-amber-700" },
-  Rejected: { text: "مرفوض", className: "bg-red-50 text-red-700" },
+  Approved: {
+    text: "معتمد",
+    className: "bg-teal-50 text-teal-700",
+  },
+
+  Pending: {
+    text: "قيد المراجعة",
+    className: "bg-amber-50 text-amber-700",
+  },
+
+  Rejected: {
+    text: "مرفوض",
+    className: "bg-red-50 text-red-700",
+  },
 };
 
 // يحول تاريخ ISO كامل (زي joinedAt) إلى شكل عربي مقروء

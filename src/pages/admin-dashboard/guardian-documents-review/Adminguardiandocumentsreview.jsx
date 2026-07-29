@@ -21,6 +21,7 @@ import { adminApi } from "../../../services/adminApi";
 /* ==================== دوال مساعدة ==================== */
 
 const DOC_TYPE_ARABIC = {
+  NationalId: "الهوية الشخصية",        // 👈 ضيفي هاد السطر
   NationalIdImage: "الهوية الشخصية",
   GuardianshipDeed: "وثيقة الوصاية",
   CustodyDocument: "إقرار الحضانة",
@@ -30,6 +31,18 @@ const DOC_TYPE_ARABIC = {
   4: "فيديو سيلفي مع الهوية",
   5: "إقرار الحضانة",
 };
+// خانة "رقم الهوية" تظهر فقط لوثيقة الهوية الشخصية (documentType أو slotKey)
+const isNationalIdDocument = (document) => {
+  return (
+    document?.documentType === "NationalId" ||
+    document?.documentType === "NationalIdImage" ||
+    document?.slotKey === "NationalIdImage" ||
+    Number(document?.documentType) === 1
+  );
+};
+
+// الحقل الأساسي الفعلي لحالة الوثيقة هو "status" (وليس "verificationStatus")
+const getDocStatus = (document) => document?.status || document?.verificationStatus;
 
 const getDocumentTypeLabel = (type) => {
   if (!type) return "وثيقة";
@@ -202,7 +215,10 @@ function DocumentTable({ documents, isLoading, onReview, currentPage, onPageChan
 function ReviewModal({ document, onClose, onApprove, onNeedsUpdate, onViewFile, viewingFile, actionLoading }) {
   const [actionModal, setActionModal] = useState(null);
   if (!document) return null;
-  const statusStyle = getStatusBadgeStyle(document.verificationStatus || document.status);
+  const statusStyle = getStatusBadgeStyle(getDocStatus(document));
+
+  // خانة "رقم الهوية" تظهر فقط لوثيقة الهوية الشخصية
+  const showNationalId = isNationalIdDocument(document);
 
   return (
     <AnimatePresence>
@@ -219,14 +235,29 @@ function ReviewModal({ document, onClose, onApprove, onNeedsUpdate, onViewFile, 
                 <p className="text-right text-sm font-medium text-[#6B7280] mb-3">معاينة الوثيقة</p>
                 <DocumentPreview document={document} onViewFile={onViewFile} viewingFile={viewingFile} />
               </div>
+
               <div className="mb-7">
                 <h3 className="mb-4 text-right text-[15px] font-extrabold text-[#003469]">معلومات الوصي</h3>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                {/* عرض شرطي: خانة رقم الهوية تظهر فقط عند وثيقة "الهوية الشخصية" */}
+                <div className={`grid grid-cols-1 gap-4 ${showNationalId ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
                   <InfoCard label="الاسم الكامل" value={document.guardianFullName} />
                   <InfoCard label="البريد الإلكتروني" value={document.guardianEmail} />
-                  <InfoCard label="رقم الهوية" value={document.nationalId} mono />
+                  {showNationalId && (
+                    <InfoCard label="رقم الهوية" value={document.submittedNationalId} mono />
+                  )}
                 </div>
               </div>
+
+              {/* تحذير عند وجود مشكلة برقم الهوية (مستخدم مسبقًا من وصي آخر) */}
+              {showNationalId && document.nationalIdValidation?.isInUseByAnotherGuardian && (
+                <div className="mb-7 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                  <MdErrorOutline className="mt-0.5 shrink-0 text-lg text-red-500" />
+                  <p className="text-right text-[13px] leading-6 text-red-700">
+                    تنبيه: رقم الهوية هذا مستخدم من قبل وصي آخر مسجّل بالمنصة.
+                  </p>
+                </div>
+              )}
+
               <div className="mb-7">
                 <h3 className="mb-4 text-right text-[15px] font-extrabold text-[#003469]">معلومات الوثيقة</h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
