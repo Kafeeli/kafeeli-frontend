@@ -95,6 +95,10 @@ const VERIFICATION_LABELS = {
     text: "معتمد",
     className: "bg-teal-50 text-teal-700",
   },
+  Verified: { 
+    text: "معتمد",
+     className: "bg-teal-50 text-teal-700"
+  },
 
   Pending: {
     text: "قيد المراجعة",
