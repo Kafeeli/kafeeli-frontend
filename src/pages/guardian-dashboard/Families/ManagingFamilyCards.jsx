@@ -81,14 +81,14 @@ function HeaderCard() {
           </p>
         </div>
 
-        <button
+        {/* <button
           type="button"
           onClick={() => navigate("/families/add")}
           className="w-full md:w-[180px] h-[54px] rounded-[8px] bg-[#003469] text-white font-[Cairo] text-[14px] font-bold flex items-center justify-center gap-2 hover:bg-[#053c74] transition shadow-[0_8px_18px_rgba(0,52,105,0.18)]"
         >
           <MdAdd className="text-[22px]" />
           إضافة عائلة
-        </button>
+        </button> */}
       </div>
     </section>
   );

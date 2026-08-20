@@ -2,11 +2,11 @@
 // ⚠️ الأرقام هون افتراضية لحد ما يرد الباك اند بالمقابلة الصحيحة (سألناهم، بانتظار الجواب).
 // عدّل هاد الكائن بس، وكل الصفحات (List/Details/Edit) بتتحدث تلقائيًا.
 export const FAMILY_STATUS_MAP = {
-  1: "active",
-  2: "pending",
-  3: "needsEdit",
-  4: "hidden",
-  5: "stopped",
+  1: "pending",
+  2: "active",
+  3: "hidden",
+  4: "stopped",
+  5: "needsEdit",
 };
 
 export function mapFamilyStatus(apiStatusNumber) {
