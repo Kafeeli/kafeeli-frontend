@@ -27,33 +27,33 @@
 //     return "";
 //   }
 
-//   // const handleSubmit = async (e) => {
-//   //   e.preventDefault();
-//   //   if (!email || !password) {
-//   //     setErrorMessage("الرجاء إدخال البريد الإلكتروني وكلمة المرور");
-//   //     return;
-//   //   }
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!email || !password) {
+  //     setErrorMessage("الرجاء إدخال البريد الإلكتروني وكلمة المرور");
+  //     return;
+  //   }
 
-//   //   setErrorMessage("");
-//   //   setIsSubmitting(true);
+  //   setErrorMessage("");
+  //   setIsSubmitting(true);
 
-//   //   try {
-//   //     const response = await authApi.login({ email, password });
+  //   try {
+  //     const response = await authApi.login({ email, password });
 
-//   //     if (response?.success) {
-//   //       navigate("/landing-page");
-//   //     } else if (response?.code === "EMAIL_NOT_VERIFIED" || response?.message?.toLowerCase().includes("verify")) {
-//   //       // إذا البريد غير مفعل، ارسل مباشرة لصفحة email-verified
-//   //       navigate(`/email-verified?email=${encodeURIComponent(email)}`);
-//   //     } else {
-//   //       setErrorMessage(extractMessage(response));
-//   //     }
-//   //   } catch (err) {
-//   //     setErrorMessage(err.response?.data?.message || "حدث خطأ أثناء تسجيل الدخول، حاول مرة أخرى");
-//   //   } finally {
-//   //     setIsSubmitting(false);
-//   //   }
-//   // };
+  //     if (response?.success) {
+  //       navigate("/landing-page");
+  //     } else if (response?.code === "EMAIL_NOT_VERIFIED" || response?.message?.toLowerCase().includes("verify")) {
+  //       // إذا البريد غير مفعل، ارسل مباشرة لصفحة email-verified
+  //       navigate(`/email-verified?email=${encodeURIComponent(email)}`);
+  //     } else {
+  //       setErrorMessage(extractMessage(response));
+  //     }
+  //   } catch (err) {
+  //     setErrorMessage(err.response?.data?.message || "حدث خطأ أثناء تسجيل الدخول، حاول مرة أخرى");
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
 // const handleSubmit = async (e) => {
 //   e.preventDefault();
 //   if (!email || !password) {
@@ -277,6 +277,7 @@
 
 
 // export default Login;
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import kafeeli from "../assets/kafeeli.png";
