@@ -1,21 +1,52 @@
-// Header.jsx
-import { useState, useEffect, useRef } from 'react';
-import { FaBars, FaTimes } from 'react-icons/fa';
+import { useState, useEffect, useRef } from "react";
+import { FaBars, FaTimes } from "react-icons/fa";
 import logo from "../assets/title.png";
 
-const Header = () => {
+const Header = ({ isLandingPage = false }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
+  const handleNavClick = (e, href) => {
+    if (isLandingPage && href.startsWith("#")) {
+      e.preventDefault();
+
+      const section = document.querySelector(href);
+
+      if (section) {
+        section.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+
+      setIsMenuOpen(false);
+    }
+  };
   const navLinks = [
-    { label: 'الرئيسية', href: '#', active: true },
-    { label: 'من نحن', href: '#about' },
-    { label: 'الأيتام', href: '#orphans' },
-    { label: 'كيفية العمل', href: '#how-it-works' },
-    { label: 'اتصل بنا', href: '#contact' },
+    {
+      label: "الرئيسية",
+      href: isLandingPage ? "#home" : "/",
+      active: true,
+    },
+    {
+      label: "من نحن",
+      href: isLandingPage ? "#about" : "/#about",
+    },
+    {
+      label: "الأيتام",
+      href: isLandingPage ? "#orphans" : "/#orphans",
+    },
+    {
+      label: "كيفية العمل",
+      href: isLandingPage ? "#how-it-works" : "/#how-it-works",
+    },
+    {
+      label: "اتصل بنا",
+      href: isLandingPage ? "#contact" : "/#contact",
+    },
   ];
 
-  // إغلاق القائمة لما تضغطي براها
+  // إغلاق القائمة عند الضغط خارجها
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -24,23 +55,29 @@ const Header = () => {
     };
 
     if (isMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      document.body.style.overflow = 'hidden';
+      document.addEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "hidden";
     }
 
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.body.style.overflow = 'unset';
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.body.style.overflow = "unset";
     };
   }, [isMenuOpen]);
 
-  // إغلاق بالـ Escape
+  // إغلاق القائمة بالـ Escape
   useEffect(() => {
     const handleEscape = (e) => {
-      if (e.key === 'Escape') setIsMenuOpen(false);
+      if (e.key === "Escape") {
+        setIsMenuOpen(false);
+      }
     };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
+
+    window.addEventListener("keydown", handleEscape);
+
+    return () => {
+      window.removeEventListener("keydown", handleEscape);
+    };
   }, []);
 
   return (
@@ -48,15 +85,14 @@ const Header = () => {
       <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
-            
-            {/* Logo - كلمة "كفيلي" تختفي بالموبايل */}
-            <div className="flex items-center ">
-              <img 
-                src={logo} 
-                alt="كفيلي" 
+            {/* Logo */}
+            <div className="flex items-center">
+              <img
+                src={logo}
+                alt="كفيلي"
                 className="h-14 w-auto object-contain"
               />
-              {/* ✅ hidden على الموبايل، تظهر من md و فوق */}
+
               <span className="hidden md:inline text-2xl font-bold text-blue-900 tracking-tight">
                 كفيلي
               </span>
@@ -68,13 +104,15 @@ const Header = () => {
                 <a
                   key={link.label}
                   href={link.href}
+                  onClick={(e) => handleNavClick(e, link.href)}
                   className={`relative font-medium transition-colors duration-200 ${
                     link.active
-                      ? 'text-blue-900 font-semibold'
-                      : 'text-gray-600 hover:text-blue-900'
+                      ? "text-blue-900 font-semibold"
+                      : "text-gray-600 hover:text-blue-900"
                   }`}
                 >
                   {link.label}
+
                   {link.active && (
                     <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-900 rounded-full" />
                   )}
@@ -85,7 +123,7 @@ const Header = () => {
             {/* Desktop CTA */}
             <div className="hidden lg:block">
               <button className="bg-blue-900 cursor-pointer hover:bg-blue-800 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-900/20 active:scale-95">
-                تبرع الآن
+                سجل الآن
               </button>
             </div>
 
@@ -95,35 +133,40 @@ const Header = () => {
               className="lg:hidden cursor-pointer p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
               aria-label="Toggle menu"
             >
-              {isMenuOpen ? <FaTimes className="w-6 h-6" /> : <FaBars className="w-6 h-6" />}
+              {isMenuOpen ? (
+                <FaTimes className="w-6 h-6" />
+              ) : (
+                <FaBars className="w-6 h-6" />
+              )}
             </button>
           </div>
         </div>
       </header>
 
-      {/* Overlay + Side Drawer - من الشمال */}
+      {/* Mobile Menu */}
       <div
         className={`fixed inset-0 z-40 lg:hidden transition-all duration-300 ${
-          isMenuOpen ? 'visible' : 'invisible'
+          isMenuOpen ? "visible" : "invisible"
         }`}
       >
-        {/* الـ Backdrop */}
-        <div 
+        {/* Backdrop */}
+        <div
           className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
-            isMenuOpen ? 'opacity-100' : 'opacity-0'
+            isMenuOpen ? "opacity-100" : "opacity-0"
           }`}
         />
 
-        {/* ✅ القائمة الجانبية - تطلع من الشمال (left-0) */}
+        {/* Side Drawer */}
         <div
           ref={menuRef}
           className={`absolute top-0 left-0 h-full w-72 max-w-[80vw] bg-white shadow-2xl transform transition-transform duration-300 ease-out ${
-            isMenuOpen ? 'translate-x-0' : '-translate-x-full'
+            isMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
-          {/* Header القائمة */}
+          {/* Menu Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-100">
             <span className="text-lg font-bold text-blue-900">القائمة</span>
+
             <button
               onClick={() => setIsMenuOpen(false)}
               className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
@@ -138,11 +181,11 @@ const Header = () => {
               <a
                 key={link.label}
                 href={link.href}
-                onClick={() => setIsMenuOpen(false)}
+                onClick={(e) => handleNavClick(e, link.href)}
                 className={`block px-4 py-3 rounded-lg text-base font-medium transition-colors ${
                   link.active
-                    ? 'bg-blue-50 text-blue-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-blue-900'
+                    ? "bg-blue-50 text-blue-900"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-blue-900"
                 }`}
               >
                 {link.label}
@@ -152,7 +195,7 @@ const Header = () => {
 
           {/* CTA Button */}
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100 bg-white">
-            <button className=" cursor-pointer w-full bg-blue-900 hover:bg-blue-800 text-white px-6 py-3 rounded-lg text-base font-semibold transition-all active:scale-[0.98]">
+            <button className="cursor-pointer w-full bg-blue-900 hover:bg-blue-800 text-white px-6 py-3 rounded-lg text-base font-semibold transition-all active:scale-[0.98]">
               تبرع الآن
             </button>
           </div>
