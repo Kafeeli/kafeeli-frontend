@@ -107,4 +107,11 @@
   .transfer-buttons button {
     width: 100% !important;
   }
+ html {
+  scroll-behavior: smooth !important;
+}
+
+html:focus-within {
+  scroll-behavior: smooth !important;
+}
 }

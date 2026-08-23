@@ -132,7 +132,7 @@ export default function LandingPage() {
 
   return (
     <div dir="rtl" className="min-h-screen bg-[#F8F9FA]">
-      <Header />
+      <Header isLandingPage={true} />
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
@@ -154,7 +154,7 @@ export default function LandingPage() {
 
             <div className="flex  flex-col sm:flex-row gap-4 justify-center lg:justify-start items-stretch sm:items-center">
               <button className="cursor-pointer bg-[#2DBCC3] hover:bg-[#2DBCC3]/90 text-white text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl shadow-lg shadow-[#2DBCC3]/20 w-full sm:w-auto">
-                ابدأ الكفالة الآن
+                سجل الآن
               </button>
 
               <button className="bg-white cursor-pointer hover:bg-gray-50 text-[#0D4B8E] text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-10 rounded-xl border-2 border-[#0D4B8E]/10 w-full sm:w-auto whitespace-nowrap">
@@ -239,7 +239,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      <section className="bg-[#F8F9FA] py-10 lg:py-20">
+      <section id="about" className="bg-[#FBF9FA] py-10 lg:py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* العنوان */}
           <div className="text-center mb-12 lg:mb-16">
@@ -278,7 +278,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      <section className="bg-white py-10 lg:py-24">
+      <section id="orphans" className="bg-white py-10 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* العنوان */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-12">
@@ -338,7 +338,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      <section className="bg-[#F8F9FA] py-10 lg:py-24">
+      <section id="how-it-works" className="bg-[#F8F9FA] py-10 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* العنوان */}
           <div className="text-center mb-12 lg:mb-16">
@@ -387,9 +387,12 @@ export default function LandingPage() {
 
           {/* الأزرار */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center">
-            <button className="cursor-pointer bg-[#D9A441] hover:bg-[#e5a021] text-white font-bold py-3 px-8 rounded-xl transition-all active:scale-95">
+            <a
+              href="/register"
+              className="inline-block cursor-pointer bg-[#D9A441] hover:bg-[#e5a021] text-white font-bold py-3 px-8 rounded-xl transition-all active:scale-95"
+            >
               انضم إلينا الآن
-            </button>
+            </a>
 
             <button className="cursor-pointer bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-8 rounded-xl border border-white/30 transition-all active:scale-95">
               شاهد قصص النجاح
