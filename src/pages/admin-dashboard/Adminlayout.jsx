@@ -1,9 +1,12 @@
 import { useState } from "react";
-import { FiBell, FiUser, FiMenu } from "react-icons/fi";
+import { FiUser, FiMenu } from "react-icons/fi";
 import Sidebar from "./sideBar";
 export default function AdminLayout({
   children,
   title = "اهلاً بك Admin في لوحة التحكم",
+  fullName,
+  role,
+  profileImageUrl,
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -27,17 +30,11 @@ export default function AdminLayout({
           </h2>
 
           <div className="flex items-center gap-3 sm:gap-4">
-            <button className="relative grid h-9 w-9 place-items-center rounded-full hover:bg-gray-100 sm:h-10 sm:w-10">
-              <FiBell className="text-lg sm:text-xl" />
-              <span className="absolute right-1 top-1 h-2 w-2 rounded-full bg-red-500" />
-            </button>
             <div className="hidden text-right sm:block">
-              <p className="text-sm font-bold">أحمد محمد</p>
-              <p className="text-xs text-gray-500">مدير النظام الأعلى</p>
+              <p className="text-sm font-bold">{fullName || "لوحة الإدارة"}</p>
+              {role && <p className="text-xs text-gray-500">{role}</p>}
             </div>
-            <div className="grid h-8 w-8 place-items-center rounded-full border border-[#0D4B8E] sm:h-9 sm:w-9">
-              <FiUser />
-            </div>
+            {profileImageUrl ? <img src={profileImageUrl} alt="الصورة الشخصية" className="h-9 w-9 rounded-full border border-[#0D4B8E] object-cover" /> : <div className="grid h-8 w-8 place-items-center rounded-full border border-[#0D4B8E] sm:h-9 sm:w-9"><FiUser /></div>}
           </div>
         </header>
 

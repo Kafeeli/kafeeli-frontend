@@ -46,7 +46,7 @@ import personalImage from "../../assets/personal.jpg";
 /* ========================================================================== */
 /* ⚙️ أدوات مساعدة لتحويل شكل بيانات الـ API إلى شكل الفورم والعكس         */
 /* ========================================================================== */
-const INITIAL_TRANSFER_STATUS = "empty";
+const INITIAL_TRANSFER_STATUS = "loading";
 
 // الشكل الفعلي لـ GET بيكون { data: { payoutAccount: {...} | null } }، بينما استجابة
 // POST/PUT ممكن ترجع الحساب مباشرة جوه data. هاي الدالة بتتعامل مع الشكلين.
@@ -154,7 +154,7 @@ function GuardianProfile() {
   const [transferData, setTransferData] = useState(null);
   const [transferReviewReason, setTransferReviewReason] = useState("");
   const [transferAccountId, setTransferAccountId] = useState(null);
-  const [transferLoading, setTransferLoading] = useState(true);
+  const [transferLoadError, setTransferLoadError] = useState("");
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [modalMode, setModalMode] = useState("add");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -217,7 +217,8 @@ function GuardianProfile() {
     let cancelled = false;
 
     const fetchBankAccount = async () => {
-      setTransferLoading(true);
+      setTransferStatus("loading");
+      setTransferLoadError("");
       try {
         const res = await bankAccountApi.getBankAccount();
         if (cancelled) return;
@@ -250,11 +251,14 @@ function GuardianProfile() {
           setTransferStatus("empty");
           setTransferData(null);
           setTransferAccountId(null);
+        } else {
+          setTransferStatus("error");
+          setTransferLoadError(
+            err?.response?.data?.message || "تعذر تحميل بيانات التحويل.",
+          );
         }
-        // بقية الأخطاء (401/403/500) منتجاهلها هون بصمت ونسيب حالة "غير مضافة"،
-        // القسم مو حرج بما يكفي إنه يوقف عرض باقي الصفحة
       } finally {
-        if (!cancelled) setTransferLoading(false);
+        // The transfer section renders its own loading/error/empty state.
       }
     };
 
@@ -510,13 +514,12 @@ function GuardianProfile() {
                 <h3 className="font-bold text-[13px] text-[#111827] leading-tight">
                   {formData.fullName}
                 </h3>
-                <p className="text-[11px] text-gray-500">وصي معتمد</p>
+                <p className="text-[11px] text-gray-500">{verification.text}</p>
               </div>
             </div>
             <div className="w-px h-6 bg-[#D8DEE8]" />
-            <button className="relative w-8 h-8 flex items-center justify-center text-[#111827] hover:bg-gray-50 rounded-lg transition cursor-pointer">
+            <button disabled title="التنبيهات غير متاحة حالياً" className="relative w-8 h-8 flex items-center justify-center text-[#111827] rounded-lg opacity-60 cursor-not-allowed">
               <MdNotificationsNone className="text-[22px]" />
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white" />
             </button>
           </div>
         </header>
@@ -562,7 +565,7 @@ function GuardianProfile() {
                       {formData.fullName}
                     </h3>
                     <p className="mt-1 text-[13px] text-gray-500 leading-relaxed">
-                      وصي معتمد على منصة كفيلي
+                      حالة التوثيق: {verification.text}
                     </p>
 
                     {/* قائمة البيانات المنظمة على شكل صفوف أنيقة بخلفيات خفيفة */}
@@ -847,6 +850,7 @@ function GuardianProfile() {
                 status={transferStatus}
                 data={transferData}
                 reviewReason={transferReviewReason}
+                errorMessage={transferLoadError}
                 onAdd={handleAddTransfer}
                 onEdit={handleEditTransfer}
               />
@@ -891,7 +895,7 @@ function GuardianProfile() {
                 {formData.fullName}
               </h3>
               <p className="text-[13px] text-gray-500 mt-1 leading-relaxed">
-                وصي معتمد على منصة كفيلي
+                حالة التوثيق: {verification.text}
               </p>
 
               <div className="mt-4 flex flex-col gap-2 text-[13px] text-right">
@@ -947,6 +951,7 @@ function GuardianProfile() {
               status={transferStatus}
               data={transferData}
               reviewReason={transferReviewReason}
+              errorMessage={transferLoadError}
               onAdd={handleAddTransfer}
               onEdit={handleEditTransfer}
             />

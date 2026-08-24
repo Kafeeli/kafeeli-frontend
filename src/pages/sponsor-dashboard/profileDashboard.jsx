@@ -7,12 +7,9 @@ import {
   MdDashboard,
   MdPerson,
   MdDescription,
-  MdFamilyRestroom,
   MdSettings,
   MdNotificationsNone,
   MdAccountBalanceWallet,
-  MdPayments,
-  MdPublishedWithChanges,
   MdSentimentSatisfiedAlt,
   MdCheckCircle,
   MdStars,
@@ -28,7 +25,7 @@ import {
 } from "react-icons/md";
 
 import { LuPencil } from "react-icons/lu";
-import { FaRestroom, FaUserTie } from "react-icons/fa";
+import { FaRestroom } from "react-icons/fa";
 import { IoEarthSharp } from "react-icons/io5";
 
 import Sidebar from "./Sidebar";
@@ -279,7 +276,12 @@ function SponsorProfile() {
 
   /* ==================== جلب بيانات البروفايل عند فتح الصفحة ==================== */
   useEffect(() => {
-    fetchProfile();
+    async function loadInitialProfile() {
+      await Promise.resolve();
+      await fetchProfile();
+    }
+
+    loadInitialProfile();
   }, [fetchProfile]);
 
   // تنظيف رابط المعاينة المؤقت عند إزالته أو إغلاق الصفحة، لتفادي تسريب الذاكرة
@@ -469,13 +471,12 @@ function SponsorProfile() {
                 <h3 className="font-bold text-[13px] text-[#111827] leading-tight">
                   {formData.name}
                 </h3>
-                <p className="text-[11px] text-gray-500">كفيل معتمد</p>
+                <p className="text-[11px] text-gray-500">{formData.accountStatus || "كفيل"}</p>
               </div>
             </div>
             <div className="w-px h-6 bg-[#D8DEE8]" />
-            <button className="relative w-8 h-8 flex items-center justify-center text-[#111827] hover:bg-gray-50 rounded-lg transition cursor-pointer">
+            <button disabled title="التنبيهات غير متاحة حالياً" className="relative w-8 h-8 flex items-center justify-center text-[#111827] rounded-lg opacity-60 cursor-not-allowed">
               <MdNotificationsNone className="text-[22px]" />
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white" />
             </button>
           </div>
         </header>

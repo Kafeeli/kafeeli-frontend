@@ -37,7 +37,6 @@ function ForgotPassword() {
         setMessageType("success");
       }
     } catch (error) {
-      console.error("Forgot password error:", error);
       setMessage(
         error.response?.data?.message ||
           "حدث خطأ أثناء إرسال رابط إعادة التعيين"

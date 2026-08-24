@@ -314,8 +314,35 @@ export default function TransferReviewList() {
   }, []);
 
   useEffect(() => {
-    fetchReviewItems();
-  }, [fetchReviewItems]);
+    let cancelled = false;
+
+    async function loadInitialReviewItems() {
+      try {
+        const response = await adminApi.getPendingBankAccounts();
+        if (cancelled) return;
+
+        if (!response?.success) {
+          setErrorMessage(response?.message || "تعذر تحميل بيانات المراجعة");
+          setStatus("error");
+          return;
+        }
+
+        const mapped = (response.data || []).map(mapListItem);
+        setReviewItems(mapped);
+        setStatus(mapped.length === 0 ? "empty" : "success");
+        setPage(1);
+      } catch (error) {
+        if (cancelled) return;
+        setErrorMessage(getErrorMessage(error, "تعذر تحميل بيانات المراجعة"));
+        setStatus("error");
+      }
+    }
+
+    loadInitialReviewItems();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const totalPages = Math.ceil(reviewItems.length / ITEMS_PER_PAGE) || 1;
 

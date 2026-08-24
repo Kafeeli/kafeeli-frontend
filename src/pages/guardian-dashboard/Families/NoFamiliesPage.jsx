@@ -7,7 +7,6 @@ import {
   MdNotificationsNone,
   MdPerson,
   MdAddCircle,
-  MdHelpOutline,
   MdDescription,
   MdCheckCircle,
   MdAssignment,
@@ -34,18 +33,17 @@ function TopNavbar({ setOpenSidebar }) {
       </div>
 
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-        <button className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-[#003469] hover:bg-gray-100 transition">
+        <button disabled title="التنبيهات غير متاحة حالياً" className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-[#003469] opacity-60 cursor-not-allowed">
           <MdNotificationsNone className="text-[18px] sm:text-[20px]" />
-          <span className="absolute top-[7px] right-[7px] w-2 h-2 rounded-full bg-red-500 border border-white" />
         </button>
 
         <div className="hidden sm:flex items-center gap-3">
           <div className="text-right leading-tight">
             <p className="font-[Cairo] text-[13px] lg:text-[14px] font-bold text-[#003469]">
-              أحمد العلي
+              حساب الوصي
             </p>
             <p className="font-[Cairo] text-[10px] lg:text-[11px] text-gray-500">
-              كفيل معتمد
+              وصي
             </p>
           </div>
 

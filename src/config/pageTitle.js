@@ -12,8 +12,14 @@ const pageTitles = {
 
   // Sponsor
   "/main": "لوحة تحكم الكفيل",
-  "/profile": "الملف الشخصي - الكفيل",
+  "/sponsorProfile": "الملف الشخصي - الكفيل",
   "/sponsor-dashboard": "لوحة تحكم الكفيل",
+  "/sponsor/families": "العائلات المتاحة للكفالة",
+  "/sponsor/families/:familyId": "تفاصيل العائلة",
+  "/sponsor/sponsorships": "كفالاتي",
+  "/sponsor/sponsorships/:sponsorshipId": "تفاصيل الكفالة",
+  "/sponsor/orphans": "الأيتام المتاحون للكفالة",
+  "/sponsor/orphans/:orphanId": "تفاصيل اليتيم",
 
   // Guardian - Families
   "/families": "لا توجد عائلات",
@@ -32,9 +38,17 @@ const pageTitles = {
 
   "/guardian-dashboard": "لوحة تحكم الوصي",
   "/guardian-profile": "الملف الشخصي - الوصي",
+  "/guardian/orphans": "أيتامي",
+  "/guardian/orphans/:orphanId": "تفاصيل اليتيم",
+  "/guardian/orphans/:orphanId/edit": "تعديل بيانات اليتيم",
+  "/families/:familyId/orphans/add": "إضافة يتيم",
+  "/guardian/payouts": "الدفعات",
 
   // Admin
   "/admin-dashboard": "لوحة تحكم المدير",
+  "/admin-dashboard/orphans": "مراجعة الأيتام",
+  "/admin-dashboard/payments": "مراجعة المدفوعات",
+  "/admin-dashboard/payouts": "دفعات الأوصياء",
 
   // Errors
   "/error-404": "الصفحة غير موجودة",

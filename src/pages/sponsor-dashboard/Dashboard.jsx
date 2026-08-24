@@ -1,344 +1,105 @@
-import React, { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { FaEnvelope, FaHandHoldingHeart, FaShieldAlt, FaUserTie } from "react-icons/fa";
+import { FiAlertCircle, FiAlignJustify, FiEye, FiUser } from "react-icons/fi";
 import Sidebar from "./Sidebar";
-import {
-  FaBell,
-  FaHandHoldingHeart,
-  FaSmile,
-  FaCalendarCheck,
-  FaAward,
-  FaEnvelope,
-  FaUserTie,
-} from "react-icons/fa";
-import { FiAlertTriangle, FiAlignJustify } from "react-icons/fi";
-import { FaBriefcase, FaShieldAlt } from "react-icons/fa";
-import { FiEye } from "react-icons/fi";
+import { sponsorshipApi } from "../../services/sponsorshipApi";
+import useDashboard from "../../hooks/useDashboard";
+import { formatAmount, formatDate, getApiErrorMessage, getResultData } from "./sponsorFlowUtils";
 
-function Dashboard() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  // بيانات الحساب - لاحقاً رح تجي من API بدل ما تكون ثابتة هون
-  const [accountData] = useState({
-    emailVerified: true,
-    accountStatus: "active",
-    accountType: "كفيل",
-  });
-
+function AccountCard({ icon, label, value }) {
   return (
-    <div className="flex min-h-screen bg-gray-50" dir="rtl">
-      {/* Sidebar */}
-      <Sidebar
-        activeItem="نظرة عامة"
-        openSidebar={isSidebarOpen}
-        setOpenSidebar={setIsSidebarOpen}
-      />
-
-      {/* تم إضافة lg:mr-64 هنا لمنع السايد بار الـ fixed من تغطية المحتوى على الديسكتوب */}
-      <div className="flex-1 flex flex-col overflow-auto lg:mr-64">
-        {/* Navbar */}
-        <header className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            {/* زر القائمة بالموبايل */}
-            <button
-              onClick={function () {
-                setIsSidebarOpen(true);
-              }}
-              className="lg:hidden p-2 text-gray-600 hover:text-[#1e3a5f]"
-            >
-              <FiAlignJustify className="text-xl" />
-            </button>
-            <p className="hidden sm:block text-sm text-gray-600">
-              مرحباً،{" "}
-              <span className="font-bold text-[#1e3a5f]">محمد أحمد</span> أهلاً
-              بك في لوحة تحكم الكفيل في{" "}
-              <span className="font-bold text-[#1e3a5f]">كفيلي</span>
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button className="relative w-9 h-9 rounded-full flex items-center justify-center text-[#003469] hover:bg-gray-100 transition">
-              <FaBell />
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 border border-white"></span>
-            </button>
-
-            <div className="text-right">
-              <p className="text-sm font-bold text-[#003469]">محمد أحمد</p>
-              <p className="text-xs text-gray-500">كفيل معتمد</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-gray-200 border border-gray-300 flex items-center justify-center overflow-hidden">
-              <FaUserTie className="text-gray-500 text-lg" />
-            </div>
-          </div>
-        </header>
-
-        <main className="flex-1 p-4 md:p-6 space-y-4">
-          {/* تنبيه */}
-          <div className="bg-[rgba(255,251,235,1)] border border-[rgba(253,230,138,1)] rounded-lg px-4 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="flex items-center gap-2 text-[rgba(146,64,14,1)] text-sm">
-              <FiAlertTriangle className="text-[rgba(217,119,6,1)] text-lg flex-shrink-0" />
-              <span>
-                يرجى تأكيد بريدك الإلكتروني حتى تتمكن من استخدام جميع مزايا
-                المنصة
-              </span>
-            </div>
-            <button className="bg-yellow-500 text-white text-sm px-4 py-1.5 rounded-lg font-bold hover:bg-yellow-600 whitespace-nowrap w-full sm:w-auto">
-              تأكيد الآن
-            </button>
-          </div>
-
-          {/* حالة الحساب */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* حالة البريد */}
-            <div className="bg-white rounded-xl border border-gray-300 p-6 flex items-center justify-start gap-3 hover:shadow-md hover:border-gray-400 transition cursor-pointer">
-              <div
-                className={
-                  "w-14 h-14 rounded-4xl flex items-center justify-center " +
-                  (accountData.emailVerified ? "bg-green-50" : "bg-red-50")
-                }
-              >
-                <FaEnvelope
-                  className={
-                    (accountData.emailVerified
-                      ? "text-green-500"
-                      : "text-red-500") + " text-2xl"
-                  }
-                />
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-500 mb-2">حالة البريد</p>
-                <p
-                  className={
-                    "text-base font-bold " +
-                    (accountData.emailVerified
-                      ? "text-green-500"
-                      : "text-red-500")
-                  }
-                >
-                  {accountData.emailVerified ? "موثّق" : "غير موثق"}
-                </p>
-              </div>
-            </div>
-
-            {/* حالة الحساب */}
-            <div className="bg-white rounded-xl border border-gray-300 p-6 flex items-center justify-start gap-3 hover:shadow-md hover:border-gray-400 transition cursor-pointer">
-              <div
-                className={
-                  "w-14 h-14 rounded-4xl flex items-center justify-center " +
-                  (accountData.accountStatus === "active"
-                    ? "bg-blue-50"
-                    : "bg-red-50")
-                }
-              >
-                <FaShieldAlt
-                  className={
-                    (accountData.accountStatus === "active"
-                      ? "text-blue-500"
-                      : "text-red-500") + " text-2xl"
-                  }
-                />
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-500 mb-2">حالة الحساب</p>
-                <p
-                  className={
-                    "text-base font-bold " +
-                    (accountData.accountStatus === "active"
-                      ? "text-black"
-                      : "text-red-500")
-                  }
-                >
-                  {accountData.accountStatus === "active" ? "نشط" : "موقوف"}
-                </p>
-              </div>
-            </div>
-
-            {/* نوع الحساب */}
-            <div className="bg-white rounded-xl border border-gray-300 p-6 flex items-center justify-start gap-3 hover:shadow-md hover:border-gray-400 transition cursor-pointer">
-              <div className="w-14 h-14 bg-[rgba(217,164,65,0.1)] rounded-4xl flex items-center justify-center">
-                <FaBriefcase className="text-[rgba(217,164,65,1)] text-2xl" />
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-500 mb-2">نوع الحساب</p>
-                <p className="text-base font-bold text-yellow-500">
-                  {accountData.accountType}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* إحصائيات */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div
-              className="bg-[rgba(45,188,195,0.05)] rounded-xl border border-[rgba(194,198,210,1)] p-6 flex flex-col justify-between"
-              style={{ minHeight: "150px" }}
-            >
-              <div className="flex items-center justify-between">
-                <FaSmile className="text-blue-400 text-2xl" />
-                <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full">
-                  +2 جديد
-                </span>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-[#1e3a5f] text-right">
-                  4
-                </p>
-                <p className="text-xs text-gray-500 text-right">
-                  أيتام مكفولين
-                </p>
-              </div>
-            </div>
-
-            <div
-              className="bg-[rgba(45,188,195,0.05)] rounded-xl border border-[rgba(194,198,210,1)] p-6 flex flex-col justify-between"
-              style={{ minHeight: "150px" }}
-            >
-              <FaCalendarCheck className="text-blue-500 text-2xl" />
-              <div>
-                <p className="text-2xl font-bold text-[#1e3a5f]">1</p>
-                <p className="text-xs text-gray-500">رعايات قيد الدفع</p>
-              </div>
-            </div>
-
-            <div
-              className="bg-[rgba(45,188,195,0.05)] rounded-xl border border-[rgba(194,198,210,1)] p-6 flex flex-col justify-between"
-              style={{ minHeight: "150px" }}
-            >
-              <FaAward className="text-yellow-500 text-2xl" />
-              <div>
-                <p className="text-2xl font-bold text-yellow-500">3</p>
-                <p className="text-xs text-gray-500">عدد الشهادات</p>
-              </div>
-            </div>
-
-            <div
-              className="bg-[rgba(45,188,195,0.05)] rounded-xl border border-[rgba(194,198,210,1)] p-6 flex flex-col justify-between"
-              style={{ minHeight: "150px" }}
-            >
-              <FaHandHoldingHeart className="text-[#1e3a5f] text-2xl" />
-              <div>
-                <p className="text-2xl font-bold text-[#1e3a5f]">12</p>
-                <p className="text-xs text-gray-500">حالات متاحة</p>
-              </div>
-            </div>
-          </div>
-
-          {/* رعاياتي النشطة */}
-          <div
-            dir="rtl"
-            className="bg-white overflow-hidden"
-            style={{
-              borderRadius: "12px",
-              border: "1px solid #C2C6D2",
-              boxShadow: "0px 1px 2px rgba(0, 0, 0, 0.05)",
-            }}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3">
-              <p className="text-sm font-bold text-gray-800">رعاياتي النشطة</p>
-              <p className="text-sm font-medium text-[#0F7F8C] cursor-pointer hover:underline">
-                عرض الكل
-              </p>
-            </div>
-
-            {/* Table */}
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse">
-                <thead>
-                  <tr className="bg-[#F5F6F8] text-gray-600 text-xs">
-                    <th className="px-4 py-3 font-medium text-right whitespace-nowrap">
-                      المستفيد
-                    </th>
-                    <th className="px-4 py-3 font-medium text-right whitespace-nowrap">
-                      نوع الكفالة
-                    </th>
-                    <th className="px-4 py-3 font-medium text-right whitespace-nowrap">
-                      حالة الكفالة
-                    </th>
-                    <th className="px-4 py-3 font-medium text-right whitespace-nowrap">
-                      بدء الكفالة
-                    </th>
-                    <th className="px-4 py-3 font-medium text-right whitespace-nowrap">
-                      الدفعة التالية
-                    </th>
-                    <th className="px-4 py-3 font-medium text-right whitespace-nowrap">
-                      الإجراء
-                    </th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {[
-                    {
-                      name: "محمد",
-                      type: "يتيم",
-                      status: "نشطة",
-                      start: "2/2/2026",
-                      next: "2/3/2026",
-                      avatar: "م",
-                    },
-                    {
-                      name: "أبو محمد",
-                      type: "عائلة",
-                      status: "نشطة",
-                      start: "2/2/2026",
-                      next: "2/3/2026",
-                      avatar: "أ",
-                    },
-                  ].map((row, index) => (
-                    <tr
-                      key={index}
-                      className="border-b border-gray-200 last:border-b-0"
-                    >
-                      <td className="px-4 py-3 text-right whitespace-nowrap">
-                        <div className="flex items-center gap-2">
-                          <div className="w-7 h-7 rounded-full bg-[#EAF6FA] text-[#1E3A5F] flex items-center justify-center text-xs font-bold flex-shrink-0">
-                            {row.avatar}
-                          </div>
-                          <span className="font-bold text-gray-800">
-                            {row.name}
-                          </span>
-                        </div>
-                      </td>
-
-                      <td className="px-4 py-3 text-gray-600 text-right whitespace-nowrap">
-                        {row.type}
-                      </td>
-
-                      <td className="px-4 py-3 text-right whitespace-nowrap">
-                        <span className="inline-flex items-center justify-center rounded-full bg-green-100 text-green-600 text-xs font-medium px-3 py-1">
-                          {row.status}
-                        </span>
-                      </td>
-
-                      <td className="px-4 py-3 text-gray-600 text-right whitespace-nowrap">
-                        {row.start}
-                      </td>
-
-                      <td className="px-4 py-3 text-gray-600 text-right whitespace-nowrap">
-                        {row.next}
-                      </td>
-
-                      <td className="px-4 py-3 text-right whitespace-nowrap">
-                        <button className="inline-flex items-center gap-1 text-[#0F7F8C] text-xs font-bold hover:underline">
-                          التفاصيل
-                          <FiEye className="text-sm" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </main>
-
-        <footer className="mt-20 py-2 border-t border-[#E5E7EB] text-center">
-          <p className="text-sm text-[#6B7280] mt-4">
-            © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
-          </p>
-        </footer>
-      </div>
+    <div className="flex items-center gap-3 rounded-xl border border-gray-300 bg-white p-5">
+      <div className="grid h-12 w-12 place-items-center rounded-full bg-blue-50 text-xl text-[#0D4B8E]">{icon}</div>
+      <div><p className="text-sm text-gray-500">{label}</p><p className="mt-1 font-bold text-[#003469]">{value}</p></div>
     </div>
   );
 }
 
-export default Dashboard;
+export default function Dashboard() {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [sponsorships, setSponsorships] = useState([]);
+  const [sponsorshipsLoading, setSponsorshipsLoading] = useState(true);
+  const [sponsorshipsError, setSponsorshipsError] = useState("");
+  const { data, loading, error, retry } = useDashboard();
+
+  const loadSponsorships = useCallback(async () => {
+    setSponsorshipsLoading(true);
+    setSponsorshipsError("");
+    try {
+      const result = await sponsorshipApi.getMine();
+      const sponsorshipData = getResultData(result, "تعذر تحميل الكفالات.");
+      setSponsorships(Array.isArray(sponsorshipData?.sponsorships) ? sponsorshipData.sponsorships : []);
+    } catch (requestError) {
+      setSponsorshipsError(getApiErrorMessage(requestError, "تعذر تحميل الكفالات."));
+    } finally {
+      setSponsorshipsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(loadSponsorships, 0);
+    return () => window.clearTimeout(timeoutId);
+  }, [loadSponsorships]);
+
+  return (
+    <div className="flex min-h-screen bg-gray-50" dir="rtl">
+      <Sidebar activeItem="نظرة عامة" openSidebar={isSidebarOpen} setOpenSidebar={setIsSidebarOpen} />
+      <div className="flex min-w-0 flex-1 flex-col lg:mr-64">
+        <header className="flex min-h-16 items-center justify-between gap-4 border-b border-gray-200 bg-white px-4 py-3 sm:px-6">
+          <button type="button" onClick={() => setIsSidebarOpen(true)} className="p-2 text-[#003469] lg:hidden" aria-label="فتح القائمة"><FiAlignJustify className="text-xl" /></button>
+          <div><p className="font-bold text-[#003469]">{data?.fullName || "لوحة تحكم الكفيل"}</p>{data?.role && <p className="text-xs text-gray-500">{data.role}</p>}</div>
+          {data?.profileImageUrl ? <img src={data.profileImageUrl} alt="الصورة الشخصية" className="h-10 w-10 rounded-full border object-cover" /> : <div className="grid h-10 w-10 place-items-center rounded-full border text-[#003469]"><FiUser /></div>}
+        </header>
+
+        <main className="flex-1 space-y-6 p-4 sm:p-6">
+          <h1 className="text-2xl font-extrabold text-[#003469]">نظرة عامة</h1>
+          {loading && <div className="rounded-xl border bg-white p-10 text-center text-gray-500">جارٍ تحميل لوحة التحكم...</div>}
+          {!loading && error && <div className="rounded-xl border border-red-200 bg-red-50 p-8 text-center text-red-700"><FiAlertCircle className="mx-auto mb-3 text-3xl" /><p>{error}</p><button type="button" onClick={retry} className="mt-4 rounded-lg bg-[#003469] px-5 py-2 font-bold text-white">إعادة المحاولة</button></div>}
+          {!loading && !error && data && (
+            <>
+              {data.nextRequiredActionMessage && <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900"><p className="font-bold">الإجراء التالي</p><p className="mt-1 text-sm">{data.nextRequiredActionMessage}</p></div>}
+              <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <AccountCard icon={<FaEnvelope />} label="حالة البريد" value={data.emailConfirmed ? "مؤكد" : "غير مؤكد"} />
+                <AccountCard icon={<FaShieldAlt />} label="حالة الحساب" value={data.isActive ? "نشط" : "غير نشط"} />
+                <AccountCard icon={<FaUserTie />} label="اكتمال الملف الشخصي" value={`${data.profileCompletionPercentage}%`} />
+              </section>
+              {data.activeFamiliesAvailableCount != null && (
+                <section className="rounded-xl border border-[#C2C6D2] bg-white p-5">
+                  <FaHandHoldingHeart className="mb-3 text-2xl text-[#0D4B8E]" />
+                  <p className="text-3xl font-extrabold text-[#003469]">{data.activeFamiliesAvailableCount}</p>
+                  <p className="mt-1 text-sm text-gray-500">العائلات النشطة المتاحة</p>
+                  <Link to="/sponsor/families" className="mt-4 inline-block font-bold text-[#0F7F8C] hover:underline">تصفح العائلات</Link>
+                </section>
+              )}
+            </>
+          )}
+
+          <section className="overflow-hidden rounded-xl border border-[#C2C6D2] bg-white">
+            <div className="flex items-center justify-between px-4 py-3"><h2 className="font-bold text-gray-800">أحدث كفالاتي</h2><Link to="/sponsor/sponsorships" className="text-sm font-bold text-[#0F7F8C] hover:underline">عرض الكل</Link></div>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-sm">
+                <thead><tr className="bg-[#F5F6F8] text-xs text-gray-600"><th className="px-4 py-3 text-right">المستفيد</th><th className="px-4 py-3 text-right">نوع الكفالة</th><th className="px-4 py-3 text-right">الحالة</th><th className="px-4 py-3 text-right">الإجمالي</th><th className="px-4 py-3 text-right">تاريخ الإنشاء</th><th className="px-4 py-3 text-right">الإجراء</th></tr></thead>
+                <tbody>
+                  {sponsorships.slice(0, 5).map((row) => (
+                    <tr key={row.sponsorshipId} className="border-b border-gray-200 last:border-0">
+                      <td className="whitespace-nowrap px-4 py-3 font-bold text-gray-800">{row.targetDisplayName || "—"}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-gray-600">{row.targetType || "—"}</td>
+                      <td className="whitespace-nowrap px-4 py-3"><span className="rounded-full bg-[#E8F1FA] px-3 py-1 text-xs text-[#0D4B8E]">{row.statusLabel || "—"}</span></td>
+                      <td className="whitespace-nowrap px-4 py-3 text-gray-600">{formatAmount(row.totalAmount)}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-gray-600">{formatDate(row.createdAt)}</td>
+                      <td className="whitespace-nowrap px-4 py-3"><Link to={`/sponsor/sponsorships/${row.sponsorshipId}`} className="inline-flex items-center gap-1 text-xs font-bold text-[#0F7F8C] hover:underline">التفاصيل <FiEye /></Link></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {sponsorshipsLoading && <p className="p-6 text-center text-sm text-gray-500">جارٍ تحميل الكفالات...</p>}
+              {!sponsorshipsLoading && sponsorshipsError && <div className="p-6 text-center text-sm text-red-600"><p>{sponsorshipsError}</p><button type="button" onClick={loadSponsorships} className="mt-2 font-bold text-[#0F7F8C] hover:underline">إعادة المحاولة</button></div>}
+              {!sponsorshipsLoading && !sponsorshipsError && sponsorships.length === 0 && <p className="p-6 text-center text-sm text-gray-500">لا توجد كفالات حتى الآن.</p>}
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  );
+}

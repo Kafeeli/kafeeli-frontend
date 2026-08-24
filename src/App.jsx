@@ -389,9 +389,23 @@ import AdminGuardianDocumentsReviewPage from "./pages/admin-dashboard/guardian-d
 import LandingPage from "./pages/LandingPage";
 import MainDashBoard from "./pages/sponsor-dashboard/Dashboard";
 import SponsorProfile from "./pages/sponsor-dashboard/profileDashboard";
+import SponsorFamiliesPage from "./pages/sponsor-dashboard/SponsorFamiliesPage";
+import SponsorFamilyDetailsPage from "./pages/sponsor-dashboard/SponsorFamilyDetailsPage";
+import SponsorSponsorshipsPage from "./pages/sponsor-dashboard/SponsorSponsorshipsPage";
+import SponsorSponsorshipDetailsPage from "./pages/sponsor-dashboard/SponsorSponsorshipDetailsPage";
+import SponsorOrphansPage from "./pages/sponsor-dashboard/SponsorOrphansPage";
+import SponsorOrphanDetailsPage from "./pages/sponsor-dashboard/SponsorOrphanDetailsPage";
 
 import GuardianProfile from "./pages/guardian-dashboard/GuardianProfile";
 import GuardianDocuments from "./pages/guardian-dashboard/GuardianDocuments";
+import GuardianDashboard from "./pages/guardian-dashboard/GuardianDashboard";
+import GuardianOrphansPage from "./pages/guardian-dashboard/GuardianOrphansPage";
+import GuardianOrphanDetailsPage from "./pages/guardian-dashboard/GuardianOrphanDetailsPage";
+import GuardianOrphanFormPage from "./pages/guardian-dashboard/GuardianOrphanFormPage";
+import GuardianPayoutsPage from "./pages/guardian-dashboard/GuardianPayoutsPage";
+import AdminOrphansReviewPage from "./pages/admin-dashboard/AdminOrphansReviewPage";
+import AdminPaymentsReviewPage from "./pages/admin-dashboard/AdminPaymentsReviewPage";
+import AdminPayoutsPage from "./pages/admin-dashboard/AdminPayoutsPage";
 
 // 🔌 صفحات العائلات (الوصي) — بعد التوحيد، صار عندنا صفحة وحدة لكل حالة
 // بدل ملف منفصل لكل حالة (كانت جوّا Families/status/ وصارت محذوفة).
@@ -434,11 +448,11 @@ function AnimatedRoutes() {
         <Route
           path="/"
           element={
-            <PublicRoute>
-              <PageWrapper>
-                <Login />
-              </PageWrapper>
-            </PublicRoute>
+            <PageWrapper>
+              <div dir="rtl" className="min-h-screen bg-gray-50">
+                <LandingPage />
+              </div>
+            </PageWrapper>
           }
         />
 
@@ -538,9 +552,11 @@ function AnimatedRoutes() {
         <Route
           path="/Side-bar"
           element={
-            <PageWrapper>
-              <SideBar />
-            </PageWrapper>
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <SideBar />
+              </PageWrapper>
+            </ProtectedRoute>
           }
         />
 
@@ -560,7 +576,7 @@ function AnimatedRoutes() {
         <Route
           path="/main"
           element={
-            <ProtectedRoute roles={["Sponsor"]}>
+            <ProtectedRoute allowedRoles={["Sponsor"]}>
               <PageWrapper>
                 <div dir="rtl" className="min-h-screen bg-gray-50">
                   <MainDashBoard />
@@ -573,7 +589,7 @@ function AnimatedRoutes() {
         <Route
           path="/sponsorProfile"
           element={
-            <ProtectedRoute roles={["Sponsor"]}>
+            <ProtectedRoute allowedRoles={["Sponsor"]}>
               <PageWrapper>
                 <div dir="rtl" className="min-h-screen bg-gray-50">
                   <SponsorProfile />
@@ -591,18 +607,22 @@ function AnimatedRoutes() {
         <Route
           path="/families"
           element={
-            <PageWrapper>
-              <ManagingFamilyCards />
-            </PageWrapper>
+            <ProtectedRoute allowedRoles={["Guardian"]}>
+              <PageWrapper>
+                <ManagingFamilyCards />
+              </PageWrapper>
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/families/add"
           element={
-            <PageWrapper>
-              <AddFamilyPage />
-            </PageWrapper>
+            <ProtectedRoute allowedRoles={["Guardian"]}>
+              <PageWrapper>
+                <AddFamilyPage />
+              </PageWrapper>
+            </ProtectedRoute>
           }
         />
 
@@ -610,9 +630,11 @@ function AnimatedRoutes() {
         <Route
           path="/families/:familyId"
           element={
-            <PageWrapper>
-              <FamilyDetailsPage />
-            </PageWrapper>
+            <ProtectedRoute allowedRoles={["Guardian"]}>
+              <PageWrapper>
+                <FamilyDetailsPage />
+              </PageWrapper>
+            </ProtectedRoute>
           }
         />
 
@@ -620,13 +642,75 @@ function AnimatedRoutes() {
         <Route
           path="/families/:familyId/edit"
           element={
-            <PageWrapper>
-              <FamilyEditPage />
-            </PageWrapper>
+            <ProtectedRoute allowedRoles={["Guardian"]}>
+              <PageWrapper>
+                <FamilyEditPage />
+              </PageWrapper>
+            </ProtectedRoute>
           }
         />
 
-        <Route path="/guardian-documents" element={<GuardianDocuments />} />
+        <Route
+          path="/guardian-documents"
+          element={
+            <ProtectedRoute allowedRoles={["Guardian"]}>
+              <GuardianDocuments />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/sponsor/families"
+          element={
+            <ProtectedRoute allowedRoles={["Sponsor"]}>
+              <PageWrapper>
+                <SponsorFamiliesPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/sponsor/families/:familyId"
+          element={
+            <ProtectedRoute allowedRoles={["Sponsor"]}>
+              <PageWrapper>
+                <SponsorFamilyDetailsPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/sponsor/sponsorships"
+          element={
+            <ProtectedRoute allowedRoles={["Sponsor"]}>
+              <PageWrapper>
+                <SponsorSponsorshipsPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/sponsor/sponsorships/:sponsorshipId"
+          element={
+            <ProtectedRoute allowedRoles={["Sponsor"]}>
+              <PageWrapper>
+                <SponsorSponsorshipDetailsPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="/sponsor/orphans" element={<ProtectedRoute allowedRoles={["Sponsor"]}><PageWrapper><SponsorOrphansPage /></PageWrapper></ProtectedRoute>} />
+        <Route path="/sponsor/orphans/:orphanId" element={<ProtectedRoute allowedRoles={["Sponsor"]}><PageWrapper><SponsorOrphanDetailsPage /></PageWrapper></ProtectedRoute>} />
+
+        <Route path="/guardian/orphans" element={<ProtectedRoute allowedRoles={["Guardian"]}><PageWrapper><GuardianOrphansPage /></PageWrapper></ProtectedRoute>} />
+        <Route path="/guardian/orphans/:orphanId" element={<ProtectedRoute allowedRoles={["Guardian"]}><PageWrapper><GuardianOrphanDetailsPage /></PageWrapper></ProtectedRoute>} />
+        <Route path="/guardian/orphans/:orphanId/edit" element={<ProtectedRoute allowedRoles={["Guardian"]}><PageWrapper><GuardianOrphanFormPage mode="edit" /></PageWrapper></ProtectedRoute>} />
+        <Route path="/families/:familyId/orphans/add" element={<ProtectedRoute allowedRoles={["Guardian"]}><PageWrapper><GuardianOrphanFormPage mode="create" /></PageWrapper></ProtectedRoute>} />
+        <Route path="/guardian/payouts" element={<ProtectedRoute allowedRoles={["Guardian"]}><PageWrapper><GuardianPayoutsPage /></PageWrapper></ProtectedRoute>} />
 
         {/* Old routes redirects */}
         <Route path="/Mange" element={<Navigate to="/families" replace />} />
@@ -660,18 +744,22 @@ function AnimatedRoutes() {
         <Route
           path="/sponsor-dashboard"
           element={
-            <PageWrapper>
-              <h1>Sponsor Dashboard</h1>
-            </PageWrapper>
+            <ProtectedRoute allowedRoles={["Sponsor"]}>
+              <PageWrapper>
+                <MainDashBoard />
+              </PageWrapper>
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/guardian-dashboard"
           element={
-            <PageWrapper>
-              <h1>Guardian Dashboard</h1>
-            </PageWrapper>
+            <ProtectedRoute allowedRoles={["Guardian"]}>
+              <PageWrapper>
+                <GuardianDashboard />
+              </PageWrapper>
+            </ProtectedRoute>
           }
         />
 
@@ -682,9 +770,11 @@ function AnimatedRoutes() {
         <Route
           path="/admin-dashboard"
           element={
-            <PageWrapper>
-              <AdminDashboard />
-            </PageWrapper>
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <AdminDashboard />
+              </PageWrapper>
+            </ProtectedRoute>
           }
         />
 
@@ -692,9 +782,11 @@ function AnimatedRoutes() {
         <Route
           path="/admin-dashboard/transfer-review"
           element={
-            <PageWrapper>
-              <TransferReviewList />
-            </PageWrapper>
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <TransferReviewList />
+              </PageWrapper>
+            </ProtectedRoute>
           }
         />
 
@@ -702,9 +794,11 @@ function AnimatedRoutes() {
         <Route
           path="/admin-dashboard/families"
           element={
-            <PageWrapper>
-              <FamiliesReview />
-            </PageWrapper>
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <FamiliesReview />
+              </PageWrapper>
+            </ProtectedRoute>
           }
         />
 
@@ -712,20 +806,29 @@ function AnimatedRoutes() {
         <Route
           path="/admin-dashboard/guardian-document-reviews"
           element={
-            <PageWrapper>
-              <AdminGuardianDocumentsReviewPage />
-            </PageWrapper>
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <AdminGuardianDocumentsReviewPage />
+              </PageWrapper>
+            </ProtectedRoute>
           }
         />
 
         <Route
           path="/guardian-profile"
           element={
-            <PageWrapper>
-              <GuardianProfile />
-            </PageWrapper>
+            <ProtectedRoute allowedRoles={["Guardian"]}>
+              <PageWrapper>
+                <GuardianProfile />
+              </PageWrapper>
+            </ProtectedRoute>
           }
         />
+
+        <Route path="/admin-dashboard/orphans" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminOrphansReviewPage /></PageWrapper></ProtectedRoute>} />
+        <Route path="/admin-dashboard/payments" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminPaymentsReviewPage /></PageWrapper></ProtectedRoute>} />
+        <Route path="/admin-dashboard/payouts" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminPayoutsPage /></PageWrapper></ProtectedRoute>} />
+
         <Route
           path="/error-404"
           element={
@@ -745,7 +848,15 @@ function AnimatedRoutes() {
         />
 
         {/* Fallback */}
-        <Route path="*" element={<Navigate to="/landing-page" replace />} />
+        <Route
+          path="*"
+          element={
+            <PageWrapper>
+              <Error404 />
+            </PageWrapper>
+          }
+        />
+
       </Routes>
     </AnimatePresence>
   );

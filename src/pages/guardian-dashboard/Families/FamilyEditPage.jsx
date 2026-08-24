@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../Sidebar";
 import { useFamily } from "../../../hooks/useFamily";
 import { familyApi } from "../../../services/familyApi";
@@ -66,17 +66,13 @@ const EDIT_STATUS_CONFIG = {
   },
 };
 
-/* 🔌 بيانات وهمية (mock) — بتتعوض ببيانات GET /families/{id} الحقيقية لاحقًا */
-const MOCK_FORM_DATA = {
-  headOfHouseholdName: "أحمد جابر العتيبي",
-  city: "الرياض - المنطقة الوسطى",
-  address: "حي الياسمين، شارع العليا، مبنى رقم 42",
-  monthlyNeedAmount: "4500",
-  description:
-    "عائلة مكوّنة من أرملة و 3 أيتام، السكن مستأجر ولا يوجد دخل ثابت للأسرة سوى معاش الضمان الاجتماعي، الحالة تستدعي الدعم العاجل لتوفير المستلزمات المدرسية والإيجار.",
+const EMPTY_FORM_DATA = {
+  headOfHouseholdName: "",
+  city: "",
+  address: "",
+  monthlyNeedAmount: "",
+  description: "",
 };
-
-const MOCK_FAMILY_TITLE = "عائلة المرحوم أحمد جابر العتيبي";
 
 /* ========================================================================== */
 /* 🧩 مكونات مشتركة (متطابقة حرفيًا بين الملفين الأصليين)                    */
@@ -102,19 +98,20 @@ function TopNavbar({ setOpenSidebar }) {
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         <button
           type="button"
-          className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-[#003469] hover:bg-gray-100 transition"
+          disabled
+          title="التنبيهات غير متاحة حالياً"
+          className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-[#003469] opacity-60 cursor-not-allowed"
         >
           <MdNotificationsNone className="text-[18px] sm:text-[20px]" />
-          <span className="absolute top-[7px] right-[7px] w-2 h-2 rounded-full bg-red-500 border border-white" />
         </button>
 
         <div className="hidden sm:flex items-center gap-3">
           <div className="text-right leading-tight">
             <p className="font-[Cairo] text-[13px] lg:text-[14px] font-bold text-[#003469]">
-              أحمد العلي
+              حساب الوصي
             </p>
             <p className="font-[Cairo] text-[10px] lg:text-[11px] text-gray-500">
-              كفيل معتمد
+              وصي
             </p>
           </div>
 
@@ -375,31 +372,28 @@ function FamilyEditPage({
   const [openSidebar, setOpenSidebar] = useState(false);
   const navigate = useNavigate();
   const { familyId } = useParams();
-  const [searchParams] = useSearchParams();
-  const [formData, setFormData] = useState(initialFormData || MOCK_FORM_DATA);
+  const [formData, setFormData] = useState(initialFormData || EMPTY_FORM_DATA);
+  const [formDataFamily, setFormDataFamily] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
 
   const { family: fetchedFamily, loading, error: fetchError } = useFamily(familyId);
 
-  // 🔌 مؤقتًا (لحد ما يجهز API): /families/123/edit?status=needsEdit
-  const previewStatus = searchParams.get("status");
-  const status = statusProp || previewStatus || fetchedFamily?.statusKey || "needsEdit";
+  const status = statusProp || fetchedFamily?.statusKey || "needsEdit";
   const config = EDIT_STATUS_CONFIG[status] || EDIT_STATUS_CONFIG.needsEdit;
-  const familyTitle = familyTitleProp || (fetchedFamily ? `عائلة ${fetchedFamily.headOfHouseholdName}` : MOCK_FAMILY_TITLE);
+  const familyTitle = familyTitleProp || (fetchedFamily ? `عائلة ${fetchedFamily.headOfHouseholdName}` : "بيانات العائلة");
 
-  // لما توصل بيانات العائلة الحقيقية، عبّي الفورم فيها (مرة وحدة، مش بكل render)
-  useEffect(() => {
-    if (fetchedFamily && !initialFormData) {
-      setFormData({
-        headOfHouseholdName: fetchedFamily.headOfHouseholdName || "",
-        city: fetchedFamily.city || "",
-        address: fetchedFamily.address || "",
-        monthlyNeedAmount: fetchedFamily.monthlyNeedAmount ?? "",
-        description: fetchedFamily.description || "",
-      });
-    }
-  }, [fetchedFamily, initialFormData]);
+  // مزامنة بيانات العائلة عند تغيّر نتيجة الجلب، قبل عرض النموذج.
+  if (fetchedFamily && !initialFormData && fetchedFamily !== formDataFamily) {
+    setFormDataFamily(fetchedFamily);
+    setFormData({
+      headOfHouseholdName: fetchedFamily.headOfHouseholdName || "",
+      city: fetchedFamily.city || "",
+      address: fetchedFamily.address || "",
+      monthlyNeedAmount: fetchedFamily.monthlyNeedAmount ?? "",
+      description: fetchedFamily.description || "",
+    });
+  }
 
   async function handleSubmit() {
     setSubmitting(true);
@@ -440,6 +434,14 @@ function FamilyEditPage({
     return (
       <div dir="rtl" className="min-h-screen bg-[#F6F7F9] font-[Cairo] flex items-center justify-center">
         <p className="text-red-600 font-bold">تعذر تحميل بيانات العائلة، حاول مجددًا.</p>
+      </div>
+    );
+  }
+
+  if (!fetchedFamily && !initialFormData) {
+    return (
+      <div dir="rtl" className="min-h-screen bg-[#F6F7F9] font-[Cairo] flex items-center justify-center">
+        <p className="text-[#6B7280] font-bold">لا توجد بيانات لهذه العائلة.</p>
       </div>
     );
   }

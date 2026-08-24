@@ -11,8 +11,49 @@ import { useEffect, useRef, useState } from "react";
 import { FaUsers, FaEye, FaShieldAlt } from "react-icons/fa";
 import { FaArrowLeft } from "react-icons/fa";
 import { FaQuoteRight } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { getStoredUser, getUserRoles } from "../utils/session";
+
+function animateCount(setCount, end) {
+  let startTime = null;
+  const duration = 2000;
+
+  const step = (timestamp) => {
+    if (!startTime) startTime = timestamp;
+    const progress = Math.min((timestamp - startTime) / duration, 1);
+    const ease = 1 - Math.pow(2, -10 * progress);
+    const current = Math.floor(ease * end);
+
+    if (progress === 1) {
+      setCount(end);
+    } else {
+      setCount(current);
+    }
+
+    if (progress < 1) requestAnimationFrame(step);
+  };
+
+  requestAnimationFrame(step);
+}
+
+function getLandingDestinations() {
+  const token = localStorage.getItem("token");
+  const roles = token ? getUserRoles(getStoredUser()) : [];
+
+  if (roles.includes("SuperAdmin") || roles.includes("Admin")) {
+    return { primary: "/admin-dashboard", sponsorBrowse: "/admin-dashboard" };
+  }
+  if (roles.includes("Guardian")) {
+    return { primary: "/guardian-dashboard", sponsorBrowse: "/guardian-dashboard" };
+  }
+  if (roles.includes("Sponsor")) {
+    return { primary: "/main", sponsorBrowse: "/sponsor/families" };
+  }
+  return { primary: "/register", sponsorBrowse: "/register" };
+}
 
 export default function LandingPage() {
+  const destinations = getLandingDestinations();
   // Counter Animation States
   const [count1, setCount1] = useState(0);
   const [count2, setCount2] = useState(0);
@@ -42,27 +83,6 @@ export default function LandingPage() {
     return () => observer.disconnect();
   }, []);
 
-  const animateCount = (setCount, end) => {
-    let startTime = null;
-    const duration = 2000;
-
-    const step = (timestamp) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      const ease = 1 - Math.pow(2, -10 * progress);
-      const current = Math.floor(ease * end);
-
-      if (progress === 1) {
-        setCount(end);
-      } else {
-        setCount(current);
-      }
-
-      if (progress < 1) requestAnimationFrame(step);
-    };
-
-    requestAnimationFrame(step);
-  };
   const features = [
     {
       icon: <FaShieldAlt className="w-8 h-8 text-blue-900" />,
@@ -131,8 +151,8 @@ export default function LandingPage() {
   ];
 
   return (
-    <div dir="rtl" className="min-h-screen bg-[#F8F9FA]">
-      <Header isLandingPage={true} />
+    <div id="top" dir="rtl" className="min-h-screen scroll-smooth bg-[#F8F9FA]">
+      <Header primaryDestination={destinations.sponsorBrowse} />
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
@@ -153,13 +173,19 @@ export default function LandingPage() {
             </p>
 
             <div className="flex  flex-col sm:flex-row gap-4 justify-center lg:justify-start items-stretch sm:items-center">
+<<<<<<< HEAD
               <button className="cursor-pointer bg-[#2DBCC3] hover:bg-[#2DBCC3]/90 text-white text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl shadow-lg shadow-[#2DBCC3]/20 w-full sm:w-auto">
                 سجل الآن
               </button>
+=======
+              <Link to={destinations.sponsorBrowse} className="cursor-pointer bg-[#2DBCC3] hover:bg-[#2DBCC3]/90 text-white text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl shadow-lg shadow-[#2DBCC3]/20 w-full sm:w-auto">
+                ابدأ الكفالة الآن
+              </Link>
+>>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
 
-              <button className="bg-white cursor-pointer hover:bg-gray-50 text-[#0D4B8E] text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-10 rounded-xl border-2 border-[#0D4B8E]/10 w-full sm:w-auto whitespace-nowrap">
+              <a href="#about" className="bg-white cursor-pointer hover:bg-gray-50 text-[#0D4B8E] text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-10 rounded-xl border-2 border-[#0D4B8E]/10 w-full sm:w-auto whitespace-nowrap">
                 تعرف علينا
-              </button>
+              </a>
             </div>
           </div>
 
@@ -185,8 +211,9 @@ export default function LandingPage() {
 
       {/* Stats Section */}
       <section
+        id="impact"
         ref={sectionRef}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 lg:pb-20"
+        className="max-w-7xl scroll-mt-24 mx-auto px-4 sm:px-6 lg:px-8 pb-12 lg:pb-20"
       >
         <div className="lg:bg-[#0D4B8E] lg:rounded-2xl lg:rounded-3xl lg:p-8 lg:p-12 lg:shadow-xl lg:shadow-[#0D4B8E]/20 relative lg:overflow-hidden">
           <div className="hidden lg:block absolute top-0 right-1/4 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2" />
@@ -239,7 +266,11 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+<<<<<<< HEAD
       <section id="about" className="bg-[#FBF9FA] py-10 lg:py-20">
+=======
+      <section id="about" className="scroll-mt-24 bg-[#F8F9FA] py-10 lg:py-20">
+>>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* العنوان */}
           <div className="text-center mb-12 lg:mb-16">
@@ -253,7 +284,7 @@ export default function LandingPage() {
           </div>
 
           {/* الكروت - RTL: الأمان على اليمين */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          <div id="privacy" className="scroll-mt-24 grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             {features.map((feature, index) => (
               <div
                 key={index}
@@ -278,7 +309,11 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+<<<<<<< HEAD
       <section id="orphans" className="bg-white py-10 lg:py-24">
+=======
+      <section id="orphans" className="scroll-mt-24 bg-white py-10 lg:py-24">
+>>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* العنوان */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-12">
@@ -291,13 +326,13 @@ export default function LandingPage() {
               </p>
             </div>
 
-            <a
-              href="#all-orphans"
+            <Link
+              to={destinations.sponsorBrowse}
               className="flex items-center justify-center gap-2 text-[#0D4B8E] font-semibold hover:text-[#2DBCC3] transition-colors"
             >
               عرض كافة الحالات
               <FaArrowLeft className="w-4 h-4" />
-            </a>
+            </Link>
           </div>
 
           {/* الكروت */}
@@ -329,19 +364,23 @@ export default function LandingPage() {
                     العمر: {orphan.age}
                   </p>
 
-                  <button className="w-full bg-[#0D4B8E] hover:bg-[#0D4B8E]/90 text-white py-3 rounded-xl font-semibold transition-all active:scale-95 cursor-pointer">
+                  <Link to={destinations.sponsorBrowse} className="block w-full bg-[#0D4B8E] hover:bg-[#0D4B8E]/90 text-white py-3 rounded-xl font-semibold transition-all active:scale-95 cursor-pointer">
                     اكفلني الآن
-                  </button>
+                  </Link>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </section>
+<<<<<<< HEAD
       <section id="how-it-works" className="bg-[#F8F9FA] py-10 lg:py-24">
+=======
+      <section id="how-it-works" className="scroll-mt-24 bg-[#F8F9FA] py-10 lg:py-24">
+>>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* العنوان */}
-          <div className="text-center mb-12 lg:mb-16">
+          <div id="faq" className="scroll-mt-24 text-center mb-12 lg:mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-[#0D4B8E]">
               رحلة الكفالة في 3 خطوات
             </h2>
@@ -387,16 +426,22 @@ export default function LandingPage() {
 
           {/* الأزرار */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center">
+<<<<<<< HEAD
             <a
               href="/register"
               className="inline-block cursor-pointer bg-[#D9A441] hover:bg-[#e5a021] text-white font-bold py-3 px-8 rounded-xl transition-all active:scale-95"
             >
               انضم إلينا الآن
             </a>
+=======
+            <Link to={destinations.primary} className="cursor-pointer bg-[#D9A441] hover:bg-[#e5a021] text-white font-bold py-3 px-8 rounded-xl transition-all active:scale-95">
+              انضم إلينا الآن
+            </Link>
+>>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
 
-            <button className="cursor-pointer bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-8 rounded-xl border border-white/30 transition-all active:scale-95">
+            <a href="#impact" className="cursor-pointer bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-8 rounded-xl border border-white/30 transition-all active:scale-95">
               شاهد قصص النجاح
-            </button>
+            </a>
           </div>
         </div>
       </section>

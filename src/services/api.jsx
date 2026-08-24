@@ -81,10 +81,9 @@
 
 // export default api;
 import axios from "axios";
+import { clearSessionStorage } from "../utils/session";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/backend";
-
-console.log("API BASE URL:", API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -115,10 +114,8 @@ function processQueue(error, token = null) {
 }
 
 function clearSessionAndRedirect() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("refreshToken");
-  localStorage.removeItem("user");
-  if (!window.location.pathname.includes("/login")) {
+  clearSessionStorage();
+  if (window.location.pathname !== "/login") {
     window.location.href = "/login";
   }
 }

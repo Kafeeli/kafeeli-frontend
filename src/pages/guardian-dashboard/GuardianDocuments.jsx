@@ -20,6 +20,7 @@ import DocumentUploadModal from "./DocumentUploadModal";
 import personalImage from "../../assets/personal.jpg";
 import { guardianApi } from "../../services/guardianApi";
 import { guardianDocumentsApi } from "../../services/guardianDocumentsApi";
+import { openProtectedBlob, unwrapResult } from "../../utils/apiUi";
 import {
   DOCUMENT_TYPE_NAME_TO_KEY,
   mapDocumentStatus,
@@ -81,9 +82,9 @@ function buildDocumentsFromApi(apiDocuments) {
       key,
       ...DOCUMENT_META[key],
       status: apiDoc ? mapDocumentStatus(apiDoc.hasCurrentDocument, apiDoc.verificationStatus) : "notUploaded",
-      rejectionReason: apiDoc?.rejectionReason || "",
+      rejectionReason: apiDoc?.needsUpdateReason || "",
       documentId: apiDoc?.documentId || null,
-      canReupload: apiDoc?.canReupload ?? true,
+      canReupload: apiDoc?.canReupload ?? false,
     };
   });
 }
@@ -109,27 +110,37 @@ function GuardianDocuments() {
   useEffect(() => {
     guardianApi.getProfile()
       .then((res) => {
-        setGuardianName(res?.data?.fullName || "");
-        setGuardianImage(res?.data?.profileImageUrl || null);
-        setGuardianVerification(res?.data?.verificationStatus || "Pending");
+        const data = unwrapResult(res, "تعذر تحميل الملف الشخصي.");
+        setGuardianName(data?.fullName || "");
+        setGuardianImage(data?.profileImageUrl || null);
+        setGuardianVerification(data?.verificationStatus || "Pending");
       })
       .catch(() => {});
   }, []);
 
-  const fetchDocuments = async () => {
-    setLoading(true);
-    setLoadError(null);
-    try {
-      const res = await guardianDocumentsApi.getDocuments();
-      setDocuments(buildDocumentsFromApi(res?.data?.documents));
-    } catch {
-      setLoadError("تعذر تحميل بيانات الوثائق، حاول مجددًا.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    let cancelled = false;
 
-  useEffect(() => { fetchDocuments(); }, []);
+    async function loadInitialDocuments() {
+      try {
+        const data = unwrapResult(await guardianDocumentsApi.getDocuments(), "تعذر تحميل بيانات الوثائق.");
+        if (!cancelled) {
+          setDocuments(buildDocumentsFromApi(data?.documents));
+        }
+      } catch {
+        if (!cancelled) {
+          setLoadError("تعذر تحميل بيانات الوثائق، حاول مجددًا.");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadInitialDocuments();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const isRejected = guardianVerification === "Rejected";
   const overallStatus = getOverallStatus(documents);
@@ -148,14 +159,14 @@ function GuardianDocuments() {
       file,
       nationalId: idNumber,
     });
-    const apiDoc = res?.data;
+    const apiDoc = unwrapResult(res, "تعذر رفع الوثيقة.");
     setDocuments((prev) =>
       prev.map((doc) =>
         doc.key === activeUploadDoc.key
           ? {
               ...doc,
               status: mapDocumentStatus(apiDoc?.hasCurrentDocument ?? true, apiDoc?.verificationStatus),
-              rejectionReason: "",
+              rejectionReason: apiDoc?.needsUpdateReason || "",
               documentId: apiDoc?.documentId || doc.documentId,
               canReupload: apiDoc?.canReupload ?? doc.canReupload,
             }
@@ -169,10 +180,7 @@ function GuardianDocuments() {
     if (!doc.documentId || viewingDocId) return;
     setViewingDocId(doc.key);
     try {
-      const blob = await guardianDocumentsApi.getDocumentFile(doc.documentId);
-      const url = URL.createObjectURL(blob);
-      window.open(url, "_blank");
-      setTimeout(() => URL.revokeObjectURL(url), 30000);
+      openProtectedBlob(await guardianDocumentsApi.getDocumentFile(doc.documentId));
     } catch {
       alert("تعذر فتح الملف، حاول مجددًا.");
     } finally {
@@ -194,6 +202,7 @@ function GuardianDocuments() {
         <div className="bg-white border border-red-200 rounded-xl p-6 max-w-md text-center space-y-3">
           <MdErrorOutline className="text-red-500 text-4xl mx-auto" />
           <p className="text-[#111827] font-bold text-sm">{loadError}</p>
+          <button type="button" onClick={() => window.location.reload()} className="rounded-lg bg-[#003469] px-4 py-2 text-sm font-bold text-white">إعادة المحاولة</button>
         </div>
       </div>
     );
@@ -216,13 +225,12 @@ function GuardianDocuments() {
               <img src={guardianImage || personalImage} alt="صورة المستخدم" className="w-9 h-9 rounded-full object-cover border border-slate-200" />
               <div dir="rtl" className="text-right hidden sm:block">
                 <h3 className="font-bold text-[13px] text-[#111827] leading-tight">{guardianName || "الوصي"}</h3>
-                <p className="text-[11px] text-gray-500">الوصي المعتمد</p>
+                <p className="text-[11px] text-gray-500">{overallConfig.label}</p>
               </div>
             </div>
             <div className="w-px h-6 bg-[#D8DEE8]" />
-            <button className="relative w-8 h-8 flex items-center justify-center text-[#111827] hover:bg-gray-50 rounded-lg transition cursor-pointer">
+            <button disabled title="التنبيهات غير متاحة حالياً" className="relative w-8 h-8 flex items-center justify-center text-[#111827] rounded-lg opacity-60 cursor-not-allowed">
               <MdNotificationsNone className="text-[22px]" />
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white" />
             </button>
           </div>
         </header>

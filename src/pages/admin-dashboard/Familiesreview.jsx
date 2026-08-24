@@ -1,130 +1,91 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FiSearch,
   FiChevronDown,
   FiChevronLeft,
   FiChevronRight,
   FiEye,
+  FiSearch,
 } from "react-icons/fi";
 import {
-  MdOutlineFamilyRestroom,
   MdOutlineCheckCircle,
-  MdOutlineCancel,
+  MdOutlineEditNote,
+  MdOutlineFamilyRestroom,
   MdOutlineVerified,
 } from "react-icons/md";
 import { HiOutlineIdentification, HiOutlineUsers } from "react-icons/hi2";
 import AdminLayout from "./Adminlayout";
 import {
-  MiniStatCard,
-  LoadingState,
   EmptyState,
   ErrorState,
+  LoadingState,
+  MiniStatCard,
 } from "./Adminstates";
 import { STATUS_MAP } from "./Familystatus";
 import FamilyDetailsModal from "./modals/Familydetailsmodal";
+import { adminApi } from "../../services/adminApi";
+import { mapFamilyStatus } from "../../config/familyStatus";
 
 const cardShadow = "shadow-[0_2px_10px_rgba(31,41,55,0.06)]";
 const ITEMS_PER_PAGE = 6;
 
-/* 🧪 بيانات تجريبية — استبدلها لاحقاً بالبيانات القادمة من الـ API */
-const MOCK_FAMILIES = [
-  {
-    id: 1,
-    familyNumber: "FAM-2026-0891",
-    familyName: "عائلة الأصقاع",
-    headName: "سارة عبد العزيز",
-    email: "sara.az@email.com",
-    phone: "+966 50 123 4567",
-    city: "غزة",
-    orphansCount: 3,
-    addedDate: "12 أكتوبر 2023",
-    docsStatus: "موثقة",
-    status: "pending",
-    image:
-      "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=400&h=400&fit=crop",
-  },
-  {
-    id: 2,
-    familyNumber: "FAM-2026-0892",
-    familyName: "عائلة سليم أحمد",
-    headName: "سليم أحمد",
-    email: "s.hamdan@email.com",
-    phone: "+966 59 000 1234",
-    city: "خان يونس",
-    orphansCount: 2,
-    addedDate: "24 أغسطس 2024",
-    docsStatus: "قيد التحقق",
-    status: "pending",
-    image:
-      "https://images.unsplash.com/photo-1509390144018-eeaf65052242?w=400&h=400&fit=crop",
-  },
-  {
-    id: 3,
-    familyNumber: "FAM-2026-0893",
-    familyName: "عائلة أحمد تمر",
-    headName: "أحمد محمود",
-    email: "m.mahmoud@email.com",
-    phone: "+966 55 987 6543",
-    city: "رفح",
-    orphansCount: 4,
-    addedDate: "5 يوليو 2023",
-    docsStatus: "موثقة",
-    status: "active",
-    image:
-      "https://images.unsplash.com/photo-1476703993599-0035a21b17a9?w=400&h=400&fit=crop",
-  },
-  {
-    id: 4,
-    familyNumber: "FAM-2026-0894",
-    familyName: "عائلة مريم السعيد",
-    headName: "مريم السعيد",
-    email: "m.saeed@email.com",
-    phone: "+966 56 222 3344",
-    city: "دير البلح",
-    orphansCount: 1,
-    addedDate: "13 أغسطس 2023",
-    docsStatus: "غير مكتملة",
-    status: "rejected",
-    rejectionReason:
-      "بيانات الهوية غير مكتملة أو غير واضحة، يرجى إعادة رفع صورة أوضح.",
-    image:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop",
-  },
-  {
-    id: 5,
-    familyNumber: "FAM-2026-0895",
-    familyName: "عائلة بن عبد الله",
-    headName: "فؤاد علي",
-    email: "f.aoudy@email.com",
-    phone: "+966 54 111 8899",
-    city: "غزة",
-    orphansCount: 5,
-    addedDate: "15 يونيو 2023",
-    docsStatus: "موثقة",
-    status: "suspended",
-    image:
-      "https://images.unsplash.com/photo-1466442929976-97f336a657be?w=400&h=400&fit=crop",
-  },
-  {
-    id: 6,
-    familyNumber: "FAM-2026-0896",
-    familyName: "عائلة أبو فهد",
-    headName: "لمياء أبو فهد",
-    email: "l.abufahad@email.com",
-    phone: "+966 53 444 5566",
-    city: "طولكرم",
-    orphansCount: 2,
-    addedDate: "19 يناير 2024",
-    docsStatus: "موثقة",
-    status: "hidden",
-    image:
-      "https://images.unsplash.com/photo-1531983412531-1f49a365ffed?w=400&h=400&fit=crop",
-  },
-];
+function getApiErrorMessage(error, fallback) {
+  const responseData = error?.response?.data || {};
+  const errors = Array.isArray(responseData.errors)
+    ? responseData.errors.filter(Boolean)
+    : [];
+
+  return responseData.message || errors.join(" - ") || error?.message || fallback;
+}
+
+async function loadFamilies() {
+  const result = await adminApi.getFamilies();
+  if (result?.success === false) {
+    throw new Error(
+      result.message || result.errors?.join(" - ") || "تعذر تحميل العائلات.",
+    );
+  }
+  return Array.isArray(result?.data) ? result.data : [];
+}
+
+async function loadPendingFamilies() {
+  const result = await adminApi.getPendingFamilies();
+  if (result?.success === false) {
+    throw new Error(
+      result.message || result.errors?.join(" - ") || "تعذر تحميل طلبات العائلات.",
+    );
+  }
+  return Array.isArray(result?.data) ? result.data : [];
+}
+
+async function loadAdminFamilies() {
+  const [families, pendingFamilies] = await Promise.all([
+    loadFamilies(),
+    loadPendingFamilies(),
+  ]);
+  return { families, pendingFamilies };
+}
+
+function formatDate(value) {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+  return date.toLocaleDateString("ar-EG", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+function formatAmount(value) {
+  if (value === null || value === undefined) return "—";
+  return new Intl.NumberFormat("ar-EG", {
+    maximumFractionDigits: 2,
+  }).format(value);
+}
 
 function StatusBadge({ status }) {
-  const info = STATUS_MAP[status];
+  const info = STATUS_MAP[mapFamilyStatus(status)] || STATUS_MAP.pending;
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold ${info.className}`}
@@ -139,12 +100,8 @@ function FamilyCard({ family, onView }) {
     <div
       className={`overflow-hidden rounded-xl border border-gray-100 bg-white transition hover:shadow-lg ${cardShadow}`}
     >
-      <div className="relative h-40 overflow-hidden bg-gray-200">
-        <img
-          src={family.image}
-          alt={family.familyName}
-          className="h-full w-full object-cover"
-        />
+      <div className="relative flex h-40 items-center justify-center overflow-hidden bg-gradient-to-l from-[#E8F1FA] to-[#F8FAFC]">
+        <MdOutlineFamilyRestroom className="text-7xl text-[#0D4B8E]/70" />
         <div className="absolute right-3 top-3">
           <StatusBadge status={family.status} />
         </div>
@@ -152,17 +109,22 @@ function FamilyCard({ family, onView }) {
 
       <div dir="rtl" className="p-4 text-right">
         <h3 className="mb-1 text-base font-bold text-[#003469]">
-          {family.familyName}
+          {family.headOfHouseholdName || "—"}
         </h3>
-        <p className="mb-3 text-xs text-gray-500">{family.headName}</p>
+        <p className="mb-3 text-xs text-gray-500">
+          الوصي: {family.guardianFullName || "—"}
+        </p>
 
         <div className="mb-4 grid grid-cols-2 gap-2 border-b border-gray-100 pb-3 text-xs text-gray-600">
           <span>
-            الأيتام:{" "}
-            <strong className="text-[#0D4B8E]">{family.orphansCount}</strong>
+            الاحتياج: {" "}
+            <strong className="text-[#0D4B8E]">
+              {formatAmount(family.monthlyNeedAmount)}
+            </strong>
           </span>
           <span>
-            المدينة: <strong className="text-[#0D4B8E]">{family.city}</strong>
+            المدينة: {" "}
+            <strong className="text-[#0D4B8E]">{family.city || "—"}</strong>
           </span>
         </div>
 
@@ -178,7 +140,6 @@ function FamilyCard({ family, onView }) {
   );
 }
 
-/* جدول مصغّر يعرض فقط الطلبات "قيد المراجعة" لتسريع اتخاذ القرار */
 function PendingRequestsTable({ items, onView }) {
   if (items.length === 0) return null;
 
@@ -195,51 +156,53 @@ function PendingRequestsTable({ items, onView }) {
         <table dir="rtl" className="w-full min-w-[640px] text-right">
           <thead className="bg-gray-100 text-sm text-[#1F2937]">
             <tr>
-              <th className="px-6 py-3 font-extrabold">رقم العائلة</th>
-              <th className="px-6 py-3 font-extrabold">الاسم</th>
+              <th className="px-6 py-3 font-extrabold">معرّف العائلة</th>
+              <th className="px-6 py-3 font-extrabold">اسم رب الأسرة</th>
               <th className="px-6 py-3 font-extrabold">التاريخ</th>
               <th className="px-6 py-3 font-extrabold">الحالة</th>
               <th className="px-6 py-3 font-extrabold">الإجراءات</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#E5E7EB]">
-            {items.map((f) => (
-              <tr key={f.id} className="text-sm">
+            {items.map((family) => (
+              <tr key={family.familyId} className="text-sm">
                 <td
                   dir="ltr"
-                  className="px-6 py-4 text-left font-mono text-[#6B7280]"
+                  className="px-6 py-4 text-left font-mono text-xs text-[#6B7280]"
                 >
-                  {f.familyNumber}
+                  {family.familyId}
                 </td>
                 <td className="px-6 py-4 font-bold text-[#1F2937]">
-                  {f.familyName}
+                  {family.headOfHouseholdName || "—"}
                 </td>
-                <td className="px-6 py-4 text-[#6B7280]">{f.addedDate}</td>
+                <td className="px-6 py-4 text-[#6B7280]">
+                  {formatDate(family.createdAt)}
+                </td>
                 <td className="px-6 py-4">
-                  <StatusBadge status={f.status} />
+                  <StatusBadge status={family.status} />
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => onView(f)}
+                      onClick={() => onView(family)}
                       title="عرض التفاصيل"
                       className="grid h-8 w-8 place-items-center rounded-lg text-[#0D4B8E] hover:bg-[#0D4B8E]/10 transition cursor-pointer"
                     >
                       <FiEye />
                     </button>
                     <button
-                      onClick={() => onView(f)}
-                      title="قبول سريع"
+                      onClick={() => onView(family)}
+                      title="اعتماد الطلب"
                       className="grid h-8 w-8 place-items-center rounded-lg text-green-600 hover:bg-green-50 transition cursor-pointer"
                     >
                       <MdOutlineCheckCircle />
                     </button>
                     <button
-                      onClick={() => onView(f)}
-                      title="رفض سريع"
-                      className="grid h-8 w-8 place-items-center rounded-lg text-red-600 hover:bg-red-50 transition cursor-pointer"
+                      onClick={() => onView(family)}
+                      title="طلب تحديث البيانات"
+                      className="grid h-8 w-8 place-items-center rounded-lg text-amber-700 hover:bg-amber-50 transition cursor-pointer"
                     >
-                      <MdOutlineCancel />
+                      <MdOutlineEditNote />
                     </button>
                   </div>
                 </td>
@@ -254,42 +217,85 @@ function PendingRequestsTable({ items, onView }) {
 
 export default function FamiliesReview() {
   const navigate = useNavigate();
-  const [status, setStatus] = useState("loading"); // loading | success | empty | error
+  const [status, setStatus] = useState("loading");
   const [families, setFamilies] = useState([]);
+  const [pendingFamilies, setPendingFamilies] = useState([]);
+  const [activeSection, setActiveSection] = useState("pending");
   const [selectedFamily, setSelectedFamily] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
+  const [loadError, setLoadError] = useState("");
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [certificateLoading, setCertificateLoading] = useState(false);
+  const certificateUrlRef = useRef(null);
+  const certificateTimerRef = useRef(null);
 
   const fetchFamilies = useCallback(async () => {
     setStatus("loading");
+    setLoadError("");
     try {
-      // TODO: استبدل هذا بنداء API فعلي
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      const data = MOCK_FAMILIES;
-      setFamilies(data);
-      setStatus(data.length === 0 ? "empty" : "success");
+      const data = await loadAdminFamilies();
+      setFamilies(data.families);
+      setPendingFamilies(data.pendingFamilies);
+      setStatus(data.families.length === 0 ? "empty" : "success");
       setPage(1);
-    } catch (err) {
+      return true;
+    } catch (error) {
+      setLoadError(getApiErrorMessage(error, "تعذر تحميل العائلات."));
       setStatus("error");
+      return false;
     }
   }, []);
 
   useEffect(() => {
-    fetchFamilies();
-  }, [fetchFamilies]);
+    let cancelled = false;
+
+    async function loadInitialFamilies() {
+      try {
+        const data = await loadAdminFamilies();
+        if (cancelled) return;
+        setFamilies(data.families);
+        setPendingFamilies(data.pendingFamilies);
+        setStatus(data.families.length === 0 ? "empty" : "success");
+        setPage(1);
+      } catch (error) {
+        if (cancelled) return;
+        setLoadError(getApiErrorMessage(error, "تعذر تحميل العائلات."));
+        setStatus("error");
+      }
+    }
+
+    loadInitialFamilies();
+    return () => {
+      cancelled = true;
+      if (certificateTimerRef.current) clearTimeout(certificateTimerRef.current);
+      if (certificateUrlRef.current) URL.revokeObjectURL(certificateUrlRef.current);
+    };
+  }, []);
 
   const filtered = useMemo(() => {
-    return families.filter((f) => {
-      const matchesSearch =
-        !searchTerm ||
-        f.familyName.includes(searchTerm) ||
-        f.headName.includes(searchTerm) ||
-        f.email.includes(searchTerm);
-      const matchesStatus = statusFilter === "all" || f.status === statusFilter;
-      return matchesSearch && matchesStatus;
+    const query = searchTerm.trim().toLowerCase();
+    const source = activeSection === "pending" ? pendingFamilies : families;
+    return source.filter((family) => {
+      const matchesStatus =
+        activeSection === "pending" ||
+        statusFilter === "all" ||
+        mapFamilyStatus(family.status) === statusFilter;
+      const matchesQuery =
+        !query ||
+        [
+          family.familyId,
+          family.headOfHouseholdName,
+          family.guardianFullName,
+          family.guardianEmail,
+          family.city,
+        ].some((value) => String(value || "").toLowerCase().includes(query));
+      return matchesStatus && matchesQuery;
     });
-  }, [families, searchTerm, statusFilter]);
+  }, [activeSection, families, pendingFamilies, searchTerm, statusFilter]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
   const pageItems = useMemo(() => {
@@ -297,37 +303,85 @@ export default function FamiliesReview() {
     return filtered.slice(start, start + ITEMS_PER_PAGE);
   }, [filtered, page]);
 
-  const pendingItems = useMemo(
-    () => families.filter((f) => f.status === "pending"),
-    [families],
-  );
+  const handleDecision = async (family, decisionType, reason) => {
+    if (actionLoading) return false;
 
-  const handleDecision = (family, decisionType, reason) => {
-    // TODO: نداء API فعلي حسب decisionType (approve/reject/suspend/hide) مع إرسال reason إذا وجد
-    const nextStatusMap = {
-      approve: "active",
-      reject: "rejected",
-      suspend: "suspended",
-      hide: "hidden",
-    };
-    setFamilies((prev) =>
-      prev.map((f) =>
-        f.id === family.id
-          ? {
-              ...f,
-              status: nextStatusMap[decisionType] || f.status,
-              rejectionReason:
-                decisionType === "reject" ? reason : f.rejectionReason,
-            }
-          : f,
-      ),
-    );
-    setSelectedFamily(null);
+    setActionLoading(true);
+    setActionError("");
+    setSuccessMessage("");
+    try {
+      let result;
+      if (decisionType === "approve") {
+        result = await adminApi.approveFamily(family.familyId);
+      } else if (decisionType === "needsUpdate") {
+        result = await adminApi.requestFamilyUpdate(family.familyId, reason);
+      } else if (decisionType === "hide") {
+        result = await adminApi.hideFamily(family.familyId);
+      } else if (decisionType === "suspend") {
+        result = await adminApi.suspendFamily(family.familyId);
+      } else {
+        throw new Error("إجراء إدارة العائلة غير مدعوم.");
+      }
+
+      if (result?.success === false) {
+        throw new Error(
+          result.message || result.errors?.join(" - ") || "تعذر تنفيذ الإجراء.",
+        );
+      }
+
+      setSelectedFamily(null);
+      const refreshed = await fetchFamilies();
+      if (!refreshed) return true;
+      setSuccessMessage(
+        result?.message ||
+          (decisionType === "approve"
+            ? "تم اعتماد العائلة بنجاح."
+            : decisionType === "needsUpdate"
+              ? "تم إرسال طلب تحديث البيانات بنجاح."
+              : decisionType === "hide"
+                ? "تم إخفاء العائلة بنجاح."
+                : "تم إيقاف العائلة بنجاح."),
+      );
+      return true;
+    } catch (error) {
+      setActionError(getApiErrorMessage(error, "تعذر تنفيذ الإجراء."));
+      return false;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleViewCertificate = async (family) => {
+    if (certificateLoading || !family?.hasFatherDeathCertificate) return;
+
+    setCertificateLoading(true);
+    setActionError("");
+    try {
+      const blob = await adminApi.getFamilyFatherDeathCertificate(
+        family.familyId,
+      );
+
+      if (certificateTimerRef.current) clearTimeout(certificateTimerRef.current);
+      if (certificateUrlRef.current) URL.revokeObjectURL(certificateUrlRef.current);
+
+      const objectUrl = URL.createObjectURL(blob);
+      certificateUrlRef.current = objectUrl;
+      window.open(objectUrl, "_blank", "noopener,noreferrer");
+      certificateTimerRef.current = setTimeout(() => {
+        URL.revokeObjectURL(objectUrl);
+        if (certificateUrlRef.current === objectUrl) {
+          certificateUrlRef.current = null;
+        }
+      }, 60000);
+    } catch (error) {
+      setActionError(getApiErrorMessage(error, "تعذر فتح شهادة الوفاة."));
+    } finally {
+      setCertificateLoading(false);
+    }
   };
 
   return (
     <AdminLayout title="أهلاً بك Admin في لوحة إدارة منصة كفيلي">
-      {/* Breadcrumb */}
       <div className="mb-3 flex items-center gap-2 text-sm text-[#6B7280]">
         <button
           onClick={() => navigate("/admin-dashboard")}
@@ -336,54 +390,88 @@ export default function FamiliesReview() {
           الرئيسية
         </button>
         <span>/</span>
-        <span className="font-bold text-[#0D4B8E]">مراجعة العائلات</span>
+        <span className="font-bold text-[#0D4B8E]">إدارة العائلات</span>
       </div>
 
       <h1 className="mb-2 text-xl font-extrabold text-[#0D4B8E] sm:text-2xl">
-        مراجعة العائلات
+        إدارة العائلات
       </h1>
       <p className="mb-6 max-w-2xl text-sm leading-6 text-[#6B7280]">
-        راجع طلبات العائلات المسجّلة واتخذ القرار المناسب: قبول، رفض، إيقاف
-        مؤقت، أو إخفاء من النظام.
+        اعرض جميع العائلات وحالتها الحالية، وراجع الطلبات التي تنتظر قرار الإدارة.
       </p>
+
+      <div className="mb-6 flex flex-wrap gap-2 border-b border-gray-200" role="tablist" aria-label="أقسام إدارة العائلات">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeSection === "pending"}
+          onClick={() => {
+            setActiveSection("pending");
+            setStatusFilter("all");
+            setPage(1);
+          }}
+          className={`border-b-2 px-5 py-3 text-sm font-bold transition ${activeSection === "pending" ? "border-[#0D4B8E] text-[#0D4B8E]" : "border-transparent text-gray-500 hover:text-[#0D4B8E]"}`}
+        >
+          قيد المراجعة ({pendingFamilies.length})
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeSection === "all"}
+          onClick={() => {
+            setActiveSection("all");
+            setStatusFilter("all");
+            setPage(1);
+          }}
+          className={`border-b-2 px-5 py-3 text-sm font-bold transition ${activeSection === "all" ? "border-[#0D4B8E] text-[#0D4B8E]" : "border-transparent text-gray-500 hover:text-[#0D4B8E]"}`}
+        >
+          جميع العائلات ({families.length})
+        </button>
+      </div>
+
+      {successMessage && (
+        <div className="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-right text-sm font-bold text-green-700">
+          {successMessage}
+        </div>
+      )}
 
       {status === "loading" && <LoadingState count={6} />}
 
-      {status === "error" && <ErrorState onRetry={fetchFamilies} />}
+      {status === "error" && (
+        <ErrorState onRetry={fetchFamilies} description={loadError} />
+      )}
 
       {status === "empty" && (
         <EmptyState
           icon={MdOutlineFamilyRestroom}
-          title="لا توجد عائلات مسجّلة حاليًا"
-          description="لم يتم إضافة أي عائلة بعد. بمجرد تسجيل عائلة جديدة ستظهر هنا للمراجعة."
+          title="لا توجد عائلات"
+          description="لا توجد عائلات مسجلة في المنصة حاليًا."
         />
       )}
 
       {status === "success" && (
         <>
-          {/* Mini stats */}
           <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
             <MiniStatCard
-              label="إجمالي العائلات"
-              value={families.length}
+              label={activeSection === "pending" ? "إجمالي الطلبات" : "إجمالي العائلات"}
+              value={activeSection === "pending" ? pendingFamilies.length : families.length}
               icon={HiOutlineUsers}
               tone="bg-[#0D4B8E]/10 text-[#0D4B8E]"
             />
             <MiniStatCard
-              label="عائلات نشطة"
-              value={families.filter((f) => f.status === "active").length}
+              label="شهادات وفاة مرفوعة"
+              value={(activeSection === "pending" ? pendingFamilies : families).filter((family) => family.hasFatherDeathCertificate).length}
               icon={MdOutlineVerified}
               tone="bg-green-100 text-green-700"
             />
             <MiniStatCard
               label="طلبات قيد المراجعة"
-              value={pendingItems.length}
+              value={pendingFamilies.length}
               icon={HiOutlineIdentification}
               tone="bg-[#F0C86A]/50 text-[#B07B11]"
             />
           </div>
 
-          {/* بحث + فلترة */}
           <div
             className={`mb-6 rounded-xl border border-[#E5E7EB] bg-white p-4 ${cardShadow}`}
           >
@@ -396,88 +484,91 @@ export default function FamiliesReview() {
                 <input
                   type="text"
                   value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
+                  onChange={(event) => {
+                    setSearchTerm(event.target.value);
                     setPage(1);
                   }}
-                  placeholder="ابحث باسم العائلة أو اسم الوصي أو البريد الإلكتروني"
+                  placeholder="ابحث باسم رب الأسرة أو الوصي أو البريد الإلكتروني"
                   className="h-11 w-full rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] pr-10 pl-4 text-sm text-right outline-none focus:border-[#0D4B8E] transition"
                 />
               </div>
 
               <div className="relative">
                 <select
-                  value={statusFilter}
-                  onChange={(e) => {
-                    setStatusFilter(e.target.value);
+                  value={activeSection === "pending" ? "pending" : statusFilter}
+                  onChange={(event) => {
+                    setStatusFilter(event.target.value);
                     setPage(1);
                   }}
-                  className="h-11 w-full appearance-none rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-4 text-sm text-right outline-none focus:border-[#0D4B8E] transition"
+                  disabled={activeSection === "pending"}
+                  className="h-11 w-full appearance-none rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-4 text-sm text-right text-[#6B7280] outline-none focus:border-[#0D4B8E] disabled:cursor-not-allowed"
                 >
-                  <option value="all">كل الحالات</option>
+                  <option value="all">جميع الحالات</option>
                   <option value="pending">قيد المراجعة</option>
-                  <option value="active">معتمدة ونشطة</option>
-                  <option value="rejected">تم الرفض</option>
-                  <option value="suspended">موقوفة</option>
+                  <option value="active">نشطة</option>
                   <option value="hidden">مخفية</option>
+                  <option value="stopped">موقوفة</option>
+                  <option value="needsEdit">تحتاج تعديل</option>
                 </select>
                 <FiChevronDown className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               </div>
             </div>
           </div>
 
-          {/* عدد النتائج */}
           <p dir="rtl" className="mb-4 text-right text-sm text-[#6B7280]">
-            عدد النتائج:{" "}
+            عدد النتائج: {" "}
             <strong className="text-[#1F2937]">{filtered.length}</strong>
           </p>
 
-          {/* الشبكة أو حالة عدم وجود نتائج بحث */}
           {filtered.length === 0 ? (
             <EmptyState
               icon={MdOutlineFamilyRestroom}
-              title="لا توجد نتائج مطابقة"
-              description="جرّب تعديل كلمات البحث أو تغيير فلتر الحالة."
+              title={activeSection === "pending" && !searchTerm.trim() ? "لا توجد طلبات عائلات قيد المراجعة" : "لا توجد نتائج مطابقة"}
+              description={activeSection === "pending" && !searchTerm.trim() ? "ستظهر هنا الطلبات الجديدة عندما تصبح جاهزة للمراجعة." : "جرّب تعديل كلمات البحث أو مرشح الحالة."}
             />
           ) : (
             <>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {pageItems.map((family) => (
                   <FamilyCard
-                    key={family.id}
+                    key={family.familyId}
                     family={family}
-                    onView={setSelectedFamily}
+                    onView={(item) => {
+                      setActionError("");
+                      setSelectedFamily(item);
+                    }}
                   />
                 ))}
               </div>
 
-              {/* Pagination */}
               {totalPages > 1 && (
                 <div className="mt-8 flex items-center justify-center gap-2">
                   <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    onClick={() => setPage((current) => Math.max(1, current - 1))}
                     disabled={page === 1}
                     className="grid h-9 w-9 place-items-center rounded-lg border border-[#E5E7EB] bg-white text-[#6B7280] transition hover:border-[#0D4B8E] hover:text-[#0D4B8E] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
                   >
                     <FiChevronRight />
                   </button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    (num) => (
+                  {Array.from({ length: totalPages }, (_, index) => index + 1).map(
+                    (number) => (
                       <button
-                        key={num}
-                        onClick={() => setPage(num)}
+                        key={number}
+                        onClick={() => setPage(number)}
                         className={`h-9 w-9 rounded-lg text-sm font-bold transition cursor-pointer ${
-                          page === num
+                          page === number
                             ? "bg-[#0D4B8E] text-white"
                             : "border border-[#E5E7EB] bg-white text-[#6B7280] hover:border-[#0D4B8E] hover:text-[#0D4B8E]"
                         }`}
                       >
-                        {num}
+                        {number}
                       </button>
                     ),
                   )}
                   <button
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    onClick={() =>
+                      setPage((current) => Math.min(totalPages, current + 1))
+                    }
                     disabled={page === totalPages}
                     className="grid h-9 w-9 place-items-center rounded-lg border border-[#E5E7EB] bg-white text-[#6B7280] transition hover:border-[#0D4B8E] hover:text-[#0D4B8E] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
                   >
@@ -488,19 +579,31 @@ export default function FamiliesReview() {
             </>
           )}
 
-          {/* جدول الطلبات قيد المراجعة */}
-          <PendingRequestsTable
-            items={pendingItems}
-            onView={setSelectedFamily}
-          />
+          {activeSection === "pending" && (
+            <PendingRequestsTable
+              items={pendingFamilies}
+              onView={(item) => {
+                setActionError("");
+                setSelectedFamily(item);
+              }}
+            />
+          )}
         </>
       )}
 
       {selectedFamily && (
         <FamilyDetailsModal
           family={selectedFamily}
-          onClose={() => setSelectedFamily(null)}
+          onClose={() => {
+            if (!actionLoading) setSelectedFamily(null);
+          }}
           onDecision={handleDecision}
+          actionLoading={actionLoading}
+          actionError={actionError}
+          onViewCertificate={handleViewCertificate}
+          certificateLoading={certificateLoading}
+          reviewMode={activeSection === "pending"}
+          managementMode={activeSection === "all"}
         />
       )}
 

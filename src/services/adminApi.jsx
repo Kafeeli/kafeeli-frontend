@@ -64,6 +64,49 @@
 import api from "./api";
 
 export const adminApi = {
+  // ============ مراجعة العائلات ============
+
+  getFamilies: async () => {
+    const response = await api.get("/api/v1/admin/families");
+    return response.data;
+  },
+
+  getPendingFamilies: async () => {
+    const response = await api.get("/api/v1/admin/families/pending");
+    return response.data;
+  },
+
+  approveFamily: async (id) => {
+    const response = await api.post(`/api/v1/admin/families/${id}/approve`);
+    return response.data;
+  },
+
+  requestFamilyUpdate: async (id, reason) => {
+    const response = await api.post(
+      `/api/v1/admin/families/${id}/needs-update`,
+      { reason },
+    );
+    return response.data;
+  },
+
+  hideFamily: async (id) => {
+    const response = await api.post(`/api/v1/admin/families/${id}/hide`);
+    return response.data;
+  },
+
+  suspendFamily: async (id) => {
+    const response = await api.post(`/api/v1/admin/families/${id}/suspend`);
+    return response.data;
+  },
+
+  getFamilyFatherDeathCertificate: async (id) => {
+    const response = await api.get(
+      `/api/v1/admin/families/${id}/father-death-certificate`,
+      { responseType: "blob" },
+    );
+    return response.data;
+  },
+
   // GET /api/v1/admin/guardian-bank-accounts/pending
   getPendingBankAccounts: async () => {
     const response = await api.get("/api/v1/admin/guardian-bank-accounts/pending");
@@ -154,6 +197,97 @@ export const adminApi = {
     const response = await api.put(
       `/api/v1/admin/guardians/${guardianId}/verification/recalculate`
     );
+    return response.data;
+  },
+
+  getPendingOrphans: async () => {
+    const response = await api.get("/api/v1/admin/orphans/pending");
+    return response.data;
+  },
+  getOrphanDetails: async (orphanId) => {
+    const response = await api.get(`/api/v1/admin/orphans/${orphanId}`);
+    return response.data;
+  },
+  approveOrphan: async (orphanId) => {
+    const response = await api.post(`/api/v1/admin/orphans/${orphanId}/approve`);
+    return response.data;
+  },
+  requestOrphanUpdate: async (orphanId, reason) => {
+    const response = await api.post(`/api/v1/admin/orphans/${orphanId}/needs-update`, { reason });
+    return response.data;
+  },
+  getPendingOrphanDocuments: async () => {
+    const response = await api.get("/api/v1/admin/orphan-documents/pending");
+    return response.data;
+  },
+  approveOrphanDocument: async (documentId) => {
+    const response = await api.post(`/api/v1/admin/orphan-documents/${documentId}/approve`);
+    return response.data;
+  },
+  requestOrphanDocumentUpdate: async (documentId, reason) => {
+    const response = await api.post(`/api/v1/admin/orphan-documents/${documentId}/needs-update`, { reason });
+    return response.data;
+  },
+  getOrphanDocumentFile: async (documentId) => {
+    const response = await api.get(`/api/v1/admin/orphan-documents/${documentId}/file`, {
+      responseType: "blob",
+    });
+    return response.data;
+  },
+  getOrphanProfileImage: async (orphanId) => {
+    const response = await api.get(`/api/v1/admin/orphans/${orphanId}/profile-image`, {
+      responseType: "blob",
+    });
+    return response.data;
+  },
+
+  getPendingPayments: async () => {
+    const response = await api.get("/api/v1/admin/payments/pending");
+    return response.data;
+  },
+  getPaymentDetails: async (paymentId) => {
+    const response = await api.get(`/api/v1/admin/payments/${paymentId}`);
+    return response.data;
+  },
+  getPaymentProof: async (paymentId) => {
+    const response = await api.get(`/api/v1/admin/payments/${paymentId}/proof`, {
+      responseType: "blob",
+    });
+    return response.data;
+  },
+  approvePayment: async (paymentId) => {
+    const response = await api.post(`/api/v1/admin/payments/${paymentId}/approve`);
+    return response.data;
+  },
+  rejectPayment: async (paymentId, reason) => {
+    const response = await api.post(`/api/v1/admin/payments/${paymentId}/reject`, { reason });
+    return response.data;
+  },
+
+  createPayout: async (sponsorshipId, notes) => {
+    const response = await api.post(`/api/v1/admin/sponsorships/${sponsorshipId}/payout`, {
+      notes: notes || null,
+    });
+    return response.data;
+  },
+  getPendingPayouts: async () => {
+    const response = await api.get("/api/v1/admin/payouts/pending");
+    return response.data;
+  },
+  getEligiblePayouts: async () => {
+    const response = await api.get("/api/v1/admin/payouts/eligible");
+    return response.data;
+  },
+  getPayoutDetails: async (payoutId) => {
+    const response = await api.get(`/api/v1/admin/payouts/${payoutId}`);
+    return response.data;
+  },
+  completePayout: async (payoutId, transferReference) => {
+    const response = await api.post(`/api/v1/admin/payouts/${payoutId}/complete`, { transferReference });
+    return response.data;
+  },
+  failPayout: async (payoutId, reason) => {
+    const response = await api.post(`/api/v1/admin/payouts/${payoutId}/fail`, { reason });
     return response.data;
   },
 };

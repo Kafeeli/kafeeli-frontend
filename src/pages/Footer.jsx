@@ -11,11 +11,8 @@ export default function Footer() {
   ];
 
   return (
-    <footer dir="rtl" className="bg-gray-50 border-t border-gray-200">
-      <div
-        id="contact"
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16"
-      >
+    <footer id="contact" dir="rtl" className="scroll-mt-24 bg-gray-50 border-t border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-8">
           {/* About */}
           <div className="text-center md:text-right">
@@ -61,13 +58,17 @@ export default function Footer() {
               </li>
               <li className="flex items-center justify-center md:justify-start gap-3 text-sm text-gray-600">
                 <FaPhone className="text-teal-500 flex-shrink-0" />
-                <span dir="ltr">+970 ###########</span>
+                <a href="tel:+970593205914" dir="ltr">+970593205914</a>
               </li>
               <li className="flex items-center justify-center md:justify-start gap-3 text-sm text-gray-600">
                 <FaEnvelope className="text-teal-500 flex-shrink-0" />
+<<<<<<< HEAD
                 <a href="mailto:kafeeli.team@outlook.com">
                   kafeeli.team@outlook.com
                 </a>
+=======
+                <a href="mailto:kafeeli.team@outlook.com" className="hover:text-blue-900">kafeeli.team@outlook.com</a>
+>>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
               </li>
             </ul>
           </div>
