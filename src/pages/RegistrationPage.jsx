@@ -296,7 +296,7 @@ export default function RegistrationPage() {
           كفيلي
         </h1>
 
-        <button onClick={() => navigate("/")} className="cursor-pointer">
+        <button onClick={() => navigate("/login")} className="cursor-pointer">
           <p className="text-navy-800 font-medium md:text-[16px]">تسجيل دخول</p>
         </button>
       </header>
