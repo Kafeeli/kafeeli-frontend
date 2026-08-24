@@ -14,6 +14,7 @@ import {
 import { PiBaby, PiMoneyWavy } from "react-icons/pi";
 import { TbReportAnalytics } from "react-icons/tb";
 import { authApi } from "../../services/authApi";
+import { clearSessionStorage } from "../../utils/session";
 import kafeeliLogo from "../../assets/kafeeli-logo.png";
 const sidebarItems = [
   { label: "لوحة المراجعة", icon: MdDashboard, path: "/admin-dashboard" },
@@ -33,8 +34,9 @@ const sidebarItems = [
     icon: MdOutlineFamilyRestroom,
     path: "/admin-dashboard/families",
   },
-  { label: "الأيتام", icon: PiBaby },
-  { label: "المدفوعات", icon: PiMoneyWavy },
+  { label: "الأيتام", icon: PiBaby, path: "/admin-dashboard/orphans" },
+  { label: "المدفوعات", icon: PiMoneyWavy, path: "/admin-dashboard/payments" },
+  { label: "دفعات الأوصياء", icon: HiOutlineBuildingLibrary, path: "/admin-dashboard/payouts" },
   { label: "التحديثات الدورية", icon: FiClock },
   { label: "سجلات المدير", icon: TbReportAnalytics },
 ];
@@ -59,12 +61,10 @@ function SidebarContent({ onItemClick }) {
       if (refreshToken) {
         await authApi.logout(refreshToken);
       }
-    } catch (err) {
-      console.error("Logout failed, clearing session anyway:", err);
+    } catch {
+      // Server logout is best-effort; local session clearing must still complete.
     } finally {
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
-      localStorage.removeItem("user");
+      clearSessionStorage();
       setLoggingOut(false);
       navigate("/login", { replace: true });
     }
@@ -114,10 +114,12 @@ function SidebarContent({ onItemClick }) {
             <button
               key={item.label}
               onClick={() => handleItemClick(item)}
+              disabled={!item.path}
+              title={!item.path ? "غير متاح حالياً" : undefined}
               className={
                 isActive
                   ? "w-full min-h-[48px] py-3 flex items-center gap-3 px-4 rounded-xl font-[Cairo] text-[14px] leading-6 transition-all duration-200 cursor-pointer shrink-0 bg-[#47DBE0] text-[#003469] font-bold shadow-md"
-                  : "w-full min-h-[48px] py-3 flex items-center gap-3 px-4 rounded-xl font-[Cairo] text-[14px] leading-6 transition-all duration-200 cursor-pointer shrink-0 text-white/90 hover:bg-white/10 hover:text-white"
+                  : "w-full min-h-[48px] py-3 flex items-center gap-3 px-4 rounded-xl font-[Cairo] text-[14px] leading-6 transition-all duration-200 cursor-pointer shrink-0 text-white/90 hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-transparent"
               }
             >
               <span
@@ -128,6 +130,7 @@ function SidebarContent({ onItemClick }) {
                 <item.icon />
               </span>
               <span className="flex-1 text-right">{item.label}</span>
+              {!item.path && <span className="text-[10px] text-white/50">غير متاح</span>}
             </button>
           );
         })}
@@ -137,13 +140,14 @@ function SidebarContent({ onItemClick }) {
       <div className="mt-auto px-3 sm:px-4 pb-2 shrink-0">
         <div className="border-t border-white/20 pt-3">
           <button
-            onClick={onItemClick}
-            className="w-full min-h-[48px] py-3 flex items-center gap-3 px-4 rounded-xl font-[Cairo] text-[14px] leading-6 transition-all duration-200 cursor-pointer shrink-0 text-white/90 hover:bg-white/10 hover:text-white"
+            disabled
+            className="w-full min-h-[48px] py-3 flex items-center gap-3 px-4 rounded-xl font-[Cairo] text-[14px] leading-6 transition-all duration-200 shrink-0 text-white/90 cursor-not-allowed opacity-60"
           >
             <span className="text-[18px] flex items-center text-white/85 shrink-0">
               <FiSettings />
             </span>
             <span className="flex-1 text-right">الإعدادات</span>
+            <span className="text-[10px] text-white/50">غير متاح</span>
           </button>
         </div>
 

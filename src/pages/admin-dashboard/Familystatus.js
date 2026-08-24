@@ -24,4 +24,12 @@ export const STATUS_MAP = {
     label: "موقوفة",
     className: "bg-orange-100 text-orange-700",
   },
+  stopped: {
+    label: "موقوفة",
+    className: "bg-orange-100 text-orange-700",
+  },
+  needsEdit: {
+    label: "تحتاج تعديل",
+    className: "bg-red-100 text-red-700",
+  },
 };

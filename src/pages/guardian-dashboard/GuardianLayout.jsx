@@ -3,7 +3,6 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "../pages/guardian-dashboard/Sidebar";
 import { useState } from "react";
 import { motion } from "framer-motion"; // استيراد motion
-import ChangePasswordModal from "../pages/guardian-dashboard/ChangePasswordModal";
 
 export default function GuardianLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);

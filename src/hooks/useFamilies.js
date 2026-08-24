@@ -2,6 +2,14 @@ import { useState, useEffect, useCallback } from "react";
 import { familyApi } from "../services/familyApi";
 import { mapFamilyStatus } from "../config/familyStatus";
 
+async function loadFamilies() {
+  const res = await familyApi.getFamilies();
+  return (res?.data?.families || []).map((family) => ({
+    ...family,
+    statusKey: mapFamilyStatus(family.status),
+  }));
+}
+
 export function useFamilies() {
   const [families, setFamilies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,12 +19,7 @@ export function useFamilies() {
     setLoading(true);
     setError(null);
     try {
-      const res = await familyApi.getFamilies();
-      const list = (res?.data?.families || []).map((f) => ({
-        ...f,
-        statusKey: mapFamilyStatus(f.status),
-      }));
-      setFamilies(list);
+      setFamilies(await loadFamilies());
     } catch (err) {
       setError(err);
     } finally {
@@ -25,8 +28,24 @@ export function useFamilies() {
   }, []);
 
   useEffect(() => {
-    fetchFamilies();
-  }, [fetchFamilies]);
+    let cancelled = false;
+
+    async function loadInitialFamilies() {
+      try {
+        const list = await loadFamilies();
+        if (!cancelled) setFamilies(list);
+      } catch (err) {
+        if (!cancelled) setError(err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadInitialFamilies();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return { families, loading, error, refetch: fetchFamilies };
 }

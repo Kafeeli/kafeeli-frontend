@@ -1,7 +1,10 @@
-import { useState, useEffect } from "react";
-import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
 import { useFamily } from "../../../hooks/useFamily";
+import { familyApi } from "../../../services/familyApi";
+import { orphanApi } from "../../../services/orphanApi";
+import { unwrapResult } from "../../../utils/apiUi";
 import { FAMILY_STATUS_CONFIG } from "../../../config/familyStatus";
 
 import {
@@ -17,62 +20,6 @@ import {
   MdEdit,
   MdPersonAdd,
 } from "react-icons/md";
-
-/* ========================================================================== */
-/* 🔌 بيانات وهمية (mock) — بتتعوض ببيانات GET /families/{id} الحقيقية لاحقًا */
-/* ========================================================================== */
-const MOCK_FAMILY = {
-  title: "عائلة المرحوم أحمد جابر العتيبي",
-  headOfHouseholdName: "أحمد جابر العتيبي رحمه الله",
-  city: "الرياض - حي اليرموك",
-  address: "شارع خالد بن الوليد، مبنى ٤٤، شقة ١٢",
-  monthlyNeedAmount: 4500,
-  createdAt: "12 يناير 2023",
-  updatedAt: "05 مايو 2024",
-  description:
-    "عائلة مكوّنة من أم و3 أيتام، يسكنون في شقة مستأجرة. مصدر الدخل الوحيد هو معاش الضمان الاجتماعي. تحتاج العائلة لدعم في الرسوم المدرسية والمستلزمات الطبية للأم، والحالة مستقرة دراسياً للأبناء.",
-};
-
-const MOCK_DOCUMENTS = [
-  {
-    name: "شهادة_وفاة_أحمد_العتيبي.pdf",
-    size: "1.2 MB",
-    date: "2023/12/01",
-  },
-];
-
-const MOCK_ORPHANS = [
-  {
-    name: "فهد أحمد العتيبي",
-    relation: "ابن المرحوم أحمد العتيبي",
-    age: "9 سنوات",
-    gender: "ذكر",
-    education: "ثالث ابتدائي",
-    idNumber: "109****122",
-    status: "منتظم دراسياً",
-    avatarBg: "bg-[#FFF2D7]",
-  },
-  {
-    name: "سارة أحمد العتيبي",
-    relation: "ابنة المرحوم أحمد العتيبي",
-    age: "12 سنة",
-    gender: "أنثى",
-    education: "أول متوسط",
-    idNumber: "112****990",
-    status: "منتظم دراسياً",
-    avatarBg: "bg-[#E8F3FF]",
-  },
-  {
-    name: "ياسر أحمد العتيبي",
-    relation: "ابن المرحوم أحمد العتيبي",
-    age: "5 سنوات",
-    gender: "ذكر",
-    education: "تمهيدي",
-    idNumber: "118****321",
-    status: "تحت السن الدراسي",
-    avatarBg: "bg-[#EAF2FF]",
-  },
-];
 
 /* ========================================================================== */
 /* 🧩 مكونات مشتركة (نفسها حرفيًا بكل الحالات الخمسة الأصلية)                */
@@ -98,19 +45,20 @@ function TopNavbar({ setOpenSidebar }) {
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         <button
           type="button"
-          className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-[#003469] hover:bg-gray-100 transition"
+          disabled
+          title="التنبيهات غير متاحة حالياً"
+          className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-[#003469] opacity-60 cursor-not-allowed"
         >
           <MdNotificationsNone className="text-[18px] sm:text-[20px]" />
-          <span className="absolute top-[7px] right-[7px] w-2 h-2 rounded-full bg-red-500 border border-white" />
         </button>
 
         <div className="hidden sm:flex items-center gap-3">
           <div className="text-right leading-tight">
             <p className="font-[Cairo] text-[13px] lg:text-[14px] font-bold text-[#003469]">
-              أحمد العلي
+              حساب الوصي
             </p>
             <p className="font-[Cairo] text-[10px] lg:text-[11px] text-gray-500">
-              كفيل معتمد
+              وصي
             </p>
           </div>
 
@@ -243,7 +191,12 @@ function FamilyInfoCard({ family }) {
   );
 }
 
-function DocumentsCard({ documents }) {
+function DocumentsCard({
+  documents,
+  onViewCertificate,
+  certificateLoading,
+  certificateError,
+}) {
   return (
     <section className="bg-white border border-[#C9D2E3] rounded-[14px] px-5 py-6 shadow-sm h-full min-h-[360px]">
       <div className="flex items-center gap-2">
@@ -257,7 +210,11 @@ function DocumentsCard({ documents }) {
       </div>
 
       <div className="mt-8 max-w-[280px] mx-auto">
-        {documents.map((doc) => (
+        {documents.length === 0 ? (
+          <p className="py-12 text-center font-[Cairo] text-sm text-[#6B7280]">
+            لا توجد مستندات متاحة.
+          </p>
+        ) : documents.map((doc) => (
           <div
             key={doc.name}
             className="rounded-[12px] border border-[#CBD5E1] bg-[#FAFBFD] px-4 py-4 shadow-[0_1px_2px_rgba(16,24,40,0.03)]"
@@ -280,11 +237,17 @@ function DocumentsCard({ documents }) {
 
             <button
               type="button"
-              onClick={() => doc.accessEndpoint && window.open(doc.accessEndpoint, "_blank")}
-              className="mt-4 w-full h-[42px] rounded-[8px] bg-[#DCE8FF] text-[#003469] font-[Cairo] text-[14px] font-bold hover:bg-[#C9DCFF] transition"
+              onClick={onViewCertificate}
+              disabled={certificateLoading}
+              className="mt-4 w-full h-[42px] rounded-[8px] bg-[#DCE8FF] text-[#003469] font-[Cairo] text-[14px] font-bold hover:bg-[#C9DCFF] transition disabled:cursor-not-allowed disabled:opacity-60"
             >
-              عرض المستند
+              {certificateLoading ? "جارٍ فتح المستند..." : "عرض المستند"}
             </button>
+            {certificateError && (
+              <p className="mt-2 text-center font-[Cairo] text-xs text-red-600">
+                {certificateError}
+              </p>
+            )}
           </div>
         ))}
       </div>
@@ -292,7 +255,7 @@ function DocumentsCard({ documents }) {
   );
 }
 
-function OrphanCard({ orphan }) {
+function OrphanCard({ orphan, onView }) {
   return (
     <article className="h-full bg-white border border-[#C9D2E3] rounded-[14px] px-6 py-5 shadow-sm hover:shadow-md transition flex flex-col">
       <div className="flex items-start justify-between gap-4">
@@ -350,6 +313,7 @@ function OrphanCard({ orphan }) {
       <div className="mt-auto pt-5">
         <button
           type="button"
+          onClick={onView}
           className="w-full h-[48px] rounded-[10px] bg-[#DCE8FF] text-[#003469] font-[Cairo] text-[16px] font-bold flex items-center justify-center gap-2 hover:bg-[#C9DCFF] transition"
         >
           <MdOutlineRemoveRedEye className="text-[20px]" />
@@ -368,40 +332,75 @@ function FamilyDetailsPage({
   status: statusProp,
   family: familyProp,
   documents: documentsProp,
-  orphans = MOCK_ORPHANS, // 🔌 لسا mock — ما في endpoint مؤكد لأيتام عائلة معينة بعد
+  orphans: orphansProp,
   onEditClick,
   onAddOrphanClick,
 }) {
   const [openSidebar, setOpenSidebar] = useState(false);
+  const [certificateLoading, setCertificateLoading] = useState(false);
+  const [certificateError, setCertificateError] = useState("");
+  const [ownedOrphans, setOwnedOrphans] = useState([]);
+  const certificateUrlRef = useRef(null);
+  const certificateRevokeTimerRef = useRef(null);
   const { familyId } = useParams();
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const { family: fetchedFamily, loading, error } = useFamily(familyId);
 
-  // 🔌 مؤقتًا (لحد ما يجهز API فعليًا بكل مكان بيستخدمه): تقدر تجرب أي حالة
-  // عن طريق الرابط، مثال: /families/123?status=stopped
-  const previewStatus = searchParams.get("status");
+  useEffect(() => {
+    if (orphansProp) return undefined;
+    let active = true;
+    orphanApi.getMine().then((result) => {
+      const data = unwrapResult(result, "تعذر تحميل الأيتام.");
+      if (active) setOwnedOrphans((data?.orphans || []).filter((orphan) => orphan.familyId === familyId));
+    }).catch(() => {
+      if (active) setOwnedOrphans([]);
+    });
+    return () => { active = false; };
+  }, [familyId, orphansProp]);
 
-  const family = familyProp || fetchedFamily || MOCK_FAMILY;
-  const documents =
-    documentsProp ||
-    (family.hasFatherDeathCertificate
-      ? [
-          {
-            name: family.fatherDeathCertificateFileName || "شهادة وفاة",
-            date: family.createdAt ? new Date(family.createdAt).toLocaleDateString("ar-EG") : "",
-            size: "",
-            accessEndpoint: family.fatherDeathCertificateAccessEndpoint,
-          },
-        ]
-      : MOCK_DOCUMENTS);
-  const status = statusProp || previewStatus || family.statusKey || "pending";
-  const config = FAMILY_STATUS_CONFIG[status] || FAMILY_STATUS_CONFIG.pending;
+  useEffect(() => {
+    return () => {
+      if (certificateRevokeTimerRef.current) {
+        clearTimeout(certificateRevokeTimerRef.current);
+      }
+      if (certificateUrlRef.current) {
+        URL.revokeObjectURL(certificateUrlRef.current);
+      }
+    };
+  }, []);
 
-  // canEdit/canAddOrphan راجعين صراحة من الـ API — أدق من تخمينهم حسب الحالة بس
-  const showEditButton = family.canEdit ?? (status === "active" || status === "needsEdit");
-  const showAddOrphanButton = family.canAddOrphan ?? status === "active";
+  const handleViewCertificate = async () => {
+    if (certificateLoading) return;
+
+    setCertificateLoading(true);
+    setCertificateError("");
+    try {
+      const blob = await familyApi.getFatherDeathCertificate(familyId);
+
+      if (certificateUrlRef.current) {
+        URL.revokeObjectURL(certificateUrlRef.current);
+      }
+      if (certificateRevokeTimerRef.current) {
+        clearTimeout(certificateRevokeTimerRef.current);
+      }
+
+      const objectUrl = URL.createObjectURL(blob);
+      certificateUrlRef.current = objectUrl;
+      window.open(objectUrl, "_blank", "noopener,noreferrer");
+
+      certificateRevokeTimerRef.current = setTimeout(() => {
+        URL.revokeObjectURL(objectUrl);
+        if (certificateUrlRef.current === objectUrl) {
+          certificateUrlRef.current = null;
+        }
+      }, 60000);
+    } catch {
+      setCertificateError("تعذر فتح شهادة الوفاة، حاول مجددًا.");
+    } finally {
+      setCertificateLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -418,6 +417,35 @@ function FamilyDetailsPage({
       </div>
     );
   }
+
+  const family = familyProp || fetchedFamily;
+
+  if (!family) {
+    return (
+      <div dir="rtl" className="min-h-screen bg-[#F6F7F9] font-[Cairo] flex items-center justify-center">
+        <p className="text-[#6B7280] font-bold">لا توجد بيانات لهذه العائلة.</p>
+      </div>
+    );
+  }
+
+  const documents =
+    documentsProp ||
+    (family.hasFatherDeathCertificate
+      ? [
+          {
+            name: family.fatherDeathCertificateFileName || "شهادة وفاة",
+            date: family.createdAt ? new Date(family.createdAt).toLocaleDateString("ar-EG") : "",
+            size: "",
+          },
+        ]
+      : []);
+  const status = statusProp || family.statusKey || "pending";
+  const orphans = orphansProp || ownedOrphans;
+  const config = FAMILY_STATUS_CONFIG[status] || FAMILY_STATUS_CONFIG.pending;
+
+  // canEdit/canAddOrphan راجعين صراحة من الـ API — أدق من تخمينهم حسب الحالة بس
+  const showEditButton = family.canEdit ?? (status === "active" || status === "needsEdit");
+  const showAddOrphanButton = family.canAddOrphan ?? status === "active";
 
   return (
     <div dir="rtl" className="min-h-screen bg-[#F6F7F9] font-[Cairo]">
@@ -445,7 +473,12 @@ function FamilyDetailsPage({
 
             <section className="mt-8 grid grid-cols-1 lg:grid-cols-[1fr_330px] gap-6 items-stretch">
               <FamilyInfoCard family={family} />
-              <DocumentsCard documents={documents} />
+              <DocumentsCard
+                documents={documents}
+                onViewCertificate={handleViewCertificate}
+                certificateLoading={certificateLoading}
+                certificateError={certificateError}
+              />
             </section>
 
             <section className="mt-10">
@@ -461,7 +494,7 @@ function FamilyDetailsPage({
                 {showAddOrphanButton && (
                   <button
                     type="button"
-                    onClick={onAddOrphanClick}
+                    onClick={onAddOrphanClick || (() => navigate(`/families/${familyId}/orphans/add`))}
                     className="inline-flex items-center gap-1.5 rounded-lg bg-[#008C78] text-white px-4 py-2 font-[Cairo] text-[13px] font-bold hover:bg-[#007566] transition"
                   >
                     <MdPersonAdd className="text-[16px]" />
@@ -471,8 +504,24 @@ function FamilyDetailsPage({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 items-stretch">
-                {orphans.map((orphan) => (
-                  <OrphanCard key={orphan.name} orphan={orphan} />
+                {orphans.length === 0 ? (
+                  <p className="md:col-span-2 xl:col-span-3 rounded-[14px] border border-[#C9D2E3] bg-white px-6 py-10 text-center font-[Cairo] text-sm text-[#6B7280]">
+                    لا توجد بيانات أيتام متاحة لهذه العائلة.
+                  </p>
+                ) : orphans.map((orphan) => (
+                  <OrphanCard
+                    key={orphan.orphanId || orphan.name}
+                    orphan={{
+                      ...orphan,
+                      name: orphan.name || orphan.fullName,
+                      status: orphan.status || orphan.orphanStatus,
+                      relation: orphan.relation || orphan.headOfHouseholdName,
+                      education: orphan.education || orphan.educationalStatus,
+                      idNumber: orphan.idNumber || orphan.maskedNationalId,
+                      avatarBg: orphan.avatarBg || "bg-[#E8F1FA]",
+                    }}
+                    onView={() => navigate(`/guardian/orphans/${orphan.orphanId}`)}
+                  />
                 ))}
               </div>
             </section>

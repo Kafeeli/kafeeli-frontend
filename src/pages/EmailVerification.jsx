@@ -118,14 +118,7 @@ export default function EmailVerification() {
         setMessage("");
         setMessageType("");
 
-        console.log("Verify email payload:", {
-          userId: userIdFromUrl,
-          token: "[hidden]",
-        });
-
         const result = await authApi.verifyEmail(payload);
-
-        console.log("Verify email response:", result);
 
         if (result?.success === true) {
           setTimeout(() => {
@@ -138,12 +131,6 @@ export default function EmailVerification() {
           );
         }
       } catch (error) {
-        console.log("Status:", error.response?.status);
-        console.log(
-          "Backend error:",
-          JSON.stringify(error.response?.data, null, 2)
-        );
-
         const status = error.response?.status;
         const apiMessage = error.response?.data?.message?.toLowerCase() || "";
 
@@ -190,11 +177,7 @@ export default function EmailVerification() {
     try {
       setIsSubmitting(true);
 
-      console.log("Resend email payload:", JSON.stringify(payload, null, 2));
-
       const result = await authApi.sendResendEmailConfirmation(payload);
-
-      console.log("Resend email success:", result);
 
       if (result?.success !== true) {
         const apiMessage =
@@ -216,12 +199,6 @@ export default function EmailVerification() {
       setTimeout(() => setSent(false), 3000);
       setCooldown(30);
     } catch (error) {
-      console.log("Status:", error.response?.status);
-      console.log(
-        "Backend error:",
-        JSON.stringify(error.response?.data, null, 2)
-      );
-
       setMessage(getApiErrorMessage(error));
       setMessageType("error");
     } finally {

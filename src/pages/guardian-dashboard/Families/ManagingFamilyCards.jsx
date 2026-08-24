@@ -1,17 +1,14 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
 import { useFamilies } from "../../../hooks/useFamilies";
 import FamilyCard from "./FamilyCard";
 import NoFamiliesPage from "./NoFamiliesPage";
-import FamilyAccessPendingPage from "./FamilyAccessPendingPage";
 import { FamiliesLoadingState, FamiliesErrorState } from "./ErrorStates";
 
 import {
   MdMenu,
   MdNotificationsNone,
   MdPerson,
-  MdAdd,
   MdGroups,
   MdCheckCircle,
   MdAssignment,
@@ -39,19 +36,20 @@ function TopNavbar({ setOpenSidebar }) {
       <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         <button
           type="button"
-          className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-[#003469] hover:bg-gray-100 transition"
+          disabled
+          title="التنبيهات غير متاحة حالياً"
+          className="relative w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-[#003469] opacity-60 cursor-not-allowed"
         >
           <MdNotificationsNone className="text-[18px] sm:text-[20px]" />
-          <span className="absolute top-[7px] right-[7px] w-2 h-2 rounded-full bg-red-500 border border-white" />
         </button>
 
         <div className="hidden sm:flex items-center gap-3">
           <div className="text-right leading-tight">
             <p className="font-[Cairo] text-[13px] lg:text-[14px] font-bold text-[#003469]">
-              أحمد العلي
+              حساب الوصي
             </p>
             <p className="font-[Cairo] text-[10px] lg:text-[11px] text-gray-500">
-              كفيل معتمد
+              وصي
             </p>
           </div>
 
@@ -65,8 +63,6 @@ function TopNavbar({ setOpenSidebar }) {
 }
 
 function HeaderCard() {
-  const navigate = useNavigate();
-
   return (
     <section className="bg-white border border-[#D8E0EA] rounded-[12px] p-5 sm:p-7 shadow-sm">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5">
@@ -131,10 +127,6 @@ function ManagingFamilyCards() {
   const [openSidebar, setOpenSidebar] = useState(false);
   const { families, loading, error, refetch } = useFamilies();
 
-  // 🔌 TODO: مصدر التأهيل (canAddFamily) لسا مش مؤكد من الـ API — لما نلاقيه
-  // (غالبًا جزء من بروفايل الوصي أو حالة وثائقه)، نبدّل هاد بقيمته الحقيقية.
-  const isEligible = true;
-
   if (loading) {
     return (
       <PageShell openSidebar={openSidebar} setOpenSidebar={setOpenSidebar}>
@@ -149,10 +141,6 @@ function ManagingFamilyCards() {
         <FamiliesErrorState onRetry={refetch} />
       </PageShell>
     );
-  }
-
-  if (!isEligible) {
-    return <FamilyAccessPendingPage />;
   }
 
   if (families.length === 0) {

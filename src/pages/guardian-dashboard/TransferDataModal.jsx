@@ -12,24 +12,27 @@ import {
   MdCheckCircle,
   MdErrorOutline,
 } from "react-icons/md";
+import { BANK_OPTIONS, isWallet } from "./transferDataConfig";
 
-export const BANK_OPTIONS = [
-  "بنك فلسطين",
-  "البنك الإسلامي العربي",
-  "البنك الإسلامي الفلسطيني",
-  "بنك القاهرة عمان",
-  "بنك القدس",
-  "محفظة PalPay",
-  "محفظة JawwalPay",
-  "محفظة Maalchat",
-];
-
-const WALLET_KEYWORDS = ["PalPay", "JawwalPay", "Maalchat", "محفظة"];
-
-export const isWallet = (bankName) => {
-  if (!bankName) return false;
-  return WALLET_KEYWORDS.some((kw) => bankName.includes(kw));
+const EMPTY_FORM_DATA = {
+  bankName: "",
+  accountHolderName: "",
+  accountNumber: "",
+  iban: "",
+  branchName: "",
 };
+
+function getInitialFormData(mode, initialData) {
+  if (mode !== "edit" || !initialData) return EMPTY_FORM_DATA;
+
+  return {
+    bankName: initialData.bankName || "",
+    accountHolderName: initialData.accountHolderName || "",
+    accountNumber: "",
+    iban: "",
+    branchName: initialData.branchName || "",
+  };
+}
 
 // يفكك أي شكل أخطاء راجع من الـ API
 function flattenServerErrors(errors) {
@@ -45,13 +48,10 @@ const TransferDataModal = ({
   onSubmit, // async (formData) => يرمي error لو فشل، الأب مسؤول عن استدعاء الـ API الفعلي
   initialData = null,
 }) => {
-  const [formData, setFormData] = useState({
-    bankName: "",
-    accountHolderName: "",
-    accountNumber: "",
-    iban: "",
-    branchName: "",
-  });
+  const [formData, setFormData] = useState(() =>
+    getInitialFormData(mode, initialData),
+  );
+  const [formDataSource, setFormDataSource] = useState({ mode, initialData });
 
   const [errors, setErrors] = useState({});
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -59,20 +59,16 @@ const TransferDataModal = ({
   const [serverError, setServerError] = useState(null);
   const dropdownRef = useRef(null);
 
-  useEffect(() => {
+  if (
+    formDataSource.mode !== mode ||
+    formDataSource.initialData !== initialData
+  ) {
+    setFormDataSource({ mode, initialData });
     if (mode === "edit" && initialData) {
-      // ⚠️ accountNumber و iban ما بيترجعوا من السيرفر إلا مقنّعين (مثلاً "**** 456")
-      // فما منقدر نعبّي فيهم القيمة الحقيقية. منسيبهم فاضيين ونطلب من المستخدم
-      // يدخل القيمة الكاملة من جديد، ومنعرض القيمة المقنّعة كتلميح (placeholder) بس.
-      setFormData({
-        bankName: initialData.bankName || "",
-        accountHolderName: initialData.accountHolderName || "",
-        accountNumber: "",
-        iban: "",
-        branchName: initialData.branchName || "",
-      });
+      // القيم الحساسة المقنّعة تبقى فارغة ليعيد المستخدم إدخالها كاملة.
+      setFormData(getInitialFormData(mode, initialData));
     }
-  }, [mode, initialData]);
+  }
 
   useEffect(() => {
     const handleClickOutside = (e) => {

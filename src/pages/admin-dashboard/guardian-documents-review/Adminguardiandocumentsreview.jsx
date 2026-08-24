@@ -327,7 +327,25 @@ export default function AdminGuardianDocumentsReviewPage() {
     }
   };
 
-  useEffect(() => { fetchDocuments(); }, []);
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadInitialDocuments() {
+      try {
+        const res = await adminApi.getPendingDocuments();
+        if (!cancelled) setDocuments(res?.data || []);
+      } catch {
+        if (!cancelled) setLoadError("تعذر تحميل الوثائق المعلقة.");
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
+
+    loadInitialDocuments();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const filteredDocuments = useMemo(() => {
     return documents.filter((doc) => {

@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import { FaLock, FaHome } from "react-icons/fa";
 import titleImg from "../assets/title.png";
@@ -8,11 +7,6 @@ const Error401 = () => {
 
   const handleHome = () => {
     navigate("/landing-page");
-  };
-
-  const handleBack = () => {
-    if (window.history.length > 1) navigate(-1);
-    else navigate("/landing-page");
   };
 
   return (

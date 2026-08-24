@@ -257,11 +257,7 @@ export default function RegistrationPage() {
     try {
       setIsSubmitting(true);
 
-      console.log("Register payload:", JSON.stringify(registerPayload, null, 2));
-
       const result = await authApi.register(registerPayload);
-
-      console.log("Register response:", result);
 
       if (result?.success !== true) {
         setErrors((prev) => ({
@@ -280,12 +276,6 @@ export default function RegistrationPage() {
         },
       });
     } catch (error) {
-      console.log("Status:", error.response?.status);
-      console.log(
-        "Backend error:",
-        JSON.stringify(error.response?.data, null, 2)
-      );
-
       setErrors((prev) => ({
         ...prev,
         api: getApiErrorMessage(error),

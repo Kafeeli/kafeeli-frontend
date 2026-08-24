@@ -28,20 +28,37 @@ const DocumentUploadModal = ({ doc, onClose, onSubmit }) => {
       ? "ارفع صورة الهوية"
       : "ارفق الوثيقة";
 
-  const validateAndSetFile = (candidateFile) => {
+  const validateAndSetFile = async (candidateFile) => {
     if (!candidateFile) return;
 
     const allowedTypes = isVideo
       ? ["video/mp4", "video/quicktime", "video/webm"]
       : ["image/jpeg", "image/png", "application/pdf"];
+    const extension = candidateFile.name.split(".").pop()?.toLowerCase();
+    const allowedExtensions = isVideo ? ["mp4", "mov", "webm"] : ["jpg", "jpeg", "png", "pdf"];
 
-    if (!allowedTypes.includes(candidateFile.type)) {
+    if (!allowedTypes.includes(candidateFile.type) && !allowedExtensions.includes(extension)) {
       setError(
         isVideo
           ? "امتداد الفيديو يجب أن يكون MP4 أو MOV أو WEBM"
           : "امتداد الملف يجب أن يكون JPG أو JPEG أو PNG أو PDF"
       );
       return;
+    }
+
+    if (isVideo) {
+      const duration = await new Promise((resolve) => {
+        const video = document.createElement("video");
+        const objectUrl = URL.createObjectURL(candidateFile);
+        video.preload = "metadata";
+        video.onloadedmetadata = () => { const value = video.duration; URL.revokeObjectURL(objectUrl); resolve(value); };
+        video.onerror = () => { URL.revokeObjectURL(objectUrl); resolve(null); };
+        video.src = objectUrl;
+      });
+      if (duration !== null && duration > 5) {
+        setError("مدة الفيديو تتجاوز الحد الأقصى المسموح به وهو 5 ثوانٍ");
+        return;
+      }
     }
 
     if (candidateFile.size > maxSizeMB * 1024 * 1024) {
@@ -54,14 +71,14 @@ const DocumentUploadModal = ({ doc, onClose, onSubmit }) => {
   };
 
   const handleInputChange = (e) => {
-    validateAndSetFile(e.target.files?.[0]);
+    void validateAndSetFile(e.target.files?.[0]);
     e.target.value = "";
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     setDragActive(false);
-    validateAndSetFile(e.dataTransfer.files?.[0]);
+    void validateAndSetFile(e.dataTransfer.files?.[0]);
   };
 
   // const handleSubmit = async () => {

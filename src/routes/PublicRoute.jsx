@@ -1,19 +1,22 @@
 import { Navigate } from "react-router-dom";
+import { getStoredUser, getUserRoles } from "../utils/session";
 
 export default function PublicRoute({ children }) {
   const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = getStoredUser();
 
   if (token && user) {
-    if (user.role === "SuperAdmin" || user.role === "Admin") {
+    const roles = getUserRoles(user);
+
+    if (roles.includes("SuperAdmin") || roles.includes("Admin")) {
       return <Navigate to="/admin-dashboard" replace />;
     }
 
-    if (user.role === "Guardian") {
+    if (roles.includes("Guardian")) {
       return <Navigate to="/guardian-profile" replace />;
     }
 
-    if (user.role === "Sponsor") {
+    if (roles.includes("Sponsor")) {
       return <Navigate to="/sponsorProfile" replace />;
     }
 

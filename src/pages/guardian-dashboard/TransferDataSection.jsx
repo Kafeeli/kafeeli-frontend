@@ -5,7 +5,7 @@ import {
   MdVerified,
 } from "react-icons/md";
 import { LuPencil } from "react-icons/lu";
-import { isWallet } from "./TransferDataModal";
+import { isWallet } from "./transferDataConfig";
 
 /**
  * status: "empty" | "pendingReview" | "needsUpdate" | "approved"
@@ -20,11 +20,34 @@ const TransferDataSection = ({
   status = "empty",
   data = null,
   reviewReason = "",
+  errorMessage = "",
   onAdd,
   onEdit,
   compact = false,
 }) => {
   const statusConfig = {
+    loading: {
+      badge: {
+        label: "جارٍ التحميل",
+        className: "bg-blue-50 text-blue-700",
+        icon: <MdAccessTime className="text-[14px]" />,
+      },
+      title: "تفاصيل التحويل",
+      desc: "جارٍ تحميل بيانات التحويل",
+      showAddButton: false,
+      showEditButton: false,
+    },
+    error: {
+      badge: {
+        label: "تعذر التحميل",
+        className: "bg-red-50 text-red-700",
+        icon: <MdWarningAmber className="text-[14px]" />,
+      },
+      title: "تفاصيل التحويل",
+      desc: errorMessage || "تعذر تحميل بيانات التحويل",
+      showAddButton: false,
+      showEditButton: false,
+    },
     empty: {
       badge: {
         label: "غير مضافة",
@@ -104,7 +127,11 @@ const TransferDataSection = ({
         </div>
 
         <div className="p-3 space-y-2">
-          {status === "empty" || !data ? (
+          {status === "loading" || status === "error" ? (
+            <p className={`py-4 text-center text-[11px] ${status === "error" ? "text-red-600" : "text-[#6B7280]"}`}>
+              {current.desc}
+            </p>
+          ) : status === "empty" || !data ? (
             <button
               onClick={onAdd}
               className="w-full h-[36px] rounded-[6px] border-2 border-dashed border-[#D0D5DD] bg-white text-[#003469] text-[11px] font-bold flex items-center justify-center gap-2 hover:bg-[#F5F8FB] hover:border-[#003469] transition cursor-pointer"
@@ -174,6 +201,8 @@ const TransferDataSection = ({
       </div>
 
       <div className="p-4 sm:p-6">
+        {status === "loading" && <p className="py-8 text-center text-sm text-[#6B7280]">جارٍ تحميل بيانات التحويل...</p>}
+        {status === "error" && <p className="py-8 text-center text-sm font-bold text-red-600">{errorMessage || "تعذر تحميل بيانات التحويل."}</p>}
         {(status === "empty" || !data) && <EmptyState onAdd={onAdd} />}
         {status === "needsUpdate" && data && (
           <NeedsUpdateState

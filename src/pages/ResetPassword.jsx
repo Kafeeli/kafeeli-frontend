@@ -112,27 +112,14 @@ function ResetPassword() {
     const payload = {
       userId: userIdFromUrl,
       token: decodedToken,
-
-      password: password,
-      confirmPassword: confirmPassword,
-
-      // احتياط لو الباك إند يستخدم newPassword بدل password
       newPassword: password,
+      confirmPassword: confirmPassword,
     };
 
     try {
       setIsSubmitting(true);
 
-      console.log("Reset password payload:", {
-        userId: userIdFromUrl,
-        token: "[hidden]",
-        password: "[hidden]",
-        confirmPassword: "[hidden]",
-      });
-
       const result = await authApi.resetPassword(payload);
-
-      console.log("Reset password success:", result);
 
       if (result?.success !== true) {
         const apiMessage =
@@ -152,12 +139,6 @@ function ResetPassword() {
         navigate("/login");
       }, 2000);
     } catch (error) {
-      console.log("Status:", error.response?.status);
-      console.log(
-        "Backend error:",
-        JSON.stringify(error.response?.data, null, 2)
-      );
-
       setSuccess(false);
       setMessage(getApiErrorMessage(error));
     } finally {

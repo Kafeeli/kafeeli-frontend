@@ -51,7 +51,9 @@ export const familyApi = {
     formData.append("headOfHouseholdName", headOfHouseholdName);
     formData.append("city", city);
     formData.append("address", address);
-    if (description !== undefined) formData.append("description", description);
+    if (description !== undefined) {
+      formData.append("caseDescription", description);
+    }
     if (monthlyNeedAmount !== undefined) {
       formData.append("monthlyNeedAmount", monthlyNeedAmount);
     }

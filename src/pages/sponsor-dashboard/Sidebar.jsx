@@ -13,9 +13,11 @@ import {
   MdPublishedWithChanges,
   MdNotificationsNone,
   MdSettings,
+  MdVolunteerActivism,
 } from "react-icons/md";
 
 import { authApi } from "../../services/authApi";
+import { clearSessionStorage } from "../../utils/session";
 import kafeeliLogo from "../../assets/kafeeli-logo.png";
 
 function Sidebar({ openSidebar, setOpenSidebar }) {
@@ -37,41 +39,47 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
     {
       title: "الوثائق",
       icon: <MdDescription />,
-      path: "/documents",
+      path: null,
     },
     {
       title: "العائلات",
       icon: <MdFamilyRestroom />,
-      path: "/familiesSponsor",
+      path: "/sponsor/families",
+    },
+    {
+      title: "كفالاتي",
+      icon: <MdVolunteerActivism />,
+      path: "/sponsor/sponsorships",
     },
     {
       title: "الأيتام",
       icon: <MdPublishedWithChanges />,
-      path: "/orphans",
+      path: "/sponsor/orphans",
     },
     {
       title: "المحفظة",
       icon: <MdAccountBalanceWallet />,
-      path: "/wallet",
+      path: null,
     },
     {
       title: "المدفوعات",
       icon: <MdPayments />,
-      path: "/payments",
+      path: null,
     },
     {
       title: "التحديثات الدورية",
       icon: <MdNotificationsNone />,
-      path: "/updates",
+      path: null,
     },
     {
       title: "التنبيهات",
       icon: <MdNotificationsNone />,
-      path: "/notifications",
+      path: null,
     },
   ];
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) =>
+    location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   const itemClasses = (active) => `
     w-full min-h-[48px] py-3
@@ -102,14 +110,10 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
       if (refreshToken) {
         await authApi.logout(refreshToken);
       }
-    } catch (error) {
-      console.error(
-        "Logout API call failed, clearing session locally anyway:",
-        error
-      );
+    } catch {
+      // Server logout is best-effort; local session clearing must still complete.
     } finally {
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
+      clearSessionStorage();
 
       setOpenSidebar(false);
       setLoggingOut(false);
@@ -176,16 +180,11 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
         <hr className="border-white/25 mx-4 my-2 shrink-0" />
 
         <nav className="flex-1 overflow-y-auto px-4 py-3 space-y-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/40">
-          {menuItems.map((item) => (
-            <Link
-              key={item.title}
-              to={item.path}
-              onClick={() => setOpenSidebar(false)}
-              className={itemClasses(isActive(item.path))}
-            >
+          {menuItems.map((item) => {
+            const content = <>
               <span
                 className={`text-[18px] flex items-center ${
-                  isActive(item.path)
+                  item.path && isActive(item.path)
                     ? "text-[#003469]"
                     : "text-white/85"
                 }`}
@@ -194,23 +193,27 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
               </span>
 
               <span className="flex-1 text-right">{item.title}</span>
-            </Link>
-          ))}
+              {!item.path && <span className="text-[10px] text-white/50">غير متاح</span>}
+            </>;
+
+            return item.path ? (
+              <Link key={item.title} to={item.path} onClick={() => setOpenSidebar(false)} className={itemClasses(isActive(item.path))}>{content}</Link>
+            ) : (
+              <div key={item.title} aria-disabled="true" className={`${itemClasses(false)} cursor-not-allowed opacity-60 hover:bg-transparent`}>{content}</div>
+            );
+          })}
         </nav>
 
         <div className="mt-auto px-3 sm:px-4 pb-2 shrink-0">
           <div className="border-t border-white/20 pt-3">
-            <Link
-              to="/sponsor-settings"
-              onClick={() => setOpenSidebar(false)}
-              className={itemClasses(isActive("/sponsor-settings"))}
-            >
+            <div aria-disabled="true" className={`${itemClasses(false)} cursor-not-allowed opacity-60 hover:bg-transparent`}>
               <span className="text-[18px] flex items-center text-white/85">
                 <MdSettings />
               </span>
 
               <span className="flex-1 text-right">الإعدادات</span>
-            </Link>
+              <span className="text-[10px] text-white/50">غير متاح</span>
+            </div>
           </div>
 
           <div className="border-t border-white/20 mt-2 pt-2">

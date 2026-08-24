@@ -73,22 +73,10 @@ function InvalidEmail() {
       };
 
 
-      console.log(
-        "Resend confirmation:",
-        payload
-      );
-
-
       const result =
         await authApi.sendResendEmailConfirmation(
           payload
         );
-
-
-      console.log(
-        "Resend response:",
-        result
-      );
 
 
       if (result?.success !== true) {
@@ -140,11 +128,6 @@ function InvalidEmail() {
 
 
     } catch(error){
-
-      console.log(
-        error.response?.data
-      );
-
 
       setMessage(
         getErrorMessage(error)

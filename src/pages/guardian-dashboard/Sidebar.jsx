@@ -15,6 +15,7 @@ import {
 } from "react-icons/md";
 
 import { authApi } from "../../services/authApi";
+import { clearSessionStorage } from "../../utils/session";
 import kafeeliLogo from "../../assets/kafeeli-logo.png";
 
 function Sidebar({ openSidebar, setOpenSidebar }) {
@@ -32,27 +33,27 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
       icon: <MdFamilyRestroom />,
       path: "/families",
     },
-    { title: "الأيتام", icon: <MdPerson />, path: "/guardian-orphans" },
+    { title: "الأيتام", icon: <MdPerson />, path: "/guardian/orphans" },
     {
       title: "المحفظة",
       icon: <MdAccountBalanceWallet />,
-      path: "/guardian-wallet",
+      path: null,
     },
-    { title: "المدفوعات", icon: <MdPayments />, path: "/guardian-payments" },
+    { title: "الدفعات", icon: <MdPayments />, path: "/guardian/payouts" },
     {
       title: "التحديثات الدورية",
       icon: <MdPublishedWithChanges />,
-      path: "/guardian-updates",
+      path: null,
     },
     {
       title: "التنبيهات",
       icon: <MdNotificationsNone />,
-      path: "/guardian-notifications",
+      path: null,
     },
   ];
 
   // 👈 فحص الرابط النشط تلقائياً
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   const itemClasses = (active) => `
     w-full min-h-[48px] py-3
@@ -86,11 +87,10 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
       if (refreshToken) {
         await authApi.logout(refreshToken);
       }
-    } catch (err) {
-      console.error("Logout API call failed, clearing session locally anyway:", err);
+    } catch {
+      // Server logout is best-effort; local session clearing must still complete.
     } finally {
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
+      clearSessionStorage();
       setOpenSidebar(false);
       setLoggingOut(false);
       navigate("/login", { replace: true });
@@ -170,16 +170,11 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
             scrollbar-track-transparent
           "
         >
-          {menuItems.map((item) => (
-            <Link
-              key={item.title}
-              to={item.path} // 👈 التوجيه للمسار المطلوب عند الضغط
-              onClick={() => setOpenSidebar(false)}
-              className={itemClasses(isActive(item.path))}
-            >
+          {menuItems.map((item) => {
+            const content = <>
               <span
                 className={`text-[20px] sm:text-[16px] lg:text-[18px] flex items-center shrink-0 ${
-                  isActive(item.path) ? "text-[#003469]" : "text-white/85"
+                  item.path && isActive(item.path) ? "text-[#003469]" : "text-white/85"
                 }`}
               >
                 {item.icon}
@@ -187,29 +182,31 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
               <span className="flex-1 text-right leading-normal">
                 {item.title}
               </span>
-            </Link>
-          ))}
+              {!item.path && <span className="text-[10px] text-white/50">غير متاح</span>}
+            </>;
+
+            return item.path ? (
+              <Link key={item.title} to={item.path} onClick={() => setOpenSidebar(false)} className={itemClasses(isActive(item.path))}>{content}</Link>
+            ) : (
+              <div key={item.title} aria-disabled="true" className={`${itemClasses(false)} cursor-not-allowed opacity-60 hover:bg-transparent`}>{content}</div>
+            );
+          })}
         </nav>
 
         {/* Bottom: Settings + Logout */}
         <div className="mt-auto px-3 sm:px-4 pb-1 shrink-0">
           <div className="border-t border-white/20 pt-3">
-            <Link
-              to="/guardian-settings"
-              onClick={() => setOpenSidebar(false)}
-              className={itemClasses(isActive("/guardian-settings"))}
-            >
+            <div aria-disabled="true" className={`${itemClasses(false)} cursor-not-allowed opacity-60 hover:bg-transparent`}>
               <span
                 className={`text-[15px] sm:text-[16px] lg:text-[18px] flex items-center shrink-0 ${
-                  isActive("/guardian-settings")
-                    ? "text-[#003469]"
-                    : "text-white/85"
+                  "text-white/85"
                 }`}
               >
                 <MdSettings />
               </span>
               <span>الإعدادات</span>
-            </Link>
+              <span className="mr-auto text-[10px] text-white/50">غير متاح</span>
+            </div>
           </div>
 
           <div className="border-t border-white/20 mt-2 pt-2">

@@ -1,13 +1,15 @@
-import { useState, useEffect, useRef } from "react";
-import { FaBars, FaTimes } from "react-icons/fa";
+// Header.jsx
+import { useState, useEffect, useRef } from 'react';
+import { FaBars, FaTimes } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 import logo from "../assets/title.png";
 
-const Header = ({ isLandingPage = false }) => {
+const Header = ({ primaryDestination = "/register" }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
   const handleNavClick = (e, href) => {
-    if (isLandingPage && href.startsWith("#")) {
+    if (href.startsWith("#")) {
       e.preventDefault();
 
       const section = document.querySelector(href);
@@ -22,28 +24,13 @@ const Header = ({ isLandingPage = false }) => {
       setIsMenuOpen(false);
     }
   };
+
   const navLinks = [
-    {
-      label: "الرئيسية",
-      href: isLandingPage ? "#home" : "/",
-      active: true,
-    },
-    {
-      label: "من نحن",
-      href: isLandingPage ? "#about" : "/#about",
-    },
-    {
-      label: "الأيتام",
-      href: isLandingPage ? "#orphans" : "/#orphans",
-    },
-    {
-      label: "كيفية العمل",
-      href: isLandingPage ? "#how-it-works" : "/#how-it-works",
-    },
-    {
-      label: "اتصل بنا",
-      href: isLandingPage ? "#contact" : "/#contact",
-    },
+    { label: 'الرئيسية', href: '#top', active: true },
+    { label: 'من نحن', href: '#about' },
+    { label: 'الأيتام', href: '#orphans' },
+    { label: 'كيفية العمل', href: '#how-it-works' },
+    { label: 'اتصل بنا', href: '#contact' },
   ];
 
   // إغلاق القائمة عند الضغط خارجها
@@ -85,8 +72,14 @@ const Header = ({ isLandingPage = false }) => {
       <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
-            {/* Logo */}
-            <div className="flex items-center">
+
+            {/* Logo - كلمة "كفيلي" تختفي بالموبايل */}
+            <a
+              href="#top"
+              onClick={(e) => handleNavClick(e, "#top")}
+              className="flex items-center"
+              aria-label="العودة إلى أعلى الصفحة"
+            >
               <img
                 src={logo}
                 alt="كفيلي"
@@ -96,7 +89,7 @@ const Header = ({ isLandingPage = false }) => {
               <span className="hidden md:inline text-2xl font-bold text-blue-900 tracking-tight">
                 كفيلي
               </span>
-            </div>
+            </a>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8">
@@ -122,16 +115,19 @@ const Header = ({ isLandingPage = false }) => {
 
             {/* Desktop CTA */}
             <div className="hidden lg:block">
-              <button className="bg-blue-900 cursor-pointer hover:bg-blue-800 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-900/20 active:scale-95">
-                سجل الآن
-              </button>
+              <Link
+                to={primaryDestination}
+                className="block bg-blue-900 cursor-pointer hover:bg-blue-800 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-900/20 active:scale-95"
+              >
+                تبرع الآن
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="lg:hidden cursor-pointer p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
-              aria-label="Toggle menu"
+              aria-label={isMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
             >
               {isMenuOpen ? (
                 <FaTimes className="w-6 h-6" />
@@ -170,6 +166,7 @@ const Header = ({ isLandingPage = false }) => {
             <button
               onClick={() => setIsMenuOpen(false)}
               className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+              aria-label="إغلاق القائمة"
             >
               <FaTimes className="w-5 h-5" />
             </button>
@@ -195,9 +192,13 @@ const Header = ({ isLandingPage = false }) => {
 
           {/* CTA Button */}
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100 bg-white">
-            <button className="cursor-pointer w-full bg-blue-900 hover:bg-blue-800 text-white px-6 py-3 rounded-lg text-base font-semibold transition-all active:scale-[0.98]">
+            <Link
+              onClick={() => setIsMenuOpen(false)}
+              to={primaryDestination}
+              className="block cursor-pointer w-full bg-blue-900 hover:bg-blue-800 text-center text-white px-6 py-3 rounded-lg text-base font-semibold transition-all active:scale-[0.98]"
+            >
               تبرع الآن
-            </button>
+            </Link>
           </div>
         </div>
       </div>
