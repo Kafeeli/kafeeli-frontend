@@ -9,7 +9,7 @@ const Header = ({ primaryDestination = "/register" }) => {
   const menuRef = useRef(null);
 
   const handleNavClick = (e, href) => {
-    if (isLandingPage && href.startsWith("#")) {
+    if (href.startsWith("#")) {
       e.preventDefault();
 
       const section = document.querySelector(href);
@@ -24,36 +24,13 @@ const Header = ({ primaryDestination = "/register" }) => {
       setIsMenuOpen(false);
     }
   };
+
   const navLinks = [
-<<<<<<< HEAD
-    {
-      label: "الرئيسية",
-      href: isLandingPage ? "#home" : "/",
-      active: true,
-    },
-    {
-      label: "من نحن",
-      href: isLandingPage ? "#about" : "/#about",
-    },
-    {
-      label: "الأيتام",
-      href: isLandingPage ? "#orphans" : "/#orphans",
-    },
-    {
-      label: "كيفية العمل",
-      href: isLandingPage ? "#how-it-works" : "/#how-it-works",
-    },
-    {
-      label: "اتصل بنا",
-      href: isLandingPage ? "#contact" : "/#contact",
-    },
-=======
     { label: 'الرئيسية', href: '#top', active: true },
     { label: 'من نحن', href: '#about' },
     { label: 'الأيتام', href: '#orphans' },
     { label: 'كيفية العمل', href: '#how-it-works' },
     { label: 'اتصل بنا', href: '#contact' },
->>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
   ];
 
   // إغلاق القائمة عند الضغط خارجها
@@ -95,20 +72,17 @@ const Header = ({ primaryDestination = "/register" }) => {
       <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
-<<<<<<< HEAD
-            {/* Logo */}
-            <div className="flex items-center">
+
+            {/* Logo - كلمة "كفيلي" تختفي بالموبايل */}
+            <a
+              href="#top"
+              onClick={(e) => handleNavClick(e, "#top")}
+              className="flex items-center"
+              aria-label="العودة إلى أعلى الصفحة"
+            >
               <img
                 src={logo}
                 alt="كفيلي"
-=======
-            
-            {/* Logo - كلمة "كفيلي" تختفي بالموبايل */}
-            <a href="#top" className="flex items-center" aria-label="العودة إلى أعلى الصفحة">
-              <img 
-                src={logo} 
-                alt="كفيلي" 
->>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
                 className="h-14 w-auto object-contain"
               />
 
@@ -141,15 +115,12 @@ const Header = ({ primaryDestination = "/register" }) => {
 
             {/* Desktop CTA */}
             <div className="hidden lg:block">
-<<<<<<< HEAD
-              <button className="bg-blue-900 cursor-pointer hover:bg-blue-800 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-900/20 active:scale-95">
-                سجل الآن
-              </button>
-=======
-              <Link to={primaryDestination} className="block bg-blue-900 cursor-pointer hover:bg-blue-800 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-900/20 active:scale-95">
+              <Link
+                to={primaryDestination}
+                className="block bg-blue-900 cursor-pointer hover:bg-blue-800 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-900/20 active:scale-95"
+              >
                 تبرع الآن
               </Link>
->>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
             </div>
 
             {/* Mobile Menu Button */}
@@ -221,11 +192,11 @@ const Header = ({ primaryDestination = "/register" }) => {
 
           {/* CTA Button */}
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100 bg-white">
-<<<<<<< HEAD
-            <button className="cursor-pointer w-full bg-blue-900 hover:bg-blue-800 text-white px-6 py-3 rounded-lg text-base font-semibold transition-all active:scale-[0.98]">
-=======
-            <Link onClick={() => setIsMenuOpen(false)} to={primaryDestination} className="block cursor-pointer w-full bg-blue-900 hover:bg-blue-800 text-center text-white px-6 py-3 rounded-lg text-base font-semibold transition-all active:scale-[0.98]">
->>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
+            <Link
+              onClick={() => setIsMenuOpen(false)}
+              to={primaryDestination}
+              className="block cursor-pointer w-full bg-blue-900 hover:bg-blue-800 text-center text-white px-6 py-3 rounded-lg text-base font-semibold transition-all active:scale-[0.98]"
+            >
               تبرع الآن
             </Link>
           </div>

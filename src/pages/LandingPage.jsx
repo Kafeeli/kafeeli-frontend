@@ -173,15 +173,9 @@ export default function LandingPage() {
             </p>
 
             <div className="flex  flex-col sm:flex-row gap-4 justify-center lg:justify-start items-stretch sm:items-center">
-<<<<<<< HEAD
-              <button className="cursor-pointer bg-[#2DBCC3] hover:bg-[#2DBCC3]/90 text-white text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl shadow-lg shadow-[#2DBCC3]/20 w-full sm:w-auto">
-                سجل الآن
-              </button>
-=======
               <Link to={destinations.sponsorBrowse} className="cursor-pointer bg-[#2DBCC3] hover:bg-[#2DBCC3]/90 text-white text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl shadow-lg shadow-[#2DBCC3]/20 w-full sm:w-auto">
                 ابدأ الكفالة الآن
               </Link>
->>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
 
               <a href="#about" className="bg-white cursor-pointer hover:bg-gray-50 text-[#0D4B8E] text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-10 rounded-xl border-2 border-[#0D4B8E]/10 w-full sm:w-auto whitespace-nowrap">
                 تعرف علينا
@@ -266,11 +260,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-<<<<<<< HEAD
-      <section id="about" className="bg-[#FBF9FA] py-10 lg:py-20">
-=======
       <section id="about" className="scroll-mt-24 bg-[#F8F9FA] py-10 lg:py-20">
->>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* العنوان */}
           <div className="text-center mb-12 lg:mb-16">
@@ -309,11 +299,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-<<<<<<< HEAD
-      <section id="orphans" className="bg-white py-10 lg:py-24">
-=======
       <section id="orphans" className="scroll-mt-24 bg-white py-10 lg:py-24">
->>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* العنوان */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-12">
@@ -373,11 +359,7 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-<<<<<<< HEAD
-      <section id="how-it-works" className="bg-[#F8F9FA] py-10 lg:py-24">
-=======
       <section id="how-it-works" className="scroll-mt-24 bg-[#F8F9FA] py-10 lg:py-24">
->>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* العنوان */}
           <div id="faq" className="scroll-mt-24 text-center mb-12 lg:mb-16">
@@ -426,18 +408,9 @@ export default function LandingPage() {
 
           {/* الأزرار */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center">
-<<<<<<< HEAD
-            <a
-              href="/register"
-              className="inline-block cursor-pointer bg-[#D9A441] hover:bg-[#e5a021] text-white font-bold py-3 px-8 rounded-xl transition-all active:scale-95"
-            >
-              انضم إلينا الآن
-            </a>
-=======
             <Link to={destinations.primary} className="cursor-pointer bg-[#D9A441] hover:bg-[#e5a021] text-white font-bold py-3 px-8 rounded-xl transition-all active:scale-95">
               انضم إلينا الآن
             </Link>
->>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
 
             <a href="#impact" className="cursor-pointer bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-8 rounded-xl border border-white/30 transition-all active:scale-95">
               شاهد قصص النجاح

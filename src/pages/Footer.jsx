@@ -62,13 +62,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center justify-center md:justify-start gap-3 text-sm text-gray-600">
                 <FaEnvelope className="text-teal-500 flex-shrink-0" />
-<<<<<<< HEAD
-                <a href="mailto:kafeeli.team@outlook.com">
-                  kafeeli.team@outlook.com
-                </a>
-=======
                 <a href="mailto:kafeeli.team@outlook.com" className="hover:text-blue-900">kafeeli.team@outlook.com</a>
->>>>>>> 55bf389 (Complete Kafeeli frontend integration and routing updates)
               </li>
             </ul>
           </div>
