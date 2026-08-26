@@ -13,7 +13,7 @@ import {
   MdVisibilityOff,
 } from "react-icons/md";
 import FamilyDecisionModal from "./Familydecisionmodal";
-import { STATUS_MAP } from "../Familystatus";
+import { FAMILY_STATUS_ACTIONS, STATUS_MAP } from "../Familystatus";
 import { mapFamilyStatus } from "../../../config/familyStatus";
 
 const formatDate = (value) => {
@@ -62,16 +62,17 @@ export default function FamilyDetailsModal({
   onDecision,
   actionLoading = false,
   actionError = "",
+  actionSuccess = "",
   onViewCertificate,
   certificateLoading = false,
-  reviewMode = true,
-  managementMode = false,
 }) {
   const [decisionType, setDecisionType] = useState(null);
-  const statusInfo = STATUS_MAP[mapFamilyStatus(family?.status)] || STATUS_MAP.pending;
-  const canReview = reviewMode && family?.status === 1;
-  const canHide = managementMode && family?.status === 2;
-  const canSuspend = managementMode && family?.status === 2;
+  const normalizedStatus = mapFamilyStatus(family?.status);
+  const statusInfo = STATUS_MAP[normalizedStatus] || STATUS_MAP.pending;
+  const availableActions = FAMILY_STATUS_ACTIONS[normalizedStatus] || [];
+  const canReview = availableActions.includes("approve");
+  const canHide = availableActions.includes("hide");
+  const canSuspend = availableActions.includes("suspend");
 
   if (!family) return null;
 
@@ -211,46 +212,63 @@ export default function FamilyDetailsModal({
               </div>
             )}
 
-            {canReview && <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-end">
-              <button
-                type="button"
-                onClick={() => setDecisionType("needsUpdate")}
-                disabled={actionLoading}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-6 py-3 font-bold text-amber-800 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <MdOutlineEditNote className="text-xl" />
-                طلب تحديث البيانات
-              </button>
-              <button
-                type="button"
-                onClick={() => setDecisionType("approve")}
-                disabled={actionLoading}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#159c8c] px-7 py-3 font-bold text-white transition hover:bg-[#128577] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <MdOutlineVerified className="text-xl" />
-                اعتماد العائلة
-              </button>
-            </div>}
-            {(canHide || canSuspend) && <div className="flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-end">
-              {canSuspend && <button
-                type="button"
-                onClick={() => setDecisionType("suspend")}
-                disabled={actionLoading}
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-600 px-6 py-3 font-bold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <MdBlock className="text-xl" />
-                إيقاف العائلة
-              </button>}
-              {canHide && <button
-                type="button"
-                onClick={() => setDecisionType("hide")}
-                disabled={actionLoading}
-                className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-6 py-3 font-bold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                <MdVisibilityOff className="text-xl" />
-                إخفاء العائلة
-              </button>}
-            </div>}
+            {actionSuccess && (
+              <div className="mb-5 rounded-2xl border border-green-200 bg-green-50 p-4 text-sm font-semibold text-green-700">
+                {actionSuccess}
+              </div>
+            )}
+
+            {availableActions.length > 0 && (
+              <section className="border-t border-slate-100 pt-6">
+                <h3 className="mb-4 font-bold text-[#183b56]">إجراءات الحالة</h3>
+                <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+                  {canReview && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setDecisionType("needsUpdate")}
+                        disabled={actionLoading}
+                        className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-6 py-3 font-bold text-amber-800 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        <MdOutlineEditNote className="text-xl" />
+                        طلب تحديث البيانات
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDecisionType("approve")}
+                        disabled={actionLoading}
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#159c8c] px-7 py-3 font-bold text-white transition hover:bg-[#128577] disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        <MdOutlineVerified className="text-xl" />
+                        اعتماد العائلة
+                      </button>
+                    </>
+                  )}
+                  {canSuspend && (
+                    <button
+                      type="button"
+                      onClick={() => setDecisionType("suspend")}
+                      disabled={actionLoading}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-600 px-6 py-3 font-bold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <MdBlock className="text-xl" />
+                      تعليق العائلة
+                    </button>
+                  )}
+                  {canHide && (
+                    <button
+                      type="button"
+                      onClick={() => setDecisionType("hide")}
+                      disabled={actionLoading}
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-6 py-3 font-bold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      <MdVisibilityOff className="text-xl" />
+                      إخفاء العائلة
+                    </button>
+                  )}
+                </div>
+              </section>
+            )}
           </main>
         </div>
       </div>

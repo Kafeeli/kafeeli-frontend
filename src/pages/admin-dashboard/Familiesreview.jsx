@@ -242,7 +242,7 @@ export default function FamiliesReview() {
       setPendingFamilies(data.pendingFamilies);
       setStatus(data.families.length === 0 ? "empty" : "success");
       setPage(1);
-      return true;
+      return data;
     } catch (error) {
       setLoadError(getApiErrorMessage(error, "تعذر تحميل العائلات."));
       setStatus("error");
@@ -329,10 +329,8 @@ export default function FamiliesReview() {
         );
       }
 
-      setSelectedFamily(null);
-      const refreshed = await fetchFamilies();
-      if (!refreshed) return true;
-      setSuccessMessage(
+      const backendUpdatedFamily = result?.data?.familyId ? result.data : null;
+      const message =
         result?.message ||
           (decisionType === "approve"
             ? "تم اعتماد العائلة بنجاح."
@@ -340,8 +338,24 @@ export default function FamiliesReview() {
               ? "تم إرسال طلب تحديث البيانات بنجاح."
               : decisionType === "hide"
                 ? "تم إخفاء العائلة بنجاح."
-                : "تم إيقاف العائلة بنجاح."),
-      );
+                : "تم تعليق العائلة بنجاح.");
+
+      setSuccessMessage(message);
+      if (backendUpdatedFamily) setSelectedFamily(backendUpdatedFamily);
+
+      const refreshed = await fetchFamilies();
+      if (refreshed) {
+        const refreshedFamily = [
+          ...refreshed.families,
+          ...refreshed.pendingFamilies,
+        ].find((item) => item.familyId === family.familyId);
+
+        if (refreshedFamily) {
+          setSelectedFamily(refreshedFamily);
+        } else if (!backendUpdatedFamily) {
+          setSelectedFamily(null);
+        }
+      }
       return true;
     } catch (error) {
       setActionError(getApiErrorMessage(error, "تعذر تنفيذ الإجراء."));
@@ -535,6 +549,7 @@ export default function FamiliesReview() {
                     family={family}
                     onView={(item) => {
                       setActionError("");
+                      setSuccessMessage("");
                       setSelectedFamily(item);
                     }}
                   />
@@ -584,6 +599,7 @@ export default function FamiliesReview() {
               items={pendingFamilies}
               onView={(item) => {
                 setActionError("");
+                setSuccessMessage("");
                 setSelectedFamily(item);
               }}
             />
@@ -600,10 +616,9 @@ export default function FamiliesReview() {
           onDecision={handleDecision}
           actionLoading={actionLoading}
           actionError={actionError}
+          actionSuccess={successMessage}
           onViewCertificate={handleViewCertificate}
           certificateLoading={certificateLoading}
-          reviewMode={activeSection === "pending"}
-          managementMode={activeSection === "all"}
         />
       )}
 

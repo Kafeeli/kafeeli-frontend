@@ -33,3 +33,13 @@ export const STATUS_MAP = {
     className: "bg-red-100 text-red-700",
   },
 };
+
+// الإجراءات التي تسمح بها واجهة الإدارة في الخادم لكل FamilyStatus مطبّع.
+// الحالات النهائية لا تملك مسارات عكسية في الـ API الحالي.
+export const FAMILY_STATUS_ACTIONS = {
+  pending: ["approve", "needsUpdate"],
+  active: ["hide", "suspend"],
+  hidden: [],
+  stopped: [],
+  needsEdit: [],
+};
