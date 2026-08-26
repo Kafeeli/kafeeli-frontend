@@ -31,13 +31,27 @@ const DOC_TYPE_ARABIC = {
   4: "فيديو سيلفي مع الهوية",
   5: "إقرار الحضانة",
 };
+
+const NORMALIZED_DOC_TYPES = {
+  1: "NationalIdImage",
+  NationalId: "NationalIdImage",
+  NationalIdImage: "NationalIdImage",
+  3: "GuardianshipDeed",
+  GuardianshipDeed: "GuardianshipDeed",
+  GuardianshipProof: "GuardianshipDeed",
+  4: "SelfieVideoWithId",
+  SelfieVideoWithId: "SelfieVideoWithId",
+  5: "CustodyDocument",
+  CustodyDocument: "CustodyDocument",
+};
+
+const normalizeDocumentType = (type) => NORMALIZED_DOC_TYPES[String(type)] || type;
+
 // خانة "رقم الهوية" تظهر فقط لوثيقة الهوية الشخصية (documentType أو slotKey)
 const isNationalIdDocument = (document) => {
   return (
-    document?.documentType === "NationalId" ||
-    document?.documentType === "NationalIdImage" ||
-    document?.slotKey === "NationalIdImage" ||
-    Number(document?.documentType) === 1
+    normalizeDocumentType(document?.documentType) === "NationalIdImage" ||
+    normalizeDocumentType(document?.slotKey) === "NationalIdImage"
   );
 };
 
@@ -46,7 +60,8 @@ const getDocStatus = (document) => document?.status || document?.verificationSta
 
 const getDocumentTypeLabel = (type) => {
   if (!type) return "وثيقة";
-  return DOC_TYPE_ARABIC[type] || DOC_TYPE_ARABIC[Number(type)] || DOC_TYPE_ARABIC[String(type)] || String(type);
+  const normalizedType = normalizeDocumentType(type);
+  return DOC_TYPE_ARABIC[normalizedType] || String(type);
 };
 
 const STATUS_STYLES = {
@@ -350,7 +365,7 @@ export default function AdminGuardianDocumentsReviewPage() {
   const filteredDocuments = useMemo(() => {
     return documents.filter((doc) => {
       const matchesSearch = !searchTerm || doc.guardianFullName?.includes(searchTerm) || doc.guardianEmail?.includes(searchTerm) || doc.nationalId?.includes(searchTerm);
-      const matchesDocType = !selectedDocType || doc.documentType === selectedDocType;
+      const matchesDocType = !selectedDocType || normalizeDocumentType(doc.documentType) === selectedDocType;
       return matchesSearch && matchesDocType;
     });
   }, [documents, searchTerm, selectedDocType]);
