@@ -9,6 +9,7 @@ import { TbShieldCheck, TbScan } from "react-icons/tb";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import { FiRefreshCw } from "react-icons/fi";
 import { authApi } from "../services/authApi";
+import { getDashboardPath } from "../utils/session";
 
 function Login() {
   const navigate = useNavigate();
@@ -47,17 +48,9 @@ function Login() {
         localStorage.setItem("refreshToken", response.data.refreshToken);
         localStorage.setItem("user", JSON.stringify(response.data));
 
-        const role = response.data.role;
-
-        if (role === "SuperAdmin" || role === "Admin") {
-          navigate("/admin-dashboard/transfer-review");
-        } else if (role === "Guardian") {
-          navigate("/guardian-profile");
-        } else if (role === "Sponsor") {
-          navigate("/sponsorProfile");
-        } else {
-          navigate("/landing-page");
-        }
+        navigate(getDashboardPath(response.data) || "/auth-401", {
+          replace: true,
+        });
       } else {
         setErrorMessage(extractMessage(response));
       }

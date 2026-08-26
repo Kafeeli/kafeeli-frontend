@@ -31,3 +31,21 @@ export function getUserRoles(user) {
     (value) => typeof value === "string" && value.trim().length > 0,
   );
 }
+
+export function getDashboardPath(user) {
+  const roles = getUserRoles(user);
+
+  if (roles.includes("SuperAdmin") || roles.includes("Admin")) {
+    return "/admin-dashboard";
+  }
+
+  if (roles.includes("Guardian")) {
+    return "/guardian-dashboard";
+  }
+
+  if (roles.includes("Sponsor")) {
+    return "/main";
+  }
+
+  return null;
+}

@@ -103,7 +103,7 @@ function EmailVerificationSuccess() {
 
           {/* الزر */}
           <button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/login")}
             className="w-full bg-[#0e3460] text-white py-3 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition text-base font-medium cursor-pointer"
           >
             <span>الذهاب إلى تسجيل الدخول</span>
