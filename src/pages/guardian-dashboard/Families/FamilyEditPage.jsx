@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../Sidebar";
 import { useFamily } from "../../../hooks/useFamily";
 import { familyApi } from "../../../services/familyApi";
 import { FAMILY_STATUS_CONFIG } from "../../../config/familyStatus";
+import { apiErrorMessage, unwrapResult } from "../../../utils/apiUi";
 
 import {
   MdMenu,
@@ -276,7 +277,19 @@ function BasicInfoForm({ formData, setFormData, FormIcon }) {
   );
 }
 
-function DocumentsSection() {
+function DocumentsSection({
+  family,
+  canReplace,
+  onView,
+  onReplace,
+  viewing,
+  replacing,
+  selectedFileName,
+  error,
+}) {
+  const fileInputRef = useRef(null);
+  const hasCertificate = Boolean(family?.hasFatherDeathCertificate);
+
   return (
     <section className="mt-7 bg-white border border-[#D8E0EA] rounded-[12px] px-5 sm:px-7 py-6 shadow-sm">
       <div className="flex items-center justify-between gap-3 border-b border-[#E5E7EB] pb-4">
@@ -296,10 +309,14 @@ function DocumentsSection() {
 
             <div className="text-right">
               <p className="font-[Cairo] text-[14px] font-bold text-[#111827]">
-                شهادة وفاة
+                {family?.fatherDeathCertificateFileName || "شهادة وفاة الأب"}
               </p>
               <p className="mt-1 font-[Cairo] text-[12px] text-[#6B7280]">
-                تم الرفع بتاريخ 12 أكتوبر 2023
+                {selectedFileName
+                  ? `الملف المحدد: ${selectedFileName}`
+                  : hasCertificate
+                    ? "الملف الحالي المرفوع للعائلة"
+                    : "لم يتم رفع شهادة وفاة الأب"}
               </p>
             </div>
           </div>
@@ -307,21 +324,47 @@ function DocumentsSection() {
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <button
               type="button"
-              className="h-[40px] rounded-[7px] bg-white border border-[#CBD5E1] px-5 font-[Cairo] text-[13px] font-bold text-[#374151] flex items-center justify-center gap-2 hover:bg-[#F8FAFC] transition"
+              onClick={onView}
+              disabled={!hasCertificate || viewing || replacing}
+              className="h-[40px] rounded-[7px] bg-white border border-[#CBD5E1] px-5 font-[Cairo] text-[13px] font-bold text-[#374151] flex items-center justify-center gap-2 hover:bg-[#F8FAFC] transition disabled:cursor-not-allowed disabled:opacity-60"
             >
               <MdVisibility className="text-[18px]" />
-              عرض
+              {viewing ? "جارٍ الفتح..." : "عرض"}
             </button>
 
             <button
               type="button"
-              className="h-[40px] rounded-[7px] bg-[#003469] px-5 font-[Cairo] text-[13px] font-bold text-white flex items-center justify-center gap-2 hover:bg-[#053c74] transition"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={!canReplace || viewing || replacing}
+              className="h-[40px] rounded-[7px] bg-[#003469] px-5 font-[Cairo] text-[13px] font-bold text-white flex items-center justify-center gap-2 hover:bg-[#053c74] transition disabled:cursor-not-allowed disabled:opacity-60"
             >
               <MdDownload className="text-[18px]" />
-              استبدال الملف
+              {replacing ? "جارٍ الاستبدال..." : hasCertificate ? "استبدال الملف" : "رفع الملف"}
             </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
+              className="hidden"
+              disabled={!canReplace || replacing}
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                event.target.value = "";
+                if (file) onReplace(file);
+              }}
+            />
           </div>
         </div>
+        {!canReplace && (
+          <p className="mt-3 font-[Cairo] text-xs text-[#6B7280]">
+            لا يمكن استبدال الملف في حالة العائلة الحالية.
+          </p>
+        )}
+        {error && (
+          <p role="alert" className="mt-3 font-[Cairo] text-xs text-red-600">
+            {error}
+          </p>
+        )}
       </div>
     </section>
   );
@@ -376,12 +419,28 @@ function FamilyEditPage({
   const [formDataFamily, setFormDataFamily] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  const [viewingCertificate, setViewingCertificate] = useState(false);
+  const [replacingCertificate, setReplacingCertificate] = useState(false);
+  const [selectedCertificateName, setSelectedCertificateName] = useState("");
+  const [certificateError, setCertificateError] = useState("");
+  const certificateUrlRef = useRef(null);
+  const certificateRevokeTimerRef = useRef(null);
 
-  const { family: fetchedFamily, loading, error: fetchError } = useFamily(familyId);
+  const { family: fetchedFamily, loading, error: fetchError, refetch } = useFamily(familyId);
 
   const status = statusProp || fetchedFamily?.statusKey || "needsEdit";
   const config = EDIT_STATUS_CONFIG[status] || EDIT_STATUS_CONFIG.needsEdit;
   const familyTitle = familyTitleProp || (fetchedFamily ? `عائلة ${fetchedFamily.headOfHouseholdName}` : "بيانات العائلة");
+  const canReplaceCertificate = fetchedFamily?.canEdit === true;
+
+  useEffect(() => () => {
+    if (certificateRevokeTimerRef.current) {
+      window.clearTimeout(certificateRevokeTimerRef.current);
+    }
+    if (certificateUrlRef.current) {
+      URL.revokeObjectURL(certificateUrlRef.current);
+    }
+  }, []);
 
   // مزامنة بيانات العائلة عند تغيّر نتيجة الجلب، قبل عرض النموذج.
   if (fetchedFamily && !initialFormData && fetchedFamily !== formDataFamily) {
@@ -400,7 +459,7 @@ function FamilyEditPage({
     setSubmitError(null);
     try {
       // 🔌 استدعاء PUT الفعلي لتحديث بيانات العائلة
-      await familyApi.updateFamily(familyId, formData);
+      unwrapResult(await familyApi.updateFamily(familyId, formData), "تعذر حفظ التعديلات.");
       navigate(`/families/${familyId}`);
     } catch (err) {
       const status = err?.response?.status;
@@ -413,6 +472,78 @@ function FamilyEditPage({
       }
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function handleViewCertificate() {
+    if (!fetchedFamily?.hasFatherDeathCertificate || viewingCertificate) return;
+
+    const previewWindow = window.open("about:blank", "_blank");
+    if (!previewWindow) {
+      setCertificateError("تعذر فتح نافذة عرض المستند. يرجى السماح بالنوافذ المنبثقة.");
+      return;
+    }
+    previewWindow.opener = null;
+
+    setViewingCertificate(true);
+    setCertificateError("");
+    try {
+      const blob = await familyApi.getFatherDeathCertificate(familyId);
+      if (certificateRevokeTimerRef.current) {
+        window.clearTimeout(certificateRevokeTimerRef.current);
+      }
+      if (certificateUrlRef.current) {
+        URL.revokeObjectURL(certificateUrlRef.current);
+      }
+
+      const objectUrl = URL.createObjectURL(blob);
+      certificateUrlRef.current = objectUrl;
+      previewWindow.location.replace(objectUrl);
+      certificateRevokeTimerRef.current = window.setTimeout(() => {
+        URL.revokeObjectURL(objectUrl);
+        if (certificateUrlRef.current === objectUrl) certificateUrlRef.current = null;
+      }, 60000);
+    } catch (requestError) {
+      previewWindow.close();
+      setCertificateError(apiErrorMessage(requestError, "تعذر فتح شهادة الوفاة."));
+    } finally {
+      setViewingCertificate(false);
+    }
+  }
+
+  async function handleReplaceCertificate(file) {
+    if (!canReplaceCertificate || replacingCertificate) return;
+
+    const extension = file.name.split(".").pop()?.toLowerCase();
+    const allowedMimeTypes = ["application/pdf", "image/jpeg", "image/png"];
+    const allowedExtensions = ["pdf", "jpg", "jpeg", "png"];
+    if ((file.type && !allowedMimeTypes.includes(file.type)) || !allowedExtensions.includes(extension)) {
+      setCertificateError("نوع الملف يجب أن يكون PDF أو JPG أو JPEG أو PNG.");
+      return;
+    }
+
+    setSelectedCertificateName(file.name);
+    setReplacingCertificate(true);
+    setCertificateError("");
+    try {
+      const result = await familyApi.updateFamily(familyId, {
+        headOfHouseholdName: fetchedFamily.headOfHouseholdName,
+        city: fetchedFamily.city,
+        address: fetchedFamily.address,
+        description: fetchedFamily.description,
+        monthlyNeedAmount: fetchedFamily.monthlyNeedAmount,
+        fatherDeathCertificate: file,
+      });
+      unwrapResult(result, "تعذر استبدال شهادة الوفاة.");
+      await refetch();
+      setSelectedCertificateName("");
+      navigate(`/families/${familyId}`, {
+        state: { familyDocumentSuccess: result.message || "تم استبدال شهادة الوفاة بنجاح." },
+      });
+    } catch (requestError) {
+      setCertificateError(apiErrorMessage(requestError, "تعذر استبدال شهادة الوفاة."));
+    } finally {
+      setReplacingCertificate(false);
     }
   }
 
@@ -472,7 +603,16 @@ function FamilyEditPage({
                 FormIcon={config.formIcon}
               />
 
-              <DocumentsSection />
+              <DocumentsSection
+                family={fetchedFamily}
+                canReplace={canReplaceCertificate}
+                onView={handleViewCertificate}
+                onReplace={handleReplaceCertificate}
+                viewing={viewingCertificate}
+                replacing={replacingCertificate}
+                selectedFileName={selectedCertificateName}
+                error={certificateError}
+              />
 
               <ActionBar
                 onCancel={handleCancel}
