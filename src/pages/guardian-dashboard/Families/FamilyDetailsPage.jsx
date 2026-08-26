@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
 import { useFamily } from "../../../hooks/useFamily";
 import { familyApi } from "../../../services/familyApi";
@@ -230,7 +230,7 @@ function DocumentsCard({
                 </p>
 
                 <p className="mt-1 font-[Cairo] text-[10px] text-[#6B7280] whitespace-nowrap">
-                  {doc.date} - PDF{doc.size ? ` - ${doc.size}` : ""}
+                  {doc.type || "ملف مرفوع"}
                 </p>
               </div>
             </div>
@@ -344,6 +344,7 @@ function FamilyDetailsPage({
   const certificateRevokeTimerRef = useRef(null);
   const { familyId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { family: fetchedFamily, loading, error } = useFamily(familyId);
 
@@ -373,6 +374,13 @@ function FamilyDetailsPage({
   const handleViewCertificate = async () => {
     if (certificateLoading) return;
 
+    const previewWindow = window.open("about:blank", "_blank");
+    if (!previewWindow) {
+      setCertificateError("تعذر فتح نافذة عرض المستند. يرجى السماح بالنوافذ المنبثقة.");
+      return;
+    }
+    previewWindow.opener = null;
+
     setCertificateLoading(true);
     setCertificateError("");
     try {
@@ -387,7 +395,7 @@ function FamilyDetailsPage({
 
       const objectUrl = URL.createObjectURL(blob);
       certificateUrlRef.current = objectUrl;
-      window.open(objectUrl, "_blank", "noopener,noreferrer");
+      previewWindow.location.replace(objectUrl);
 
       certificateRevokeTimerRef.current = setTimeout(() => {
         URL.revokeObjectURL(objectUrl);
@@ -396,6 +404,7 @@ function FamilyDetailsPage({
         }
       }, 60000);
     } catch {
+      previewWindow.close();
       setCertificateError("تعذر فتح شهادة الوفاة، حاول مجددًا.");
     } finally {
       setCertificateLoading(false);
@@ -434,8 +443,7 @@ function FamilyDetailsPage({
       ? [
           {
             name: family.fatherDeathCertificateFileName || "شهادة وفاة",
-            date: family.createdAt ? new Date(family.createdAt).toLocaleDateString("ar-EG") : "",
-            size: "",
+            type: family.fatherDeathCertificateFileName?.split(".").pop()?.toUpperCase() || "ملف مرفوع",
           },
         ]
       : []);
@@ -470,6 +478,12 @@ function FamilyDetailsPage({
             />
 
             <StatusAlert config={config} />
+
+            {location.state?.familyDocumentSuccess && (
+              <p role="status" className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 font-[Cairo] text-sm font-bold text-emerald-700">
+                {location.state.familyDocumentSuccess}
+              </p>
+            )}
 
             <section className="mt-8 grid grid-cols-1 lg:grid-cols-[1fr_330px] gap-6 items-stretch">
               <FamilyInfoCard family={family} />

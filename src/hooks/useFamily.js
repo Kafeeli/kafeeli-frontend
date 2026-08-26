@@ -18,9 +18,12 @@ export function useFamily(familyId) {
     setLoading(true);
     setError(null);
     try {
-      setFamily(await loadFamily(familyId));
+      const data = await loadFamily(familyId);
+      setFamily(data);
+      return data;
     } catch (err) {
       setError(err);
+      throw err;
     } finally {
       setLoading(false);
     }
