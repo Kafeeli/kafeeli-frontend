@@ -22,7 +22,7 @@ const Error401 = () => {
         <div className="mb-5 flex justify-center">
           <img
             src={titleImg}
-            alt="logo"
+            alt="شعار كفيلي"
             className="w-56 h-56 md:w-64 object-contain animate-float"
           />
         </div>
@@ -30,7 +30,7 @@ const Error401 = () => {
         {/* Badge */}
         <div className="inline-flex items-center gap-2 bg-[#FDECEC] text-[#C53030] px-4 py-1.5 rounded-full text-sm font-bold mb-5 animate-popIn">
           <FaLock />
-          <span>ERROR 401</span>
+          <span>خطأ 401</span>
           <FaLock />
         </div>
 

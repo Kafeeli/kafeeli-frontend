@@ -407,7 +407,7 @@ export default function TransferReviewList() {
   };
 
   return (
-    <AdminLayout title="أهلاً بك Admin في لوحة إدارة منصة كفيلي">
+    <AdminLayout>
       {/* Breadcrumb */}
       <div className="mb-3 flex items-center gap-2 text-sm text-[#6B7280]">
         <button

@@ -6,6 +6,7 @@ import { sponsorshipApi } from "../../services/sponsorshipApi";
 import { EmptyState, ErrorState, LoadingState } from "../admin-dashboard/Adminstates";
 import SponsorFlowLayout from "./SponsorFlowLayout";
 import { formatAmount, formatDate, getApiErrorMessage, getResultData } from "./sponsorFlowUtils";
+import { localizeStatus } from "../../utils/localization";
 
 export default function SponsorSponsorshipsPage() {
   const navigate = useNavigate();
@@ -42,7 +43,7 @@ export default function SponsorSponsorshipsPage() {
             <article key={item.sponsorshipId} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
               <div className="flex items-start justify-between gap-3">
                 <div><h2 className="font-extrabold text-[#003469]">{item.targetDisplayName || "—"}</h2><p className="mt-1 text-sm text-gray-500">{item.targetType || "—"} · {item.targetCity || "—"}</p></div>
-                <span className="rounded-full bg-[#E8F1FA] px-3 py-1 text-xs font-bold text-[#0D4B8E]">{item.statusLabel || "—"}</span>
+                <span className="rounded-full bg-[#E8F1FA] px-3 py-1 text-xs font-bold text-[#0D4B8E]">{localizeStatus(item.statusLabel || item.status)}</span>
               </div>
               <dl className="mt-5 grid grid-cols-2 gap-4 text-sm">
                 <div><dt className="text-gray-500">المبلغ الشهري</dt><dd className="mt-1 font-bold">{formatAmount(item.monthlyAmount)}</dd></div>

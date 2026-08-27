@@ -99,6 +99,17 @@ export const adminApi = {
     return response.data;
   },
 
+  updateFamilyStatus: async (familyId, status, reason = null) => {
+    const response = await api.patch(
+      `/api/v1/admin/families/${familyId}/status`,
+      {
+        status,
+        reason: status === "NeedsUpdate" ? reason?.trim() : null,
+      },
+    );
+    return response.data;
+  },
+
   getFamilyFatherDeathCertificate: async (id) => {
     const response = await api.get(
       `/api/v1/admin/families/${id}/father-death-certificate`,
@@ -175,6 +186,16 @@ export const adminApi = {
     return response.data;
   },
 
+  getAllGuardians: async () => {
+    const response = await api.get("/api/v1/admin/guardians");
+    return response.data;
+  },
+
+  getAllSponsors: async () => {
+    const response = await api.get("/api/v1/admin/sponsors");
+    return response.data;
+  },
+
   // PUT /api/v1/admin/guardians/{guardianId}/verification/approve
   approveGuardian: async (guardianId) => {
     const response = await api.put(
@@ -202,6 +223,10 @@ export const adminApi = {
 
   getPendingOrphans: async () => {
     const response = await api.get("/api/v1/admin/orphans/pending");
+    return response.data;
+  },
+  getAllOrphans: async () => {
+    const response = await api.get("/api/v1/admin/orphans");
     return response.data;
   },
   getOrphanDetails: async (orphanId) => {

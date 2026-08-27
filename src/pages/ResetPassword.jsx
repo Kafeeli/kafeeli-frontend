@@ -152,7 +152,7 @@ function ResetPassword() {
         <div className="w-full h-[79px] flex items-center justify-between px-8">
           <img
             src={logo}
-            alt="logo"
+            alt="شعار كفيلي"
             className="w-[109px] h-[55px] object-contain"
           />
 
@@ -163,7 +163,7 @@ function ResetPassword() {
           <div className="flex items-center gap-1">
             <img
               src={securityIcon}
-              alt="security"
+              alt="الأمان"
               className="w-[12px] h-[12px] object-contain"
             />
 
@@ -179,7 +179,7 @@ function ResetPassword() {
           <div className="flex justify-center mb-4">
             <img
               src={Icon}
-              alt="Reset Password Icon"
+              alt="أيقونة إعادة تعيين كلمة المرور"
               className="w-[80px] h-[70px] object-contain"
             />
           </div>

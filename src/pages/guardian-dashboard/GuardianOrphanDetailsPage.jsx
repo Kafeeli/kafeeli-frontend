@@ -5,6 +5,7 @@ import { orphanApi } from "../../services/orphanApi";
 import { apiErrorMessage, openProtectedBlob, unwrapResult } from "../../utils/apiUi";
 import { ErrorState, LoadingState } from "../admin-dashboard/Adminstates";
 import GuardianFlowLayout from "./GuardianFlowLayout";
+import { localizeDisplayFields, localizeDocumentType } from "../../utils/localization";
 
 const ORPHAN_DOCUMENT_TYPES = { BirthCertificate: 1, FatherDeathCertificate: 2, MotherDeathCertificate: 3, CaseReport: 4, RecentPhoto: 5, OrphanNationalId: 6, MedicalReport: 7, EducationProof: 8, Other: 9 };
 
@@ -22,8 +23,8 @@ export default function GuardianOrphanDetailsPage() {
     setLoading(true); setError("");
     try {
       const [orphanResult, documentsResult] = await Promise.all([orphanApi.getById(orphanId), orphanApi.getDocuments(orphanId)]);
-      setOrphan(unwrapResult(orphanResult, "تعذر تحميل بيانات اليتيم."));
-      setDocuments(unwrapResult(documentsResult, "تعذر تحميل وثائق اليتيم.") || []);
+      setOrphan(localizeDisplayFields(unwrapResult(orphanResult, "تعذر تحميل بيانات اليتيم."), ["orphanStatus", "gender", "educationalStatus"]));
+      setDocuments((unwrapResult(documentsResult, "تعذر تحميل وثائق اليتيم.") || []).map((item) => ({ ...localizeDisplayFields(item, ["verificationStatus"]), arabicLabel: item.arabicLabel || localizeDocumentType(item.documentType) })));
     } catch (requestError) { setError(apiErrorMessage(requestError, "تعذر تحميل بيانات اليتيم.")); }
     finally { setLoading(false); }
   }, [orphanId]);

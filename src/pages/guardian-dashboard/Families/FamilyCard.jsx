@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { MdLocationOn, MdInfoOutline } from "react-icons/md";
 import { FAMILY_STATUS_CONFIG, FAMILY_CARD_STYLE } from "../../../config/familyStatus";
+import { formatArabicDateTime } from "../../../utils/date";
 
 /**
  * كرت عائلة واحد بصفحة القائمة. مبني على الديزاين الأصلي (ManagingFamilyCards)
@@ -70,7 +71,7 @@ function FamilyCard({ family }) {
               تاريخ الإضافة
             </p>
             <p className="mt-1 font-[Cairo] text-[14px] font-bold text-[#111827]">
-              {family.createdAt ? new Date(family.createdAt).toLocaleDateString("ar-EG") : "—"}
+              {formatArabicDateTime(family.createdAt)}
             </p>
           </div>
         </div>

@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaEnvelope, FaHandHoldingHeart, FaShieldAlt, FaUserTie } from "react-icons/fa";
-import { FiAlertCircle, FiAlignJustify, FiEye, FiUser } from "react-icons/fi";
+import { FiAlertCircle, FiEye } from "react-icons/fi";
 import Sidebar from "./Sidebar";
 import { sponsorshipApi } from "../../services/sponsorshipApi";
 import useDashboard from "../../hooks/useDashboard";
 import { formatAmount, formatDate, getApiErrorMessage, getResultData } from "./sponsorFlowUtils";
+import AuthenticatedHeader from "../../components/layout/AuthenticatedHeader";
+import AuthenticatedFooter from "../../components/layout/AuthenticatedFooter";
+import { localizeStatus } from "../../utils/localization";
 
 function AccountCard({ icon, label, value }) {
   return (
@@ -46,11 +49,7 @@ export default function Dashboard() {
     <div className="flex min-h-screen bg-gray-50" dir="rtl">
       <Sidebar activeItem="نظرة عامة" openSidebar={isSidebarOpen} setOpenSidebar={setIsSidebarOpen} />
       <div className="flex min-w-0 flex-1 flex-col lg:mr-64">
-        <header className="flex min-h-16 items-center justify-between gap-4 border-b border-gray-200 bg-white px-4 py-3 sm:px-6">
-          <button type="button" onClick={() => setIsSidebarOpen(true)} className="p-2 text-[#003469] lg:hidden" aria-label="فتح القائمة"><FiAlignJustify className="text-xl" /></button>
-          <div><p className="font-bold text-[#003469]">{data?.fullName || "لوحة تحكم الكفيل"}</p>{data?.role && <p className="text-xs text-gray-500">{data.role}</p>}</div>
-          {data?.profileImageUrl ? <img src={data.profileImageUrl} alt="الصورة الشخصية" className="h-10 w-10 rounded-full border object-cover" /> : <div className="grid h-10 w-10 place-items-center rounded-full border text-[#003469]"><FiUser /></div>}
-        </header>
+        <AuthenticatedHeader onMenuClick={() => setIsSidebarOpen(true)} />
 
         <main className="flex-1 space-y-6 p-4 sm:p-6">
           <h1 className="text-2xl font-extrabold text-[#003469]">نظرة عامة</h1>
@@ -85,7 +84,7 @@ export default function Dashboard() {
                     <tr key={row.sponsorshipId} className="border-b border-gray-200 last:border-0">
                       <td className="whitespace-nowrap px-4 py-3 font-bold text-gray-800">{row.targetDisplayName || "—"}</td>
                       <td className="whitespace-nowrap px-4 py-3 text-gray-600">{row.targetType || "—"}</td>
-                      <td className="whitespace-nowrap px-4 py-3"><span className="rounded-full bg-[#E8F1FA] px-3 py-1 text-xs text-[#0D4B8E]">{row.statusLabel || "—"}</span></td>
+                      <td className="whitespace-nowrap px-4 py-3"><span className="rounded-full bg-[#E8F1FA] px-3 py-1 text-xs text-[#0D4B8E]">{localizeStatus(row.statusLabel || row.status)}</span></td>
                       <td className="whitespace-nowrap px-4 py-3 text-gray-600">{formatAmount(row.totalAmount)}</td>
                       <td className="whitespace-nowrap px-4 py-3 text-gray-600">{formatDate(row.createdAt)}</td>
                       <td className="whitespace-nowrap px-4 py-3"><Link to={`/sponsor/sponsorships/${row.sponsorshipId}`} className="inline-flex items-center gap-1 text-xs font-bold text-[#0F7F8C] hover:underline">التفاصيل <FiEye /></Link></td>
@@ -99,6 +98,7 @@ export default function Dashboard() {
             </div>
           </section>
         </main>
+        <AuthenticatedFooter />
       </div>
     </div>
   );

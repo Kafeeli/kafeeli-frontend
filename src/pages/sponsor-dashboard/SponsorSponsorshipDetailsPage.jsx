@@ -5,6 +5,7 @@ import { sponsorshipApi } from "../../services/sponsorshipApi";
 import { ErrorState, LoadingState } from "../admin-dashboard/Adminstates";
 import SponsorFlowLayout from "./SponsorFlowLayout";
 import { formatAmount, formatDate, getApiErrorMessage, getResultData } from "./sponsorFlowUtils";
+import { localizeStatus } from "../../utils/localization";
 
 const MAX_PAYMENT_PROOF_SIZE = 5 * 1024 * 1024;
 const PAYMENT_PROOF_ACCEPT = ".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf";
@@ -145,7 +146,7 @@ export default function SponsorSponsorshipDetailsPage() {
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="flex items-start justify-between gap-4 border-b border-gray-100 pb-5">
             <div className="flex items-center gap-3"><div className="grid h-12 w-12 place-items-center rounded-full bg-[#E8F1FA] text-[#0D4B8E]"><MdVolunteerActivism className="text-2xl" /></div><div><h2 className="text-xl font-extrabold text-[#003469]">{sponsorship.targetDisplayName || "—"}</h2><p className="mt-1 text-sm text-gray-500">{sponsorship.targetType || "—"} · {sponsorship.targetCity || "—"}</p></div></div>
-            <span className="rounded-full bg-[#E8F1FA] px-3 py-1 text-xs font-bold text-[#0D4B8E]">{sponsorship.statusLabel || "—"}</span>
+            <span className="rounded-full bg-[#E8F1FA] px-3 py-1 text-xs font-bold text-[#0D4B8E]">{localizeStatus(sponsorship.statusLabel || sponsorship.status)}</span>
           </div>
           <dl className="mt-6 grid gap-5 sm:grid-cols-2">
             <div><dt className="text-sm text-gray-500">المبلغ الشهري</dt><dd className="mt-1 font-extrabold">{formatAmount(sponsorship.monthlyAmount)}</dd></div>

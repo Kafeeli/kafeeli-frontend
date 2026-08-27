@@ -303,25 +303,18 @@ export default function FamiliesReview() {
     return filtered.slice(start, start + ITEMS_PER_PAGE);
   }, [filtered, page]);
 
-  const handleDecision = async (family, decisionType, reason) => {
+  const handleDecision = async (family, targetStatus, reason) => {
     if (actionLoading) return false;
 
     setActionLoading(true);
     setActionError("");
     setSuccessMessage("");
     try {
-      let result;
-      if (decisionType === "approve") {
-        result = await adminApi.approveFamily(family.familyId);
-      } else if (decisionType === "needsUpdate") {
-        result = await adminApi.requestFamilyUpdate(family.familyId, reason);
-      } else if (decisionType === "hide") {
-        result = await adminApi.hideFamily(family.familyId);
-      } else if (decisionType === "suspend") {
-        result = await adminApi.suspendFamily(family.familyId);
-      } else {
-        throw new Error("إجراء إدارة العائلة غير مدعوم.");
-      }
+      const result = await adminApi.updateFamilyStatus(
+        family.familyId,
+        targetStatus,
+        reason,
+      );
 
       if (result?.success === false) {
         throw new Error(
@@ -331,14 +324,7 @@ export default function FamiliesReview() {
 
       const backendUpdatedFamily = result?.data?.familyId ? result.data : null;
       const message =
-        result?.message ||
-          (decisionType === "approve"
-            ? "تم اعتماد العائلة بنجاح."
-            : decisionType === "needsUpdate"
-              ? "تم إرسال طلب تحديث البيانات بنجاح."
-              : decisionType === "hide"
-                ? "تم إخفاء العائلة بنجاح."
-                : "تم تعليق العائلة بنجاح.");
+        result?.message || "تم حفظ حالة العائلة بنجاح.";
 
       setSuccessMessage(message);
       if (backendUpdatedFamily) setSelectedFamily(backendUpdatedFamily);
@@ -395,7 +381,7 @@ export default function FamiliesReview() {
   };
 
   return (
-    <AdminLayout title="أهلاً بك Admin في لوحة إدارة منصة كفيلي">
+    <AdminLayout>
       <div className="mb-3 flex items-center gap-2 text-sm text-[#6B7280]">
         <button
           onClick={() => navigate("/admin-dashboard")}
@@ -622,11 +608,6 @@ export default function FamiliesReview() {
         />
       )}
 
-      <footer className="mt-20 py-2 border-t border-[#E5E7EB] text-center">
-        <p className="text-sm text-[#6B7280] mt-4">
-          © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
-        </p>
-      </footer>
     </AdminLayout>
   );
 }

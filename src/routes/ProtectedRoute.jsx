@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { currentUserApi } from "../services/currentUserApi";
 import { apiErrorMessage, unwrapResult } from "../utils/apiUi";
 import { getStoredUser, getUserRoles } from "../utils/session";
+import CurrentUserProvider from "../context/CurrentUserProvider";
 
 function ProtectedRoute({ children, allowedRoles = [] }) {
   const token = localStorage.getItem("token");
@@ -56,7 +57,7 @@ function ProtectedRoute({ children, allowedRoles = [] }) {
     return <Navigate to="/auth-401" replace />;
   }
 
-  return children;
+  return <CurrentUserProvider user={serverUser || user}>{children}</CurrentUserProvider>;
 }
 
 export default ProtectedRoute;

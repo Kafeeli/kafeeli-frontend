@@ -5,6 +5,7 @@ import { apiErrorMessage, openProtectedBlob, unwrapResult } from "../../utils/ap
 import { formatAmount, formatDate } from "../sponsor-dashboard/sponsorFlowUtils";
 import AdminLayout from "./Adminlayout";
 import { EmptyState, ErrorState, LoadingState } from "./Adminstates";
+import { localizeDisplayFields } from "../../utils/localization";
 
 export default function AdminPaymentsReviewPage() {
   const [payments, setPayments] = useState([]);
@@ -14,9 +15,9 @@ export default function AdminPaymentsReviewPage() {
   const [actionError, setActionError] = useState("");
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
-  const load = useCallback(async () => { setLoading(true); setError(""); try { setPayments(unwrapResult(await adminApi.getPendingPayments(), "تعذر تحميل المدفوعات.") || []); } catch (requestError) { setError(apiErrorMessage(requestError)); } finally { setLoading(false); } }, []);
+  const load = useCallback(async () => { setLoading(true); setError(""); try { const items = unwrapResult(await adminApi.getPendingPayments(), "تعذر تحميل المدفوعات.") || []; setPayments(items.map((item) => localizeDisplayFields(item, ["paymentStatus"]))); } catch (requestError) { setError(apiErrorMessage(requestError)); } finally { setLoading(false); } }, []);
   useEffect(() => { const id = window.setTimeout(load, 0); return () => window.clearTimeout(id); }, [load]);
-  const showDetails = async (paymentId) => { setBusy(true); setActionError(""); try { setSelected(unwrapResult(await adminApi.getPaymentDetails(paymentId), "تعذر تحميل تفاصيل الدفعة.")); } catch (requestError) { setActionError(apiErrorMessage(requestError)); } finally { setBusy(false); } };
+  const showDetails = async (paymentId) => { setBusy(true); setActionError(""); try { setSelected(localizeDisplayFields(unwrapResult(await adminApi.getPaymentDetails(paymentId), "تعذر تحميل تفاصيل الدفعة."), ["paymentStatus"])); } catch (requestError) { setActionError(apiErrorMessage(requestError)); } finally { setBusy(false); } };
   const viewProof = async () => { setBusy(true); setActionError(""); try { openProtectedBlob(await adminApi.getPaymentProof(selected.paymentId)); } catch (requestError) { setActionError(apiErrorMessage(requestError, "تعذر فتح إثبات الدفع.")); } finally { setBusy(false); } };
   const review = async (action) => { setBusy(true); setActionError(""); try { const result = action === "approve" ? await adminApi.approvePayment(selected.paymentId) : await adminApi.rejectPayment(selected.paymentId, reason); unwrapResult(result, "تعذر مراجعة الدفعة."); setSelected(null); setReason(""); await load(); } catch (requestError) { setActionError(apiErrorMessage(requestError)); } finally { setBusy(false); } };
   let content;
