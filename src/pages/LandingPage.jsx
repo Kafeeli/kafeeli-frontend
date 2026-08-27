@@ -44,7 +44,10 @@ function getLandingDestinations() {
     return { primary: "/admin-dashboard", sponsorBrowse: "/admin-dashboard" };
   }
   if (roles.includes("Guardian")) {
-    return { primary: "/guardian-dashboard", sponsorBrowse: "/guardian-dashboard" };
+    return {
+      primary: "/guardian-dashboard",
+      sponsorBrowse: "/guardian-dashboard",
+    };
   }
   if (roles.includes("Sponsor")) {
     return { primary: "/main", sponsorBrowse: "/sponsor/families" };
@@ -173,13 +176,19 @@ export default function LandingPage() {
             </p>
 
             <div className="flex  flex-col sm:flex-row gap-4 justify-center lg:justify-start items-stretch sm:items-center">
-              <Link to="/register" className="cursor-pointer bg-[#2DBCC3] hover:bg-[#2DBCC3]/90 text-white text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl shadow-lg shadow-[#2DBCC3]/20 w-full sm:w-auto">
-                سجّل الآن
+              <Link
+                to={destinations.sponsorBrowse}
+                className="cursor-pointer bg-[#2DBCC3] hover:bg-[#2DBCC3]/90 text-white text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl shadow-lg shadow-[#2DBCC3]/20 w-full sm:w-auto"
+              >
+                ابدأ الكفالة الآن
               </Link>
 
-              <a href="#about" className="bg-white cursor-pointer hover:bg-gray-50 text-[#0D4B8E] text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-10 rounded-xl border-2 border-[#0D4B8E]/10 w-full sm:w-auto whitespace-nowrap">
+              <Link
+                to="/about"
+                className="bg-white cursor-pointer hover:bg-gray-50 text-[#0D4B8E] text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-10 rounded-xl border-2 border-[#0D4B8E]/10 w-full sm:w-auto whitespace-nowrap"
+              >
                 تعرف علينا
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -274,7 +283,10 @@ export default function LandingPage() {
           </div>
 
           {/* الكروت - RTL: الأمان على اليمين */}
-          <div id="privacy" className="scroll-mt-24 grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+          <div
+            id="privacy"
+            className="scroll-mt-24 grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8"
+          >
             {features.map((feature, index) => (
               <div
                 key={index}
@@ -350,8 +362,11 @@ export default function LandingPage() {
                     العمر: {orphan.age}
                   </p>
 
-                  <Link to="/register" className="block w-full bg-[#0D4B8E] hover:bg-[#0D4B8E]/90 text-white py-3 rounded-xl font-semibold transition-all active:scale-95 cursor-pointer">
-                    سجّل الآن
+                  <Link
+                    to={destinations.sponsorBrowse}
+                    className="block w-full bg-[#0D4B8E] hover:bg-[#0D4B8E]/90 text-white py-3 rounded-xl font-semibold transition-all active:scale-95 cursor-pointer"
+                  >
+                    اكفلني الآن
                   </Link>
                 </div>
               </div>
@@ -359,7 +374,10 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      <section id="how-it-works" className="scroll-mt-24 bg-[#F8F9FA] py-10 lg:py-24">
+      <section
+        id="how-it-works"
+        className="scroll-mt-24 bg-[#F8F9FA] py-10 lg:py-24"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* العنوان */}
           <div id="faq" className="scroll-mt-24 text-center mb-12 lg:mb-16">
@@ -408,13 +426,12 @@ export default function LandingPage() {
 
           {/* الأزرار */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center">
-            <Link to="/register" className="cursor-pointer bg-[#D9A441] hover:bg-[#e5a021] text-white font-bold py-3 px-8 rounded-xl transition-all active:scale-95">
-              سجّل الآن
+            <Link
+              to={destinations.primary}
+              className="cursor-pointer bg-[#D9A441] hover:bg-[#e5a021] text-white font-bold py-3 px-8 rounded-xl transition-all active:scale-95"
+            >
+              انضم إلينا الآن
             </Link>
-
-            <a href="#impact" className="cursor-pointer bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-8 rounded-xl border border-white/30 transition-all active:scale-95">
-              شاهد قصص النجاح
-            </a>
           </div>
         </div>
       </section>
