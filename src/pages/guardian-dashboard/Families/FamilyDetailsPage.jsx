@@ -6,10 +6,12 @@ import { familyApi } from "../../../services/familyApi";
 import { orphanApi } from "../../../services/orphanApi";
 import { unwrapResult } from "../../../utils/apiUi";
 import { FAMILY_STATUS_CONFIG } from "../../../config/familyStatus";
+import AuthenticatedHeader from "../../../components/layout/AuthenticatedHeader";
+import AuthenticatedFooter from "../../../components/layout/AuthenticatedFooter";
+import { localizeStatus } from "../../../utils/localization";
+import { formatArabicDateTime } from "../../../utils/date";
 
 import {
-  MdMenu,
-  MdNotificationsNone,
   MdPerson,
   MdKeyboardArrowLeft,
   MdInfoOutline,
@@ -25,7 +27,8 @@ import {
 /* 🧩 مكونات مشتركة (نفسها حرفيًا بكل الحالات الخمسة الأصلية)                */
 /* ========================================================================== */
 function TopNavbar({ setOpenSidebar }) {
-  return (
+  return <AuthenticatedHeader onMenuClick={() => setOpenSidebar(true)} />;
+  /* return (
     <header className="min-h-[52px] bg-white border-b border-[#DDE2EA] shadow-sm flex items-center justify-between gap-3 px-4 py-2 sm:px-6">
       <div className="flex items-center gap-3 min-w-0">
         <button
@@ -68,7 +71,7 @@ function TopNavbar({ setOpenSidebar }) {
         </div>
       </div>
     </header>
-  );
+  ); */
 }
 
 function Breadcrumb() {
@@ -174,8 +177,8 @@ function FamilyInfoCard({ family }) {
 
       <div className="mt-7 grid grid-cols-1 sm:grid-cols-3 gap-x-8 gap-y-6 border-b border-[#D8DEE9] pb-6">
         <InfoItem label="الاحتياج الشهري المقدر" value={family.monthlyNeedAmount + " ILS"} highlight />
-        <InfoItem label="تاريخ الإنشاء" value={family.createdAt} />
-        <InfoItem label="آخر تحديث" value={family.updatedAt} />
+        <InfoItem label="تاريخ الإنشاء" value={formatArabicDateTime(family.createdAt)} />
+        <InfoItem label="آخر تحديث" value={formatArabicDateTime(family.updatedAt)} />
       </div>
 
       <div className="mt-7">
@@ -260,7 +263,7 @@ function OrphanCard({ orphan, onView }) {
     <article className="h-full bg-white border border-[#C9D2E3] rounded-[14px] px-6 py-5 shadow-sm hover:shadow-md transition flex flex-col">
       <div className="flex items-start justify-between gap-4">
         <span className="inline-flex items-center rounded-full bg-[#D9F7F1] px-3 py-1.5 font-[Cairo] text-[11px] font-bold text-[#008C78] whitespace-nowrap">
-          {orphan.status}
+          {localizeStatus(orphan.status)}
         </span>
 
         <div
@@ -542,11 +545,7 @@ function FamilyDetailsPage({
           </div>
         </main>
 
-        <footer className="mt-10 sm:mt-14 lg:mt-20 border-t border-[#E5E7EB] text-center px-4">
-          <p className="text-xs sm:text-sm text-[#6B7280] mt-4 mb-4">
-            © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
-          </p>
-        </footer>
+        <AuthenticatedFooter />
       </div>
     </div>
   );

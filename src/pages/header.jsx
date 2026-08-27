@@ -123,7 +123,7 @@ const Header = ({ primaryDestination = "/register" }) => {
                 to={primaryDestination}
                 className="block bg-blue-900 cursor-pointer hover:bg-blue-800 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-900/20 active:scale-95"
               >
-                تبرع الآن
+                سجّل الآن
               </Link>
             </div>
 
@@ -195,7 +195,7 @@ const Header = ({ primaryDestination = "/register" }) => {
               to={primaryDestination}
               className="block cursor-pointer w-full bg-blue-900 hover:bg-blue-800 text-center text-white px-6 py-3 rounded-lg text-base font-semibold transition-all active:scale-[0.98]"
             >
-              تبرع الآن
+              سجّل الآن
             </Link>
           </div>
         </div>

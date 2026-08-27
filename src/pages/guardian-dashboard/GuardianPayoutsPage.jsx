@@ -5,6 +5,7 @@ import { apiErrorMessage, unwrapResult } from "../../utils/apiUi";
 import { EmptyState, ErrorState, LoadingState } from "../admin-dashboard/Adminstates";
 import { formatAmount, formatDate } from "../sponsor-dashboard/sponsorFlowUtils";
 import GuardianFlowLayout from "./GuardianFlowLayout";
+import { localizeDisplayFields } from "../../utils/localization";
 
 export default function GuardianPayoutsPage() {
   const [payouts, setPayouts] = useState([]);
@@ -12,9 +13,9 @@ export default function GuardianPayoutsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [detailError, setDetailError] = useState("");
-  const load = useCallback(async () => { setLoading(true); setError(""); try { setPayouts(unwrapResult(await payoutApi.getMine(), "تعذر تحميل الدفعات.") || []); } catch (requestError) { setError(apiErrorMessage(requestError, "تعذر تحميل الدفعات.")); } finally { setLoading(false); } }, []);
+  const load = useCallback(async () => { setLoading(true); setError(""); try { const items = unwrapResult(await payoutApi.getMine(), "تعذر تحميل التحويلات.") || []; setPayouts(items.map((item) => localizeDisplayFields(item, ["payoutStatus"]))); } catch (requestError) { setError(apiErrorMessage(requestError, "تعذر تحميل التحويلات.")); } finally { setLoading(false); } }, []);
   useEffect(() => { const id = window.setTimeout(load, 0); return () => window.clearTimeout(id); }, [load]);
-  const showDetails = async (payoutId) => { setDetailError(""); try { setSelected(unwrapResult(await payoutApi.getMineById(payoutId), "تعذر تحميل تفاصيل الدفعة.")); } catch (requestError) { setDetailError(apiErrorMessage(requestError, "تعذر تحميل تفاصيل الدفعة.")); } };
+  const showDetails = async (payoutId) => { setDetailError(""); try { setSelected(localizeDisplayFields(unwrapResult(await payoutApi.getMineById(payoutId), "تعذر تحميل تفاصيل التحويل."), ["payoutStatus"])); } catch (requestError) { setDetailError(apiErrorMessage(requestError, "تعذر تحميل تفاصيل التحويل.")); } };
   let content;
   if (loading) content = <LoadingState />;
   else if (error) content = <ErrorState onRetry={load} description={error} />;

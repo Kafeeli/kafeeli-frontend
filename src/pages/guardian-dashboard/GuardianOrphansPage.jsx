@@ -5,6 +5,7 @@ import { orphanApi } from "../../services/orphanApi";
 import { apiErrorMessage, unwrapResult } from "../../utils/apiUi";
 import { EmptyState, ErrorState, LoadingState } from "../admin-dashboard/Adminstates";
 import GuardianFlowLayout from "./GuardianFlowLayout";
+import { localizeDisplayFields } from "../../utils/localization";
 
 export default function GuardianOrphansPage() {
   const [orphans, setOrphans] = useState([]);
@@ -12,7 +13,7 @@ export default function GuardianOrphansPage() {
   const [error, setError] = useState("");
   const load = useCallback(async () => {
     setLoading(true); setError("");
-    try { const data = unwrapResult(await orphanApi.getMine(), "تعذر تحميل الأيتام."); setOrphans(data?.orphans || []); }
+    try { const data = unwrapResult(await orphanApi.getMine(), "تعذر تحميل الأيتام."); setOrphans((data?.orphans || []).map((item) => localizeDisplayFields(item, ["orphanStatus"]))); }
     catch (requestError) { setError(apiErrorMessage(requestError, "تعذر تحميل الأيتام.")); }
     finally { setLoading(false); }
   }, []);

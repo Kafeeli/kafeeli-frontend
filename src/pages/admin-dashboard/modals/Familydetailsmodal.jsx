@@ -1,20 +1,32 @@
 import { useState } from "react";
 import {
   MdCalendarToday,
-  MdBlock,
   MdClose,
   MdEmail,
   MdFamilyRestroom,
   MdLocationOn,
   MdOutlineEditNote,
-  MdOutlineVerified,
   MdPerson,
   MdPictureAsPdf,
-  MdVisibilityOff,
 } from "react-icons/md";
-import FamilyDecisionModal from "./Familydecisionmodal";
-import { FAMILY_STATUS_ACTIONS, STATUS_MAP } from "../Familystatus";
+import { STATUS_MAP } from "../Familystatus";
 import { mapFamilyStatus } from "../../../config/familyStatus";
+
+const FAMILY_STATUS_OPTIONS = [
+  { value: "PendingReview", label: "قيد المراجعة" },
+  { value: "NeedsUpdate", label: "يحتاج تحديث" },
+  { value: "Active", label: "نشطة" },
+  { value: "Hidden", label: "مخفية" },
+  { value: "Suspended", label: "معلّقة" },
+];
+
+const BACKEND_STATUS_BY_NORMALIZED_STATUS = {
+  pending: "PendingReview",
+  needsEdit: "NeedsUpdate",
+  active: "Active",
+  hidden: "Hidden",
+  stopped: "Suspended",
+};
 
 const formatDate = (value) => {
   if (!value) return "غير متوفر";
@@ -66,19 +78,33 @@ export default function FamilyDetailsModal({
   onViewCertificate,
   certificateLoading = false,
 }) {
-  const [decisionType, setDecisionType] = useState(null);
   const normalizedStatus = mapFamilyStatus(family?.status);
   const statusInfo = STATUS_MAP[normalizedStatus] || STATUS_MAP.pending;
-  const availableActions = FAMILY_STATUS_ACTIONS[normalizedStatus] || [];
-  const canReview = availableActions.includes("approve");
-  const canHide = availableActions.includes("hide");
-  const canSuspend = availableActions.includes("suspend");
+  const [targetStatus, setTargetStatus] = useState(
+    () => BACKEND_STATUS_BY_NORMALIZED_STATUS[normalizedStatus] || "PendingReview",
+  );
+  const [reason, setReason] = useState("");
+  const [validationError, setValidationError] = useState("");
 
   if (!family) return null;
 
-  const handleConfirmedDecision = async (reason) => {
-    const succeeded = await onDecision?.(family, decisionType, reason);
-    if (succeeded) setDecisionType(null);
+  const handleStatusSubmit = async (event) => {
+    event.preventDefault();
+    if (actionLoading) return;
+
+    const trimmedReason = reason.trim();
+    if (targetStatus === "NeedsUpdate" && !trimmedReason) {
+      setValidationError("يرجى كتابة سبب طلب التحديث.");
+      return;
+    }
+
+    setValidationError("");
+    const succeeded = await onDecision?.(
+      family,
+      targetStatus,
+      targetStatus === "NeedsUpdate" ? trimmedReason : null,
+    );
+    if (succeeded && targetStatus !== "NeedsUpdate") setReason("");
   };
 
   return (
@@ -113,9 +139,7 @@ export default function FamilyDetailsModal({
             </div>
 
             <div className="mt-auto rounded-2xl bg-white/10 p-4 text-sm leading-7 text-white/80">
-              {canReview
-                ? "راجع بيانات العائلة والشهادة المرفقة قبل اتخاذ القرار."
-                : "تعرض هذه الصفحة بيانات العائلة وحالتها الحالية كما أعادها الخادم."}
+              اختر حالة العائلة المطلوبة، وسيعرض النظام الحالة التي يعيدها الخادم بعد الحفظ.
             </div>
           </aside>
 
@@ -218,71 +242,67 @@ export default function FamilyDetailsModal({
               </div>
             )}
 
-            {availableActions.length > 0 && (
-              <section className="border-t border-slate-100 pt-6">
-                <h3 className="mb-4 font-bold text-[#183b56]">إجراءات الحالة</h3>
-                <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-                  {canReview && (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => setDecisionType("needsUpdate")}
-                        disabled={actionLoading}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl border border-amber-300 bg-amber-50 px-6 py-3 font-bold text-amber-800 transition hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        <MdOutlineEditNote className="text-xl" />
-                        طلب تحديث البيانات
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setDecisionType("approve")}
-                        disabled={actionLoading}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#159c8c] px-7 py-3 font-bold text-white transition hover:bg-[#128577] disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        <MdOutlineVerified className="text-xl" />
-                        اعتماد العائلة
-                      </button>
-                    </>
-                  )}
-                  {canSuspend && (
-                    <button
-                      type="button"
-                      onClick={() => setDecisionType("suspend")}
+            <section className="border-t border-slate-100 pt-6">
+              <h3 className="mb-4 font-bold text-[#183b56]">إدارة حالة العائلة</h3>
+              <form onSubmit={handleStatusSubmit} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <label htmlFor="family-status" className="mb-2 block text-sm font-bold text-[#183b56]">
+                  الحالة المطلوبة
+                </label>
+                <select
+                  id="family-status"
+                  value={targetStatus}
+                  onChange={(event) => {
+                    setTargetStatus(event.target.value);
+                    setValidationError("");
+                  }}
+                  disabled={actionLoading}
+                  className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-[#183b56] outline-none focus:border-[#159c8c] focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {FAMILY_STATUS_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+
+                {targetStatus === "NeedsUpdate" && (
+                  <div className="mt-4">
+                    <label htmlFor="family-status-reason" className="mb-2 block text-sm font-bold text-[#183b56]">
+                      سبب طلب التحديث
+                    </label>
+                    <textarea
+                      id="family-status-reason"
+                      value={reason}
+                      onChange={(event) => {
+                        setReason(event.target.value);
+                        setValidationError("");
+                      }}
+                      maxLength={500}
+                      rows={4}
                       disabled={actionLoading}
-                      className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-600 px-6 py-3 font-bold text-white transition hover:bg-orange-700 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      <MdBlock className="text-xl" />
-                      تعليق العائلة
-                    </button>
-                  )}
-                  {canHide && (
-                    <button
-                      type="button"
-                      onClick={() => setDecisionType("hide")}
-                      disabled={actionLoading}
-                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-6 py-3 font-bold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      <MdVisibilityOff className="text-xl" />
-                      إخفاء العائلة
-                    </button>
-                  )}
+                      placeholder="اكتب البيانات أو المستندات التي تحتاج إلى تحديث."
+                      className="w-full resize-none rounded-xl border border-slate-300 bg-white p-3 text-sm outline-none focus:border-[#159c8c] focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    />
+                    <p className="mt-1 text-left text-xs text-slate-500">{reason.length}/٥٠٠</p>
+                  </div>
+                )}
+
+                {validationError && <p className="mt-3 text-sm font-semibold text-red-600">{validationError}</p>}
+
+                <div className="mt-5 flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={actionLoading}
+                    className="inline-flex min-w-40 items-center justify-center gap-2 rounded-xl bg-[#159c8c] px-6 py-3 font-bold text-white transition hover:bg-[#128577] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    <MdOutlineEditNote className="text-xl" />
+                    {actionLoading ? "جارٍ حفظ الحالة..." : "حفظ الحالة"}
+                  </button>
                 </div>
-              </section>
-            )}
+              </form>
+            </section>
           </main>
         </div>
       </div>
 
-      {decisionType && (
-        <FamilyDecisionModal
-          type={decisionType}
-          family={family}
-          onCancel={() => setDecisionType(null)}
-          onConfirm={handleConfirmedDecision}
-          loading={actionLoading}
-          serverError={actionError}
-        />
-      )}
     </>
   );
 }

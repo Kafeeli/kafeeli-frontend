@@ -2,10 +2,11 @@ import { useState, useEffect, useRef } from "react";
 import ChangePasswordModal from "./ChangePasswordModal";
 import { guardianApi } from "../../services/guardianApi";
 import { bankAccountApi } from "../../services/bankAccountApi";
+import AuthenticatedHeader from "../../components/layout/AuthenticatedHeader";
+import AuthenticatedFooter from "../../components/layout/AuthenticatedFooter";
 
 import {
   // إدارة القوائم والهيدر
-  MdMenu,
   MdDashboard,
   MdPerson,
   MdDescription,
@@ -490,39 +491,7 @@ function GuardianProfile() {
       {/* ====================== Main Content Body ======================== */}
       <div className="flex-1 min-w-0 w-full lg:mr-[255px] flex flex-col justify-between">
         {/* ---------------------------- Top Navbar ---------------------------- */}
-        <header className="w-full h-[64px] bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 z-20 sticky top-0">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setOpenSidebar(true)}
-              className="lg:hidden w-10 h-10 rounded-xl flex items-center justify-center text-[#424750] hover:bg-gray-50 transition shrink-0 cursor-pointer"
-            >
-              <MdMenu className="text-2xl" />
-            </button>
-            <h1 className="font-bold text-[16px] text-[#003469] truncate">
-              ملفي الشخصي - الوصي
-            </h1>
-          </div>
-
-          <div dir="ltr" className="flex items-center gap-4 shrink-0">
-            <div className="flex items-center gap-2.5">
-              <img
-                src={avatarSrc}
-                alt="صورة المستخدم"
-                className="w-9 h-9 rounded-full object-cover border border-slate-200"
-              />
-              <div dir="rtl" className="text-right hidden sm:block">
-                <h3 className="font-bold text-[13px] text-[#111827] leading-tight">
-                  {formData.fullName}
-                </h3>
-                <p className="text-[11px] text-gray-500">{verification.text}</p>
-              </div>
-            </div>
-            <div className="w-px h-6 bg-[#D8DEE8]" />
-            <button disabled title="التنبيهات غير متاحة حالياً" className="relative w-8 h-8 flex items-center justify-center text-[#111827] rounded-lg opacity-60 cursor-not-allowed">
-              <MdNotificationsNone className="text-[22px]" />
-            </button>
-          </div>
-        </header>
+        <AuthenticatedHeader onMenuClick={() => setOpenSidebar(true)} />
 
         {/* =================================================================== */}
         {/* 🖥️ DESKTOP VIEW */}
@@ -539,7 +508,7 @@ function GuardianProfile() {
                     <div className="relative w-[92px] mx-auto">
                       <img
                         src={avatarSrc}
-                        alt="Avatar"
+                        alt="الصورة الشخصية"
                         className="w-[92px] h-[92px] mx-auto rounded-full border-4 border-white shadow-sm object-cover bg-white"
                       />
                       <button
@@ -869,7 +838,7 @@ function GuardianProfile() {
               <div className="relative w-[92px] mx-auto">
                 <img
                   src={avatarSrc}
-                  alt="Avatar Mobile"
+                  alt="الصورة الشخصية"
                   className="w-[92px] h-[92px] mx-auto rounded-full border-4 border-white shadow-sm object-cover bg-white"
                 />
                 <button
@@ -1175,11 +1144,7 @@ function GuardianProfile() {
         </main>
 
         {/* ---------------------------- Global Footer ---------------------------- */}
-        <footer className="w-full h-[54px] bg-white border-t border-[#E5E7EB] flex items-center justify-center px-4 shrink-0 z-10">
-          <p className="text-[12px] text-center text-gray-400">
-            © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
-          </p>
-        </footer>
+        <AuthenticatedFooter />
       </div>
 
       {/* ============================== Overlay Modal Component ============================== */}

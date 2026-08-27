@@ -26,9 +26,9 @@ const sidebarItems = [
   {
     label: "الأوصياء",
     icon: HiOutlineIdentification,
-    path: "/admin-dashboard/guardian-document-reviews",
+    path: "/admin-dashboard/guardians",
   },
-  { label: "الكفلاء", icon: MdOutlineVolunteerActivism },
+  { label: "الكفلاء", icon: MdOutlineVolunteerActivism, path: "/admin-dashboard/sponsors" },
   {
     label: "العائلات",
     icon: MdOutlineFamilyRestroom,

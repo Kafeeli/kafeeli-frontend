@@ -315,7 +315,7 @@ export default function RegistrationPage() {
               className="hidden lg:flex flex-col justify-center p-4 h-full rounded-r-lg gap-4"
               style={{ backgroundColor: "rgba(13, 75, 142, 1)" }}
             >
-              <img src={sideIcon} alt="icon" className="w-12" />
+              <img src={sideIcon} alt="أيقونة" className="w-12" />
 
               <h2 className="text-white text-3xl font-bold leading-loose text-right">
                 خطوة واحدة لنصنع <br /> الفرق
@@ -327,12 +327,12 @@ export default function RegistrationPage() {
               </p>
 
               <div className="flex items-center gap-2">
-                <img src={checkIcon} alt="check" className="w-5 h-5" />
+                <img src={checkIcon} alt="علامة تحقق" className="w-5 h-5" />
                 <span className="text-blue-200 text-sm">تحقق أمني عالي</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <img src={reportIcon} alt="report" className="w-5 h-5" />
+                <img src={reportIcon} alt="تقرير" className="w-5 h-5" />
                 <span className="text-blue-200 text-sm">
                   تقارير دورية شفافة
                 </span>

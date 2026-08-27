@@ -5,6 +5,7 @@ import { apiErrorMessage, unwrapResult } from "../../utils/apiUi";
 import { formatAmount, formatDate } from "../sponsor-dashboard/sponsorFlowUtils";
 import AdminLayout from "./Adminlayout";
 import { ErrorState, LoadingState } from "./Adminstates";
+import { localizeDisplayFields } from "../../utils/localization";
 
 function CandidateDetails({ candidate }) {
   if (!candidate) return null;
@@ -65,9 +66,12 @@ export default function AdminPayoutsPage() {
         adminApi.getPendingPayouts(),
         adminApi.getEligiblePayouts(),
       ]);
-      setPayouts(unwrapResult(pendingResult, "تعذر تحميل التحويلات.") || []);
+      setPayouts((unwrapResult(pendingResult, "تعذر تحميل التحويلات.") || []).map((item) => localizeDisplayFields(item, ["payoutStatus"])));
       setEligibleCandidates(
-        unwrapResult(eligibleResult, "تعذر تحميل الكفالات المؤهلة للتحويل.") || [],
+        (unwrapResult(eligibleResult, "تعذر تحميل الكفالات المؤهلة للتحويل.") || []).map((item) => ({
+          ...localizeDisplayFields(item, ["sponsorshipStatus", "targetType"]),
+          guardianPayoutAccount: localizeDisplayFields(item.guardianPayoutAccount, ["verificationStatus"]),
+        })),
       );
     } catch (requestError) {
       setError(apiErrorMessage(requestError));
@@ -85,7 +89,7 @@ export default function AdminPayoutsPage() {
     setBusy(true);
     setActionError("");
     try {
-      setSelected(unwrapResult(await adminApi.getPayoutDetails(payoutId), "تعذر تحميل التفاصيل."));
+      setSelected(localizeDisplayFields(unwrapResult(await adminApi.getPayoutDetails(payoutId), "تعذر تحميل التفاصيل."), ["payoutStatus"]));
     } catch (requestError) {
       setActionError(apiErrorMessage(requestError));
     } finally {

@@ -3,7 +3,6 @@ import { sponsorApi } from "../../services/sponsorApi";
 import ChangePasswordModal from "../guardian-dashboard/ChangePasswordModal";
 
 import {
-  MdMenu,
   MdDashboard,
   MdPerson,
   MdDescription,
@@ -30,6 +29,9 @@ import { IoEarthSharp } from "react-icons/io5";
 
 import Sidebar from "./Sidebar";
 import personalImage from "../../assets/personal.jpg";
+import AuthenticatedHeader from "../../components/layout/AuthenticatedHeader";
+import AuthenticatedFooter from "../../components/layout/AuthenticatedFooter";
+import { localizeStatus } from "../../utils/localization";
 
 function getApiBody(response) {
   if (!response || typeof response !== "object") return response;
@@ -193,8 +195,8 @@ function mapProfileData(profile) {
     city: normalizeCity(profile?.city),
     birthDate: formatDateOnly(profile?.dateOfBirth || profile?.birthDate),
     joinDate: formatJoinDate(profile?.joinedAt || profile?.joinDate),
-    accountStatus: profile?.accountStatus || "",
-    emailVerificationStatus: profile?.emailVerificationStatus || "",
+    accountStatus: profile?.accountStatus ? localizeStatus(profile.accountStatus) : "",
+    emailVerificationStatus: profile?.emailVerificationStatus ? localizeStatus(profile.emailVerificationStatus) : "",
     // نضيف طابع زمني لكسر الكاش، وإلا المتصفح ممكن يعرض نفس الصورة القديمة المخزنة لنفس الرابط
     profileImageUrl: profile?.profileImageUrl
       ? `${profile.profileImageUrl}${profile.profileImageUrl.includes("?") ? "&" : "?"}t=${Date.now()}`
@@ -447,39 +449,7 @@ function SponsorProfile() {
       />
 
       <div className="flex-1 min-w-0 w-full lg:mr-[255px] flex flex-col justify-between">
-        <header className="w-full h-[64px] bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 z-20 sticky top-0">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setOpenSidebar(true)}
-              className="lg:hidden w-10 h-10 rounded-xl flex items-center justify-center text-[#424750] hover:bg-gray-50 transition shrink-0 cursor-pointer"
-            >
-              <MdMenu className="text-2xl" />
-            </button>
-            <h1 className="font-bold text-[16px] text-[#003469] truncate">
-              ملفي الشخصي - الكفيل
-            </h1>
-          </div>
-
-          <div dir="ltr" className="flex items-center gap-4 shrink-0">
-            <div className="flex items-center gap-2.5">
-              <img
-                src={avatarSrc}
-                alt="صورة الكفيل"
-                className="w-9 h-9 rounded-full object-cover border border-slate-200"
-              />
-              <div dir="rtl" className="text-right hidden sm:block">
-                <h3 className="font-bold text-[13px] text-[#111827] leading-tight">
-                  {formData.name}
-                </h3>
-                <p className="text-[11px] text-gray-500">{formData.accountStatus || "كفيل"}</p>
-              </div>
-            </div>
-            <div className="w-px h-6 bg-[#D8DEE8]" />
-            <button disabled title="التنبيهات غير متاحة حالياً" className="relative w-8 h-8 flex items-center justify-center text-[#111827] rounded-lg opacity-60 cursor-not-allowed">
-              <MdNotificationsNone className="text-[22px]" />
-            </button>
-          </div>
-        </header>
+        <AuthenticatedHeader onMenuClick={() => setOpenSidebar(true)} />
 
         {/* =================================================================== */}
         {/* 🖥️ DESKTOP VIEW */}
@@ -494,7 +464,7 @@ function SponsorProfile() {
                     <div className="relative w-[92px] mx-auto">
                       <img
                         src={avatarSrc}
-                        alt="Sponsor Avatar"
+                        alt="صورة الكفيل الشخصية"
                         className="w-[92px] h-[92px] mx-auto rounded-full border-4 border-white shadow-sm object-cover bg-white"
                       />
                       <button
@@ -793,7 +763,7 @@ function SponsorProfile() {
               <div className="relative w-[92px] mx-auto">
                 <img
                   src={avatarSrc}
-                  alt="Sponsor Avatar Mobile"
+                  alt="صورة الكفيل الشخصية"
                   className="w-[92px] h-[92px] mx-auto rounded-full border-4 border-white shadow-sm object-cover bg-white"
                 />
                 <button
@@ -1076,11 +1046,7 @@ function SponsorProfile() {
           </section>
         </main>
 
-        <footer className="w-full h-[54px] bg-white border-t border-[#E5E7EB] flex items-center justify-center px-4 shrink-0 z-10">
-          <p className="text-[12px] text-center text-gray-400">
-            © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
-          </p>
-        </footer>
+        <AuthenticatedFooter />
       </div>
 
       {/* ============================== Overlay Modal Component ============================== */}

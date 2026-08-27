@@ -1,7 +1,8 @@
 export function getResultData(result, fallbackMessage) {
   if (result?.success !== true) {
     const errors = Array.isArray(result?.errors) ? result.errors.filter(Boolean) : [];
-    throw new Error(result?.message || errors.join(" - ") || fallbackMessage);
+    const message = [result?.message, ...errors].find((value) => typeof value === "string" && /[\u0600-\u06ff]/.test(value));
+    throw new Error(message || fallbackMessage);
   }
 
   return result.data;
@@ -10,7 +11,7 @@ export function getResultData(result, fallbackMessage) {
 export function getApiErrorMessage(error, fallbackMessage) {
   const body = error?.response?.data;
   const errors = Array.isArray(body?.errors) ? body.errors.filter(Boolean) : [];
-  return body?.message || errors.join(" - ") || error?.message || fallbackMessage;
+  return [body?.message, ...errors, error?.message].find((value) => typeof value === "string" && /[\u0600-\u06ff]/.test(value)) || fallbackMessage;
 }
 
 export function formatAmount(value) {

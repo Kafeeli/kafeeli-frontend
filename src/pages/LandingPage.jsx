@@ -155,7 +155,7 @@ export default function LandingPage() {
 
   return (
     <div id="top" dir="rtl" className="min-h-screen scroll-smooth bg-[#F8F9FA]">
-      <Header primaryDestination={destinations.sponsorBrowse} />
+      <Header primaryDestination="/register" />
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">

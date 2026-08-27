@@ -221,7 +221,7 @@ export default function EmailVerification() {
       <header className="bg-white border-b border-gray-200 px-8 py-1" dir="rtl">
         <div className="w-full mx-auto flex items-center justify-between">
           <button onClick={() => navigate("/")} className="cursor-pointer">
-            <img src={logo} alt="logo" className="w-20 h-19" />
+            <img src={logo} alt="شعار كفيلي" className="w-20 h-19" />
           </button>
           <h1 className="text-[24px] font-bold text-[#003469] hidden md:block">
             كفيلي
@@ -335,7 +335,7 @@ export default function EmailVerification() {
                   </p>
 
                   <p className="text-xs text-gray-500 leading-relaxed">
-                    تأكد من مجلد الرسائل غير المرغوب فيها (Spam) أو تواصل معنا.
+                    تأكد من مجلد الرسائل غير المرغوب فيها أو تواصل معنا.
                   </p>
                 </div>
               </div>
@@ -344,7 +344,7 @@ export default function EmailVerification() {
             <div className="hidden md:flex flex-col items-center justify-center w-85 min-h-96 bg-white border border-gray-200 rounded-2xl p-8 gap-5 shadow-sm">
               <img
                 src={emailImg}
-                alt="email verification"
+                alt="التحقق من البريد الإلكتروني"
                 className="w-80 h-52 object-cover"
               />
 

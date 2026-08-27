@@ -7,6 +7,11 @@ export const FAMILY_STATUS_MAP = {
   3: "hidden",
   4: "stopped",
   5: "needsEdit",
+  PendingReview: "pending",
+  NeedsUpdate: "needsEdit",
+  Active: "active",
+  Hidden: "hidden",
+  Suspended: "stopped",
 };
 
 export function mapFamilyStatus(apiStatusNumber) {
