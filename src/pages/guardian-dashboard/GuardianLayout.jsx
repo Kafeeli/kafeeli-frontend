@@ -3,6 +3,8 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "../pages/guardian-dashboard/Sidebar";
 import { useState } from "react";
 import { motion } from "framer-motion"; // استيراد motion
+import AuthenticatedHeader from "../../components/layout/AuthenticatedHeader";
+import AuthenticatedFooter from "../../components/layout/AuthenticatedFooter";
 
 export default function GuardianLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -12,6 +14,7 @@ export default function GuardianLayout() {
       <Sidebar openSidebar={sidebarOpen} setOpenSidebar={setSidebarOpen} />
 
       <div className="flex-1 lg:mr-64 flex flex-col">
+        <AuthenticatedHeader onMenuClick={() => setSidebarOpen(true)} />
         {/* الأنيميشن بيبدأ هون لكل الصفحات اللي بتيجي من الـ Outlet */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -21,6 +24,7 @@ export default function GuardianLayout() {
         >
           <Outlet />
         </motion.div>
+        <AuthenticatedFooter />
       </div>
     </div>
   );

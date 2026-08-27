@@ -43,10 +43,10 @@ const DECISION_CONFIG = {
   suspend: {
     icon: MdBlock,
     iconTone: "bg-orange-100 text-orange-700",
-    title: "تأكيد إيقاف العائلة",
+    title: "تأكيد تعليق العائلة",
     description:
-      "هل أنت متأكد من إيقاف هذه العائلة؟ سيعرض النظام الحالة التي يعيدها الخادم بعد التأكيد.",
-    confirmLabel: "تأكيد الإيقاف",
+      "هل أنت متأكد من تعليق هذه العائلة؟ سيعرض النظام الحالة التي يعيدها الخادم بعد التأكيد.",
+    confirmLabel: "تأكيد التعليق",
     confirmClass: "bg-orange-600 hover:bg-orange-700",
     needsReason: false,
   },

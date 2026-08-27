@@ -151,7 +151,7 @@ function InvalidEmail() {
 
       <header className="flex items-center justify-between px-4 md:px-8 py-1 bg-gray-50 shadow-sm">
         <button onClick={() => navigate("/")} className="cursor-pointer">
-          <img src={logo} alt="logo" className="w-20 h-19" />
+          <img src={logo} alt="شعار كفيلي" className="w-20 h-19" />
         </button>
         <h1 className="text-lg md:text-2xl font-bold text-[#003469] hidden md:block">
           كفيلي

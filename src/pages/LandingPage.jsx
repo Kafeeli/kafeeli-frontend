@@ -152,7 +152,7 @@ export default function LandingPage() {
 
   return (
     <div id="top" dir="rtl" className="min-h-screen scroll-smooth bg-[#F8F9FA]">
-      <Header primaryDestination={destinations.sponsorBrowse} />
+      <Header primaryDestination="/register" />
 
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
@@ -173,8 +173,8 @@ export default function LandingPage() {
             </p>
 
             <div className="flex  flex-col sm:flex-row gap-4 justify-center lg:justify-start items-stretch sm:items-center">
-              <Link to={destinations.sponsorBrowse} className="cursor-pointer bg-[#2DBCC3] hover:bg-[#2DBCC3]/90 text-white text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl shadow-lg shadow-[#2DBCC3]/20 w-full sm:w-auto">
-                ابدأ الكفالة الآن
+              <Link to="/register" className="cursor-pointer bg-[#2DBCC3] hover:bg-[#2DBCC3]/90 text-white text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl shadow-lg shadow-[#2DBCC3]/20 w-full sm:w-auto">
+                سجّل الآن
               </Link>
 
               <a href="#about" className="bg-white cursor-pointer hover:bg-gray-50 text-[#0D4B8E] text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-10 rounded-xl border-2 border-[#0D4B8E]/10 w-full sm:w-auto whitespace-nowrap">
@@ -350,8 +350,8 @@ export default function LandingPage() {
                     العمر: {orphan.age}
                   </p>
 
-                  <Link to={destinations.sponsorBrowse} className="block w-full bg-[#0D4B8E] hover:bg-[#0D4B8E]/90 text-white py-3 rounded-xl font-semibold transition-all active:scale-95 cursor-pointer">
-                    اكفلني الآن
+                  <Link to="/register" className="block w-full bg-[#0D4B8E] hover:bg-[#0D4B8E]/90 text-white py-3 rounded-xl font-semibold transition-all active:scale-95 cursor-pointer">
+                    سجّل الآن
                   </Link>
                 </div>
               </div>
@@ -408,8 +408,8 @@ export default function LandingPage() {
 
           {/* الأزرار */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-stretch sm:items-center">
-            <Link to={destinations.primary} className="cursor-pointer bg-[#D9A441] hover:bg-[#e5a021] text-white font-bold py-3 px-8 rounded-xl transition-all active:scale-95">
-              انضم إلينا الآن
+            <Link to="/register" className="cursor-pointer bg-[#D9A441] hover:bg-[#e5a021] text-white font-bold py-3 px-8 rounded-xl transition-all active:scale-95">
+              سجّل الآن
             </Link>
 
             <a href="#impact" className="cursor-pointer bg-white/10 hover:bg-white/20 text-white font-semibold py-3 px-8 rounded-xl border border-white/30 transition-all active:scale-95">

@@ -4,11 +4,10 @@ import { useFamilies } from "../../../hooks/useFamilies";
 import FamilyCard from "./FamilyCard";
 import NoFamiliesPage from "./NoFamiliesPage";
 import { FamiliesLoadingState, FamiliesErrorState } from "./ErrorStates";
+import AuthenticatedHeader from "../../../components/layout/AuthenticatedHeader";
+import AuthenticatedFooter from "../../../components/layout/AuthenticatedFooter";
 
 import {
-  MdMenu,
-  MdNotificationsNone,
-  MdPerson,
   MdGroups,
   MdCheckCircle,
   MdAssignment,
@@ -16,7 +15,8 @@ import {
 } from "react-icons/md";
 
 function TopNavbar({ setOpenSidebar }) {
-  return (
+  return <AuthenticatedHeader onMenuClick={() => setOpenSidebar(true)} />;
+  /* return (
     <header className="min-h-[60px] bg-white border-b border-[#DDE2EA] shadow-sm flex items-center justify-between gap-3 px-4 py-2 sm:px-6">
       <div className="flex items-center gap-3 min-w-0">
         <button
@@ -59,7 +59,7 @@ function TopNavbar({ setOpenSidebar }) {
         </div>
       </div>
     </header>
-  );
+  ); */
 }
 
 function HeaderCard() {
@@ -213,11 +213,7 @@ function PageShell({ openSidebar, setOpenSidebar, children }) {
           <div className="w-full max-w-[1180px] mx-auto">{children}</div>
         </main>
 
-        <footer className="mt-10 sm:mt-14 lg:mt-20 border-t border-[#E5E7EB] text-center px-4">
-          <p className="text-xs sm:text-sm text-[#6B7280] mt-4 mb-4">
-            © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
-          </p>
-        </footer>
+        <AuthenticatedFooter />
       </div>
     </div>
   );

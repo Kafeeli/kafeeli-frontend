@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from "react";
-import { MdChildCare } from "react-icons/md";
 import { useNavigate, useParams } from "react-router-dom";
 import { sponsorApi } from "../../services/sponsorApi";
 import { sponsorshipApi } from "../../services/sponsorshipApi";
@@ -7,6 +6,8 @@ import { apiErrorMessage, unwrapResult } from "../../utils/apiUi";
 import { ErrorState, LoadingState } from "../admin-dashboard/Adminstates";
 import SponsorFlowLayout from "./SponsorFlowLayout";
 import { formatAmount } from "./sponsorFlowUtils";
+import { localizeDisplayFields } from "../../utils/localization";
+import SponsorOrphanProfileImage from "../../components/sponsor/SponsorOrphanProfileImage";
 
 export default function SponsorOrphanDetailsPage() {
   const { orphanId } = useParams();
@@ -18,14 +19,13 @@ export default function SponsorOrphanDetailsPage() {
   const [numberOfMonths, setNumberOfMonths] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [actionError, setActionError] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
       const data = unwrapResult(await sponsorApi.getOrphan(orphanId), "تعذر تحميل تفاصيل اليتيم.");
-      setOrphan(data);
+      setOrphan(localizeDisplayFields(data, ["gender", "educationalStatus", "orphanStatus"]));
       setMonthlyAmount(String(data.monthlyNeedAmount ?? ""));
     } catch (requestError) {
       setError(apiErrorMessage(requestError, "تعذر تحميل تفاصيل اليتيم."));
@@ -33,17 +33,6 @@ export default function SponsorOrphanDetailsPage() {
   }, [orphanId]);
 
   useEffect(() => { const id = window.setTimeout(load, 0); return () => window.clearTimeout(id); }, [load]);
-
-  useEffect(() => {
-    if (!orphan?.hasProfileImage || !orphan.canAccessProfileImage) return undefined;
-    let objectUrl = "";
-    let active = true;
-    sponsorApi.getOrphanProfileImage(orphanId).then((blob) => {
-      objectUrl = URL.createObjectURL(blob);
-      if (active) setImageUrl(objectUrl);
-    }).catch(() => {});
-    return () => { active = false; if (objectUrl) URL.revokeObjectURL(objectUrl); };
-  }, [orphan?.canAccessProfileImage, orphan?.hasProfileImage, orphanId]);
 
   const createSponsorship = async (event) => {
     event.preventDefault();
@@ -61,7 +50,7 @@ export default function SponsorOrphanDetailsPage() {
   else if (orphan) content = (
     <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
       <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-        <div className="flex items-center gap-3">{imageUrl ? <img src={imageUrl} alt={orphan.displayName || "صورة اليتيم"} className="h-16 w-16 rounded-full object-cover" /> : <div className="grid h-14 w-14 place-items-center rounded-full bg-[#E8F1FA] text-[#0D4B8E]"><MdChildCare className="text-3xl" /></div>}<div><h2 className="text-xl font-extrabold text-[#003469]">{orphan.displayName || "—"}</h2><p className="text-sm text-gray-500">{orphan.city || "—"}</p></div></div>
+        <div className="flex items-center gap-3"><SponsorOrphanProfileImage orphan={orphan} className="h-16 w-16" iconClassName="text-3xl" /><div><h2 className="text-xl font-extrabold text-[#003469]">{orphan.displayName || "—"}</h2><p className="text-sm text-gray-500">{orphan.city || "—"}</p></div></div>
         <dl className="mt-6 grid gap-4 sm:grid-cols-2"><div><dt className="text-sm text-gray-500">العمر</dt><dd className="font-bold">{orphan.age}</dd></div><div><dt className="text-sm text-gray-500">الجنس</dt><dd className="font-bold">{orphan.gender || "—"}</dd></div><div><dt className="text-sm text-gray-500">الحالة التعليمية</dt><dd className="font-bold">{orphan.educationalStatus || "—"}</dd></div><div><dt className="text-sm text-gray-500">الاحتياج الشهري</dt><dd className="font-bold text-[#D9A441]">{formatAmount(orphan.monthlyNeedAmount)}</dd></div></dl>
         <p className="mt-5 rounded-lg bg-gray-50 p-4 text-sm leading-7 text-gray-700">{orphan.caseDescription || "—"}</p>
       </section>

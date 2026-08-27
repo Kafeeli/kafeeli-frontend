@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
+import AuthenticatedHeader from "../../../components/layout/AuthenticatedHeader";
+import AuthenticatedFooter from "../../../components/layout/AuthenticatedFooter";
 
 import {
-  MdMenu,
-  MdOutlineAccountCircle,
-  MdInfoOutline,
   MdLock,
   MdDescription,
   MdManageAccounts,
@@ -18,53 +17,7 @@ import {
 } from "react-icons/md";
 
 function TopNavbar({ setOpenSidebar }) {
-  return (
-    <header
-      dir="rtl"
-      className="h-[60px] bg-white border-b border-[#DDE2EA] shadow-sm px-3 sm:px-6"
-    >
-      <div className="h-full flex items-center justify-between gap-3">
-        {/* يمين الهيدر */}
-        <div className="flex items-center gap-3 min-w-0">
-          <button
-            type="button"
-            onClick={() => setOpenSidebar(true)}
-            className="lg:hidden w-9 h-9 rounded-lg flex items-center justify-center text-[#374151] hover:bg-gray-100 transition shrink-0"
-            aria-label="فتح القائمة"
-          >
-            <MdMenu className="text-2xl" />
-          </button>
-
-          <h1 className="font-[Cairo] text-[15px] font-bold text-[#003469] whitespace-nowrap shrink-0">
-            عائلاتي
-          </h1>
-
-          <div className="h-6 w-px bg-[#DDE2EA] shrink-0" />
-
-          <div className="flex items-center gap-1.5 min-w-0">
-            <MdInfoOutline className="text-[#374151] text-[17px] shrink-0" />
-
-            <span className="font-[Cairo] text-[12px] sm:text-[14px] text-[#4B5563] whitespace-nowrap">
-              حالة الحساب:
-            </span>
-
-            <span className="font-[Cairo] text-[12px] sm:text-[14px] font-bold text-[#D11F1F] whitespace-nowrap">
-              بانتظار المراجعة
-            </span>
-          </div>
-        </div>
-
-        {/* يسار الهيدر */}
-        <button
-          type="button"
-          className="w-9 h-9 rounded-full flex items-center justify-center text-[#374151] hover:bg-gray-100 transition shrink-0"
-          aria-label="حساب المستخدم"
-        >
-          <MdOutlineAccountCircle className="text-[25px]" />
-        </button>
-      </div>
-    </header>
-  );
+  return <AuthenticatedHeader onMenuClick={() => setOpenSidebar(true)} />;
 }
 
 function RestrictedIllustration() {
@@ -245,11 +198,7 @@ function FamilyAccessPendingPage() {
             </section>
           </div>
         </main>
-        <footer className="mt-10 sm:mt-14 lg:mt-20 border-t border-[#E5E7EB] text-center px-4">
-          <p className="text-xs sm:text-sm text-[#6B7280] mt-4 mb-4">
-            © 2026 كفيلي - منصة رعاية الأيتام . جميع الحقوق محفوظة
-          </p>
-        </footer>
+        <AuthenticatedFooter />
       </div>
     </div>
   );

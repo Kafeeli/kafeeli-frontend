@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { FiAlertCircle, FiCalendar, FiCheckCircle, FiMenu, FiUser } from "react-icons/fi";
+import { FiAlertCircle, FiCalendar, FiCheckCircle } from "react-icons/fi";
 import { MdDescription, MdFamilyRestroom, MdVerifiedUser } from "react-icons/md";
 import Sidebar from "./Sidebar";
 import useDashboard from "../../hooks/useDashboard";
+import AuthenticatedHeader from "../../components/layout/AuthenticatedHeader";
+import AuthenticatedFooter from "../../components/layout/AuthenticatedFooter";
+import { localizeStatus } from "../../utils/localization";
 
 function StatCard({ icon, label, value }) {
   return (
@@ -28,14 +31,7 @@ export default function GuardianDashboard() {
     <div className="flex min-h-screen bg-gray-50" dir="rtl">
       <Sidebar openSidebar={sidebarOpen} setOpenSidebar={setSidebarOpen} />
       <div className="flex min-w-0 flex-1 flex-col lg:mr-64">
-        <header className="flex min-h-16 items-center justify-between gap-4 border-b border-gray-200 bg-white px-4 py-3 sm:px-6">
-          <button type="button" onClick={() => setSidebarOpen(true)} className="p-2 text-[#003469] lg:hidden" aria-label="فتح القائمة"><FiMenu className="text-xl" /></button>
-          <div>
-            <p className="font-bold text-[#003469]">{data?.fullName || "لوحة تحكم الوصي"}</p>
-            {data?.role && <p className="text-xs text-gray-500">{data.role}</p>}
-          </div>
-          {data?.profileImageUrl ? <img src={data.profileImageUrl} alt="الصورة الشخصية" className="h-10 w-10 rounded-full border object-cover" /> : <div className="grid h-10 w-10 place-items-center rounded-full border text-[#003469]"><FiUser /></div>}
-        </header>
+        <AuthenticatedHeader onMenuClick={() => setSidebarOpen(true)} />
 
         <main className="flex-1 p-4 sm:p-6">
           <h1 className="text-2xl font-extrabold text-[#003469]">نظرة عامة</h1>
@@ -45,7 +41,7 @@ export default function GuardianDashboard() {
             <>
               {data.nextRequiredActionMessage && <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-900"><p className="font-bold">الإجراء التالي</p><p className="mt-1 text-sm">{data.nextRequiredActionMessage}</p></div>}
               <section className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                {data.verificationStatus && <StatCard icon={<MdVerifiedUser />} label="حالة التحقق" value={data.verificationStatus} />}
+                {data.verificationStatus && <StatCard icon={<MdVerifiedUser />} label="حالة التحقق" value={localizeStatus(data.verificationStatus)} />}
                 {data.documentsUploadedCount != null && <StatCard icon={<MdDescription />} label="الوثائق المرفوعة" value={data.documentsUploadedCount} />}
                 {data.pendingDocumentsCount != null && <StatCard icon={<FiCalendar />} label="الوثائق قيد المراجعة" value={data.pendingDocumentsCount} />}
                 {data.approvedDocumentsCount != null && <StatCard icon={<FiCheckCircle />} label="الوثائق المقبولة" value={data.approvedDocumentsCount} />}
@@ -65,6 +61,7 @@ export default function GuardianDashboard() {
             </>
           )}
         </main>
+        <AuthenticatedFooter />
       </div>
     </div>
   );

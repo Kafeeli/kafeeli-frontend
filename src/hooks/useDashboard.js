@@ -4,7 +4,7 @@ import { dashboardApi } from "../services/dashboardApi";
 function getErrorMessage(error) {
   const result = error?.response?.data;
   const errors = Array.isArray(result?.errors) ? result.errors.filter(Boolean) : [];
-  return result?.message || errors.join(" - ") || error?.message || "تعذر تحميل لوحة التحكم.";
+  return [result?.message, ...errors, error?.message].find((value) => typeof value === "string" && /[\u0600-\u06ff]/.test(value)) || "تعذر تحميل لوحة التحكم.";
 }
 
 export default function useDashboard() {
@@ -19,7 +19,8 @@ export default function useDashboard() {
       const result = await dashboardApi.getMine();
       if (result?.success !== true || !result.data) {
         const errors = Array.isArray(result?.errors) ? result.errors.filter(Boolean) : [];
-        throw new Error(result?.message || errors.join(" - ") || "تعذر تحميل لوحة التحكم.");
+        const message = [result?.message, ...errors].find((value) => typeof value === "string" && /[\u0600-\u06ff]/.test(value));
+        throw new Error(message || "تعذر تحميل لوحة التحكم.");
       }
       setData(result.data);
     } catch (requestError) {

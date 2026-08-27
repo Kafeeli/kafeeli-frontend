@@ -1,7 +1,11 @@
+function arabicMessage(candidates, fallbackMessage) {
+  return candidates.flat().find((value) => typeof value === "string" && /[\u0600-\u06ff]/.test(value)) || fallbackMessage;
+}
+
 export function unwrapResult(result, fallbackMessage = "تعذر إكمال العملية.") {
   if (result?.success !== true) {
     const errors = Array.isArray(result?.errors) ? result.errors.filter(Boolean) : [];
-    throw new Error(result?.message || errors.join(" - ") || fallbackMessage);
+    throw new Error(arabicMessage([result?.message, errors], fallbackMessage));
   }
   return result.data;
 }
@@ -9,7 +13,7 @@ export function unwrapResult(result, fallbackMessage = "تعذر إكمال ال
 export function apiErrorMessage(error, fallbackMessage = "تعذر إكمال العملية.") {
   const body = error?.response?.data;
   const errors = Array.isArray(body?.errors) ? body.errors.filter(Boolean) : [];
-  return body?.message || errors.join(" - ") || error?.message || fallbackMessage;
+  return arabicMessage([body?.message, errors, error?.message], fallbackMessage);
 }
 
 export function openProtectedBlob(blob) {
