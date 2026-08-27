@@ -420,6 +420,10 @@ import Error401 from "./pages/auth401";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicRoute from "./routes/PublicRoute";
 
+import About from "./pages/About";
+import HowItWorks from "./pages/HowItWorks";
+import Contact from "./pages/contact";
+
 function PageWrapper({ children }) {
   return (
     <motion.div
@@ -456,27 +460,27 @@ function AnimatedRoutes() {
           }
         />
 
-          <Route
+        <Route
           path="/login"
           element={
-          <PublicRoute>
-          <PageWrapper>
-          <Login />
-          </PageWrapper>
-          </PublicRoute>
+            <PublicRoute>
+              <PageWrapper>
+                <Login />
+              </PageWrapper>
+            </PublicRoute>
           }
-          />
+        />
 
-          <Route
+        <Route
           path="/register"
           element={
-          <PublicRoute>
-          <PageWrapper>
-          <RegistrationPage />
-          </PageWrapper>
-          </PublicRoute>
+            <PublicRoute>
+              <PageWrapper>
+                <RegistrationPage />
+              </PageWrapper>
+            </PublicRoute>
           }
-          /> 
+        />
 
         {/* صفحة انتظار التحقق بعد التسجيل */}
         <Route
@@ -530,14 +534,14 @@ function AnimatedRoutes() {
         />
 
         <Route
-        path="/forgot-password"
-        element={
-        <PublicRoute>
-        <PageWrapper>
-        <ForgotPassword />
-        </PageWrapper>
-        </PublicRoute>
-        }
+          path="/forgot-password"
+          element={
+            <PublicRoute>
+              <PageWrapper>
+                <ForgotPassword />
+              </PageWrapper>
+            </PublicRoute>
+          }
         />
 
         <Route
@@ -568,6 +572,33 @@ function AnimatedRoutes() {
               <div dir="rtl" className="min-h-screen bg-gray-50">
                 <LandingPage />
               </div>
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/about"
+          element={
+            <PageWrapper>
+              <About />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/how-it-works"
+          element={
+            <PageWrapper>
+              <HowItWorks />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/contact"
+          element={
+            <PageWrapper>
+              <Contact />
             </PageWrapper>
           }
         />
@@ -703,14 +734,77 @@ function AnimatedRoutes() {
           }
         />
 
-        <Route path="/sponsor/orphans" element={<ProtectedRoute allowedRoles={["Sponsor"]}><PageWrapper><SponsorOrphansPage /></PageWrapper></ProtectedRoute>} />
-        <Route path="/sponsor/orphans/:orphanId" element={<ProtectedRoute allowedRoles={["Sponsor"]}><PageWrapper><SponsorOrphanDetailsPage /></PageWrapper></ProtectedRoute>} />
+        <Route
+          path="/sponsor/orphans"
+          element={
+            <ProtectedRoute allowedRoles={["Sponsor"]}>
+              <PageWrapper>
+                <SponsorOrphansPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/sponsor/orphans/:orphanId"
+          element={
+            <ProtectedRoute allowedRoles={["Sponsor"]}>
+              <PageWrapper>
+                <SponsorOrphanDetailsPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
 
-        <Route path="/guardian/orphans" element={<ProtectedRoute allowedRoles={["Guardian"]}><PageWrapper><GuardianOrphansPage /></PageWrapper></ProtectedRoute>} />
-        <Route path="/guardian/orphans/:orphanId" element={<ProtectedRoute allowedRoles={["Guardian"]}><PageWrapper><GuardianOrphanDetailsPage /></PageWrapper></ProtectedRoute>} />
-        <Route path="/guardian/orphans/:orphanId/edit" element={<ProtectedRoute allowedRoles={["Guardian"]}><PageWrapper><GuardianOrphanFormPage mode="edit" /></PageWrapper></ProtectedRoute>} />
-        <Route path="/families/:familyId/orphans/add" element={<ProtectedRoute allowedRoles={["Guardian"]}><PageWrapper><GuardianOrphanFormPage mode="create" /></PageWrapper></ProtectedRoute>} />
-        <Route path="/guardian/payouts" element={<ProtectedRoute allowedRoles={["Guardian"]}><PageWrapper><GuardianPayoutsPage /></PageWrapper></ProtectedRoute>} />
+        <Route
+          path="/guardian/orphans"
+          element={
+            <ProtectedRoute allowedRoles={["Guardian"]}>
+              <PageWrapper>
+                <GuardianOrphansPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/guardian/orphans/:orphanId"
+          element={
+            <ProtectedRoute allowedRoles={["Guardian"]}>
+              <PageWrapper>
+                <GuardianOrphanDetailsPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/guardian/orphans/:orphanId/edit"
+          element={
+            <ProtectedRoute allowedRoles={["Guardian"]}>
+              <PageWrapper>
+                <GuardianOrphanFormPage mode="edit" />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/families/:familyId/orphans/add"
+          element={
+            <ProtectedRoute allowedRoles={["Guardian"]}>
+              <PageWrapper>
+                <GuardianOrphanFormPage mode="create" />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/guardian/payouts"
+          element={
+            <ProtectedRoute allowedRoles={["Guardian"]}>
+              <PageWrapper>
+                <GuardianPayoutsPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
 
         {/* Old routes redirects */}
         <Route path="/Mange" element={<Navigate to="/families" replace />} />
@@ -825,9 +919,36 @@ function AnimatedRoutes() {
           }
         />
 
-        <Route path="/admin-dashboard/orphans" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminOrphansReviewPage /></PageWrapper></ProtectedRoute>} />
-        <Route path="/admin-dashboard/payments" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminPaymentsReviewPage /></PageWrapper></ProtectedRoute>} />
-        <Route path="/admin-dashboard/payouts" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminPayoutsPage /></PageWrapper></ProtectedRoute>} />
+        <Route
+          path="/admin-dashboard/orphans"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <AdminOrphansReviewPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-dashboard/payments"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <AdminPaymentsReviewPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-dashboard/payouts"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <AdminPayoutsPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/error-404"
@@ -856,7 +977,6 @@ function AnimatedRoutes() {
             </PageWrapper>
           }
         />
-
       </Routes>
     </AnimatePresence>
   );

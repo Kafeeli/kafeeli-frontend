@@ -140,15 +140,11 @@ export default function RegistrationPage() {
       newErrors.email = "البريد الإلكتروني غير صحيح";
     }
 
-    // if (!formData.phone.trim()) {
-    //   newErrors.phone = "رقم الهاتف مطلوب";
-    // } else if (!/^\+97059\d{7}$/.test(formData.phone.trim())) {
-    //   newErrors.phone = "رقم الجوال يجب أن يكون بالصيغة +97059XXXXXXX";
-    // }
     if (!formData.phone.trim()) {
-    newErrors.phone = "رقم الهاتف مطلوب";
+      newErrors.phone = "رقم الهاتف مطلوب";
     } else if (!/^\+9705[69]\d{7}$/.test(formData.phone.trim())) {
-     newErrors.phone = "رقم الجوال يجب أن يكون بالصيغة +97056XXXXXXX أو +97059XXXXXXX";
+      newErrors.phone =
+        "رقم الجوال يجب أن يكون بالصيغة +97056XXXXXXX أو +97059XXXXXXX";
     }
 
     if (!formData.city) {
@@ -289,7 +285,7 @@ export default function RegistrationPage() {
     <>
       <header className="flex items-center justify-between px-8 py-1 bg-gray-50 shadow-sm">
         <button onClick={() => navigate("/")} className="cursor-pointer">
-          <img src={logo} alt="logo" className="w-20 h-19" />
+          <img src={logo} alt="logo" className="w-auto h-18" />
         </button>
 
         <h1 className="text-[24px] font-bold text-[#003469] hidden md:block">

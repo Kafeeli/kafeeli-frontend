@@ -1,12 +1,13 @@
 // Header.jsx
-import { useState, useEffect, useRef } from 'react';
-import { FaBars, FaTimes } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from "react";
+import { FaBars, FaTimes } from "react-icons/fa";
+import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/title.png";
 
 const Header = ({ primaryDestination = "/register" }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const location = useLocation();
 
   const handleNavClick = (e, href) => {
     if (href.startsWith("#")) {
@@ -20,18 +21,24 @@ const Header = ({ primaryDestination = "/register" }) => {
           block: "start",
         });
       }
-
-      setIsMenuOpen(false);
     }
+
+    setIsMenuOpen(false);
   };
 
+  // لازم الروابط دي تكون مطابقة تمامًا لمسارات App.jsx
   const navLinks = [
-    { label: 'الرئيسية', href: '#top', active: true },
-    { label: 'من نحن', href: '#about' },
-    { label: 'الأيتام', href: '#orphans' },
-    { label: 'كيفية العمل', href: '#how-it-works' },
-    { label: 'اتصل بنا', href: '#contact' },
+    { label: "الرئيسية", href: "/landing-page" },
+    { label: "من نحن", href: "/about" },
+    { label: "كيفية العمل", href: "/how-it-works" },
+    { label: "اتصل بنا", href: "/contact" },
   ];
+
+  // دالة تحدد هل الرابط ده active ولا لأ حسب المسار الحالي
+  const isActive = (href) => {
+    if (href.startsWith("#")) return false;
+    return location.pathname.toLowerCase() === href.toLowerCase();
+  };
 
   // إغلاق القائمة عند الضغط خارجها
   useEffect(() => {
@@ -72,11 +79,9 @@ const Header = ({ primaryDestination = "/register" }) => {
       <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
-
-            {/* Logo - كلمة "كفيلي" تختفي بالموبايل */}
-            <a
-              href="#top"
-              onClick={(e) => handleNavClick(e, "#top")}
+            {/* Logo */}
+            <Link
+              to="/landing-page"
               className="flex items-center"
               aria-label="العودة إلى أعلى الصفحة"
             >
@@ -85,31 +90,30 @@ const Header = ({ primaryDestination = "/register" }) => {
                 alt="كفيلي"
                 className="h-14 w-auto object-contain"
               />
-
               <span className="hidden md:inline text-2xl font-bold text-blue-900 tracking-tight">
                 كفيلي
               </span>
-            </a>
+            </Link>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-8">
               {navLinks.map((link) => (
-                <a
+                <Link
                   key={link.label}
-                  href={link.href}
+                  to={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
                   className={`relative font-medium transition-colors duration-200 ${
-                    link.active
+                    isActive(link.href)
                       ? "text-blue-900 font-semibold"
                       : "text-gray-600 hover:text-blue-900"
                   }`}
                 >
                   {link.label}
 
-                  {link.active && (
+                  {isActive(link.href) && (
                     <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-900 rounded-full" />
                   )}
-                </a>
+                </Link>
               ))}
             </nav>
 
@@ -145,24 +149,20 @@ const Header = ({ primaryDestination = "/register" }) => {
           isMenuOpen ? "visible" : "invisible"
         }`}
       >
-        {/* Backdrop */}
         <div
           className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
             isMenuOpen ? "opacity-100" : "opacity-0"
           }`}
         />
 
-        {/* Side Drawer */}
         <div
           ref={menuRef}
           className={`absolute top-0 left-0 h-full w-72 max-w-[80vw] bg-white shadow-2xl transform transition-transform duration-300 ease-out ${
             isMenuOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
-          {/* Menu Header */}
           <div className="flex items-center justify-between p-4 border-b border-gray-100">
             <span className="text-lg font-bold text-blue-900">القائمة</span>
-
             <button
               onClick={() => setIsMenuOpen(false)}
               className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
@@ -172,25 +172,23 @@ const Header = ({ primaryDestination = "/register" }) => {
             </button>
           </div>
 
-          {/* Links */}
           <div className="p-4 space-y-1">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.label}
-                href={link.href}
+                to={link.href}
                 onClick={(e) => handleNavClick(e, link.href)}
                 className={`block px-4 py-3 rounded-lg text-base font-medium transition-colors ${
-                  link.active
+                  isActive(link.href)
                     ? "bg-blue-50 text-blue-900"
                     : "text-gray-600 hover:bg-gray-50 hover:text-blue-900"
                 }`}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
 
-          {/* CTA Button */}
           <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100 bg-white">
             <Link
               onClick={() => setIsMenuOpen(false)}

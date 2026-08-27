@@ -4,10 +4,10 @@ import logo from "../assets/title.png";
 
 export default function Footer() {
   const quickLinks = [
-    { label: "من نحن", href: "#about" },
+    { label: "من نحن", href: "/About" },
     { label: "الأسئلة الشائعة", href: "#faq" },
     { label: "سياسة الخصوصية", href: "#privacy" },
-    { label: "اتصل بنا", href: "#contact" },
+    { label: "اتصل بنا", href: "/contact" },
   ];
 
   return (
