@@ -88,6 +88,15 @@ export default function AuthenticatedHeader({
 
           {/* بيانات المستخدم */}
           <div className="flex items-center gap-3">
+            {/* الاسم والدور */}
+            <div className="hidden text-right sm:block">
+              <p className="text-sm font-bold text-gray-800">
+                {fullName || email || "مستخدم كفيلي"}
+              </p>
+
+              {role && <p className="text-xs text-gray-500">{role}</p>}
+            </div>
+
             {/* الصورة */}
             <div
               className="relative grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border border-[#0D4B8E] bg-gray-100 text-[#003469]"
@@ -103,15 +112,6 @@ export default function AuthenticatedHeader({
                   className="absolute inset-0 h-full w-full object-cover"
                 />
               )}
-            </div>
-
-            {/* الاسم والدور */}
-            <div className="hidden text-right sm:block">
-              <p className="text-sm font-bold text-gray-800">
-                {fullName || email || "مستخدم كفيلي"}
-              </p>
-
-              {role && <p className="text-xs text-gray-500">{role}</p>}
             </div>
           </div>
         </div>

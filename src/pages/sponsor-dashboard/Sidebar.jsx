@@ -37,12 +37,12 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
       path: "/sponsorProfile",
     },
     {
-      title: "الوثائق",
-      icon: <MdDescription />,
-      path: null,
+      title: "تصفح الأيتام",
+      icon: <MdPublishedWithChanges />,
+      path: "/sponsor/orphans",
     },
     {
-      title: "العائلات",
+      title: "تصفح العائلات",
       icon: <MdFamilyRestroom />,
       path: "/sponsor/families",
     },
@@ -52,9 +52,9 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
       path: "/sponsor/sponsorships",
     },
     {
-      title: "الأيتام",
-      icon: <MdPublishedWithChanges />,
-      path: "/sponsor/orphans",
+      title: "الوثائق",
+      icon: <MdDescription />,
+      path: null,
     },
     {
       title: "المحفظة",

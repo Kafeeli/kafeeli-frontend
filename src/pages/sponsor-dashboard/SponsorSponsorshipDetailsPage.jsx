@@ -1,16 +1,31 @@
 import { useCallback, useEffect, useState } from "react";
-import { MdAccountBalance, MdCloudUpload, MdInfoOutline, MdVolunteerActivism } from "react-icons/md";
+import {
+  MdAccountBalance,
+  MdCloudUpload,
+  MdInfoOutline,
+  MdVolunteerActivism,
+} from "react-icons/md";
 import { useParams } from "react-router-dom";
 import { sponsorshipApi } from "../../services/sponsorshipApi";
 import { ErrorState, LoadingState } from "../admin-dashboard/Adminstates";
 import SponsorFlowLayout from "./SponsorFlowLayout";
-import { formatAmount, formatDate, getApiErrorMessage, getResultData } from "./sponsorFlowUtils";
+import {
+  formatAmount,
+  formatDate,
+  getApiErrorMessage,
+  getResultData,
+} from "./sponsorFlowUtils";
 import { localizeStatus } from "../../utils/localization";
 
 const MAX_PAYMENT_PROOF_SIZE = 5 * 1024 * 1024;
-const PAYMENT_PROOF_ACCEPT = ".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf";
+const PAYMENT_PROOF_ACCEPT =
+  ".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf";
 const ALLOWED_PAYMENT_PROOF_EXTENSIONS = ["jpg", "jpeg", "png", "pdf"];
-const ALLOWED_PAYMENT_PROOF_MIME_TYPES = ["image/jpeg", "image/png", "application/pdf"];
+const ALLOWED_PAYMENT_PROOF_MIME_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "application/pdf",
+];
 const FIXED_BANK_NAME_AR = "بنك فلسطين";
 const FIXED_BANK_NAME_EN = "Bank of Palestine";
 const FIXED_TRANSFER_NUMBER = "0593205914";
@@ -22,8 +37,11 @@ function validatePaymentProof(file) {
   if (!file) return "يرجى اختيار ملف إثبات الدفع.";
 
   const extension = file.name.split(".").pop()?.toLowerCase();
-  const hasAllowedExtension = ALLOWED_PAYMENT_PROOF_EXTENSIONS.includes(extension);
-  const hasAllowedMimeType = ALLOWED_PAYMENT_PROOF_MIME_TYPES.includes(file.type);
+  const hasAllowedExtension =
+    ALLOWED_PAYMENT_PROOF_EXTENSIONS.includes(extension);
+  const hasAllowedMimeType = ALLOWED_PAYMENT_PROOF_MIME_TYPES.includes(
+    file.type,
+  );
 
   if (!hasAllowedExtension && !hasAllowedMimeType) {
     return "صيغة الملف غير مدعومة. الصيغ المقبولة: JPG وJPEG وPNG وPDF.";
@@ -84,7 +102,10 @@ export default function SponsorSponsorshipDetailsPage() {
       else setSponsorship(data);
     } catch (requestError) {
       if (requestError?.response?.status === 404) setNotFound(true);
-      else setError(getApiErrorMessage(requestError, "تعذر تحميل تفاصيل الكفالة."));
+      else
+        setError(
+          getApiErrorMessage(requestError, "تعذر تحميل تفاصيل الكفالة."),
+        );
     } finally {
       setLoading(false);
     }
@@ -138,49 +159,180 @@ export default function SponsorSponsorshipDetailsPage() {
 
   let content;
   if (loading) content = <LoadingState count={2} columns="md:grid-cols-2" />;
-  else if (notFound) content = <ErrorState onRetry={loadSponsorship} title="الكفالة غير موجودة" description="لم يعثر الخادم على الكفالة المطلوبة." />;
-  else if (error) content = <ErrorState onRetry={loadSponsorship} description={error} />;
+  else if (notFound)
+    content = (
+      <ErrorState
+        onRetry={loadSponsorship}
+        title="الكفالة غير موجودة"
+        description="لم يعثر الخادم على الكفالة المطلوبة."
+      />
+    );
+  else if (error)
+    content = <ErrorState onRetry={loadSponsorship} description={error} />;
   else if (sponsorship) {
     content = (
       <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
         <section className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
           <div className="flex items-start justify-between gap-4 border-b border-gray-100 pb-5">
-            <div className="flex items-center gap-3"><div className="grid h-12 w-12 place-items-center rounded-full bg-[#E8F1FA] text-[#0D4B8E]"><MdVolunteerActivism className="text-2xl" /></div><div><h2 className="text-xl font-extrabold text-[#003469]">{sponsorship.targetDisplayName || "—"}</h2><p className="mt-1 text-sm text-gray-500">{sponsorship.targetType || "—"} · {sponsorship.targetCity || "—"}</p></div></div>
-            <span className="rounded-full bg-[#E8F1FA] px-3 py-1 text-xs font-bold text-[#0D4B8E]">{localizeStatus(sponsorship.statusLabel || sponsorship.status)}</span>
+            <div className="flex items-center gap-3">
+              <div className="grid h-12 w-12 place-items-center rounded-full bg-[#E8F1FA] text-[#0D4B8E]">
+                <MdVolunteerActivism className="text-2xl" />
+              </div>
+              <div>
+                <h2 className="text-xl font-extrabold text-[#003469]">
+                  {sponsorship.targetDisplayName || "—"}
+                </h2>
+                <p className="mt-1 text-sm text-gray-500">
+                  {sponsorship.targetType || "—"} ·{" "}
+                  {sponsorship.targetCity || "—"}
+                </p>
+              </div>
+            </div>
+            <span className="rounded-full bg-[#E8F1FA] px-3 py-1 text-xs font-bold text-[#0D4B8E]">
+              {localizeStatus(sponsorship.statusLabel || sponsorship.status)}
+            </span>
           </div>
           <dl className="mt-6 grid gap-5 sm:grid-cols-2">
-            <div><dt className="text-sm text-gray-500">المبلغ الشهري</dt><dd className="mt-1 font-extrabold">{formatAmount(sponsorship.monthlyAmount)}</dd></div>
-            <div><dt className="text-sm text-gray-500">عدد الأشهر</dt><dd className="mt-1 font-extrabold">{sponsorship.numberOfMonths}</dd></div>
-            <div><dt className="text-sm text-gray-500">إجمالي الكفالة</dt><dd className="mt-1 font-extrabold text-[#D9A441]">{formatAmount(sponsorship.totalAmount)}</dd></div>
-            <div><dt className="text-sm text-gray-500">تاريخ الإنشاء</dt><dd className="mt-1 font-extrabold">{formatDate(sponsorship.createdAt)}</dd></div>
+            <div>
+              <dt className="text-sm text-gray-500">المبلغ الشهري</dt>
+              <dd className="mt-1 font-extrabold">
+                {formatAmount(sponsorship.monthlyAmount)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm text-gray-500">عدد الأشهر</dt>
+              <dd className="mt-1 font-extrabold">
+                {sponsorship.numberOfMonths}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm text-gray-500">إجمالي الكفالة</dt>
+              <dd className="mt-1 font-extrabold text-[#D9A441]">
+                {formatAmount(sponsorship.totalAmount)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-sm text-gray-500">تاريخ الإنشاء</dt>
+              <dd className="mt-1 font-extrabold">
+                {formatDate(sponsorship.createdAt)}
+              </dd>
+            </div>
           </dl>
         </section>
         <aside className="h-fit rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-          <h2 className="text-lg font-extrabold text-[#003469]">الخطوة التالية</h2>
-          {sponsorship.nextStepInfo ? <p className="mt-3 rounded-lg bg-[#E8F1FA] p-4 text-sm leading-6 text-[#003469]">{sponsorship.nextStepInfo}</p> : <p className="mt-3 text-sm leading-6 text-gray-600">الكفالة بانتظار الخطوة التالية التي يدعمها الخادم.</p>}
-          <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800"><MdInfoOutline className="mt-0.5 shrink-0 text-lg" /><p>{sponsorship.paymentRequired ? "تتطلب هذه الكفالة استكمال خطوة الدفع وفق تعليمات الخادم." : "لا يطلب الخادم دفعة لهذه الكفالة حاليًا."}</p></div>
-          {!sponsorship.canUploadPayment && <p className="mt-4 rounded-lg bg-gray-100 p-3 text-sm text-gray-600">رفع إثبات الدفع غير متاح لهذه الكفالة حاليًا.</p>}
-          {uploadSuccess && <p role="status" className="mt-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm font-bold text-green-700">{uploadSuccess}</p>}
+          <h2 className="text-lg font-extrabold text-[#003469]">
+            الخطوة التالية
+          </h2>
+          {sponsorship.nextStepInfo ? (
+            <p className="mt-3 rounded-lg bg-[#E8F1FA] p-4 text-sm leading-6 text-[#003469]">
+              {sponsorship.nextStepInfo}
+            </p>
+          ) : (
+            <p className="mt-3 text-sm leading-6 text-gray-600">
+              الكفالة بانتظار الخطوة التالية التي يدعمها الخادم.
+            </p>
+          )}
+          <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+            <MdInfoOutline className="mt-0.5 shrink-0 text-lg" />
+            <p>
+              {sponsorship.paymentRequired
+                ? "تتطلب هذه الكفالة استكمال خطوة الدفع وفق تعليمات الخادم."
+                : "لا يطلب الخادم دفعة لهذه الكفالة حاليًا."}
+            </p>
+          </div>
+          {!sponsorship.canUploadPayment && (
+            <p className="mt-4 rounded-lg bg-gray-100 p-3 text-sm text-gray-600">
+              رفع إثبات الدفع غير متاح لهذه الكفالة حاليًا.
+            </p>
+          )}
+          {uploadSuccess && (
+            <p
+              role="status"
+              className="mt-4 rounded-lg border border-green-200 bg-green-50 p-3 text-sm font-bold text-green-700"
+            >
+              {uploadSuccess}
+            </p>
+          )}
           {sponsorship.paymentRequired && sponsorship.canUploadPayment && (
-            <section className="mt-4 rounded-xl border border-[#B8CCE0] bg-[#F7FAFD] p-4" aria-labelledby="payment-proof-title">
+            <section
+              className="mt-4 rounded-xl border border-[#B8CCE0] bg-[#F7FAFD] p-4"
+              aria-labelledby="payment-proof-title"
+            >
               <div className="flex items-center gap-2 text-[#003469]">
                 <MdCloudUpload className="text-xl" />
-                <h3 id="payment-proof-title" className="font-extrabold">رفع إثبات الدفع</h3>
+                <h3 id="payment-proof-title" className="font-extrabold">
+                  رفع إثبات الدفع
+                </h3>
               </div>
-              <p className="mt-3 text-sm leading-6 text-gray-700">يرجى تحويل مبلغ الكفالة إلى حساب منصة كفيلي الموضح أدناه، ثم رفع صورة إثبات التحويل لإكمال عملية الدفع.</p>
+              <p className="mt-3 text-sm leading-6 text-gray-700">
+                يرجى تحويل مبلغ الكفالة إلى حساب منصة كفيلي الموضح أدناه، ثم رفع
+                صورة إثبات التحويل لإكمال عملية الدفع.
+              </p>
               <div className="mt-4 rounded-xl border border-[#B8CCE0] bg-white p-4">
-                <div className="flex items-center gap-2 font-extrabold text-[#003469]"><MdAccountBalance className="text-xl" />معلومات التحويل</div>
+                <div className="flex items-center gap-2 font-extrabold text-[#003469]">
+                  <MdAccountBalance className="text-xl" />
+                  معلومات التحويل
+                </div>
                 <dl className="mt-3 grid gap-3 text-sm">
-                  <div><dt className="text-gray-500">البنك</dt><dd className="mt-1 font-extrabold">{FIXED_BANK_NAME_AR} <span dir="ltr" className="text-xs font-semibold text-gray-500">({FIXED_BANK_NAME_EN})</span></dd></div>
-                  <div><dt className="text-gray-500">اسم صاحب الحساب</dt><dd dir="ltr" className="mt-1 text-right font-extrabold">{FIXED_ACCOUNT_HOLDER}</dd></div>
-                  <div><dt className="text-gray-500">رقم التحويل</dt><dd dir="ltr" className="mt-1 text-right font-mono text-lg font-extrabold text-[#0D4B8E]">{FIXED_TRANSFER_NUMBER}</dd></div>
-                  <div><dt className="text-gray-500">IBAN</dt><dd dir="ltr" className="mt-1 break-all text-right font-mono font-extrabold">{FIXED_IBAN}</dd></div>
-                  <div><dt className="text-gray-500">العملة</dt><dd dir="ltr" className="mt-1 text-right font-extrabold">{FIXED_CURRENCY}</dd></div>
-                  <div><dt className="text-gray-500">مبلغ الكفالة</dt><dd className="mt-1 font-extrabold text-[#D9A441]">{formatAmount(sponsorship.totalAmount)}</dd></div>
+                  <div>
+                    <dt className="text-gray-500">البنك</dt>
+                    <dd className="mt-1 font-extrabold">
+                      {FIXED_BANK_NAME_AR}{" "}
+                      <span
+                        dir="ltr"
+                        className="text-xs font-semibold text-gray-500"
+                      >
+                        ({FIXED_BANK_NAME_EN})
+                      </span>
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-500">اسم صاحب الحساب</dt>
+                    <dd dir="ltr" className="mt-1 text-right font-extrabold">
+                      {FIXED_ACCOUNT_HOLDER}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-500">رقم التحويل</dt>
+                    <dd
+                      dir="ltr"
+                      className="mt-1 text-right font-mono text-lg font-extrabold text-[#0D4B8E]"
+                    >
+                      {FIXED_TRANSFER_NUMBER}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-500">IBAN</dt>
+                    <dd
+                      dir="ltr"
+                      className="mt-1 break-all text-right font-mono font-extrabold"
+                    >
+                      {FIXED_IBAN}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-500">العملة</dt>
+                    <dd dir="ltr" className="mt-1 text-right font-extrabold">
+                      {FIXED_CURRENCY}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-gray-500">مبلغ الكفالة</dt>
+                    <dd className="mt-1 font-extrabold text-[#D9A441]">
+                      {formatAmount(sponsorship.totalAmount)}
+                    </dd>
+                  </div>
                 </dl>
               </div>
-              <p className="mt-3 text-xs leading-5 text-gray-600">الصيغ المقبولة: JPG وJPEG وPNG وPDF، وبحجم أقصى 5 ميجابايت.</p>
-              <label htmlFor="transfer-reference" className="mt-4 block text-sm font-bold text-gray-700">مرجع التحويل (اختياري)</label>
+              <p className="mt-3 text-xs leading-5 text-gray-600">
+                الصيغ المقبولة: JPG وJPEG وPNG وPDF، وبحجم أقصى 5 ميجابايت.
+              </p>
+              <label
+                htmlFor="transfer-reference"
+                className="mt-4 block text-sm font-bold text-gray-700"
+              >
+                مرجع التحويل (اختياري)
+              </label>
               <input
                 id="transfer-reference"
                 type="text"
@@ -193,7 +345,12 @@ export default function SponsorSponsorshipDetailsPage() {
                 disabled={uploading}
                 className="mt-2 h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:border-[#0D4B8E] disabled:cursor-not-allowed disabled:bg-gray-100"
               />
-              <label htmlFor="payment-proof" className="mt-4 block text-sm font-bold text-gray-700">ملف إثبات الدفع</label>
+              <label
+                htmlFor="payment-proof"
+                className="mt-4 block text-sm font-bold text-gray-700"
+              >
+                ملف إثبات الدفع
+              </label>
               <input
                 key={paymentProofInputKey}
                 id="payment-proof"
@@ -204,14 +361,32 @@ export default function SponsorSponsorshipDetailsPage() {
                 aria-describedby="payment-proof-file payment-proof-error"
                 className="mt-2 block w-full cursor-pointer rounded-lg border border-gray-300 bg-white text-sm text-gray-700 file:ml-3 file:border-0 file:bg-[#E8F1FA] file:px-4 file:py-3 file:font-bold file:text-[#0D4B8E] disabled:cursor-not-allowed disabled:opacity-60"
               />
-              <p id="payment-proof-file" className="mt-2 min-h-5 text-sm text-gray-600">
-                {paymentProof ? `الملف المحدد: ${paymentProof.name}` : "لم يتم اختيار ملف."}
+              <p
+                id="payment-proof-file"
+                className="mt-2 min-h-5 text-sm text-gray-600"
+              >
+                {paymentProof
+                  ? `الملف المحدد: ${paymentProof.name}`
+                  : "لم يتم اختيار ملف."}
               </p>
-              {uploadError && <p id="payment-proof-error" role="alert" className="mt-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{uploadError}</p>}
+              {uploadError && (
+                <p
+                  id="payment-proof-error"
+                  role="alert"
+                  className="mt-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700"
+                >
+                  {uploadError}
+                </p>
+              )}
               <button
                 type="button"
                 onClick={handlePaymentProofUpload}
-                disabled={uploading || !paymentProof || transferReference.length > 200 || Boolean(validatePaymentProof(paymentProof))}
+                disabled={
+                  uploading ||
+                  !paymentProof ||
+                  transferReference.length > 200 ||
+                  Boolean(validatePaymentProof(paymentProof))
+                }
                 className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0D4B8E] px-4 py-3 text-sm font-extrabold text-white transition hover:bg-[#003469] disabled:cursor-not-allowed disabled:bg-gray-400"
               >
                 <MdCloudUpload className="text-lg" />
@@ -224,5 +399,9 @@ export default function SponsorSponsorshipDetailsPage() {
     );
   }
 
-  return <SponsorFlowLayout title="تفاصيل الكفالة" backTo="/sponsor/sponsorships">{content}</SponsorFlowLayout>;
+  return (
+    <SponsorFlowLayout title="تفاصيل الكفالة" backTo="/sponsor/sponsorships">
+      {content}
+    </SponsorFlowLayout>
+  );
 }

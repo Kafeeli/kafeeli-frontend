@@ -152,7 +152,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
           </h2>
 
           <p className="font-[Cairo] font-normal text-[11px] sm:text-[12px] lg:text-[13px] leading-[16px] tracking-[0px] text-center text-[#e6ecf7] whitespace-nowrap">
-            لوحة الوصي الذكية
+            لوحة تحكم الوصي الذكية
           </p>
         </div>
 
