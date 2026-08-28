@@ -455,7 +455,7 @@ export default function Contact() {
 
                 <div className="flex gap-3">
                   <a
-                    href="#"
+                    href="https://www.linkedin.com/company/135195768/"
                     aria-label="LinkedIn"
                     className="w-11 h-11 rounded-xl bg-[#0D4B8E]/5 text-[#0D4B8E] flex items-center justify-center hover:bg-[#0D4B8E] hover:text-white transition-all"
                   >
