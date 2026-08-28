@@ -143,7 +143,7 @@ export default function Contact() {
                 </a>
 
                 <a
-                  href="mailto:support@kafeeli.org"
+                  href="mailto:kafeeli.team@outlook.com"
                   className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 hover:border-[#2DBCC3] hover:text-[#0D4B8E] text-gray-700 px-7 py-3.5 rounded-xl font-bold text-sm transition-all duration-200 active:scale-95"
                 >
                   <FaEnvelope />
@@ -463,7 +463,7 @@ export default function Contact() {
                   </a>
 
                   <a
-                    href="mailto:support@kafeeli.org"
+                    href="mailto:kafeeli.team@outlook.com"
                     aria-label="Email"
                     className="w-11 h-11 rounded-xl bg-[#2DBCC3]/10 text-[#087D84] flex items-center justify-center hover:bg-[#2DBCC3] hover:text-white transition-all"
                   >
