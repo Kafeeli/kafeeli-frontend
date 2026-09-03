@@ -10,6 +10,7 @@ import { formatArabicDateTime } from "../../utils/date";
 import {
   localizeStatus,
   localizeVerificationStatus,
+  verificationStatusMeta,
 } from "../../utils/localization";
 
 import AdminLayout from "./Adminlayout";
@@ -26,11 +27,10 @@ import AdminTableIconButton from "./AdminTableIconButton";
 
 const VERIFICATION_FILTERS = [
   { value: "all", label: "كل حالات التحقق" },
-  { value: "Pending", label: "قيد المراجعة" },
-  { value: "Approved", label: "موثق" },
-  { value: "Rejected", label: "مرفوض" },
-  { value: "NeedsUpdate", label: "يحتاج تحديث" },
-  { value: "Suspended", label: "معلق" },
+  ...["Pending", "Approved", "Rejected", "NeedsUpdate", "Suspended"].map((value) => ({
+    value,
+    label: verificationStatusMeta(value).label,
+  })),
 ];
 
 const ACCOUNT_FILTERS = [
@@ -45,6 +45,16 @@ function accountStatusLabel(status) {
 
 function accountStatusClasses(status) {
   return status === "Active" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700";
+}
+
+function VerificationStatusBadge({ status }) {
+  const { label, className } = verificationStatusMeta(status);
+
+  return (
+    <span className={`inline-flex rounded-full border px-2 py-1 text-[10px] font-bold ${className}`}>
+      {label}
+    </span>
+  );
 }
 
 function toDateInputValue(value) {
@@ -251,10 +261,10 @@ export default function AdminGuardiansPage() {
   else content = (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
       <div className="overflow-x-auto"><table className="w-full min-w-[1080px] text-right text-xs">
-        <thead className="bg-[#F5F7FA] text-[11px] text-[#374151]"><tr><th className="whitespace-nowrap px-3 py-3 font-extrabold">الاسم</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">البريد الإلكتروني</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الهاتف</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الموقع</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">التحقق</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الحساب</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">العائلة</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الإجراءات</th></tr></thead>
+        <thead className="bg-[#F5F7FA] text-[11px] text-[#374151]"><tr><th className="whitespace-nowrap px-3 py-3 font-extrabold">الاسم</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">البريد الإلكتروني</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الهاتف</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الموقع</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">حالة التحقق</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">حالة الحساب</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">العائلة</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الإجراءات</th></tr></thead>
         <tbody className="divide-y divide-gray-100">{filteredGuardians.map((guardian) => (
           <tr key={guardian.guardianId} className="hover:bg-gray-50/70">
-            <td title={guardian.fullName || undefined} className="max-w-[170px] truncate px-3 py-3 font-bold text-[#003469]">{guardian.fullName || "—"}</td><td title={guardian.email || undefined} className="max-w-[210px] truncate px-3 py-3 text-[11px] text-gray-600">{guardian.email || "—"}</td><td dir="ltr" className="whitespace-nowrap px-3 py-3 text-right text-[11px] text-gray-600">{guardian.phoneNumber || "—"}</td><td title={[guardian.city, guardian.country].filter(Boolean).join("، ") || undefined} className="max-w-[140px] truncate px-3 py-3">{[guardian.city, guardian.country].filter(Boolean).join("، ") || "—"}</td><td className="whitespace-nowrap px-3 py-3"><span className="rounded-full bg-[#E8F1FA] px-2 py-1 text-[10px] font-bold text-[#0D4B8E]">{localizeVerificationStatus(guardian.verificationStatus)}</span></td><td className="whitespace-nowrap px-3 py-3"><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${accountStatusClasses(guardian.accountStatus)}`}>{accountStatusLabel(guardian.accountStatus)}</span></td><td className="max-w-[130px] truncate px-3 py-3">{guardian.hasFamily ? localizeStatus(guardian.familyStatus) : "لا توجد عائلة"}</td>
+            <td title={guardian.fullName || undefined} className="max-w-[170px] truncate px-3 py-3 font-bold text-[#003469]">{guardian.fullName || "—"}</td><td title={guardian.email || undefined} className="max-w-[210px] truncate px-3 py-3 text-[11px] text-gray-600">{guardian.email || "—"}</td><td dir="ltr" className="whitespace-nowrap px-3 py-3 text-right text-[11px] text-gray-600">{guardian.phoneNumber || "—"}</td><td title={[guardian.city, guardian.country].filter(Boolean).join("، ") || undefined} className="max-w-[140px] truncate px-3 py-3">{[guardian.city, guardian.country].filter(Boolean).join("، ") || "—"}</td><td className="whitespace-nowrap px-3 py-3"><VerificationStatusBadge status={guardian.verificationStatus} /></td><td className="whitespace-nowrap px-3 py-3"><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${accountStatusClasses(guardian.accountStatus)}`}>{accountStatusLabel(guardian.accountStatus)}</span></td><td className="max-w-[130px] truncate px-3 py-3">{guardian.hasFamily ? localizeStatus(guardian.familyStatus) : "لا توجد عائلة"}</td>
             <td className="px-3 py-3"><div className="flex items-center gap-1 whitespace-nowrap"><AdminTableIconButton label="عرض التفاصيل" tone="view" disabled={Boolean(busy)} onClick={() => openGuardian(guardian.guardianId)}><FiEye aria-hidden="true" /></AdminTableIconButton><AdminTableIconButton label="تعديل" disabled={Boolean(busy)} onClick={() => openGuardian(guardian.guardianId, "edit")}><FiEdit2 aria-hidden="true" /></AdminTableIconButton>{guardian.canSuspend && <AdminTableIconButton label="تعليق الحساب" tone="suspend" disabled={Boolean(busy)} onClick={() => showStatusConfirmation(guardian, false)}><MdPauseCircleOutline aria-hidden="true" /></AdminTableIconButton>}{guardian.canReactivate && <AdminTableIconButton label="إعادة تفعيل الحساب" tone="reactivate" disabled={Boolean(busy)} onClick={() => showStatusConfirmation(guardian, true)}><MdPlayCircleOutline aria-hidden="true" /></AdminTableIconButton>}<AdminTableIconButton label="حذف نهائي" tone="delete" disabled={Boolean(busy)} onClick={() => openDelete(guardian.guardianId)}><FiTrash2 aria-hidden="true" /></AdminTableIconButton></div></td>
           </tr>
         ))}</tbody>

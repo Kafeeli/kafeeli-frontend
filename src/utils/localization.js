@@ -75,10 +75,33 @@ export const DOCUMENT_TYPE_LABELS = {
 
 const VERIFICATION_STATUS_LABELS = {
   Pending: "قيد المراجعة",
+  PendingReview: "قيد المراجعة",
+  UnderReview: "قيد المراجعة",
   Approved: "موثق",
+  Verified: "موثق",
   Rejected: "مرفوض",
+  Unverified: "غير موثق",
+  NotVerified: "غير موثق",
   Suspended: "معلق",
   NeedsUpdate: "يحتاج تحديث",
+};
+
+const VERIFICATION_STATUS_CLASSES = {
+  Pending: "border-amber-200 bg-amber-50 text-amber-700",
+  PendingReview: "border-amber-200 bg-amber-50 text-amber-700",
+  UnderReview: "border-amber-200 bg-amber-50 text-amber-700",
+  Approved: "border-green-200 bg-green-50 text-green-700",
+  Verified: "border-green-200 bg-green-50 text-green-700",
+  Rejected: "border-red-200 bg-red-50 text-red-700",
+  Unverified: "border-red-200 bg-red-50 text-red-700",
+  NotVerified: "border-red-200 bg-red-50 text-red-700",
+  Suspended: "border-red-200 bg-red-50 text-red-700",
+  NeedsUpdate: "border-orange-200 bg-orange-50 text-orange-700",
+};
+
+const UNKNOWN_VERIFICATION_STATUS = {
+  label: "غير محدد",
+  className: "border-gray-200 bg-gray-50 text-gray-600",
 };
 
 export function localizeRole(role) {
@@ -98,6 +121,15 @@ export function localizeDocumentType(type, fallback = "وثيقة") {
 export function localizeVerificationStatus(status, fallback = "—") {
   if (status == null || status === "") return fallback;
   return VERIFICATION_STATUS_LABELS[status] || localizeStatus(status, fallback);
+}
+
+export function verificationStatusMeta(status) {
+  if (!VERIFICATION_STATUS_LABELS[status]) return UNKNOWN_VERIFICATION_STATUS;
+
+  return {
+    label: VERIFICATION_STATUS_LABELS[status],
+    className: VERIFICATION_STATUS_CLASSES[status],
+  };
 }
 
 export function localizeDisplayFields(record, fields) {
