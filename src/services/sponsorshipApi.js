@@ -1,8 +1,5 @@
 import api from "./api";
 
-const FIXED_PLATFORM_BANK_ACCOUNT_ID =
-  "8E9F3A2D-71B4-4C68-9A25-1F0D6E7B3C91";
-
 export const sponsorshipApi = {
   create: async ({ familyId, orphanId, monthlyAmount, numberOfMonths }) => {
     const response = await api.post("/api/v1/sponsorships", {
@@ -24,12 +21,17 @@ export const sponsorshipApi = {
     return response.data;
   },
 
+  getPlatformBankAccounts: async () => {
+    const response = await api.get("/api/v1/platform-bank-accounts");
+    return response.data;
+  },
+
   uploadPaymentProof: async (
     sponsorshipId,
-    { transferReference, paymentProof },
+    { platformBankAccountId, transferReference, paymentProof },
   ) => {
     const formData = new FormData();
-    formData.append("PlatformBankAccountId", FIXED_PLATFORM_BANK_ACCOUNT_ID);
+    formData.append("PlatformBankAccountId", platformBankAccountId);
     if (transferReference.trim()) {
       formData.append("TransferReference", transferReference.trim());
     }

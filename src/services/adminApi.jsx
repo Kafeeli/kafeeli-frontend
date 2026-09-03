@@ -191,8 +191,54 @@ export const adminApi = {
     return response.data;
   },
 
+  getGuardianDetails: async (guardianId) => {
+    const response = await api.get(`/api/v1/admin/guardians/${guardianId}`);
+    return response.data;
+  },
+
+  updateGuardian: async (guardianId, payload) => {
+    const response = await api.patch(`/api/v1/admin/guardians/${guardianId}`, payload);
+    return response.data;
+  },
+
+  updateGuardianStatus: async (guardianId, isActive, reason = null) => {
+    const response = await api.patch(`/api/v1/admin/guardians/${guardianId}/status`, {
+      isActive,
+      reason: reason?.trim() || null,
+    });
+    return response.data;
+  },
+
+  deleteGuardian: async (guardianId) => {
+    const response = await api.delete(`/api/v1/admin/guardians/${guardianId}`);
+    return response.data;
+  },
+
   getAllSponsors: async () => {
     const response = await api.get("/api/v1/admin/sponsors");
+    return response.data;
+  },
+
+  getSponsorDetails: async (sponsorId) => {
+    const response = await api.get(`/api/v1/admin/sponsors/${sponsorId}`);
+    return response.data;
+  },
+
+  updateSponsor: async (sponsorId, payload) => {
+    const response = await api.patch(`/api/v1/admin/sponsors/${sponsorId}`, payload);
+    return response.data;
+  },
+
+  updateSponsorStatus: async (sponsorId, isActive, reason = null) => {
+    const response = await api.patch(`/api/v1/admin/sponsors/${sponsorId}/status`, {
+      isActive,
+      reason: reason?.trim() || null,
+    });
+    return response.data;
+  },
+
+  deleteSponsor: async (sponsorId) => {
+    const response = await api.delete(`/api/v1/admin/sponsors/${sponsorId}`);
     return response.data;
   },
 
@@ -233,6 +279,22 @@ export const adminApi = {
     const response = await api.get(`/api/v1/admin/orphans/${orphanId}`);
     return response.data;
   },
+  updateOrphan: async (orphanId, payload) => {
+    const response = await api.patch(`/api/v1/admin/orphans/${orphanId}`, payload);
+    return response.data;
+  },
+  updateOrphanStatus: async (orphanId, status, reason = null) => {
+    const statusValues = { Active: 2, Hidden: 3, Suspended: 4 };
+    const response = await api.patch(`/api/v1/admin/orphans/${orphanId}/status`, {
+      status: statusValues[status],
+      reason: reason?.trim() || null,
+    });
+    return response.data;
+  },
+  deleteOrphan: async (orphanId) => {
+    const response = await api.delete(`/api/v1/admin/orphans/${orphanId}`);
+    return response.data;
+  },
   approveOrphan: async (orphanId) => {
     const response = await api.post(`/api/v1/admin/orphans/${orphanId}/approve`);
     return response.data;
@@ -243,10 +305,6 @@ export const adminApi = {
   },
   getPendingOrphanDocuments: async () => {
     const response = await api.get("/api/v1/admin/orphan-documents/pending");
-    return response.data;
-  },
-  approveOrphanDocument: async (documentId) => {
-    const response = await api.post(`/api/v1/admin/orphan-documents/${documentId}/approve`);
     return response.data;
   },
   requestOrphanDocumentUpdate: async (documentId, reason) => {
