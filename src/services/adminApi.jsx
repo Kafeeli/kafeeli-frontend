@@ -145,9 +145,13 @@ export const adminApi = {
 
   // ============ مراجعة وثائق الأوصياء ============
 
-  // GET /api/v1/admin/guardian-documents/pending
-  getPendingDocuments: async () => {
-    const response = await api.get("/api/v1/admin/guardian-documents/pending");
+  getAllGuardianDocuments: async (filters = {}) => {
+    const params = Object.fromEntries(
+      Object.entries(filters)
+        .map(([key, value]) => [key, typeof value === "string" ? value.trim() : value])
+        .filter(([, value]) => value !== "" && value !== "all" && value != null),
+    );
+    const response = await api.get("/api/v1/admin/guardian-documents", { params });
     return response.data;
   },
 
@@ -303,8 +307,13 @@ export const adminApi = {
     const response = await api.post(`/api/v1/admin/orphans/${orphanId}/needs-update`, { reason });
     return response.data;
   },
-  getPendingOrphanDocuments: async () => {
-    const response = await api.get("/api/v1/admin/orphan-documents/pending");
+  getAllOrphanDocuments: async (filters = {}) => {
+    const params = Object.fromEntries(
+      Object.entries(filters)
+        .map(([key, value]) => [key, typeof value === "string" ? value.trim() : value])
+        .filter(([, value]) => value !== "" && value !== "all" && value != null),
+    );
+    const response = await api.get("/api/v1/admin/orphan-documents", { params });
     return response.data;
   },
   requestOrphanDocumentUpdate: async (documentId, reason) => {

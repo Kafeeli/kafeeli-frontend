@@ -8,6 +8,7 @@ import {
 } from "react-icons/hi2";
 import {
   MdDashboard,
+  MdDescription,
   MdOutlineFamilyRestroom,
   MdOutlineVolunteerActivism,
 } from "react-icons/md";
@@ -39,6 +40,16 @@ const sidebarItems = [
     path: "/admin-dashboard/families",
   },
   { label: "الأيتام", icon: PiBaby, path: "/admin-dashboard/orphans" },
+  {
+    label: "وثائق الأوصياء",
+    icon: MdDescription,
+    path: "/admin-dashboard/guardian-document-reviews",
+  },
+  {
+    label: "وثائق الأيتام",
+    icon: MdDescription,
+    path: "/admin-dashboard/orphan-document-reviews",
+  },
   { label: "المدفوعات", icon: PiMoneyWavy, path: "/admin-dashboard/payments" },
   {
     label: "دفعات الأوصياء",
