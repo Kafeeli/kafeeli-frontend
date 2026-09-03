@@ -425,6 +425,7 @@ import PublicRoute from "./routes/PublicRoute";
 import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
 import Contact from "./pages/contact";
+import KafeeliPresentation from "./pages/KafeeliPresentation";
 
 function PageWrapper({ children }) {
   return (
@@ -945,8 +946,61 @@ function AnimatedRoutes() {
             </ProtectedRoute>
           }
         />
+<<<<<<< Updated upstream
         <Route path="/admin-dashboard/guardians" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminGuardiansPage /></PageWrapper></ProtectedRoute>} />
         <Route path="/admin-dashboard/sponsors" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminSponsorsPage /></PageWrapper></ProtectedRoute>} />
+=======
+        <Route
+          path="/admin-dashboard/orphans"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <AdminOrphansReviewPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-dashboard/guardians"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <AdminGuardiansPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-dashboard/sponsors"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <AdminSponsorsPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-dashboard/payments"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <AdminPaymentsReviewPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-dashboard/payouts"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <AdminPayoutsPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+>>>>>>> Stashed changes
 
         <Route
           path="/error-404"
@@ -957,6 +1011,7 @@ function AnimatedRoutes() {
           }
         />
 
+        <Route path="/presentation" element={<KafeeliPresentation />} />
         <Route
           path="/auth-401"
           element={
