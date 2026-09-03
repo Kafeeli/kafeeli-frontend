@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import {
-  FaMapMarkerAlt,
   FaPhone,
   FaEnvelope,
-  FaFacebookF,
   FaLinkedinIn,
   FaPaperPlane,
   FaClock,
@@ -54,23 +52,6 @@ export default function Contact() {
       });
     }, 3000);
   };
-
-  const contactInfo = [
-    {
-      icon: <FaEnvelope />,
-      title: "البريد الإلكتروني",
-      value: "kafeeli.team@outlook.com",
-      description: "نحن هنا للإجابة على استفساراتك",
-      color: "#2DBCC3",
-    },
-    {
-      icon: <FaPhone />,
-      title: "الهاتف",
-      value: "+972592161058",
-      description: "من الأحد إلى الخميس",
-      color: "#0D4B8E",
-    },
-  ];
 
   const supportTypes = [
     {

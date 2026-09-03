@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   MdAccountBalance,
   MdCloudUpload,
@@ -33,7 +33,7 @@ function validatePaymentProof(file) {
     file.type,
   );
 
-  if (!hasAllowedExtension && !hasAllowedMimeType) {
+  if (!hasAllowedExtension || (file.type && !hasAllowedMimeType)) {
     return "صيغة الملف غير مدعومة. الصيغ المقبولة: JPG وJPEG وPNG وPDF.";
   }
 
@@ -82,6 +82,7 @@ export default function SponsorSponsorshipDetailsPage() {
   const [uploadError, setUploadError] = useState("");
   const [uploadSuccess, setUploadSuccess] = useState("");
   const [paymentProofInputKey, setPaymentProofInputKey] = useState(0);
+  const uploadRequestRef = useRef(false);
 
   const loadSponsorship = useCallback(async () => {
     setLoading(true);
@@ -134,14 +135,15 @@ export default function SponsorSponsorshipDetailsPage() {
   };
 
   const handlePaymentProofUpload = async () => {
-    if (uploading) return;
+    if (uploadRequestRef.current) return;
 
     if (!selectedBankAccountId) {
       setUploadError("يرجى اختيار حساب التحويل البنكي.");
       return;
     }
 
-    if (transferReference.length > 200) {
+    const trimmedTransferReference = transferReference.trim();
+    if (trimmedTransferReference.length > 200) {
       setUploadError("يجب ألا يتجاوز مرجع التحويل 200 حرف.");
       return;
     }
@@ -152,6 +154,7 @@ export default function SponsorSponsorshipDetailsPage() {
       return;
     }
 
+    uploadRequestRef.current = true;
     setUploading(true);
     setUploadError("");
     setUploadSuccess("");
@@ -159,7 +162,7 @@ export default function SponsorSponsorshipDetailsPage() {
     try {
       const result = await sponsorshipApi.uploadPaymentProof(sponsorshipId, {
         platformBankAccountId: selectedBankAccountId,
-        transferReference,
+        transferReference: trimmedTransferReference,
         paymentProof,
       });
       getResultData(result, "تعذر رفع إثبات الدفع.");
@@ -171,6 +174,7 @@ export default function SponsorSponsorshipDetailsPage() {
     } catch (requestError) {
       setUploadError(getPaymentProofErrorMessage(requestError));
     } finally {
+      uploadRequestRef.current = false;
       setUploading(false);
     }
   };

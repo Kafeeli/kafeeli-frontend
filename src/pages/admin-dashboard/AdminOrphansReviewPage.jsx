@@ -95,37 +95,6 @@ function documentFileErrorMessage(error) {
 }
 
 
-/* =========================================================
-   STATUS BADGE COMPONENT
-========================================================= */
-
-function StatusBadge({ status }) {
-  const style = getOrphanStatusStyle(status);
-  const Icon = style.icon;
-
-  return (
-    <span
-      className={`
-        inline-flex
-        min-w-[105px]
-        items-center
-        justify-center
-        gap-1.5
-        whitespace-nowrap
-        rounded-full
-        px-3
-        py-1.5
-        text-xs
-        font-bold
-        ${style.wrapper}
-      `}
-    >
-      <Icon size={13} />
-      {localizeStatus(status)}
-    </span>
-  );
-}
-
 function toDateInputValue(value) {
   return value ? String(value).slice(0, 10) : "";
 }
@@ -364,12 +333,6 @@ export default function AdminOrphansReviewPage() {
     });
   }, [allOrphans, searchTerm, statusFilter]);
 
-  const birthCertificate = selected?.requiredDocuments?.find((document) => document.documentType === "BirthCertificate");
-  const hasBirthCertificate = Boolean(
-    birthCertificate?.documentId && birthCertificate.hasCurrentDocument !== false && birthCertificate.canView !== false,
-  );
-  const hasFatherDeathCertificate = Boolean(selected?.familyId && selected.familyFatherDeathCertificateAccessEndpoint);
-
   const selectTab = (tab) => {
     setActiveTab(tab);
 
@@ -394,16 +357,6 @@ export default function AdminOrphansReviewPage() {
     setSelectedForReview(false);
 
     setActionError("");
-  };
-
-
-  /* =========================================================
-     CLEAR FILTERS
-  ========================================================= */
-
-  const clearFilters = () => {
-    setSearchTerm("");
-    setStatusFilter("all");
   };
 
 

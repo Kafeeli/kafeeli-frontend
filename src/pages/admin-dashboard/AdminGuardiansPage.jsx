@@ -235,56 +235,6 @@ export default function AdminGuardiansPage() {
 
   /*
    * ---------------------------------------------------------
-   * Verification Badge Styles
-   * ---------------------------------------------------------
-   */
-
-  const getVerificationStyle = (status) => {
-    switch (status) {
-      case "Approved":
-        return "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200";
-
-      case "Pending":
-        return "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200";
-
-      case "Rejected":
-        return "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200";
-
-      case "NeedsUpdate":
-        return "bg-orange-50 text-orange-700 ring-1 ring-inset ring-orange-200";
-
-      case "Suspended":
-        return "bg-gray-100 text-gray-700 ring-1 ring-inset ring-gray-200";
-
-      default:
-        return "bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-200";
-    }
-  };
-
-  /*
-   * ---------------------------------------------------------
-   * Family Status Styles
-   * ---------------------------------------------------------
-   */
-
-  const getFamilyStyle = (status) => {
-    switch (status) {
-      case "Active":
-        return "bg-emerald-50 text-emerald-700";
-
-      case "Pending":
-        return "bg-amber-50 text-amber-700";
-
-      case "Inactive":
-        return "bg-gray-100 text-gray-600";
-
-      default:
-        return "bg-gray-100 text-gray-600";
-    }
-  };
-
-  /*
-   * ---------------------------------------------------------
    * Content
    * ---------------------------------------------------------
    */
