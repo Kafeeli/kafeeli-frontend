@@ -12,6 +12,7 @@ import { adminApi } from "../../../services/adminApi";
 import { apiErrorMessage, openProtectedBlob, unwrapResult } from "../../../utils/apiUi";
 import { formatArabicDateTime } from "../../../utils/date";
 import AdminLayout from "../Adminlayout";
+import AdminBreadcrumbs from "../AdminBreadcrumbs";
 import { AdminConfirmationDialog } from "../AdminManagementDialogs";
 import { EmptyState, ErrorState, LoadingState } from "../Adminstates";
 import AdminTableIconButton from "../AdminTableIconButton";
@@ -145,6 +146,7 @@ export default function AdminGuardianDocumentsReviewPage() {
   return (
     <AdminLayout title="وثائق الأوصياء">
       <div className="space-y-6" dir="rtl">
+        <AdminBreadcrumbs items={[{ label: "الأوصياء", to: "/admin-dashboard/guardians" }, { label: "مراجعة الأوراق" }]} />
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div><h1 className="text-2xl font-extrabold text-[#003469]">وثائق الأوصياء</h1><p className="mt-1 text-sm text-gray-500">عرض ومراجعة جميع وثائق الأوصياء ومتابعة حالاتها.</p></div>
           <button type="button" onClick={() => loadDocuments({ silent: true })} disabled={refreshing || loading} className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-[#0D4B8E] disabled:opacity-50"><FiRefreshCw className={refreshing ? "animate-spin" : ""} aria-hidden="true" />تحديث</button>

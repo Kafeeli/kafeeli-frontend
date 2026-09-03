@@ -1,12 +1,19 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FiEdit2, FiEye, FiSearch, FiTrash2 } from "react-icons/fi";
+import { FiEdit2, FiEye, FiInfo, FiMapPin, FiSearch, FiTrash2, FiUser } from "react-icons/fi";
 import { MdOutlineVolunteerActivism, MdPauseCircleOutline, MdPlayCircleOutline } from "react-icons/md";
 import { adminApi } from "../../services/adminApi";
 import { apiErrorMessage, unwrapResult } from "../../utils/apiUi";
 import { formatArabicDateTime } from "../../utils/date";
 import { localizeStatus } from "../../utils/localization";
 import AdminLayout from "./Adminlayout";
-import { AdminConfirmationDialog, AdminDialog } from "./AdminManagementDialogs";
+import {
+  AdminConfirmationDialog,
+  AdminDetailItem,
+  AdminDetailsHero,
+  AdminDetailsSection,
+  AdminDetailStat,
+  AdminDialog,
+} from "./AdminManagementDialogs";
 import { EmptyState, ErrorState, LoadingState, MiniStatCard } from "./Adminstates";
 import AdminTableIconButton from "./AdminTableIconButton";
 
@@ -40,10 +47,6 @@ function sponsorForm(details) {
     city: details.city || "",
     country: details.country || "",
   };
-}
-
-function DetailItem({ label, value, dir }) {
-  return <div><dt className="text-xs font-bold text-gray-500">{label}</dt><dd dir={dir} className="mt-1 break-words text-sm font-bold text-gray-900">{value ?? "—"}</dd></div>;
 }
 
 export default function AdminSponsorsPage() {
@@ -226,8 +229,16 @@ export default function AdminSponsorsPage() {
       {actionError && <p role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}{successMessage && <p role="status" className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700">{successMessage}</p>}<p className="mb-3 text-sm font-bold text-gray-600">النتائج: {filteredSponsors.length}</p>{content}
     </div>
 
-    {selected && dialogMode === "details" && <AdminDialog title="تفاصيل الكفيل" onClose={() => { setSelected(null); setDialogMode(""); }} footer={<><button type="button" onClick={() => setDialogMode("edit")} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white">تعديل</button>{selected.canSuspend && <button type="button" onClick={() => showStatusConfirmation(selected, false)} className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-bold text-white">تعليق الحساب</button>}{selected.canReactivate && <button type="button" onClick={() => showStatusConfirmation(selected, true)} className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white">إعادة تفعيل الحساب</button>}<button type="button" onClick={() => setConfirmation({ type: "delete", sponsor: selected })} className="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-bold text-red-700">حذف نهائي</button></>}>
-      <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"><DetailItem label="الاسم الكامل" value={selected.fullName} /><DetailItem label="البريد الإلكتروني" value={selected.email} /><DetailItem label="رقم الهاتف" value={selected.phoneNumber} dir="ltr" /><DetailItem label="تاريخ الميلاد" value={toDateInputValue(selected.dateOfBirth)} /><DetailItem label="الجنس" value={localizeStatus(selected.gender)} /><DetailItem label="المدينة" value={selected.city} /><DetailItem label="الدولة" value={selected.country} /><DetailItem label="حالة الحساب" value={accountStatusLabel(selected.accountStatus)} /><DetailItem label="تاريخ الانضمام" value={formatArabicDateTime(selected.joinedAt)} /><DetailItem label="صورة ملف شخصي" value={selected.hasProfileImage ? "متوفرة" : "غير متوفرة"} /><DetailItem label="عدد الكفالات" value={selected.sponsorshipCount} /><DetailItem label="عدد المدفوعات" value={selected.paymentCount} /><DetailItem label="عدد الشهادات" value={selected.certificateCount} /><DetailItem label="معرّف الكفيل" value={selected.sponsorId} dir="ltr" /><DetailItem label="معرّف المستخدم" value={selected.userId} dir="ltr" /><DetailItem label="إمكانية التعليق" value={selected.canSuspend ? "متاحة" : "غير متاحة"} /><DetailItem label="إمكانية إعادة التفعيل" value={selected.canReactivate ? "متاحة" : "غير متاحة"} /><DetailItem label="إمكانية الحذف" value={selected.canDelete ? "متاح" : "غير متاح لوجود بيانات مرتبطة"} /></dl>
+    {selected && dialogMode === "details" && <AdminDialog title="تفاصيل الكفيل" size="max-w-5xl" onClose={() => { setSelected(null); setDialogMode(""); }} footer={<><button type="button" onClick={() => setDialogMode("edit")} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white">تعديل</button>{selected.canSuspend && <button type="button" onClick={() => showStatusConfirmation(selected, false)} className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-bold text-white">تعليق الحساب</button>}{selected.canReactivate && <button type="button" onClick={() => showStatusConfirmation(selected, true)} className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white">إعادة تفعيل الحساب</button>}<button type="button" onClick={() => setConfirmation({ type: "delete", sponsor: selected })} className="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-bold text-red-700">حذف نهائي</button></>}>
+      <div className="space-y-5">
+        <AdminDetailsHero icon={MdOutlineVolunteerActivism} eyebrow="ملف الكفيل" title={selected.fullName} subtitle={selected.email} badges={[{ label: "الحساب", value: accountStatusLabel(selected.accountStatus) }, { label: "الموقع", value: [selected.city, selected.country].filter(Boolean).join("، ") }]} />
+        <div className="grid grid-cols-3 gap-3"><AdminDetailStat label="الكفالات" value={selected.sponsorshipCount} /><AdminDetailStat label="المدفوعات" value={selected.paymentCount} /><AdminDetailStat label="الشهادات" value={selected.certificateCount} /></div>
+        <div className="grid gap-5 lg:grid-cols-2">
+          <AdminDetailsSection title="البيانات الشخصية" icon={FiUser}><dl className="grid gap-3 sm:grid-cols-2"><AdminDetailItem label="رقم الهاتف" value={selected.phoneNumber} dir="ltr" /><AdminDetailItem label="تاريخ الميلاد" value={toDateInputValue(selected.dateOfBirth)} /><AdminDetailItem label="الجنس" value={localizeStatus(selected.gender)} /><AdminDetailItem label="صورة الملف الشخصي" value={selected.hasProfileImage ? "متوفرة" : "غير متوفرة"} /><AdminDetailItem label="تاريخ الانضمام" value={formatArabicDateTime(selected.joinedAt)} wide /></dl></AdminDetailsSection>
+          <AdminDetailsSection title="الموقع وحالة الحساب" icon={FiMapPin}><dl className="grid gap-3 sm:grid-cols-2"><AdminDetailItem label="المدينة" value={selected.city} /><AdminDetailItem label="الدولة" value={selected.country} /><AdminDetailItem label="حالة الحساب" value={accountStatusLabel(selected.accountStatus)} /><AdminDetailItem label="إمكانية الحذف" value={selected.canDelete ? "متاحة" : "غير متاحة لوجود بيانات مرتبطة"} /><AdminDetailItem label="إمكانية التعليق" value={selected.canSuspend ? "متاحة" : "غير متاحة"} /><AdminDetailItem label="إمكانية إعادة التفعيل" value={selected.canReactivate ? "متاحة" : "غير متاحة"} /></dl></AdminDetailsSection>
+        </div>
+        <AdminDetailsSection title="المعرّفات التقنية" icon={FiInfo}><dl className="grid gap-3 sm:grid-cols-2"><AdminDetailItem label="معرّف الكفيل" value={selected.sponsorId} dir="ltr" /><AdminDetailItem label="معرّف المستخدم" value={selected.userId} dir="ltr" /></dl></AdminDetailsSection>
+      </div>
     </AdminDialog>}
 
     {selected && dialogMode === "edit" && editForm && <AdminDialog title="تعديل بيانات الكفيل" onClose={() => setDialogMode("details")} closeDisabled={busy === "edit"} footer={<><button type="button" onClick={() => setDialogMode("details")} disabled={busy === "edit"} className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-bold">إلغاء</button><button type="submit" form="sponsor-edit-form" disabled={busy === "edit"} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50">{busy === "edit" ? "جارٍ الحفظ..." : "حفظ التعديلات"}</button></>}>
