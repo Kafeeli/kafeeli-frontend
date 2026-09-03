@@ -529,12 +529,6 @@ function AnimatedRoutes() {
           }
         />
 
-        {/* دعم الراوت القديم بحرف E كبير */}
-        <Route
-          path="/invalid-Email"
-          element={<Navigate to="/invalid-email" replace />}
-        />
-
         <Route
           path="/forgot-password"
           element={
@@ -951,11 +945,8 @@ function AnimatedRoutes() {
             </ProtectedRoute>
           }
         />
-        <Route path="/admin-dashboard/orphans" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminOrphansReviewPage /></PageWrapper></ProtectedRoute>} />
         <Route path="/admin-dashboard/guardians" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminGuardiansPage /></PageWrapper></ProtectedRoute>} />
         <Route path="/admin-dashboard/sponsors" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminSponsorsPage /></PageWrapper></ProtectedRoute>} />
-        <Route path="/admin-dashboard/payments" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminPaymentsReviewPage /></PageWrapper></ProtectedRoute>} />
-        <Route path="/admin-dashboard/payouts" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminPayoutsPage /></PageWrapper></ProtectedRoute>} />
 
         <Route
           path="/error-404"

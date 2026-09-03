@@ -1,6 +1,6 @@
 # Kafeeli endpoint coverage
 
-Contract audited from the live OpenAPI document on 2026-08-24. `Integrated` means a real service call is connected to a screen, action, route guard, or authentication infrastructure. No endpoint listed below is inferred.
+Contract audited from backend `main` at `195061b72a0492433f8f9c6c113a99fe5919a486` on 2026-09-03. `Integrated` means a real service call is connected to a screen, action, route guard, or authentication infrastructure. No endpoint listed below is inferred.
 
 | Endpoint | Role | Frontend service | UI/action | Status |
 |---|---|---|---|---|
@@ -52,10 +52,13 @@ Contract audited from the live OpenAPI document on 2026-08-24. `Integrated` mean
 | `GET /api/v1/guardians/me/orphans/{orphanId}/profile-image` | Guardian | `orphanApi.getProfileImage` | Authenticated image blob | Integrated |
 | `GET /api/v1/admin/orphan-documents/pending` | Admin/SuperAdmin | `adminApi.getPendingOrphanDocuments` | Admin orphan review page | Integrated |
 | `GET /api/v1/admin/orphans/pending` | Admin/SuperAdmin | `adminApi.getPendingOrphans` | Admin orphan queue | Integrated |
+| `GET /api/v1/admin/orphans` | Admin/SuperAdmin | `adminApi.getAllOrphans` | Admin orphan management | Integrated |
 | `GET /api/v1/admin/orphans/{orphanId}` | Admin/SuperAdmin | `adminApi.getOrphanDetails` | Admin orphan details | Integrated |
-| `POST /api/v1/admin/orphan-documents/{documentId}/approve` | Admin/SuperAdmin | `adminApi.approveOrphanDocument` | Document approval | Integrated |
+| `PATCH /api/v1/admin/orphans/{orphanId}` | Admin/SuperAdmin | `adminApi.updateOrphan` | Admin orphan edit | Integrated |
+| `PATCH /api/v1/admin/orphans/{orphanId}/status` | Admin/SuperAdmin | `adminApi.updateOrphanStatus` | Active/Hidden/Suspended management | Integrated |
+| `DELETE /api/v1/admin/orphans/{orphanId}` | Admin/SuperAdmin | `adminApi.deleteOrphan` | Confirmed permanent delete | Integrated |
 | `POST /api/v1/admin/orphan-documents/{documentId}/needs-update` | Admin/SuperAdmin | `adminApi.requestOrphanDocumentUpdate` | Document update request | Integrated |
-| `POST /api/v1/admin/orphans/{id}/approve` | Admin/SuperAdmin | `adminApi.approveOrphan` | Orphan approval | Integrated |
+| `POST /api/v1/admin/orphans/{id}/approve` | Admin/SuperAdmin | `adminApi.approveOrphan` | Atomic orphan and current-document approval | Integrated |
 | `POST /api/v1/admin/orphans/{id}/needs-update` | Admin/SuperAdmin | `adminApi.requestOrphanUpdate` | Orphan update request | Integrated |
 | `GET /api/v1/admin/orphan-documents/{documentId}/file` | Admin/SuperAdmin | `adminApi.getOrphanDocumentFile` | Authenticated blob viewer | Integrated |
 | `GET /api/v1/admin/orphans/{orphanId}/profile-image` | Admin/SuperAdmin | `adminApi.getOrphanProfileImage` | Authenticated image blob | Integrated |
@@ -64,6 +67,7 @@ Contract audited from the live OpenAPI document on 2026-08-24. `Integrated` mean
 | `GET /api/v1/orphans/{id}` | Sponsor | `sponsorApi.getOrphan` | Sponsor orphan details | Integrated |
 | `GET /api/v1/orphans/{id}/profile-image` | Sponsor | `sponsorApi.getOrphanProfileImage` | Authenticated image blob | Integrated |
 | `GET /api/v1/sponsors/me/sponsorships` | Sponsor | `sponsorshipApi.getMine` | Sponsor sponsorship list/dashboard | Integrated |
+| `GET /api/v1/platform-bank-accounts` | Sponsor | `sponsorshipApi.getPlatformBankAccounts` | Bank-transfer instructions and account selection | Integrated |
 | `GET /api/v1/sponsorships/{id}` | Sponsor/Admin/SuperAdmin | `sponsorshipApi.getById` | Sponsor details; admin review DTOs embed required context | Integrated |
 | `POST /api/v1/admin/sponsorships/{sponsorshipId}/payout` | Admin/SuperAdmin | `adminApi.createPayout` | Admin payout creation form | Integrated; no candidate list |
 | `POST /api/v1/sponsorships` | Sponsor | `sponsorshipApi.create` | Family/orphan sponsorship actions | Integrated |
@@ -74,6 +78,16 @@ Contract audited from the live OpenAPI document on 2026-08-24. `Integrated` mean
 | `GET /api/v1/admin/payouts/pending` | Admin/SuperAdmin | `adminApi.getPendingPayouts` | Payout queue | Integrated |
 | `GET /api/v1/admin/guardian-bank-accounts/{id}` | Admin/SuperAdmin | `adminApi.getBankAccountDetails` | Bank-account details modal | Integrated |
 | `GET /api/v1/admin/guardians/{guardianId}/verification` | Admin/SuperAdmin | `adminApi.getGuardianVerification` | Guardian verification review | Integrated |
+| `GET /api/v1/admin/guardians` | Admin/SuperAdmin | `adminApi.getAllGuardians` | Guardian management list | Integrated |
+| `GET /api/v1/admin/guardians/{guardianId}` | Admin/SuperAdmin | `adminApi.getGuardianDetails` | Guardian management details | Integrated |
+| `PATCH /api/v1/admin/guardians/{guardianId}` | Admin/SuperAdmin | `adminApi.updateGuardian` | Guardian edit | Integrated |
+| `PATCH /api/v1/admin/guardians/{guardianId}/status` | Admin/SuperAdmin | `adminApi.updateGuardianStatus` | Suspend/reactivate Guardian | Integrated |
+| `DELETE /api/v1/admin/guardians/{guardianId}` | Admin/SuperAdmin | `adminApi.deleteGuardian` | Confirmed permanent delete | Integrated |
+| `GET /api/v1/admin/sponsors` | Admin/SuperAdmin | `adminApi.getAllSponsors` | Sponsor management list | Integrated |
+| `GET /api/v1/admin/sponsors/{sponsorId}` | Admin/SuperAdmin | `adminApi.getSponsorDetails` | Sponsor management details | Integrated |
+| `PATCH /api/v1/admin/sponsors/{sponsorId}` | Admin/SuperAdmin | `adminApi.updateSponsor` | Sponsor edit | Integrated |
+| `PATCH /api/v1/admin/sponsors/{sponsorId}/status` | Admin/SuperAdmin | `adminApi.updateSponsorStatus` | Suspend/reactivate Sponsor | Integrated |
+| `DELETE /api/v1/admin/sponsors/{sponsorId}` | Admin/SuperAdmin | `adminApi.deleteSponsor` | Confirmed permanent delete | Integrated |
 | `GET /api/v1/admin/payments/{paymentId}` | Admin/SuperAdmin | `adminApi.getPaymentDetails` | Payment details pane | Integrated |
 | `GET /api/v1/admin/payments/{paymentId}/proof` | Admin/SuperAdmin | `adminApi.getPaymentProof` | Authenticated proof blob | Integrated |
 | `GET /api/v1/admin/payouts/{payoutId}` | Admin/SuperAdmin | `adminApi.getPayoutDetails` | Payout details pane | Integrated |
@@ -93,7 +107,5 @@ Contract audited from the live OpenAPI document on 2026-08-24. `Integrated` mean
 
 ## Current blockers
 
-1. Payment-proof prose says `PlatformBankAccountId` is required, while the formal multipart `required` array contains only `PaymentProof`. No Sponsor-facing platform-bank-account list or account ID exists in the contract or sponsorship details DTO.
-2. Family `hide` and `suspend` require an Active Family, but the backend exposes only an Admin pending-family list. A safe management UI cannot discover eligible Active families.
-3. Payout creation is connected, but the backend exposes no Admin list of payout-eligible Active sponsorships. The UI therefore requires a known sponsorship UUID and clearly identifies that limitation.
-4. No certificate, wallet, installment, periodic-update, notification, audit-log, or SuperAdmin-management endpoints exist in the current contract.
+1. Payout creation is connected, but the backend exposes no Admin list of payout-eligible Active sponsorships. The UI therefore requires a known sponsorship UUID and clearly identifies that limitation.
+2. No wallet, periodic-update, notification, audit-log, or SuperAdmin-management endpoints exist in the current contract.
