@@ -323,8 +323,14 @@ export default function FamiliesReview() {
       }
 
       const backendUpdatedFamily = result?.data?.familyId ? result.data : null;
+      const statusSuccessMessages = {
+        Active: "تم تفعيل العائلة بنجاح.",
+        Hidden: "تم إخفاء العائلة بنجاح.",
+        Suspended: "تم تعليق العائلة بنجاح.",
+        NeedsUpdate: "تم طلب تحديث بيانات العائلة بنجاح.",
+      };
       const message =
-        result?.message || "تم حفظ حالة العائلة بنجاح.";
+        statusSuccessMessages[targetStatus] || "تم تحديث حالة العائلة بنجاح.";
 
       setSuccessMessage(message);
       if (backendUpdatedFamily) setSelectedFamily(backendUpdatedFamily);

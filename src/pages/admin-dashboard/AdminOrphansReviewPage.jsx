@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FiEdit2, FiEye, FiSearch, FiTrash2 } from "react-icons/fi";
-import { MdChildCare, MdDescription } from "react-icons/md";
+import { FiCheckCircle, FiEdit2, FiEye, FiEyeOff, FiSearch, FiTrash2 } from "react-icons/fi";
+import { MdChildCare, MdDescription, MdPauseCircleOutline, MdPlayCircleOutline } from "react-icons/md";
 import { adminApi } from "../../services/adminApi";
 import {
   apiErrorMessage,
@@ -18,6 +18,7 @@ import {
 import AdminLayout from "./Adminlayout";
 import { AdminConfirmationDialog, AdminDialog } from "./AdminManagementDialogs";
 import { EmptyState, ErrorState, LoadingState, MiniStatCard } from "./Adminstates";
+import AdminTableIconButton from "./AdminTableIconButton";
 
 const ORPHAN_STATUS_FILTERS = [
   { value: "all", label: "كل الحالات" },
@@ -55,6 +56,12 @@ function statusActionLabel(status) {
   if (status === "Active") return "إعادة تفعيل";
   if (status === "Hidden") return "إخفاء";
   return "تعليق";
+}
+
+function StatusActionIcon({ status }) {
+  if (status === "Active") return <MdPlayCircleOutline aria-hidden="true" />;
+  if (status === "Hidden") return <FiEyeOff aria-hidden="true" />;
+  return <MdPauseCircleOutline aria-hidden="true" />;
 }
 
 function statusConfirmation(status) {
@@ -402,9 +409,9 @@ export default function AdminOrphansReviewPage() {
     if (allOrphans.length === 0) tabContent = <EmptyState icon={MdChildCare} title="لا يوجد أيتام" description="لم يُرجع الخادم أي سجلات أيتام حتى الآن." />;
     else if (filteredOrphans.length === 0) tabContent = <EmptyState icon={FiSearch} title="لا توجد نتائج مطابقة" description="جرّب تعديل عبارة البحث أو حالة اليتيم." />;
     else tabContent = (
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"><div className="overflow-x-auto"><table className="w-full min-w-[1450px] text-right text-sm">
-        <thead className="bg-[#F5F7FA] text-[#374151]"><tr><th className="px-4 py-3 font-extrabold">الاسم الكامل</th><th className="px-4 py-3 font-extrabold">رقم الهوية</th><th className="px-4 py-3 font-extrabold">العمر</th><th className="px-4 py-3 font-extrabold">الجنس</th><th className="px-4 py-3 font-extrabold">العائلة</th><th className="px-4 py-3 font-extrabold">الوصي</th><th className="px-4 py-3 font-extrabold">الحالة</th><th className="px-4 py-3 font-extrabold">آخر تحديث</th><th className="px-4 py-3 font-extrabold">الإجراءات</th></tr></thead>
-        <tbody className="divide-y divide-gray-100">{filteredOrphans.map((orphan) => <tr key={orphan.orphanId} className="hover:bg-gray-50/70"><td className="px-4 py-4 font-bold text-[#003469]">{orphan.fullName || "—"}</td><td dir="ltr" className="px-4 py-4 text-right">{orphan.nationalId || "—"}</td><td className="px-4 py-4">{orphan.age ?? "—"}</td><td className="px-4 py-4">{localizeStatus(orphan.gender)}</td><td className="px-4 py-4">{orphan.familyHeadOfHouseholdName || "—"}</td><td className="px-4 py-4">{orphan.guardianFullName || "—"}</td><td className="px-4 py-4"><span className={`rounded-full px-3 py-1 text-xs font-bold ${orphanStatusClasses(orphan.orphanStatus)}`}>{orphanStatusLabel(orphan.orphanStatus)}</span></td><td className="whitespace-nowrap px-4 py-4 text-gray-600">{formatArabicDateTime(orphan.updatedAt)}</td><td className="px-4 py-4"><div className="flex flex-wrap gap-2"><button type="button" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId)} className="inline-flex items-center gap-1 rounded-md bg-[#E8F1FA] px-3 py-2 text-xs font-bold text-[#0D4B8E] disabled:opacity-50"><FiEye />عرض</button><button type="button" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId, { mode: "edit" })} className="inline-flex items-center gap-1 rounded-md border border-gray-300 px-3 py-2 text-xs font-bold text-gray-700 disabled:opacity-50"><FiEdit2 />تعديل</button>{(STATUS_TRANSITIONS[orphan.orphanStatus] || []).map((status) => <button key={status} type="button" disabled={Boolean(busy)} onClick={() => openStatusConfirmation(orphan, status)} className={`rounded-md px-3 py-2 text-xs font-bold text-white disabled:opacity-50 ${status === "Active" ? "bg-emerald-600" : status === "Hidden" ? "bg-slate-600" : "bg-amber-600"}`}>{statusActionLabel(status)}</button>)}{orphan.orphanStatus === "PendingReview" && <button type="button" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId, { forReview: true })} className="rounded-md bg-emerald-600 px-3 py-2 text-xs font-bold text-white disabled:opacity-50">مراجعة واعتماد</button>}<button type="button" disabled={Boolean(busy)} onClick={() => setConfirmation({ type: "delete", orphan })} className="inline-flex items-center gap-1 rounded-md border border-red-200 px-3 py-2 text-xs font-bold text-red-700 disabled:opacity-50"><FiTrash2 />حذف نهائي</button></div></td></tr>)}</tbody>
+      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"><div className="overflow-x-auto"><table className="w-full min-w-[1200px] text-right text-xs">
+        <thead className="bg-[#F5F7FA] text-[11px] text-[#374151]"><tr><th className="whitespace-nowrap px-3 py-3 font-extrabold">الاسم الكامل</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">رقم الهوية</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">العمر</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الجنس</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">العائلة</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الوصي</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الحالة</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">آخر تحديث</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الإجراءات</th></tr></thead>
+        <tbody className="divide-y divide-gray-100">{filteredOrphans.map((orphan) => <tr key={orphan.orphanId} className="hover:bg-gray-50/70"><td title={orphan.fullName || undefined} className="max-w-[170px] truncate px-3 py-3 font-bold text-[#003469]">{orphan.fullName || "—"}</td><td dir="ltr" className="whitespace-nowrap px-3 py-3 text-right text-[11px]">{orphan.nationalId || "—"}</td><td className="px-3 py-3">{orphan.age ?? "—"}</td><td className="px-3 py-3">{localizeStatus(orphan.gender)}</td><td title={orphan.familyHeadOfHouseholdName || undefined} className="max-w-[150px] truncate px-3 py-3">{orphan.familyHeadOfHouseholdName || "—"}</td><td title={orphan.guardianFullName || undefined} className="max-w-[150px] truncate px-3 py-3">{orphan.guardianFullName || "—"}</td><td className="whitespace-nowrap px-3 py-3"><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${orphanStatusClasses(orphan.orphanStatus)}`}>{orphanStatusLabel(orphan.orphanStatus)}</span></td><td className="whitespace-nowrap px-3 py-3 text-[11px] text-gray-600">{formatArabicDateTime(orphan.updatedAt)}</td><td className="px-3 py-3"><div className="flex items-center gap-1 whitespace-nowrap"><AdminTableIconButton label="عرض التفاصيل" tone="view" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId)}><FiEye aria-hidden="true" /></AdminTableIconButton><AdminTableIconButton label="تعديل" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId, { mode: "edit" })}><FiEdit2 aria-hidden="true" /></AdminTableIconButton>{(STATUS_TRANSITIONS[orphan.orphanStatus] || []).map((status) => <AdminTableIconButton key={status} label={statusActionLabel(status)} tone={status === "Active" ? "reactivate" : status === "Hidden" ? "hide" : "suspend"} disabled={Boolean(busy)} onClick={() => openStatusConfirmation(orphan, status)}><StatusActionIcon status={status} /></AdminTableIconButton>)}{orphan.orphanStatus === "PendingReview" && <AdminTableIconButton label="مراجعة واعتماد" tone="approve" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId, { forReview: true })}><FiCheckCircle aria-hidden="true" /></AdminTableIconButton>}<AdminTableIconButton label="حذف نهائي" tone="delete" disabled={Boolean(busy)} onClick={() => setConfirmation({ type: "delete", orphan })}><FiTrash2 aria-hidden="true" /></AdminTableIconButton></div></td></tr>)}</tbody>
       </table></div></div>
     );
   } else if (activeTab === "pending") {
