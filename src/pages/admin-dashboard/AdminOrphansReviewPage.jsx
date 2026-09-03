@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FiCheckCircle, FiEdit2, FiEye, FiEyeOff, FiSearch, FiTrash2 } from "react-icons/fi";
-import { MdChildCare, MdPauseCircleOutline, MdPlayCircleOutline } from "react-icons/md";
+import { FiCheckCircle, FiEdit2, FiEye, FiEyeOff, FiFileText, FiHome, FiSearch, FiTrash2, FiUser } from "react-icons/fi";
+import { MdChildCare, MdOutlineSchool, MdPauseCircleOutline, MdPlayCircleOutline } from "react-icons/md";
 import { adminApi } from "../../services/adminApi";
 import {
   apiErrorMessage,
@@ -13,7 +13,13 @@ import { formatArabicDateTime } from "../../utils/date";
 import { localizeStatus } from "../../utils/localization";
 
 import AdminLayout from "./Adminlayout";
-import { AdminConfirmationDialog, AdminDialog } from "./AdminManagementDialogs";
+import {
+  AdminConfirmationDialog,
+  AdminDetailItem,
+  AdminDetailsHero,
+  AdminDetailsSection,
+  AdminDialog,
+} from "./AdminManagementDialogs";
 import { EmptyState, ErrorState, LoadingState, MiniStatCard } from "./Adminstates";
 import AdminTableIconButton from "./AdminTableIconButton";
 
@@ -116,10 +122,6 @@ function orphanForm(details) {
   };
 }
 
-function DetailItem({ label, value, dir }) {
-  return <div><dt className="text-xs font-bold text-gray-500">{label}</dt><dd dir={dir} className="mt-1 break-words text-sm font-bold text-gray-900">{value ?? "—"}</dd></div>;
-}
-
 export default function AdminOrphansReviewPage() {
   const [allOrphans, setAllOrphans] = useState([]);
   const [pendingOrphans, setPendingOrphans] = useState([]);
@@ -141,6 +143,7 @@ export default function AdminOrphansReviewPage() {
   const [documentReason, setDocumentReason] = useState("");
   const [statusReason, setStatusReason] = useState("");
   const [busy, setBusy] = useState("");
+  const [profileImage, setProfileImage] = useState({ orphanId: null, status: "idle", url: "", error: "" });
 
   const load = useCallback(async ({ silent = false } = {}) => {
     if (!silent) setLoading(true);
@@ -176,12 +179,37 @@ export default function AdminOrphansReviewPage() {
       window.clearTimeout(timeoutId);
   }, [load]);
 
+  useEffect(() => {
+    let active = true;
+    let objectUrl = "";
+
+    if (dialogMode !== "details" || !selected?.profileImageAccessEndpoint) {
+      return undefined;
+    }
+
+    adminApi.getOrphanProfileImage(selected.orphanId)
+      .then((blob) => {
+        objectUrl = URL.createObjectURL(blob);
+        if (active) setProfileImage({ orphanId: selected.orphanId, status: "loaded", url: objectUrl, error: "" });
+        else URL.revokeObjectURL(objectUrl);
+      })
+      .catch((requestError) => {
+        if (active) setProfileImage({ orphanId: selected.orphanId, status: "error", url: "", error: documentFileErrorMessage(requestError) });
+      });
+
+    return () => {
+      active = false;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [dialogMode, selected?.orphanId, selected?.profileImageAccessEndpoint]);
+
   const fetchDetails = useCallback(async (orphanId) => (
     unwrapResult(await adminApi.getOrphanDetails(orphanId), "تعذر تحميل تفاصيل اليتيم.")
   ), []);
 
   const showOrphan = async (orphanId, { forReview = false, mode = "details" } = {}) => {
     if (busy) return;
+    setProfileImage({ orphanId: null, status: "idle", url: "", error: "" });
     setBusy(`detail-${orphanId}`);
     setActionError("");
     setSuccessMessage("");
@@ -265,6 +293,7 @@ export default function AdminOrphansReviewPage() {
       setSelected(details);
       setEditForm(orphanForm(details));
       setSelectedForReview(details.orphanStatus === "PendingReview");
+      setProfileImage({ orphanId: null, status: "idle", url: "", error: "" });
       setDialogMode("details");
       setSuccessMessage("تم تحديث بيانات اليتيم بنجاح.");
     } catch (requestError) {
@@ -348,8 +377,14 @@ export default function AdminOrphansReviewPage() {
     setSelected(null);
     setDialogMode("");
     setSelectedForReview(false);
+    setProfileImage({ orphanId: null, status: "idle", url: "", error: "" });
 
     setActionError("");
+  };
+
+  const returnToDetails = () => {
+    setProfileImage({ orphanId: null, status: "idle", url: "", error: "" });
+    setDialogMode("details");
   };
 
 
@@ -416,15 +451,27 @@ export default function AdminOrphansReviewPage() {
     </div>
 
     {selected && dialogMode === "details" && <AdminDialog title={selectedForReview ? "مراجعة ملف اليتيم" : "تفاصيل اليتيم"} onClose={closeDetails} closeDisabled={Boolean(busy)} size="max-w-5xl" footer={!selectedForReview ? <><button type="button" onClick={() => setDialogMode("edit")} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white">تعديل</button>{(STATUS_TRANSITIONS[selected.orphanStatus] || []).map((status) => <button key={status} type="button" onClick={() => openStatusConfirmation(selected, status)} className={`rounded-lg px-5 py-2.5 text-sm font-bold text-white ${status === "Active" ? "bg-emerald-600" : status === "Hidden" ? "bg-slate-600" : "bg-amber-600"}`}>{statusActionLabel(status)}</button>)}<button type="button" onClick={() => { setActionError(""); setConfirmation({ type: "delete", orphan: selected }); }} className="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-bold text-red-700">حذف نهائي</button></> : undefined}>
-      {actionError && <p role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}
-      <section><h3 className="mb-3 text-base font-extrabold text-[#003469]">بيانات اليتيم</h3><dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4"><DetailItem label="الاسم الكامل" value={selected.fullName} /><DetailItem label="رقم الهوية" value={selected.nationalId} dir="ltr" /><DetailItem label="تاريخ الميلاد" value={toDateInputValue(selected.dateOfBirth)} /><DetailItem label="العمر" value={selected.age} /><DetailItem label="الجنس" value={localizeStatus(selected.gender)} /><DetailItem label="الحالة التعليمية" value={localizeStatus(selected.educationalStatus)} /><DetailItem label="الوالد المتوفى" value={selected.deceasedParent} /><DetailItem label="حالة اليتيم" value={orphanStatusLabel(selected.orphanStatus)} /><DetailItem label="تاريخ الإنشاء" value={formatArabicDateTime(selected.createdAt)} /><DetailItem label="تاريخ المراجعة" value={formatArabicDateTime(selected.reviewedAt)} /><DetailItem label="معرّف اليتيم" value={selected.orphanId} dir="ltr" /></dl><p className="mt-4 rounded-lg bg-gray-50 p-4 text-sm leading-7">{selected.caseDescription || "—"}</p></section>
-      <section className="mt-6"><h3 className="mb-3 text-base font-extrabold text-[#003469]">صورة اليتيم</h3>{selected.profileImageAccessEndpoint ? <button type="button" disabled={Boolean(busy)} onClick={() => viewBlob("image", () => adminApi.getOrphanProfileImage(selected.orphanId))} className="rounded-lg bg-[#E8F1FA] px-4 py-2 text-sm font-bold text-[#0D4B8E] disabled:opacity-60">{busy === "image" ? "جارٍ فتح الصورة..." : "عرض الصورة"}</button> : <p className="text-sm text-gray-500">لا توجد صورة ملف شخصي.</p>}</section>
-      <section className="mt-6 rounded-xl border border-[#D7E2EE] bg-[#F8FAFC] p-4"><h3 className="text-base font-extrabold text-[#003469]">شهادة الميلاد والوثائق</h3><div className="mt-3 flex flex-wrap gap-3"><div><button type="button" disabled={Boolean(busy) || !hasBirthCertificate} onClick={() => viewBlob("birth-certificate", () => adminApi.getOrphanDocumentFile(birthCertificate.documentId))} className="rounded-lg bg-[#E8F1FA] px-4 py-2 text-sm font-bold text-[#0D4B8E] disabled:cursor-not-allowed disabled:opacity-60">{busy === "birth-certificate" ? "جارٍ فتح الوثيقة..." : "عرض الوثيقة"}</button>{!hasBirthCertificate && <p className="mt-1 text-xs text-red-600">شهادة ميلاد اليتيم غير متوفرة.</p>}</div><div><button type="button" disabled={Boolean(busy) || !hasFatherDeathCertificate} onClick={() => viewBlob("father-death-certificate", () => adminApi.getFamilyFatherDeathCertificate(selected.familyId))} className="rounded-lg bg-[#E8F1FA] px-4 py-2 text-sm font-bold text-[#0D4B8E] disabled:cursor-not-allowed disabled:opacity-60">{busy === "father-death-certificate" ? "جارٍ فتح شهادة الوفاة..." : "عرض شهادة وفاة الأب"}</button>{!hasFatherDeathCertificate && <p className="mt-1 text-xs text-red-600">شهادة وفاة الأب غير متوفرة.</p>}</div></div>{selectedForReview && hasBirthCertificate && <><label className="mt-4 block max-w-xl text-sm font-bold">سبب طلب تعديل الوثيقة<textarea value={documentReason} onChange={(event) => setDocumentReason(event.target.value)} maxLength={500} rows={2} required className="mt-2 w-full rounded-lg border border-gray-300 p-3" /></label><button type="button" disabled={Boolean(busy) || !documentReason.trim()} onClick={() => runReviewAction("update-birth-certificate", () => adminApi.requestOrphanDocumentUpdate(birthCertificate.documentId, documentReason.trim()), "تم إرسال طلب تعديل الوثيقة بنجاح.")} className="mt-3 rounded-lg bg-amber-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-60">{busy === "update-birth-certificate" ? "جارٍ إرسال الطلب..." : "طلب تعديل الوثيقة"}</button></>}</section>
-      <section className="mt-6"><h3 className="mb-3 text-base font-extrabold text-[#003469]">بيانات العائلة</h3><dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4"><DetailItem label="رب الأسرة" value={selected.familyHeadOfHouseholdName} /><DetailItem label="حالة العائلة" value={localizeStatus(selected.familyStatus)} /><DetailItem label="مدينة العائلة" value={selected.familyCity} /><DetailItem label="الوصي" value={selected.guardianFullName} /><DetailItem label="بريد الوصي" value={selected.guardianEmail} /><DetailItem label="معرّف العائلة" value={selected.familyId} dir="ltr" /></dl></section>
+      <div className="space-y-5">
+        {actionError && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}
+        <AdminDetailsHero icon={MdChildCare} eyebrow={selectedForReview ? "ملف بانتظار المراجعة" : "ملف اليتيم"} title={selected.fullName} subtitle={selected.familyHeadOfHouseholdName ? `عائلة ${selected.familyHeadOfHouseholdName}` : "لا توجد بيانات للعائلة"} badges={[{ label: "الحالة", value: orphanStatusLabel(selected.orphanStatus) }, { label: "العمر", value: selected.age != null ? `${selected.age} سنة` : "—" }]}>
+          <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-2xl border-4 border-white/25 bg-white/10 shadow-xl" aria-live="polite">
+            {selected.profileImageAccessEndpoint && profileImage.orphanId === selected.orphanId && profileImage.status === "loaded" && <img src={profileImage.url} alt={`صورة ${selected.fullName || "اليتيم"}`} className="h-full w-full object-cover" />}
+            {selected.profileImageAccessEndpoint && profileImage.orphanId !== selected.orphanId && <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/30 border-t-[#47DBE0]" aria-label="جارٍ تحميل صورة اليتيم" />}
+            {(!selected.profileImageAccessEndpoint || (profileImage.orphanId === selected.orphanId && profileImage.status === "error")) && <div className="px-3 text-center"><MdChildCare className="mx-auto text-4xl text-white/60" aria-hidden="true" /><span className="mt-1 block text-[11px] text-white/70">{selected.profileImageAccessEndpoint ? "تعذر تحميل الصورة" : "لا توجد صورة"}</span></div>}
+          </div>
+        </AdminDetailsHero>
+        {profileImage.orphanId === selected.orphanId && profileImage.error && <p role="alert" className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-bold text-amber-800">{profileImage.error}</p>}
+        <div className="grid gap-5 lg:grid-cols-2">
+          <AdminDetailsSection title="البيانات الشخصية والتعليمية" icon={FiUser}><dl className="grid gap-3 sm:grid-cols-2"><AdminDetailItem label="رقم الهوية" value={selected.nationalId} dir="ltr" /><AdminDetailItem label="تاريخ الميلاد" value={toDateInputValue(selected.dateOfBirth)} /><AdminDetailItem label="العمر" value={selected.age} /><AdminDetailItem label="الجنس" value={localizeStatus(selected.gender)} /><AdminDetailItem label="الحالة التعليمية" value={localizeStatus(selected.educationalStatus)} /><AdminDetailItem label="الوالد المتوفى" value={selected.deceasedParent} /><AdminDetailItem label="تاريخ الإنشاء" value={formatArabicDateTime(selected.createdAt)} /><AdminDetailItem label="تاريخ المراجعة" value={formatArabicDateTime(selected.reviewedAt)} /></dl></AdminDetailsSection>
+          <AdminDetailsSection title="بيانات العائلة والوصي" icon={FiHome}><dl className="grid gap-3 sm:grid-cols-2"><AdminDetailItem label="رب الأسرة" value={selected.familyHeadOfHouseholdName} /><AdminDetailItem label="حالة العائلة" value={localizeStatus(selected.familyStatus)} /><AdminDetailItem label="مدينة العائلة" value={selected.familyCity} /><AdminDetailItem label="الوصي" value={selected.guardianFullName} /><AdminDetailItem label="بريد الوصي" value={selected.guardianEmail} wide /><AdminDetailItem label="معرّف العائلة" value={selected.familyId} dir="ltr" /><AdminDetailItem label="معرّف اليتيم" value={selected.orphanId} dir="ltr" /></dl></AdminDetailsSection>
+        </div>
+        <AdminDetailsSection title="وصف الحالة" icon={MdOutlineSchool}><p className="whitespace-pre-wrap text-sm leading-8 text-slate-700">{selected.caseDescription || "لا يوجد وصف مسجل للحالة."}</p></AdminDetailsSection>
+        <AdminDetailsSection title="شهادة الميلاد والوثائق" icon={FiFileText}><div className="flex flex-wrap gap-3"><div><button type="button" disabled={Boolean(busy) || !hasBirthCertificate} onClick={() => viewBlob("birth-certificate", () => adminApi.getOrphanDocumentFile(birthCertificate.documentId))} className="rounded-lg bg-[#E8F1FA] px-4 py-2 text-sm font-bold text-[#0D4B8E] disabled:cursor-not-allowed disabled:opacity-60">{busy === "birth-certificate" ? "جارٍ فتح الوثيقة..." : "عرض شهادة الميلاد"}</button>{!hasBirthCertificate && <p className="mt-1 text-xs text-red-600">شهادة ميلاد اليتيم غير متوفرة.</p>}</div><div><button type="button" disabled={Boolean(busy) || !hasFatherDeathCertificate} onClick={() => viewBlob("father-death-certificate", () => adminApi.getFamilyFatherDeathCertificate(selected.familyId))} className="rounded-lg bg-[#E8F1FA] px-4 py-2 text-sm font-bold text-[#0D4B8E] disabled:cursor-not-allowed disabled:opacity-60">{busy === "father-death-certificate" ? "جارٍ فتح شهادة الوفاة..." : "عرض شهادة وفاة الأب"}</button>{!hasFatherDeathCertificate && <p className="mt-1 text-xs text-red-600">شهادة وفاة الأب غير متوفرة.</p>}</div></div>{selectedForReview && hasBirthCertificate && <><label className="mt-4 block max-w-xl text-sm font-bold">سبب طلب تعديل الوثيقة<textarea value={documentReason} onChange={(event) => setDocumentReason(event.target.value)} maxLength={500} rows={2} required className="mt-2 w-full rounded-lg border border-gray-300 p-3" /></label><button type="button" disabled={Boolean(busy) || !documentReason.trim()} onClick={() => runReviewAction("update-birth-certificate", () => adminApi.requestOrphanDocumentUpdate(birthCertificate.documentId, documentReason.trim()), "تم إرسال طلب تعديل الوثيقة بنجاح.")} className="mt-3 rounded-lg bg-amber-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-60">{busy === "update-birth-certificate" ? "جارٍ إرسال الطلب..." : "طلب تعديل الوثيقة"}</button></>}</AdminDetailsSection>
+      </div>
       {selectedForReview && <section className="mt-6 border-t border-gray-200 pt-5"><label className="block max-w-xl text-sm font-bold">سبب طلب تعديل بيانات اليتيم<textarea value={reason} onChange={(event) => setReason(event.target.value)} maxLength={500} rows={3} required className="mt-2 w-full rounded-lg border border-gray-300 p-3" /></label><div className="mt-4 flex flex-wrap gap-3"><button type="button" disabled={Boolean(busy)} onClick={() => { setActionError(""); setConfirmation({ type: "approve", orphan: selected }); }} className="rounded-lg bg-[#008C78] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-60">اعتماد اليتيم</button><button type="button" disabled={Boolean(busy) || !reason.trim()} onClick={() => runReviewAction("update-orphan", () => adminApi.requestOrphanUpdate(selected.orphanId, reason.trim()), "تم إرسال طلب تعديل بيانات اليتيم بنجاح.")} className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-bold text-white disabled:opacity-60">{busy === "update-orphan" ? "جارٍ إرسال الطلب..." : "طلب تعديل بيانات اليتيم"}</button></div></section>}
     </AdminDialog>}
 
-    {selected && dialogMode === "edit" && editForm && <AdminDialog title="تعديل بيانات اليتيم" onClose={() => setDialogMode("details")} closeDisabled={busy === "edit-orphan"} footer={<><button type="button" onClick={() => setDialogMode("details")} disabled={busy === "edit-orphan"} className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-bold">إلغاء</button><button type="submit" form="orphan-edit-form" disabled={busy === "edit-orphan"} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50">{busy === "edit-orphan" ? "جارٍ الحفظ..." : "حفظ التعديلات"}</button></>}>
+    {selected && dialogMode === "edit" && editForm && <AdminDialog title="تعديل بيانات اليتيم" onClose={returnToDetails} closeDisabled={busy === "edit-orphan"} footer={<><button type="button" onClick={returnToDetails} disabled={busy === "edit-orphan"} className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-bold">إلغاء</button><button type="submit" form="orphan-edit-form" disabled={busy === "edit-orphan"} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50">{busy === "edit-orphan" ? "جارٍ الحفظ..." : "حفظ التعديلات"}</button></>}>
       <form id="orphan-edit-form" onSubmit={submitEdit} className="grid gap-4 sm:grid-cols-2">{actionError && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700 sm:col-span-2">{actionError}</p>}{[["firstName", "الاسم الأول"], ["fatherName", "اسم الأب"], ["grandfatherName", "اسم الجد"], ["nationalId", "رقم الهوية"], ["educationalStatus", "الحالة التعليمية"]].map(([name, label]) => <label key={name} className="text-sm font-bold text-gray-700">{label}<input value={editForm[name]} onChange={(event) => setEditForm({ ...editForm, [name]: event.target.value })} required maxLength={name === "educationalStatus" ? 100 : 150} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-[#0D4B8E]" /></label>)}<label className="text-sm font-bold text-gray-700">تاريخ الميلاد<input type="date" value={editForm.dateOfBirth} onChange={(event) => setEditForm({ ...editForm, dateOfBirth: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5" /></label><label className="text-sm font-bold text-gray-700">الجنس<select value={editForm.gender} onChange={(event) => setEditForm({ ...editForm, gender: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5"><option value="1">ذكر</option><option value="2">أنثى</option></select></label><label className="text-sm font-bold text-gray-700 sm:col-span-2">وصف الحالة<textarea value={editForm.caseDescription} onChange={(event) => setEditForm({ ...editForm, caseDescription: event.target.value })} required maxLength={1000} rows={4} className="mt-2 w-full rounded-lg border border-gray-300 p-3" /></label></form>
     </AdminDialog>}
 

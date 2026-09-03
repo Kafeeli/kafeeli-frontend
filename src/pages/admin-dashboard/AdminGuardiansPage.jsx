@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FiEdit2, FiEye, FiSearch, FiTrash2 } from "react-icons/fi";
+import { FiEdit2, FiEye, FiInfo, FiMapPin, FiSearch, FiTrash2, FiUser } from "react-icons/fi";
 import { HiOutlineIdentification } from "react-icons/hi2";
-import { MdDescription, MdPauseCircleOutline, MdPlayCircleOutline } from "react-icons/md";
+import { MdDescription, MdOutlineFamilyRestroom, MdPauseCircleOutline, MdPlayCircleOutline } from "react-icons/md";
 import { Link } from "react-router-dom";
 
 import { adminApi } from "../../services/adminApi";
@@ -13,7 +13,14 @@ import {
 } from "../../utils/localization";
 
 import AdminLayout from "./Adminlayout";
-import { AdminConfirmationDialog, AdminDialog } from "./AdminManagementDialogs";
+import {
+  AdminConfirmationDialog,
+  AdminDetailItem,
+  AdminDetailsHero,
+  AdminDetailsSection,
+  AdminDetailStat,
+  AdminDialog,
+} from "./AdminManagementDialogs";
 import { EmptyState, ErrorState, LoadingState, MiniStatCard } from "./Adminstates";
 import AdminTableIconButton from "./AdminTableIconButton";
 
@@ -58,10 +65,6 @@ function guardianForm(details) {
     country: details.country || "",
     occupation: details.occupation || "",
   };
-}
-
-function DetailItem({ label, value, dir }) {
-  return <div><dt className="text-xs font-bold text-gray-500">{label}</dt><dd dir={dir} className="mt-1 break-words text-sm font-bold text-gray-900">{value ?? "—"}</dd></div>;
 }
 
 export default function AdminGuardiansPage() {
@@ -275,8 +278,17 @@ export default function AdminGuardiansPage() {
       <p className="mb-3 text-sm font-bold text-gray-600">النتائج: {filteredGuardians.length}</p>{content}
     </div>
 
-    {selected && dialogMode === "details" && <AdminDialog title="تفاصيل الوصي" onClose={() => { setSelected(null); setDialogMode(""); }} footer={<><button type="button" onClick={() => setDialogMode("edit")} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white">تعديل</button>{selected.canSuspend && <button type="button" onClick={() => showStatusConfirmation(selected, false)} className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-bold text-white">تعليق الحساب</button>}{selected.canReactivate && <button type="button" onClick={() => showStatusConfirmation(selected, true)} className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white">إعادة تفعيل الحساب</button>}<button type="button" onClick={() => setConfirmation({ type: "delete", guardian: selected })} className="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-bold text-red-700">حذف نهائي</button></>}>
-      <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"><DetailItem label="الاسم الكامل" value={selected.fullName} /><DetailItem label="البريد الإلكتروني" value={selected.email} /><DetailItem label="رقم الهاتف" value={selected.phoneNumber} dir="ltr" /><DetailItem label="رقم الهوية" value={selected.nationalId} dir="ltr" /><DetailItem label="تاريخ الميلاد" value={toDateInputValue(selected.dateOfBirth)} /><DetailItem label="الجنس" value={localizeStatus(selected.gender)} /><DetailItem label="العنوان" value={selected.address} /><DetailItem label="المدينة" value={selected.city} /><DetailItem label="الدولة" value={selected.country} /><DetailItem label="المهنة" value={selected.occupation} /><DetailItem label="الدخل الشهري" value={selected.monthlyIncome} /><DetailItem label="عدد أفراد العائلة" value={selected.familyMembersCount} /><DetailItem label="حالة التحقق" value={localizeVerificationStatus(selected.verificationStatus)} /><DetailItem label="حالة الحساب" value={accountStatusLabel(selected.accountStatus)} /><DetailItem label="تاريخ الانضمام" value={formatArabicDateTime(selected.joinedAt)} /><DetailItem label="صورة ملف شخصي" value={selected.hasProfileImage ? "متوفرة" : "غير متوفرة"} /><DetailItem label="عدد العائلات" value={selected.familyCount} /><DetailItem label="عدد الأيتام" value={selected.orphanCount} /><DetailItem label="عدد الكفالات" value={selected.sponsorshipCount} /><DetailItem label="عدد الدفعات" value={selected.payoutCount} /><DetailItem label="معرّف الوصي" value={selected.guardianId} dir="ltr" /><DetailItem label="معرّف المستخدم" value={selected.userId} dir="ltr" /><DetailItem label="إمكانية التعليق" value={selected.canSuspend ? "متاحة" : "غير متاحة"} /><DetailItem label="إمكانية إعادة التفعيل" value={selected.canReactivate ? "متاحة" : "غير متاحة"} /><DetailItem label="إمكانية الحذف" value={selected.canDelete ? "متاح" : "غير متاح لوجود بيانات مرتبطة"} /></dl>
+    {selected && dialogMode === "details" && <AdminDialog title="تفاصيل الوصي" size="max-w-5xl" onClose={() => { setSelected(null); setDialogMode(""); }} footer={<><button type="button" onClick={() => setDialogMode("edit")} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white">تعديل</button>{selected.canSuspend && <button type="button" onClick={() => showStatusConfirmation(selected, false)} className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-bold text-white">تعليق الحساب</button>}{selected.canReactivate && <button type="button" onClick={() => showStatusConfirmation(selected, true)} className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white">إعادة تفعيل الحساب</button>}<button type="button" onClick={() => setConfirmation({ type: "delete", guardian: selected })} className="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-bold text-red-700">حذف نهائي</button></>}>
+      <div className="space-y-5">
+        <AdminDetailsHero icon={HiOutlineIdentification} eyebrow="ملف الوصي" title={selected.fullName} subtitle={selected.email} badges={[{ label: "التحقق", value: localizeVerificationStatus(selected.verificationStatus) }, { label: "الحساب", value: accountStatusLabel(selected.accountStatus) }]} />
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4"><AdminDetailStat label="العائلات" value={selected.familyCount} /><AdminDetailStat label="الأيتام" value={selected.orphanCount} /><AdminDetailStat label="الكفالات" value={selected.sponsorshipCount} /><AdminDetailStat label="الدفعات" value={selected.payoutCount} /></div>
+        <div className="grid gap-5 lg:grid-cols-2">
+          <AdminDetailsSection title="البيانات الشخصية" icon={FiUser}><dl className="grid gap-3 sm:grid-cols-2"><AdminDetailItem label="رقم الهوية" value={selected.nationalId} dir="ltr" /><AdminDetailItem label="رقم الهاتف" value={selected.phoneNumber} dir="ltr" /><AdminDetailItem label="تاريخ الميلاد" value={toDateInputValue(selected.dateOfBirth)} /><AdminDetailItem label="الجنس" value={localizeStatus(selected.gender)} /><AdminDetailItem label="صورة الملف الشخصي" value={selected.hasProfileImage ? "متوفرة" : "غير متوفرة"} /><AdminDetailItem label="تاريخ الانضمام" value={formatArabicDateTime(selected.joinedAt)} /></dl></AdminDetailsSection>
+          <AdminDetailsSection title="السكن والعمل" icon={FiMapPin}><dl className="grid gap-3 sm:grid-cols-2"><AdminDetailItem label="المدينة" value={selected.city} /><AdminDetailItem label="الدولة" value={selected.country} /><AdminDetailItem label="العنوان" value={selected.address} wide /><AdminDetailItem label="المهنة" value={selected.occupation} /><AdminDetailItem label="الدخل الشهري" value={selected.monthlyIncome} /></dl></AdminDetailsSection>
+        </div>
+        <AdminDetailsSection title="بيانات العائلة والصلاحيات" icon={MdOutlineFamilyRestroom}><dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"><AdminDetailItem label="عدد أفراد العائلة" value={selected.familyMembersCount} /><AdminDetailItem label="إمكانية التعليق" value={selected.canSuspend ? "متاحة" : "غير متاحة"} /><AdminDetailItem label="إمكانية إعادة التفعيل" value={selected.canReactivate ? "متاحة" : "غير متاحة"} /><AdminDetailItem label="إمكانية الحذف" value={selected.canDelete ? "متاحة" : "غير متاحة لوجود بيانات مرتبطة"} /></dl></AdminDetailsSection>
+        <AdminDetailsSection title="المعرّفات التقنية" icon={FiInfo}><dl className="grid gap-3 sm:grid-cols-2"><AdminDetailItem label="معرّف الوصي" value={selected.guardianId} dir="ltr" /><AdminDetailItem label="معرّف المستخدم" value={selected.userId} dir="ltr" /></dl></AdminDetailsSection>
+      </div>
     </AdminDialog>}
 
     {selected && dialogMode === "edit" && editForm && <AdminDialog title="تعديل بيانات الوصي" onClose={() => setDialogMode("details")} closeDisabled={busy === "edit"} footer={<><button type="button" onClick={() => setDialogMode("details")} disabled={busy === "edit"} className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-bold">إلغاء</button><button type="submit" form="guardian-edit-form" disabled={busy === "edit"} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50">{busy === "edit" ? "جارٍ الحفظ..." : "حفظ التعديلات"}</button></>}>
