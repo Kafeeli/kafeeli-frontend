@@ -15,7 +15,7 @@ import { PiBaby, PiMoneyWavy } from "react-icons/pi";
 import { TbReportAnalytics } from "react-icons/tb";
 import { authApi } from "../../services/authApi";
 import { clearSessionStorage } from "../../utils/session";
-import kafeeliLogo from "../../assets/kafeeli-logo.png";
+import kafeeliLogo from "../../assets/title.png";
 const sidebarItems = [
   { label: "لوحة المراجعة", icon: MdDashboard, path: "/admin-dashboard" },
   {
@@ -28,7 +28,11 @@ const sidebarItems = [
     icon: HiOutlineIdentification,
     path: "/admin-dashboard/guardians",
   },
-  { label: "الكفلاء", icon: MdOutlineVolunteerActivism, path: "/admin-dashboard/sponsors" },
+  {
+    label: "الكفلاء",
+    icon: MdOutlineVolunteerActivism,
+    path: "/admin-dashboard/sponsors",
+  },
   {
     label: "العائلات",
     icon: MdOutlineFamilyRestroom,
@@ -36,7 +40,11 @@ const sidebarItems = [
   },
   { label: "الأيتام", icon: PiBaby, path: "/admin-dashboard/orphans" },
   { label: "المدفوعات", icon: PiMoneyWavy, path: "/admin-dashboard/payments" },
-  { label: "دفعات الأوصياء", icon: HiOutlineBuildingLibrary, path: "/admin-dashboard/payouts" },
+  {
+    label: "دفعات الأوصياء",
+    icon: HiOutlineBuildingLibrary,
+    path: "/admin-dashboard/payouts",
+  },
   { label: "التحديثات الدورية", icon: FiClock },
   { label: "سجلات المدير", icon: TbReportAnalytics },
 ];
@@ -75,19 +83,19 @@ function SidebarContent({ onItemClick }) {
       {/* Logo */}
       <div className="flex flex-col items-center justify-center px-4 py-3 shrink-0">
         <div className="w-[100px] h-[100px] bg-white/20 rounded-full mx-auto mb-2 flex items-center justify-center ">
-              <img
-                src={kafeeliLogo}
-                alt="كفيلي"
-                className="w-[140px] h-[140px] object-contain mt-2 scale-[1.4]"
-              />
-            </div>
+          <img
+            src={kafeeliLogo}
+            alt="كفيلي"
+            className="w-[90px] h-[125px] object-contain mt-2 scale-[1.4]"
+          />
+        </div>
 
         <h2 className="font-[Cairo] font-bold text-[18px] sm:text-[20px] lg:text-[22px] tracking-[0px] text-center text-[#FFDEAA] mb-2">
           كفيلي
         </h2>
 
         <p className="font-[Cairo] font-normal text-[11px] sm:text-[12px] lg:text-[13px] leading-[16px] tracking-[0px] text-center text-[#e6ecf7] whitespace-nowrap">
-          لوحة الإدارة الذكية
+          لوحة تحكم الإدارة الذكية
         </p>
       </div>
 
@@ -130,7 +138,9 @@ function SidebarContent({ onItemClick }) {
                 <item.icon />
               </span>
               <span className="flex-1 text-right">{item.label}</span>
-              {!item.path && <span className="text-[10px] text-white/50">غير متاح</span>}
+              {!item.path && (
+                <span className="text-[10px] text-white/50">غير متاح</span>
+              )}
             </button>
           );
         })}

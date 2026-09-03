@@ -16,7 +16,7 @@ import {
 
 import { authApi } from "../../services/authApi";
 import { clearSessionStorage } from "../../utils/session";
-import kafeeliLogo from "../../assets/kafeeli-logo.png";
+import kafeeliLogo from "../../assets/title.png";
 
 function Sidebar({ openSidebar, setOpenSidebar }) {
   const location = useLocation(); // 👈 قراءة المسار المفتوح في المتصفح حالياً
@@ -53,7 +53,8 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
   ];
 
   // 👈 فحص الرابط النشط تلقائياً
-  const isActive = (path) => location.pathname === path || location.pathname.startsWith(`${path}/`);
+  const isActive = (path) =>
+    location.pathname === path || location.pathname.startsWith(`${path}/`);
 
   const itemClasses = (active) => `
     w-full min-h-[48px] py-3
@@ -136,14 +137,14 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
         <div className="flex flex-col items-center justify-center px-4 py-3 shrink-0">
           <div className="text-center mb-2">
             <div className="text-center mb-2">
-          <div className="w-[100px] h-[100px] bg-white/20 rounded-full mx-auto mb-2 flex items-center justify-center ">
-            <img
-              src={kafeeliLogo}
-              alt="كفيلي"
-              className="w-[140px] h-[140px] object-contain mt-2 scale-[1.4]"
-            />
-          </div>
-        </div>
+              <div className="w-[100px] h-[100px] bg-white/20 rounded-full mx-auto mb-2 flex items-center justify-center ">
+                <img
+                  src={kafeeliLogo}
+                  alt="كفيلي"
+                  className="w-[90px] h-[125px] object-contain mt-2 scale-[1.4]"
+                />
+              </div>
+            </div>
           </div>
 
           <h2 className="font-[Cairo] font-bold text-[18px] sm:text-[20px] lg:text-[22px] tracking-[0px] text-center text-[#FFDEAA] mb-2">
@@ -151,7 +152,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
           </h2>
 
           <p className="font-[Cairo] font-normal text-[11px] sm:text-[12px] lg:text-[13px] leading-[16px] tracking-[0px] text-center text-[#e6ecf7] whitespace-nowrap">
-            لوحة الإدارة الذكية
+            لوحة تحكم الوصي الذكية
           </p>
         </div>
 
@@ -171,24 +172,43 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
           "
         >
           {menuItems.map((item) => {
-            const content = <>
-              <span
-                className={`text-[20px] sm:text-[16px] lg:text-[18px] flex items-center shrink-0 ${
-                  item.path && isActive(item.path) ? "text-[#003469]" : "text-white/85"
-                }`}
-              >
-                {item.icon}
-              </span>
-              <span className="flex-1 text-right leading-normal">
-                {item.title}
-              </span>
-              {!item.path && <span className="text-[10px] text-white/50">غير متاح</span>}
-            </>;
+            const content = (
+              <>
+                <span
+                  className={`text-[20px] sm:text-[16px] lg:text-[18px] flex items-center shrink-0 ${
+                    item.path && isActive(item.path)
+                      ? "text-[#003469]"
+                      : "text-white/85"
+                  }`}
+                >
+                  {item.icon}
+                </span>
+                <span className="flex-1 text-right leading-normal">
+                  {item.title}
+                </span>
+                {!item.path && (
+                  <span className="text-[10px] text-white/50">غير متاح</span>
+                )}
+              </>
+            );
 
             return item.path ? (
-              <Link key={item.title} to={item.path} onClick={() => setOpenSidebar(false)} className={itemClasses(isActive(item.path))}>{content}</Link>
+              <Link
+                key={item.title}
+                to={item.path}
+                onClick={() => setOpenSidebar(false)}
+                className={itemClasses(isActive(item.path))}
+              >
+                {content}
+              </Link>
             ) : (
-              <div key={item.title} aria-disabled="true" className={`${itemClasses(false)} cursor-not-allowed opacity-60 hover:bg-transparent`}>{content}</div>
+              <div
+                key={item.title}
+                aria-disabled="true"
+                className={`${itemClasses(false)} cursor-not-allowed opacity-60 hover:bg-transparent`}
+              >
+                {content}
+              </div>
             );
           })}
         </nav>
@@ -196,16 +216,19 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
         {/* Bottom: Settings + Logout */}
         <div className="mt-auto px-3 sm:px-4 pb-1 shrink-0">
           <div className="border-t border-white/20 pt-3">
-            <div aria-disabled="true" className={`${itemClasses(false)} cursor-not-allowed opacity-60 hover:bg-transparent`}>
+            <div
+              aria-disabled="true"
+              className={`${itemClasses(false)} cursor-not-allowed opacity-60 hover:bg-transparent`}
+            >
               <span
-                className={`text-[15px] sm:text-[16px] lg:text-[18px] flex items-center shrink-0 ${
-                  "text-white/85"
-                }`}
+                className={`text-[15px] sm:text-[16px] lg:text-[18px] flex items-center shrink-0 ${"text-white/85"}`}
               >
                 <MdSettings />
               </span>
               <span>الإعدادات</span>
-              <span className="mr-auto text-[10px] text-white/50">غير متاح</span>
+              <span className="mr-auto text-[10px] text-white/50">
+                غير متاح
+              </span>
             </div>
           </div>
 
@@ -227,7 +250,9 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
               <span className="text-[15px] sm:text-[16px] lg:text-[18px] flex items-center shrink-0">
                 <MdLogout />
               </span>
-              <span>{loggingOut ? "جارٍ تسجيل الخروج..." : "تسجيل الخروج"}</span>
+              <span>
+                {loggingOut ? "جارٍ تسجيل الخروج..." : "تسجيل الخروج"}
+              </span>
             </button>
           </div>
         </div>

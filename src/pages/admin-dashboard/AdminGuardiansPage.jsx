@@ -3,10 +3,15 @@ import { FiEdit2, FiEye, FiSearch, FiTrash2 } from "react-icons/fi";
 import { HiOutlineIdentification } from "react-icons/hi2";
 import { MdDescription, MdPauseCircleOutline, MdPlayCircleOutline } from "react-icons/md";
 import { Link } from "react-router-dom";
+
 import { adminApi } from "../../services/adminApi";
 import { apiErrorMessage, unwrapResult } from "../../utils/apiUi";
 import { formatArabicDateTime } from "../../utils/date";
-import { localizeStatus, localizeVerificationStatus } from "../../utils/localization";
+import {
+  localizeStatus,
+  localizeVerificationStatus,
+} from "../../utils/localization";
+
 import AdminLayout from "./Adminlayout";
 import { AdminConfirmationDialog, AdminDialog } from "./AdminManagementDialogs";
 import { EmptyState, ErrorState, LoadingState, MiniStatCard } from "./Adminstates";
@@ -77,11 +82,17 @@ export default function AdminGuardiansPage() {
   const load = useCallback(async ({ silent = false } = {}) => {
     if (!silent) setLoading(true);
     setError("");
+
     try {
       const data = unwrapResult(await adminApi.getAllGuardians(), "تعذر تحميل قائمة الأوصياء.");
       setGuardians(Array.isArray(data) ? data : []);
     } catch (requestError) {
-      setError(apiErrorMessage(requestError, "تعذر تحميل قائمة الأوصياء."));
+      setError(
+        apiErrorMessage(
+          requestError,
+          "تعذر تحميل قائمة الأوصياء.",
+        ),
+      );
     } finally {
       if (!silent) setLoading(false);
     }
@@ -89,6 +100,7 @@ export default function AdminGuardiansPage() {
 
   useEffect(() => {
     const timeoutId = window.setTimeout(load, 0);
+
     return () => window.clearTimeout(timeoutId);
   }, [load]);
 
@@ -204,6 +216,7 @@ export default function AdminGuardiansPage() {
 
   const filteredGuardians = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
+
     return guardians.filter((guardian) => {
       const matchesVerification = verificationFilter === "all" || guardian.verificationStatus === verificationFilter;
       const matchesAccount = accountFilter === "all" || guardian.accountStatus === accountFilter;
@@ -219,6 +232,62 @@ export default function AdminGuardiansPage() {
     setActionError("");
     setSuccessMessage("");
   };
+
+  /*
+   * ---------------------------------------------------------
+   * Verification Badge Styles
+   * ---------------------------------------------------------
+   */
+
+  const getVerificationStyle = (status) => {
+    switch (status) {
+      case "Approved":
+        return "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200";
+
+      case "Pending":
+        return "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200";
+
+      case "Rejected":
+        return "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200";
+
+      case "NeedsUpdate":
+        return "bg-orange-50 text-orange-700 ring-1 ring-inset ring-orange-200";
+
+      case "Suspended":
+        return "bg-gray-100 text-gray-700 ring-1 ring-inset ring-gray-200";
+
+      default:
+        return "bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-200";
+    }
+  };
+
+  /*
+   * ---------------------------------------------------------
+   * Family Status Styles
+   * ---------------------------------------------------------
+   */
+
+  const getFamilyStyle = (status) => {
+    switch (status) {
+      case "Active":
+        return "bg-emerald-50 text-emerald-700";
+
+      case "Pending":
+        return "bg-amber-50 text-amber-700";
+
+      case "Inactive":
+        return "bg-gray-100 text-gray-600";
+
+      default:
+        return "bg-gray-100 text-gray-600";
+    }
+  };
+
+  /*
+   * ---------------------------------------------------------
+   * Content
+   * ---------------------------------------------------------
+   */
 
   let content;
   if (loading) content = <LoadingState />;
@@ -238,6 +307,12 @@ export default function AdminGuardiansPage() {
       </table></div>
     </div>
   );
+
+  /*
+   * ---------------------------------------------------------
+   * PAGE
+   * ---------------------------------------------------------
+   */
 
   return (
     <AdminLayout title="الأوصياء"><div className="mx-auto w-full max-w-7xl">

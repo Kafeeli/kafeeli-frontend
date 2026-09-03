@@ -18,7 +18,7 @@ import {
 
 import { authApi } from "../../services/authApi";
 import { clearSessionStorage } from "../../utils/session";
-import kafeeliLogo from "../../assets/kafeeli-logo.png";
+import kafeeliLogo from "../../assets/title.png";
 
 function Sidebar({ openSidebar, setOpenSidebar }) {
   const location = useLocation();
@@ -37,12 +37,12 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
       path: "/sponsorProfile",
     },
     {
-      title: "الوثائق",
-      icon: <MdDescription />,
-      path: null,
+      title: "تصفح الأيتام",
+      icon: <MdPublishedWithChanges />,
+      path: "/sponsor/orphans",
     },
     {
-      title: "العائلات",
+      title: "تصفح العائلات",
       icon: <MdFamilyRestroom />,
       path: "/sponsor/families",
     },
@@ -52,9 +52,9 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
       path: "/sponsor/sponsorships",
     },
     {
-      title: "الأيتام",
-      icon: <MdPublishedWithChanges />,
-      path: "/sponsor/orphans",
+      title: "الوثائق",
+      icon: <MdDescription />,
+      path: null,
     },
     {
       title: "المحفظة",
@@ -163,7 +163,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
               <img
                 src={kafeeliLogo}
                 alt="كفيلي"
-                className="w-[140px] h-[140px] object-contain mt-2 scale-[1.4]"
+                className="w-[90px] h-[125px] object-contain mt-2 scale-[1.4]"
               />
             </div>
           </div>
@@ -173,7 +173,7 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
           </h2>
 
           <p className="font-[Cairo] font-normal text-[11px] sm:text-[12px] lg:text-[13px] leading-[16px] tracking-[0px] text-center text-[#e6ecf7] whitespace-nowrap">
-            لوحة الإدارة الذكية
+            لوحة تحكم الكفيل الذكية
           </p>
         </div>
 
@@ -181,32 +181,52 @@ function Sidebar({ openSidebar, setOpenSidebar }) {
 
         <nav className="flex-1 overflow-y-auto px-4 py-3 space-y-2 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent hover:scrollbar-thumb-white/40">
           {menuItems.map((item) => {
-            const content = <>
-              <span
-                className={`text-[18px] flex items-center ${
-                  item.path && isActive(item.path)
-                    ? "text-[#003469]"
-                    : "text-white/85"
-                }`}
-              >
-                {item.icon}
-              </span>
+            const content = (
+              <>
+                <span
+                  className={`text-[18px] flex items-center ${
+                    item.path && isActive(item.path)
+                      ? "text-[#003469]"
+                      : "text-white/85"
+                  }`}
+                >
+                  {item.icon}
+                </span>
 
-              <span className="flex-1 text-right">{item.title}</span>
-              {!item.path && <span className="text-[10px] text-white/50">غير متاح</span>}
-            </>;
+                <span className="flex-1 text-right">{item.title}</span>
+                {!item.path && (
+                  <span className="text-[10px] text-white/50">غير متاح</span>
+                )}
+              </>
+            );
 
             return item.path ? (
-              <Link key={item.title} to={item.path} onClick={() => setOpenSidebar(false)} className={itemClasses(isActive(item.path))}>{content}</Link>
+              <Link
+                key={item.title}
+                to={item.path}
+                onClick={() => setOpenSidebar(false)}
+                className={itemClasses(isActive(item.path))}
+              >
+                {content}
+              </Link>
             ) : (
-              <div key={item.title} aria-disabled="true" className={`${itemClasses(false)} cursor-not-allowed opacity-60 hover:bg-transparent`}>{content}</div>
+              <div
+                key={item.title}
+                aria-disabled="true"
+                className={`${itemClasses(false)} cursor-not-allowed opacity-60 hover:bg-transparent`}
+              >
+                {content}
+              </div>
             );
           })}
         </nav>
 
         <div className="mt-auto px-3 sm:px-4 pb-2 shrink-0">
           <div className="border-t border-white/20 pt-3">
-            <div aria-disabled="true" className={`${itemClasses(false)} cursor-not-allowed opacity-60 hover:bg-transparent`}>
+            <div
+              aria-disabled="true"
+              className={`${itemClasses(false)} cursor-not-allowed opacity-60 hover:bg-transparent`}
+            >
               <span className="text-[18px] flex items-center text-white/85">
                 <MdSettings />
               </span>

@@ -2,9 +2,19 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FiEdit2, FiEye, FiSearch, FiTrash2 } from "react-icons/fi";
 import { MdChildCare, MdDescription } from "react-icons/md";
 import { adminApi } from "../../services/adminApi";
-import { apiErrorMessage, openProtectedBlob, unwrapResult } from "../../utils/apiUi";
+import {
+  apiErrorMessage,
+  openProtectedBlob,
+  unwrapResult,
+} from "../../utils/apiUi";
+
 import { formatArabicDateTime } from "../../utils/date";
-import { localizeDocumentType, localizeStatus } from "../../utils/localization";
+
+import {
+  localizeDocumentType,
+  localizeStatus,
+} from "../../utils/localization";
+
 import AdminLayout from "./Adminlayout";
 import { AdminConfirmationDialog, AdminDialog } from "./AdminManagementDialogs";
 import { EmptyState, ErrorState, LoadingState, MiniStatCard } from "./Adminstates";
@@ -65,10 +75,55 @@ function statusConfirmation(status) {
 
 function documentFileErrorMessage(error) {
   const status = error?.response?.status;
-  if (status === 401) return "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.";
-  if (status === 403) return "ليس لديك صلاحية لعرض هذا المستند.";
-  if (status === 404) return "المستند غير موجود.";
-  return apiErrorMessage(error, "تعذر فتح المستند. حاول مرة أخرى.");
+
+  if (status === 401) {
+    return "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.";
+  }
+
+  if (status === 403) {
+    return "ليس لديك صلاحية لعرض هذا المستند.";
+  }
+
+  if (status === 404) {
+    return "المستند غير موجود.";
+  }
+
+  return apiErrorMessage(
+    error,
+    "تعذر فتح المستند. حاول مرة أخرى.",
+  );
+}
+
+
+/* =========================================================
+   STATUS BADGE COMPONENT
+========================================================= */
+
+function StatusBadge({ status }) {
+  const style = getOrphanStatusStyle(status);
+  const Icon = style.icon;
+
+  return (
+    <span
+      className={`
+        inline-flex
+        min-w-[105px]
+        items-center
+        justify-center
+        gap-1.5
+        whitespace-nowrap
+        rounded-full
+        px-3
+        py-1.5
+        text-xs
+        font-bold
+        ${style.wrapper}
+      `}
+    >
+      <Icon size={13} />
+      {localizeStatus(status)}
+    </span>
+  );
 }
 
 function toDateInputValue(value) {
@@ -96,9 +151,12 @@ export default function AdminOrphansReviewPage() {
   const [allOrphans, setAllOrphans] = useState([]);
   const [pendingOrphans, setPendingOrphans] = useState([]);
   const [documents, setDocuments] = useState([]);
+
   const [activeTab, setActiveTab] = useState("all");
+
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+
   const [selected, setSelected] = useState(null);
   const [selectedForReview, setSelectedForReview] = useState(false);
   const [dialogMode, setDialogMode] = useState("");
@@ -116,8 +174,13 @@ export default function AdminOrphansReviewPage() {
   const load = useCallback(async ({ silent = false } = {}) => {
     if (!silent) setLoading(true);
     setError("");
+
     try {
-      const [allResult, pendingResult, documentResult] = await Promise.all([
+      const [
+        allResult,
+        pendingResult,
+        documentResult,
+      ] = await Promise.all([
         adminApi.getAllOrphans(),
         adminApi.getPendingOrphans(),
         adminApi.getPendingOrphanDocuments(),
@@ -129,15 +192,26 @@ export default function AdminOrphansReviewPage() {
         arabicLabel: item.arabicLabel || localizeDocumentType(item.documentType),
       })));
     } catch (requestError) {
-      setError(apiErrorMessage(requestError, "تعذر تحميل بيانات الأيتام."));
+      setError(
+        apiErrorMessage(
+          requestError,
+          "تعذر تحميل بيانات الأيتام.",
+        ),
+      );
     } finally {
       if (!silent) setLoading(false);
     }
   }, []);
 
+
   useEffect(() => {
-    const timeoutId = window.setTimeout(load, 0);
-    return () => window.clearTimeout(timeoutId);
+    const timeoutId = window.setTimeout(
+      load,
+      0,
+    );
+
+    return () =>
+      window.clearTimeout(timeoutId);
   }, [load]);
 
   const fetchDetails = useCallback(async (orphanId) => (
@@ -158,7 +232,12 @@ export default function AdminOrphansReviewPage() {
       setEditForm(orphanForm(details));
       setDialogMode(mode);
     } catch (requestError) {
-      setActionError(apiErrorMessage(requestError, "تعذر تحميل تفاصيل اليتيم."));
+      setActionError(
+        apiErrorMessage(
+          requestError,
+          "تعذر تحميل تفاصيل اليتيم.",
+        ),
+      );
     } finally {
       setBusy("");
     }
@@ -168,6 +247,7 @@ export default function AdminOrphansReviewPage() {
     if (busy) return;
     setBusy(key);
     setActionError("");
+
     try {
       openProtectedBlob(await request());
     } catch (requestError) {
@@ -292,6 +372,7 @@ export default function AdminOrphansReviewPage() {
 
   const selectTab = (tab) => {
     setActiveTab(tab);
+
     setSelected(null);
     setDialogMode("");
     setSelectedForReview(false);
@@ -311,10 +392,59 @@ export default function AdminOrphansReviewPage() {
     setSelected(null);
     setDialogMode("");
     setSelectedForReview(false);
+
     setActionError("");
   };
 
+
+  /* =========================================================
+     CLEAR FILTERS
+  ========================================================= */
+
+  const clearFilters = () => {
+    setSearchTerm("");
+    setStatusFilter("all");
+  };
+
+
+  /* =========================================================
+     SELECTED DOCUMENTS
+  ========================================================= */
+
+  const birthCertificate =
+    selected?.requiredDocuments?.find(
+      (document) =>
+        document.documentType ===
+        "BirthCertificate",
+    );
+
+  const hasBirthCertificate =
+    Boolean(
+      birthCertificate?.documentId &&
+        birthCertificate.hasCurrentDocument !==
+          false &&
+        birthCertificate.canView !==
+          false,
+    );
+
+  const hasFatherDeathCertificate =
+    Boolean(
+      selected?.familyId &&
+        selected.familyFatherDeathCertificateAccessEndpoint,
+    );
+
+
+  /* =========================================================
+     TAB CONTENT
+  ========================================================= */
+
   let tabContent;
+
+
+  /* =========================================================
+     ALL ORPHANS
+  ========================================================= */
+
   if (activeTab === "all") {
     if (allOrphans.length === 0) tabContent = <EmptyState icon={MdChildCare} title="لا يوجد أيتام" description="لم يُرجع الخادم أي سجلات أيتام حتى الآن." />;
     else if (filteredOrphans.length === 0) tabContent = <EmptyState icon={FiSearch} title="لا توجد نتائج مطابقة" description="جرّب تعديل عبارة البحث أو حالة اليتيم." />;
