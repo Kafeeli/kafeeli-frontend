@@ -404,6 +404,7 @@ import GuardianOrphanDetailsPage from "./pages/guardian-dashboard/GuardianOrphan
 import GuardianOrphanFormPage from "./pages/guardian-dashboard/GuardianOrphanFormPage";
 import GuardianPayoutsPage from "./pages/guardian-dashboard/GuardianPayoutsPage";
 import AdminOrphansReviewPage from "./pages/admin-dashboard/AdminOrphansReviewPage";
+import AdminOrphanDocumentsPage from "./pages/admin-dashboard/AdminOrphanDocumentsPage";
 import AdminGuardiansPage from "./pages/admin-dashboard/AdminGuardiansPage";
 import AdminSponsorsPage from "./pages/admin-dashboard/AdminSponsorsPage";
 import AdminPaymentsReviewPage from "./pages/admin-dashboard/AdminPaymentsReviewPage";
@@ -921,6 +922,16 @@ function AnimatedRoutes() {
             <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
               <PageWrapper>
                 <AdminOrphansReviewPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-dashboard/orphan-document-reviews"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <AdminOrphanDocumentsPage />
               </PageWrapper>
             </ProtectedRoute>
           }

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FiCheckCircle, FiEdit2, FiEye, FiEyeOff, FiSearch, FiTrash2 } from "react-icons/fi";
-import { MdChildCare, MdDescription, MdPauseCircleOutline, MdPlayCircleOutline } from "react-icons/md";
+import { MdChildCare, MdPauseCircleOutline, MdPlayCircleOutline } from "react-icons/md";
 import { adminApi } from "../../services/adminApi";
 import {
   apiErrorMessage,
@@ -10,10 +10,7 @@ import {
 
 import { formatArabicDateTime } from "../../utils/date";
 
-import {
-  localizeDocumentType,
-  localizeStatus,
-} from "../../utils/localization";
+import { localizeStatus } from "../../utils/localization";
 
 import AdminLayout from "./Adminlayout";
 import { AdminConfirmationDialog, AdminDialog } from "./AdminManagementDialogs";
@@ -126,8 +123,6 @@ function DetailItem({ label, value, dir }) {
 export default function AdminOrphansReviewPage() {
   const [allOrphans, setAllOrphans] = useState([]);
   const [pendingOrphans, setPendingOrphans] = useState([]);
-  const [documents, setDocuments] = useState([]);
-
   const [activeTab, setActiveTab] = useState("all");
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -152,21 +147,12 @@ export default function AdminOrphansReviewPage() {
     setError("");
 
     try {
-      const [
-        allResult,
-        pendingResult,
-        documentResult,
-      ] = await Promise.all([
+      const [allResult, pendingResult] = await Promise.all([
         adminApi.getAllOrphans(),
         adminApi.getPendingOrphans(),
-        adminApi.getPendingOrphanDocuments(),
       ]);
       setAllOrphans(unwrapResult(allResult, "تعذر تحميل جميع الأيتام.") || []);
       setPendingOrphans(unwrapResult(pendingResult, "تعذر تحميل الأيتام المعلقين.") || []);
-      setDocuments((unwrapResult(documentResult, "تعذر تحميل الوثائق المعلقة.") || []).map((item) => ({
-        ...item,
-        arabicLabel: item.arabicLabel || localizeDocumentType(item.documentType),
-      })));
     } catch (requestError) {
       setError(
         apiErrorMessage(
@@ -414,17 +400,15 @@ export default function AdminOrphansReviewPage() {
         <tbody className="divide-y divide-gray-100">{filteredOrphans.map((orphan) => <tr key={orphan.orphanId} className="hover:bg-gray-50/70"><td title={orphan.fullName || undefined} className="max-w-[170px] truncate px-3 py-3 font-bold text-[#003469]">{orphan.fullName || "—"}</td><td dir="ltr" className="whitespace-nowrap px-3 py-3 text-right text-[11px]">{orphan.nationalId || "—"}</td><td className="px-3 py-3">{orphan.age ?? "—"}</td><td className="px-3 py-3">{localizeStatus(orphan.gender)}</td><td title={orphan.familyHeadOfHouseholdName || undefined} className="max-w-[150px] truncate px-3 py-3">{orphan.familyHeadOfHouseholdName || "—"}</td><td title={orphan.guardianFullName || undefined} className="max-w-[150px] truncate px-3 py-3">{orphan.guardianFullName || "—"}</td><td className="whitespace-nowrap px-3 py-3"><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${orphanStatusClasses(orphan.orphanStatus)}`}>{orphanStatusLabel(orphan.orphanStatus)}</span></td><td className="whitespace-nowrap px-3 py-3 text-[11px] text-gray-600">{formatArabicDateTime(orphan.updatedAt)}</td><td className="px-3 py-3"><div className="flex items-center gap-1 whitespace-nowrap"><AdminTableIconButton label="عرض التفاصيل" tone="view" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId)}><FiEye aria-hidden="true" /></AdminTableIconButton><AdminTableIconButton label="تعديل" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId, { mode: "edit" })}><FiEdit2 aria-hidden="true" /></AdminTableIconButton>{(STATUS_TRANSITIONS[orphan.orphanStatus] || []).map((status) => <AdminTableIconButton key={status} label={statusActionLabel(status)} tone={status === "Active" ? "reactivate" : status === "Hidden" ? "hide" : "suspend"} disabled={Boolean(busy)} onClick={() => openStatusConfirmation(orphan, status)}><StatusActionIcon status={status} /></AdminTableIconButton>)}{orphan.orphanStatus === "PendingReview" && <AdminTableIconButton label="مراجعة واعتماد" tone="approve" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId, { forReview: true })}><FiCheckCircle aria-hidden="true" /></AdminTableIconButton>}<AdminTableIconButton label="حذف نهائي" tone="delete" disabled={Boolean(busy)} onClick={() => setConfirmation({ type: "delete", orphan })}><FiTrash2 aria-hidden="true" /></AdminTableIconButton></div></td></tr>)}</tbody>
       </table></div></div>
     );
-  } else if (activeTab === "pending") {
-    tabContent = pendingOrphans.length ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{pendingOrphans.map((orphan) => <article key={orphan.orphanId} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"><div className="flex justify-between gap-3"><strong>{orphan.fullName || "—"}</strong><span className="text-xs font-bold text-[#0D4B8E]">{orphanStatusLabel(orphan.orphanStatus)}</span></div><p className="mt-2 text-sm text-gray-500">{orphan.familyHeadOfHouseholdName || "—"} · {orphan.guardianFullName || "—"}</p><button type="button" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId, { forReview: true })} className="mt-4 w-full rounded-lg bg-[#0D4B8E] px-4 py-2 text-sm font-bold text-white disabled:opacity-60">عرض ومراجعة</button></article>)}</div> : <EmptyState icon={MdChildCare} title="لا توجد حالات معلقة" description="لا توجد حالات أيتام بانتظار المراجعة." />;
   } else {
-    tabContent = documents.length ? <><label className="mb-4 block max-w-xl text-sm font-bold">سبب طلب تعديل الوثيقة<textarea value={documentReason} onChange={(event) => setDocumentReason(event.target.value)} maxLength={500} rows={2} required className="mt-2 w-full rounded-lg border border-gray-300 p-3" /></label><div className="grid gap-4 md:grid-cols-2">{documents.map((document) => <article key={document.documentId} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"><h3 className="font-bold">{document.arabicLabel || document.documentType || "—"}</h3><p className="mt-1 text-sm text-gray-500">{document.orphanFullName || "—"} · {document.displayFileName || "—"}</p><div className="mt-4 flex flex-wrap gap-2"><button type="button" disabled={Boolean(busy)} onClick={() => viewBlob(`doc-${document.documentId}`, () => adminApi.getOrphanDocumentFile(document.documentId))} className="rounded bg-[#E8F1FA] px-3 py-2 text-xs font-bold text-[#0D4B8E] disabled:opacity-60">{busy === `doc-${document.documentId}` ? "جارٍ فتح الملف..." : "عرض الوثيقة"}</button><button type="button" disabled={Boolean(busy) || !documentReason.trim()} onClick={() => runReviewAction(`update-${document.documentId}`, () => adminApi.requestOrphanDocumentUpdate(document.documentId, documentReason.trim()), "تم إرسال طلب تعديل الوثيقة بنجاح.")} className="rounded bg-amber-600 px-3 py-2 text-xs font-bold text-white disabled:opacity-60">{busy === `update-${document.documentId}` ? "جارٍ إرسال الطلب..." : "طلب تعديل الوثيقة"}</button></div></article>)}</div></> : <EmptyState icon={MdDescription} title="لا توجد وثائق معلقة" description="لا توجد وثائق أيتام بانتظار المراجعة." />;
+    tabContent = pendingOrphans.length ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{pendingOrphans.map((orphan) => <article key={orphan.orphanId} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"><div className="flex justify-between gap-3"><strong>{orphan.fullName || "—"}</strong><span className="text-xs font-bold text-[#0D4B8E]">{orphanStatusLabel(orphan.orphanStatus)}</span></div><p className="mt-2 text-sm text-gray-500">{orphan.familyHeadOfHouseholdName || "—"} · {orphan.guardianFullName || "—"}</p><button type="button" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId, { forReview: true })} className="mt-4 w-full rounded-lg bg-[#0D4B8E] px-4 py-2 text-sm font-bold text-white disabled:opacity-60">عرض ومراجعة</button></article>)}</div> : <EmptyState icon={MdChildCare} title="لا توجد حالات معلقة" description="لا توجد حالات أيتام بانتظار المراجعة." />;
   }
 
   return (
     <AdminLayout title="إدارة الأيتام"><div className="space-y-6">
       <div><h1 className="text-2xl font-extrabold text-[#003469]">إدارة الأيتام</h1><p className="mt-1 text-sm text-gray-500">إدارة جميع الأيتام مع إبقاء المراجعة الأولية ومسار تصحيح الوثائق منفصلين.</p></div>
       <div className="max-w-sm"><MiniStatCard label="إجمالي الأيتام" value={allOrphans.length} icon={MdChildCare} tone="bg-[#E8F1FA] text-[#0D4B8E]" /></div>
-      <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-3">{[{ key: "all", label: `جميع الأيتام (${allOrphans.length})` }, { key: "pending", label: `بانتظار المراجعة (${pendingOrphans.length})` }, { key: "documents", label: `الوثائق المعلقة (${documents.length})` }].map((tab) => <button key={tab.key} type="button" onClick={() => selectTab(tab.key)} className={`rounded-lg px-4 py-2.5 text-sm font-bold transition ${activeTab === tab.key ? "bg-[#0D4B8E] text-white" : "bg-white text-[#0D4B8E] hover:bg-[#E8F1FA]"}`}>{tab.label}</button>)}</div>
+      <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-3">{[{ key: "all", label: `جميع الأيتام (${allOrphans.length})` }, { key: "pending", label: `بانتظار المراجعة (${pendingOrphans.length})` }].map((tab) => <button key={tab.key} type="button" onClick={() => selectTab(tab.key)} className={`rounded-lg px-4 py-2.5 text-sm font-bold transition ${activeTab === tab.key ? "bg-[#0D4B8E] text-white" : "bg-white text-[#0D4B8E] hover:bg-[#E8F1FA]"}`}>{tab.label}</button>)}</div>
       {activeTab === "all" && <div className="grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-[1fr_220px]"><label className="relative"><span className="sr-only">البحث في الأيتام</span><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="ابحث بالاسم أو رقم الهوية" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none focus:border-[#0D4B8E]" /></label><select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} aria-label="تصفية حسب حالة اليتيم" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ORPHAN_STATUS_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select></div>}
       {actionError && !selected && !confirmation && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}{successMessage && <p role="status" className="rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700">{successMessage}</p>}
       {activeTab === "all" && <p className="text-sm font-bold text-gray-600">النتائج: {filteredOrphans.length}</p>}
