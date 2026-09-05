@@ -7,6 +7,8 @@ export const DOCUMENT_STATUS_FILTERS = [
   { value: 5, key: "NeedsUpdate", label: "تحتاج تحديث" },
 ];
 
+export const DOCUMENT_STATUS_OPTIONS = DOCUMENT_STATUS_FILTERS.filter((item) => item.key);
+
 export const GUARDIAN_DOCUMENT_TYPE_FILTERS = [
   { value: "", label: "كل أنواع الوثائق" },
   { value: 1, key: "NationalId", label: "الهوية الوطنية" },
@@ -28,8 +30,12 @@ export const ORPHAN_DOCUMENT_TYPE_FILTERS = [
   { value: 9, key: "Other", label: "وثيقة أخرى" },
 ];
 
-const statusLabels = Object.fromEntries(
-  DOCUMENT_STATUS_FILTERS.filter((item) => item.key).map((item) => [item.key, item.label]),
+const statusOptionsByKey = Object.fromEntries(
+  DOCUMENT_STATUS_OPTIONS.map((item) => [item.key, item]),
+);
+
+const statusOptionsByValue = Object.fromEntries(
+  DOCUMENT_STATUS_OPTIONS.map((item) => [item.value, item]),
 );
 
 const documentTypeLabels = Object.fromEntries(
@@ -39,7 +45,7 @@ const documentTypeLabels = Object.fromEntries(
 );
 
 export function adminDocumentStatusLabel(status) {
-  return statusLabels[status] || "—";
+  return statusOptionsByKey[status]?.label || statusOptionsByValue[status]?.label || "—";
 }
 
 export function adminDocumentTypeLabel(type, fallback = "وثيقة") {
@@ -47,9 +53,15 @@ export function adminDocumentTypeLabel(type, fallback = "وثيقة") {
 }
 
 export function adminDocumentStatusClasses(status) {
-  if (status === "Approved") return "bg-emerald-50 text-emerald-700";
-  if (status === "Rejected") return "bg-red-50 text-red-700";
-  if (status === "Expired") return "bg-slate-100 text-slate-700";
-  if (status === "NeedsUpdate") return "bg-blue-50 text-blue-700";
+  const statusKey = statusOptionsByValue[status]?.key || status;
+  if (statusKey === "Approved") return "bg-emerald-50 text-emerald-700";
+  if (statusKey === "Rejected") return "bg-red-50 text-red-700";
+  if (statusKey === "Expired") return "bg-slate-100 text-slate-700";
+  if (statusKey === "NeedsUpdate") return "bg-orange-50 text-orange-700";
   return "bg-amber-50 text-amber-700";
+}
+
+export function adminDocumentStatusRequiresReason(status) {
+  const statusKey = statusOptionsByValue[status]?.key || status;
+  return statusKey === "Rejected" || statusKey === "NeedsUpdate";
 }
