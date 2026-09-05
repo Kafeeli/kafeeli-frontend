@@ -180,6 +180,15 @@ export const adminApi = {
     );
     return response.data;
   },
+
+  updateGuardianDocumentStatus: async (documentId, status, reason = "") => {
+    const trimmedReason = typeof reason === "string" ? reason.trim() : "";
+    const response = await api.patch(
+      `/api/v1/admin/guardian-documents/${documentId}/status`,
+      { status, ...(trimmedReason ? { reason: trimmedReason } : {}) },
+    );
+    return response.data;
+  },
   // ============ توثيق الوصي (الحساب ككل) ============
 
   // GET /api/v1/admin/guardians/{guardianId}/verification
@@ -318,6 +327,14 @@ export const adminApi = {
   },
   requestOrphanDocumentUpdate: async (documentId, reason) => {
     const response = await api.post(`/api/v1/admin/orphan-documents/${documentId}/needs-update`, { reason });
+    return response.data;
+  },
+  updateOrphanDocumentStatus: async (documentId, status, reason = "") => {
+    const trimmedReason = typeof reason === "string" ? reason.trim() : "";
+    const response = await api.patch(
+      `/api/v1/admin/orphan-documents/${documentId}/status`,
+      { status, ...(trimmedReason ? { reason: trimmedReason } : {}) },
+    );
     return response.data;
   },
   getOrphanDocumentFile: async (documentId) => {
