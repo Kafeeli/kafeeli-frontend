@@ -348,13 +348,26 @@ function GuardianProfile() {
       });
 
       const mapped = mapProfileToFormData(res.data);
-      setFormData(mapped);
-      setOriginalData(mapped);
-      if (imagePreview) URL.revokeObjectURL(imagePreview);
-      setNewProfileImage(null);
-      setImagePreview(null);
-      setIsEditing(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+
+setFormData(mapped);
+setOriginalData(mapped);
+
+// تحديث صورة الهيدر مباشرة بدون Refresh
+window.dispatchEvent(
+  new CustomEvent("profileImageUpdated", {
+    detail: mapped.profileImageUrl,
+  })
+);
+
+if (imagePreview) URL.revokeObjectURL(imagePreview);
+
+setNewProfileImage(null);
+setImagePreview(null);
+setIsEditing(false);
+
+if (fileInputRef.current) {
+  fileInputRef.current.value = "";
+}
     } catch (err) {
       const status = err?.response?.status;
       if (status === 400) {
