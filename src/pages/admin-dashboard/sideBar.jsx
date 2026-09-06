@@ -24,10 +24,14 @@ const sidebarItems = [
     path: "/admin-dashboard/transfer-review",
   },
   {
-    label: "الأوصياء",
-    icon: HiOutlineIdentification,
-    path: "/admin-dashboard/guardians",
-  },
+  label: "الأوصياء",
+  icon: HiOutlineIdentification,
+  path: "/admin-dashboard/guardians",
+  activePaths: [
+    "/admin-dashboard/guardians",
+    "/admin-dashboard/guardian-document-reviews",
+  ],
+},
   {
     label: "الكفلاء",
     icon: MdOutlineVolunteerActivism,
@@ -116,7 +120,12 @@ function SidebarContent({ onItemClick }) {
         "
       >
         {sidebarItems.map(function (item) {
-          const isActive = item.path && location.pathname === item.path;
+          // const isActive = item.path && location.pathname === item.path;
+          const isActive =
+  item.activePaths?.some((path) =>
+    location.pathname.startsWith(path)
+  ) ||
+  (item.path && location.pathname === item.path);
 
           return (
             <button
