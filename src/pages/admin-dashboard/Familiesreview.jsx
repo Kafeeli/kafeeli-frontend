@@ -399,9 +399,9 @@ export default function FamiliesReview() {
         <span className="font-bold text-[#0D4B8E]">إدارة العائلات</span>
       </div>
 
-      <h1 className="mb-2 text-xl font-extrabold text-[#0D4B8E] sm:text-2xl">
+      {/* <h1 className="mb-2 text-xl font-extrabold text-[#0D4B8E] sm:text-2xl">
         إدارة العائلات
-      </h1>
+      </h1> */}
       <p className="mb-6 max-w-2xl text-sm leading-6 text-[#6B7280]">
         اعرض جميع العائلات وحالتها الحالية، وراجع الطلبات التي تنتظر قرار الإدارة.
       </p>
