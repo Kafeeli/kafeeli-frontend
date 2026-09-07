@@ -399,11 +399,11 @@ export const adminApi = {
     const response = await api.post(`/api/v1/admin/payouts/${payoutId}/fail`, { reason });
     return response.data;
   },
-  getAllGuardianDocuments: async () => {
-  const response = await api.get(
-    "/api/v1/admin/guardian-documents"
-  );
+//   getAllGuardianDocuments: async () => {
+//   const response = await api.get(
+//     "/api/v1/admin/guardian-documents"
+//   );
 
-  return response.data;
-},
+//   return response.data;
+// },
 };
