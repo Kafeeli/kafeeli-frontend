@@ -19,6 +19,19 @@ import {
   LoadingState,
   MiniStatCard,
 } from "./Adminstates";
+import {
+  FiX,
+  FiUser,
+  FiMail,
+  FiPhone,
+  FiShield,
+  FiFileText,
+  FiEye,
+  FiCheckCircle,
+  FiClock,
+  FiXCircle,
+  FiTrash2
+} from "react-icons/fi";  
 
 const VERIFICATION_FILTERS = [
   { value: "all", label: "كل حالات التحقق" },
@@ -35,6 +48,57 @@ export default function AdminGuardiansPage() {
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [verificationFilter, setVerificationFilter] = useState("all");
+  const [selectedGuardian, setSelectedGuardian] = useState(null);
+const [guardianDocuments, setGuardianDocuments] = useState([]);
+const [detailsLoading, setDetailsLoading] = useState(false);
+const approvedDocs = guardianDocuments.filter(
+  (doc) => doc.status === "Approved"
+).length;
+
+const pendingDocs = guardianDocuments.filter(
+  (doc) => doc.status === "Pending"
+).length;
+
+const rejectedDocs = guardianDocuments.filter(
+  (doc) => doc.status === "Rejected"
+).length;
+const localizeDocumentType = (type) => {
+  switch (type) {
+    case "NationalId":
+      return "الهوية الشخصية";
+
+    case "CustodyDocument":
+      return "حجة الحضانة";
+
+    case "SelfieVideoWithId":
+      return "فيديو سيلفي مع الهوية";
+
+    case "GuardianshipProof":
+      return "إثبات الوصاية";
+
+    default:
+      return type;
+  }
+};
+const localizeDocumentStatus = (status) => {
+  switch (status) {
+    case "Approved":
+      return "معتمدة";
+
+    case "Pending":
+      return "قيد المراجعة";
+
+    case "Rejected":
+      return "مرفوضة";
+
+    case "NeedsUpdate":
+      return "تحتاج تحديث";
+
+    default:
+      return status;
+  }
+};
+
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -58,6 +122,43 @@ export default function AdminGuardiansPage() {
       setLoading(false);
     }
   }, []);
+ const openGuardianDetails = async (guardian) => {
+  setSelectedGuardian(guardian);
+  setDetailsLoading(true);
+
+  try {
+
+    const response =
+      await adminApi.getAllGuardianDocuments();
+
+    const docs =
+      response.data || response;
+
+
+    const myDocs = docs.filter(
+      (doc) =>
+        doc.guardianId === guardian.guardianId
+    );
+
+
+    setGuardianDocuments(myDocs);
+
+
+  } catch (error) {
+
+    console.error(
+      "Documents Error:",
+      error
+    );
+
+    setGuardianDocuments([]);
+
+  } finally {
+
+    setDetailsLoading(false);
+
+  }
+};
 
   useEffect(() => {
     const timeoutId = window.setTimeout(load, 0);
@@ -243,6 +344,9 @@ export default function AdminGuardiansPage() {
                 <th className="w-[170px] px-5 py-4 text-xs font-extrabold text-gray-500">
                   تاريخ الانضمام
                 </th>
+                <th className="w-[120px] px-5 py-4 text-xs font-extrabold text-gray-500">
+                   الإجراءات
+                  </th>
 
               </tr>
             </thead>
@@ -399,7 +503,25 @@ export default function AdminGuardiansPage() {
                       guardian.joinedAt,
                     )}
                   </td>
+                      <td className="px-5 py-4">
 
+  <button
+    onClick={() => openGuardianDetails(guardian)}
+    className="
+      rounded-lg
+      bg-[#003469]
+      px-4
+      py-2
+      text-xs
+      font-bold
+      text-white
+      hover:bg-[#0D4B8E]
+    "
+  >
+    التفاصيل
+  </button>
+
+</td>
                 </tr>
 
               ))}
@@ -578,7 +700,21 @@ export default function AdminGuardiansPage() {
    * PAGE
    * ---------------------------------------------------------
    */
+ const openDocument = async (id) => {
+  try {
 
+    const file = await adminApi.getDocumentFile(id);
+
+    const url = URL.createObjectURL(file);
+
+    window.open(url, "_blank");
+
+  } catch(error){
+
+    console.error(error);
+
+  }
+};
   return (
     <AdminLayout title="الأوصياء">
 
@@ -819,7 +955,441 @@ export default function AdminGuardiansPage() {
         {content}
 
       </div>
+          {selectedGuardian && (
 
+<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" dir="rtl">
+
+  <div className="
+    w-full
+    max-w-3xl
+    max-h-[90vh]
+    overflow-hidden
+    rounded-3xl
+    bg-white
+    shadow-2xl
+  ">
+
+
+    {/* Header */}
+
+    <div className="
+      flex
+      items-center
+      justify-between
+      border-b
+      px-6
+      py-5
+    ">
+
+
+      <div className="flex items-center gap-3">
+
+        <div className="
+          flex
+          h-14
+          w-14
+          items-center
+          justify-center
+          rounded-2xl
+          bg-[#E8F1FA]
+          text-[#003469]
+        ">
+          <FiUser size={28}/>
+        </div>
+
+
+        <div>
+
+          <h2 className="
+            text-xl
+            font-extrabold
+            text-[#003469]
+          ">
+            تفاصيل الوصي
+          </h2>
+
+          <p className="text-sm text-gray-400">
+            مراجعة بيانات ووثائق الوصي
+          </p>
+
+        </div>
+
+      </div>
+
+
+
+      <button
+        onClick={()=>setSelectedGuardian(null)}
+        className="
+          rounded-xl
+          bg-gray-100
+          p-2
+          text-gray-500
+          hover:bg-red-50
+          hover:text-red-600
+        "
+      >
+        <FiX size={22}/>
+      </button>
+
+
+    </div>
+
+
+
+
+
+    <div className="
+      max-h-[65vh]
+      overflow-y-auto
+      p-6
+    ">
+
+
+      {/* معلومات الوصي */}
+
+      <div className="
+        rounded-2xl
+        bg-[#F8FAFC]
+        p-5
+      ">
+
+
+        <div className="
+          grid
+          grid-cols-2
+          gap-4
+        ">
+
+
+          <InfoCard
+            icon={<FiUser/>}
+            title="الاسم"
+            value={selectedGuardian.fullName}
+          />
+
+
+          <InfoCard
+            icon={<FiMail/>}
+            title="البريد الإلكتروني"
+            value={selectedGuardian.email}
+          />
+
+
+          <InfoCard
+            icon={<FiPhone/>}
+            title="الهاتف"
+            value={selectedGuardian.phoneNumber}
+          />
+
+
+          <InfoCard
+            icon={<FiShield/>}
+            title="حالة الحساب"
+            value={localizeVerificationStatus(
+              selectedGuardian.verificationStatus
+            )}
+          />
+
+
+        </div>
+
+      </div>
+
+
+
+
+
+
+      {/* الاحصائيات */}
+
+      <div className="
+        mt-5
+        grid
+        grid-cols-3
+        gap-4
+      ">
+
+
+        <StatCard
+          number={approvedDocs}
+          title="وثائق مقبولة"
+          color="green"
+          icon={<FiCheckCircle/>}
+        />
+
+
+        <StatCard
+          number={pendingDocs}
+          title="قيد المراجعة"
+          color="yellow"
+          icon={<FiClock/>}
+        />
+
+
+        <StatCard
+          number={rejectedDocs}
+          title="مرفوضة"
+          color="red"
+          icon={<FiXCircle/>}
+        />
+
+
+      </div>
+
+
+
+
+
+
+
+      {/* الوثائق */}
+
+      <div className="mt-6">
+
+
+        <div className="
+          mb-4
+          flex
+          items-center
+          justify-between
+        ">
+
+
+          <h3 className="
+            text-lg
+            font-extrabold
+            text-[#003469]
+          ">
+            الوثائق المرفوعة
+          </h3>
+
+
+          <span className="
+            rounded-full
+            bg-[#E8F1FA]
+            px-4
+            py-1
+            text-xs
+            font-bold
+            text-[#003469]
+          ">
+            {guardianDocuments.length} وثائق
+          </span>
+
+
+        </div>
+
+
+
+
+        <div className="space-y-3">
+
+
+        {guardianDocuments.map((doc)=>(
+
+
+          <div
+            key={doc.id}
+            className="
+              flex
+              items-center
+              justify-between
+              rounded-2xl
+              border
+              border-gray-100
+              bg-white
+              p-4
+              shadow-sm
+            "
+          >
+
+
+            <div className="flex items-center gap-3">
+
+
+              <div className="
+                flex
+                h-11
+                w-11
+                items-center
+                justify-center
+                rounded-xl
+                bg-[#E8F1FA]
+                text-[#003469]
+              ">
+                <FiFileText/>
+              </div>
+
+
+
+              <div>
+
+                <p className="font-extrabold">
+                  {localizeDocumentType(doc.documentType)}
+                </p>
+
+
+                <p className="
+                  text-xs
+                  text-gray-500
+                ">
+                  {localizeDocumentStatus(doc.status)}
+                </p>
+
+              </div>
+
+
+            </div>
+
+
+
+
+            <button
+              onClick={()=>openDocument(doc.id)}
+              className="
+                flex
+                items-center
+                gap-2
+                rounded-xl
+                bg-[#003469]
+                px-4
+                py-2
+                text-xs
+                font-bold
+                text-white
+              "
+            >
+              <FiEye/>
+              عرض
+            </button>
+
+
+          </div>
+
+
+        ))}
+
+
+        </div>
+
+
+      </div>
+
+
+    </div>
+
+
+
+
+
+
+    {/* Footer */}
+
+    <div className="
+      flex
+      gap-3
+      border-t
+      p-5
+    ">
+
+
+      <button
+        className="
+          flex-1
+          rounded-xl
+          bg-green-600
+          py-3
+          font-extrabold
+          text-white
+        "
+      >
+        <FiCheckCircle className="inline ml-2"/>
+        اعتماد الحساب
+      </button>
+
+
+
+      <button
+        className="
+          flex-1
+          rounded-xl
+          bg-red-600
+          py-3
+          font-extrabold
+          text-white
+        "
+      >
+        <FiTrash2 className="inline ml-2"/>
+        رفض الحساب
+      </button>
+
+
+    </div>
+
+
+  </div>
+
+</div>
+
+)}
     </AdminLayout>
+    
   );
+  function InfoCard({ icon, title, value }) {
+  return (
+    <div className="rounded-xl bg-white p-4 shadow-sm border border-gray-100">
+
+      <div className="flex items-center gap-2 text-xs text-gray-400">
+        {icon}
+        <span>{title}</span>
+      </div>
+
+      <p className="mt-2 font-bold text-gray-800 truncate">
+        {value || "-"}
+      </p>
+
+    </div>
+  );
+}
+
+
+
+function StatCard({ number, title, color, icon }) {
+
+  const colors = {
+    green: "bg-green-50 text-green-700",
+    yellow: "bg-yellow-50 text-yellow-700",
+    red: "bg-red-50 text-red-700",
+  };
+
+
+  return (
+    <div
+      className={`
+        rounded-2xl
+        p-4
+        text-center
+        ${colors[color]}
+      `}
+    >
+
+      <div className="mb-2 flex justify-center text-xl">
+        {icon}
+      </div>
+
+
+      <p className="text-3xl font-extrabold">
+        {number}
+      </p>
+
+
+      <p className="mt-1 text-xs font-bold">
+        {title}
+      </p>
+
+
+    </div>
+  );
+}
 }
