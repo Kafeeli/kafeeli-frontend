@@ -1245,7 +1245,7 @@ const localizeDocumentStatus = (status) => {
 
 
 
-            <button
+            {/* <button
               onClick={()=>openDocument(doc.id)}
               className="
                 flex
@@ -1262,7 +1262,7 @@ const localizeDocumentStatus = (status) => {
             >
               <FiEye/>
               عرض
-            </button>
+            </button> */}
 
 
           </div>
