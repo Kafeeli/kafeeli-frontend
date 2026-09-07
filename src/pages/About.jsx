@@ -5,12 +5,9 @@ import {
   FaHeart,
   FaShieldAlt,
   FaCheckCircle,
-  FaArrowLeft,
   FaUsers,
   FaChartLine,
   FaLock,
-  FaHandshake,
-  FaEnvelope,
   FaLinkedin,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
@@ -20,26 +17,6 @@ import Footer from "./Footer";
 import aboutHeroImg from "../assets/smileChildern.jpg";
 
 export default function About() {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 25, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: "spring", stiffness: 100, damping: 15 },
-    },
-  };
-
   const values = [
     {
       icon: <FaShieldAlt className="w-6 h-6 text-[#0D4B8E]" />,

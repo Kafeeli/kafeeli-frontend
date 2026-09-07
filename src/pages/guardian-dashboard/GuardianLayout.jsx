@@ -1,6 +1,6 @@
 // src/components/GuardianLayout.jsx
 import { Outlet } from "react-router-dom";
-import Sidebar from "../pages/guardian-dashboard/Sidebar";
+import Sidebar from "./Sidebar";
 import { useState } from "react";
 import { motion } from "framer-motion"; // استيراد motion
 import AuthenticatedHeader from "../../components/layout/AuthenticatedHeader";

@@ -145,9 +145,13 @@ export const adminApi = {
 
   // ============ مراجعة وثائق الأوصياء ============
 
-  // GET /api/v1/admin/guardian-documents/pending
-  getPendingDocuments: async () => {
-    const response = await api.get("/api/v1/admin/guardian-documents/pending");
+  getAllGuardianDocuments: async (filters = {}) => {
+    const params = Object.fromEntries(
+      Object.entries(filters)
+        .map(([key, value]) => [key, typeof value === "string" ? value.trim() : value])
+        .filter(([, value]) => value !== "" && value !== "all" && value != null),
+    );
+    const response = await api.get("/api/v1/admin/guardian-documents", { params });
     return response.data;
   },
 
@@ -176,6 +180,15 @@ export const adminApi = {
     );
     return response.data;
   },
+
+  updateGuardianDocumentStatus: async (documentId, status, reason = "") => {
+    const trimmedReason = typeof reason === "string" ? reason.trim() : "";
+    const response = await api.patch(
+      `/api/v1/admin/guardian-documents/${documentId}/status`,
+      { status, ...(trimmedReason ? { reason: trimmedReason } : {}) },
+    );
+    return response.data;
+  },
   // ============ توثيق الوصي (الحساب ككل) ============
 
   // GET /api/v1/admin/guardians/{guardianId}/verification
@@ -191,8 +204,54 @@ export const adminApi = {
     return response.data;
   },
 
+  getGuardianDetails: async (guardianId) => {
+    const response = await api.get(`/api/v1/admin/guardians/${guardianId}`);
+    return response.data;
+  },
+
+  updateGuardian: async (guardianId, payload) => {
+    const response = await api.patch(`/api/v1/admin/guardians/${guardianId}`, payload);
+    return response.data;
+  },
+
+  updateGuardianStatus: async (guardianId, isActive, reason = null) => {
+    const response = await api.patch(`/api/v1/admin/guardians/${guardianId}/status`, {
+      isActive,
+      reason: reason?.trim() || null,
+    });
+    return response.data;
+  },
+
+  deleteGuardian: async (guardianId) => {
+    const response = await api.delete(`/api/v1/admin/guardians/${guardianId}`);
+    return response.data;
+  },
+
   getAllSponsors: async () => {
     const response = await api.get("/api/v1/admin/sponsors");
+    return response.data;
+  },
+
+  getSponsorDetails: async (sponsorId) => {
+    const response = await api.get(`/api/v1/admin/sponsors/${sponsorId}`);
+    return response.data;
+  },
+
+  updateSponsor: async (sponsorId, payload) => {
+    const response = await api.patch(`/api/v1/admin/sponsors/${sponsorId}`, payload);
+    return response.data;
+  },
+
+  updateSponsorStatus: async (sponsorId, isActive, reason = null) => {
+    const response = await api.patch(`/api/v1/admin/sponsors/${sponsorId}/status`, {
+      isActive,
+      reason: reason?.trim() || null,
+    });
+    return response.data;
+  },
+
+  deleteSponsor: async (sponsorId) => {
+    const response = await api.delete(`/api/v1/admin/sponsors/${sponsorId}`);
     return response.data;
   },
 
@@ -233,6 +292,22 @@ export const adminApi = {
     const response = await api.get(`/api/v1/admin/orphans/${orphanId}`);
     return response.data;
   },
+  updateOrphan: async (orphanId, payload) => {
+    const response = await api.patch(`/api/v1/admin/orphans/${orphanId}`, payload);
+    return response.data;
+  },
+  updateOrphanStatus: async (orphanId, status, reason = null) => {
+    const statusValues = { Active: 2, Hidden: 3, Suspended: 4 };
+    const response = await api.patch(`/api/v1/admin/orphans/${orphanId}/status`, {
+      status: statusValues[status],
+      reason: reason?.trim() || null,
+    });
+    return response.data;
+  },
+  deleteOrphan: async (orphanId) => {
+    const response = await api.delete(`/api/v1/admin/orphans/${orphanId}`);
+    return response.data;
+  },
   approveOrphan: async (orphanId) => {
     const response = await api.post(`/api/v1/admin/orphans/${orphanId}/approve`);
     return response.data;
@@ -241,16 +316,25 @@ export const adminApi = {
     const response = await api.post(`/api/v1/admin/orphans/${orphanId}/needs-update`, { reason });
     return response.data;
   },
-  getPendingOrphanDocuments: async () => {
-    const response = await api.get("/api/v1/admin/orphan-documents/pending");
-    return response.data;
-  },
-  approveOrphanDocument: async (documentId) => {
-    const response = await api.post(`/api/v1/admin/orphan-documents/${documentId}/approve`);
+  getAllOrphanDocuments: async (filters = {}) => {
+    const params = Object.fromEntries(
+      Object.entries(filters)
+        .map(([key, value]) => [key, typeof value === "string" ? value.trim() : value])
+        .filter(([, value]) => value !== "" && value !== "all" && value != null),
+    );
+    const response = await api.get("/api/v1/admin/orphan-documents", { params });
     return response.data;
   },
   requestOrphanDocumentUpdate: async (documentId, reason) => {
     const response = await api.post(`/api/v1/admin/orphan-documents/${documentId}/needs-update`, { reason });
+    return response.data;
+  },
+  updateOrphanDocumentStatus: async (documentId, status, reason = "") => {
+    const trimmedReason = typeof reason === "string" ? reason.trim() : "";
+    const response = await api.patch(
+      `/api/v1/admin/orphan-documents/${documentId}/status`,
+      { status, ...(trimmedReason ? { reason: trimmedReason } : {}) },
+    );
     return response.data;
   },
   getOrphanDocumentFile: async (documentId) => {

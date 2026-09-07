@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   MdAccountBalance,
   MdCloudUpload,
@@ -21,17 +21,7 @@ const MAX_PAYMENT_PROOF_SIZE = 5 * 1024 * 1024;
 const PAYMENT_PROOF_ACCEPT =
   ".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf";
 const ALLOWED_PAYMENT_PROOF_EXTENSIONS = ["jpg", "jpeg", "png", "pdf"];
-const ALLOWED_PAYMENT_PROOF_MIME_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "application/pdf",
-];
-const FIXED_BANK_NAME_AR = "بنك فلسطين";
-const FIXED_BANK_NAME_EN = "Bank of Palestine";
-const FIXED_TRANSFER_NUMBER = "0593205914";
-const FIXED_ACCOUNT_HOLDER = "Kafeeli Test Account";
-const FIXED_IBAN = "PS00KAFEELI000000000000000000";
-const FIXED_CURRENCY = "ILS";
+const ALLOWED_PAYMENT_PROOF_MIME_TYPES = ["image/jpeg", "image/png", "application/pdf"];
 
 function validatePaymentProof(file) {
   if (!file) return "يرجى اختيار ملف إثبات الدفع.";
@@ -43,7 +33,7 @@ function validatePaymentProof(file) {
     file.type,
   );
 
-  if (!hasAllowedExtension && !hasAllowedMimeType) {
+  if (!hasAllowedExtension || (file.type && !hasAllowedMimeType)) {
     return "صيغة الملف غير مدعومة. الصيغ المقبولة: JPG وJPEG وPNG وPDF.";
   }
 
@@ -84,12 +74,15 @@ export default function SponsorSponsorshipDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [notFound, setNotFound] = useState(false);
+  const [bankAccounts, setBankAccounts] = useState([]);
+  const [selectedBankAccountId, setSelectedBankAccountId] = useState("");
   const [transferReference, setTransferReference] = useState("");
   const [paymentProof, setPaymentProof] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [uploadSuccess, setUploadSuccess] = useState("");
   const [paymentProofInputKey, setPaymentProofInputKey] = useState(0);
+  const uploadRequestRef = useRef(false);
 
   const loadSponsorship = useCallback(async () => {
     setLoading(true);
@@ -98,8 +91,26 @@ export default function SponsorSponsorshipDetailsPage() {
     try {
       const result = await sponsorshipApi.getById(sponsorshipId);
       const data = getResultData(result, "تعذر تحميل تفاصيل الكفالة.");
-      if (!data) setNotFound(true);
-      else setSponsorship(data);
+      if (!data) {
+        setNotFound(true);
+        return;
+      }
+
+      setSponsorship(data);
+      if (data.paymentRequired && data.canUploadPayment) {
+        const accountsResult = await sponsorshipApi.getPlatformBankAccounts();
+        const accounts = getResultData(accountsResult, "تعذر تحميل حسابات التحويل البنكي.");
+        const activeAccounts = Array.isArray(accounts) ? accounts : [];
+        setBankAccounts(activeAccounts);
+        setSelectedBankAccountId((currentId) => (
+          activeAccounts.some((account) => account.platformBankAccountId === currentId)
+            ? currentId
+            : activeAccounts[0]?.platformBankAccountId || ""
+        ));
+      } else {
+        setBankAccounts([]);
+        setSelectedBankAccountId("");
+      }
     } catch (requestError) {
       if (requestError?.response?.status === 404) setNotFound(true);
       else
@@ -124,7 +135,15 @@ export default function SponsorSponsorshipDetailsPage() {
   };
 
   const handlePaymentProofUpload = async () => {
-    if (transferReference.length > 200) {
+    if (uploadRequestRef.current) return;
+
+    if (!selectedBankAccountId) {
+      setUploadError("يرجى اختيار حساب التحويل البنكي.");
+      return;
+    }
+
+    const trimmedTransferReference = transferReference.trim();
+    if (trimmedTransferReference.length > 200) {
       setUploadError("يجب ألا يتجاوز مرجع التحويل 200 حرف.");
       return;
     }
@@ -135,13 +154,15 @@ export default function SponsorSponsorshipDetailsPage() {
       return;
     }
 
+    uploadRequestRef.current = true;
     setUploading(true);
     setUploadError("");
     setUploadSuccess("");
 
     try {
       const result = await sponsorshipApi.uploadPaymentProof(sponsorshipId, {
-        transferReference,
+        platformBankAccountId: selectedBankAccountId,
+        transferReference: trimmedTransferReference,
         paymentProof,
       });
       getResultData(result, "تعذر رفع إثبات الدفع.");
@@ -153,9 +174,14 @@ export default function SponsorSponsorshipDetailsPage() {
     } catch (requestError) {
       setUploadError(getPaymentProofErrorMessage(requestError));
     } finally {
+      uploadRequestRef.current = false;
       setUploading(false);
     }
   };
+
+  const selectedBankAccount = bankAccounts.find(
+    (account) => account.platformBankAccountId === selectedBankAccountId,
+  );
 
   let content;
   if (loading) content = <LoadingState count={2} columns="md:grid-cols-2" />;
@@ -264,75 +290,51 @@ export default function SponsorSponsorshipDetailsPage() {
                   رفع إثبات الدفع
                 </h3>
               </div>
-              <p className="mt-3 text-sm leading-6 text-gray-700">
-                يرجى تحويل مبلغ الكفالة إلى حساب منصة كفيلي الموضح أدناه، ثم رفع
-                صورة إثبات التحويل لإكمال عملية الدفع.
-              </p>
+              <p className="mt-3 text-sm leading-6 text-gray-700">يرجى تحويل مبلغ الكفالة إلى حساب منصة كفيلي الموضح أدناه، ثم رفع صورة إثبات التحويل لإكمال عملية الدفع.</p>
+              {bankAccounts.length > 1 && (
+                <label htmlFor="platform-bank-account" className="mt-4 block text-sm font-bold text-gray-700">
+                  حساب التحويل البنكي
+                  <select
+                    id="platform-bank-account"
+                    value={selectedBankAccountId}
+                    onChange={(event) => {
+                      setSelectedBankAccountId(event.target.value);
+                      setUploadError("");
+                    }}
+                    disabled={uploading}
+                    className="mt-2 h-11 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm outline-none focus:border-[#0D4B8E] disabled:bg-gray-100"
+                  >
+                    {bankAccounts.map((account) => (
+                      <option key={account.platformBankAccountId} value={account.platformBankAccountId}>
+                        {account.bankName} — {account.currency}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
+              {bankAccounts.length === 0 && (
+                <p role="alert" className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-700">
+                  لا يوجد حساب تحويل بنكي نشط متاح حاليًا. يرجى المحاولة لاحقًا.
+                </p>
+              )}
+              {selectedBankAccount && (
               <div className="mt-4 rounded-xl border border-[#B8CCE0] bg-white p-4">
                 <div className="flex items-center gap-2 font-extrabold text-[#003469]">
                   <MdAccountBalance className="text-xl" />
                   معلومات التحويل
                 </div>
                 <dl className="mt-3 grid gap-3 text-sm">
-                  <div>
-                    <dt className="text-gray-500">البنك</dt>
-                    <dd className="mt-1 font-extrabold">
-                      {FIXED_BANK_NAME_AR}{" "}
-                      <span
-                        dir="ltr"
-                        className="text-xs font-semibold text-gray-500"
-                      >
-                        ({FIXED_BANK_NAME_EN})
-                      </span>
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-gray-500">اسم صاحب الحساب</dt>
-                    <dd dir="ltr" className="mt-1 text-right font-extrabold">
-                      {FIXED_ACCOUNT_HOLDER}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-gray-500">رقم التحويل</dt>
-                    <dd
-                      dir="ltr"
-                      className="mt-1 text-right font-mono text-lg font-extrabold text-[#0D4B8E]"
-                    >
-                      {FIXED_TRANSFER_NUMBER}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-gray-500">IBAN</dt>
-                    <dd
-                      dir="ltr"
-                      className="mt-1 break-all text-right font-mono font-extrabold"
-                    >
-                      {FIXED_IBAN}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-gray-500">العملة</dt>
-                    <dd dir="ltr" className="mt-1 text-right font-extrabold">
-                      {FIXED_CURRENCY}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt className="text-gray-500">مبلغ الكفالة</dt>
-                    <dd className="mt-1 font-extrabold text-[#D9A441]">
-                      {formatAmount(sponsorship.totalAmount)}
-                    </dd>
-                  </div>
+                  <div><dt className="text-gray-500">البنك</dt><dd className="mt-1 font-extrabold">{selectedBankAccount.bankName || "—"}</dd></div>
+                  <div><dt className="text-gray-500">اسم صاحب الحساب</dt><dd className="mt-1 font-extrabold">{selectedBankAccount.accountHolderName || "—"}</dd></div>
+                  <div><dt className="text-gray-500">رقم الحساب</dt><dd dir="ltr" className="mt-1 text-right font-mono text-lg font-extrabold text-[#0D4B8E]">{selectedBankAccount.accountNumber || "—"}</dd></div>
+                  <div><dt className="text-gray-500">IBAN</dt><dd dir="ltr" className="mt-1 break-all text-right font-mono font-extrabold">{selectedBankAccount.iban || "—"}</dd></div>
+                  <div><dt className="text-gray-500">العملة</dt><dd dir="ltr" className="mt-1 text-right font-extrabold">{selectedBankAccount.currency || "—"}</dd></div>
+                  <div><dt className="text-gray-500">مبلغ الكفالة</dt><dd className="mt-1 font-extrabold text-[#D9A441]">{formatAmount(sponsorship.totalAmount)}</dd></div>
                 </dl>
               </div>
-              <p className="mt-3 text-xs leading-5 text-gray-600">
-                الصيغ المقبولة: JPG وJPEG وPNG وPDF، وبحجم أقصى 5 ميجابايت.
-              </p>
-              <label
-                htmlFor="transfer-reference"
-                className="mt-4 block text-sm font-bold text-gray-700"
-              >
-                مرجع التحويل (اختياري)
-              </label>
+              )}
+              <p className="mt-3 text-xs leading-5 text-gray-600">الصيغ المقبولة: JPG وJPEG وPNG وPDF، وبحجم أقصى 5 ميجابايت.</p>
+              <label htmlFor="transfer-reference" className="mt-4 block text-sm font-bold text-gray-700">مرجع التحويل (اختياري)</label>
               <input
                 id="transfer-reference"
                 type="text"
@@ -381,12 +383,7 @@ export default function SponsorSponsorshipDetailsPage() {
               <button
                 type="button"
                 onClick={handlePaymentProofUpload}
-                disabled={
-                  uploading ||
-                  !paymentProof ||
-                  transferReference.length > 200 ||
-                  Boolean(validatePaymentProof(paymentProof))
-                }
+                disabled={uploading || !selectedBankAccountId || !paymentProof || transferReference.length > 200 || Boolean(validatePaymentProof(paymentProof))}
                 className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[#0D4B8E] px-4 py-3 text-sm font-extrabold text-white transition hover:bg-[#003469] disabled:cursor-not-allowed disabled:bg-gray-400"
               >
                 <MdCloudUpload className="text-lg" />

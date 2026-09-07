@@ -1,5 +1,9 @@
 function arabicMessage(candidates, fallbackMessage) {
-  return candidates.flat().find((value) => typeof value === "string" && /[\u0600-\u06ff]/.test(value)) || fallbackMessage;
+  const messages = candidates
+    .flat()
+    .filter((value) => typeof value === "string" && value.trim())
+    .map((value) => value.trim());
+  return messages.find((value) => /[\u0600-\u06ff]/.test(value)) || messages[0] || fallbackMessage;
 }
 
 export function unwrapResult(result, fallbackMessage = "تعذر إكمال العملية.") {

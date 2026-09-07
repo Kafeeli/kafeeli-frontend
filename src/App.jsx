@@ -32,6 +32,7 @@ import GuardianOrphanDetailsPage from "./pages/guardian-dashboard/GuardianOrphan
 import GuardianOrphanFormPage from "./pages/guardian-dashboard/GuardianOrphanFormPage";
 import GuardianPayoutsPage from "./pages/guardian-dashboard/GuardianPayoutsPage";
 import AdminOrphansReviewPage from "./pages/admin-dashboard/AdminOrphansReviewPage";
+import AdminOrphanDocumentsPage from "./pages/admin-dashboard/AdminOrphanDocumentsPage";
 import AdminGuardiansPage from "./pages/admin-dashboard/AdminGuardiansPage";
 import AdminSponsorsPage from "./pages/admin-dashboard/AdminSponsorsPage";
 import AdminPaymentsReviewPage from "./pages/admin-dashboard/AdminPaymentsReviewPage";
@@ -155,12 +156,6 @@ function AnimatedRoutes() {
               <InvalidEmail />
             </PageWrapper>
           }
-        />
-
-        {/* دعم الراوت القديم بحرف E كبير */}
-        <Route
-          path="/invalid-Email"
-          element={<Navigate to="/invalid-email" replace />}
         />
 
         <Route
@@ -560,6 +555,16 @@ function AnimatedRoutes() {
           }
         />
         <Route
+          path="/admin-dashboard/orphan-document-reviews"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <AdminOrphanDocumentsPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/admin-dashboard/payments"
           element={
             <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
@@ -579,11 +584,8 @@ function AnimatedRoutes() {
             </ProtectedRoute>
           }
         />
-        <Route path="/admin-dashboard/orphans" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminOrphansReviewPage /></PageWrapper></ProtectedRoute>} />
         <Route path="/admin-dashboard/guardians" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminGuardiansPage /></PageWrapper></ProtectedRoute>} />
         <Route path="/admin-dashboard/sponsors" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminSponsorsPage /></PageWrapper></ProtectedRoute>} />
-        <Route path="/admin-dashboard/payments" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminPaymentsReviewPage /></PageWrapper></ProtectedRoute>} />
-        <Route path="/admin-dashboard/payouts" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminPayoutsPage /></PageWrapper></ProtectedRoute>} />
 
         <Route
           path="/error-404"

@@ -10,7 +10,6 @@ import {
   FaHandHoldingHeart, 
   FaFileAlt, 
   FaChevronDown, 
-  FaQuestionCircle,
   FaCheckCircle,
   FaLock,
   FaChartLine,
