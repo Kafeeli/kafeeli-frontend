@@ -13,6 +13,7 @@ import { formatArabicDateTime } from "../../utils/date";
 import { localizeStatus } from "../../utils/localization";
 
 import AdminLayout from "./Adminlayout";
+import AdminEntityAvatar from "./AdminEntityAvatar";
 import {
   AdminConfirmationDialog,
   AdminDetailItem,
@@ -42,6 +43,17 @@ const STATUS_TRANSITIONS = {
   Hidden: ["Active", "Suspended"],
   Suspended: ["Active", "Hidden"],
 };
+
+function orphanProfileImageEndpoint(orphan) {
+  const preferredEndpoint =
+    typeof orphan?.profileImageAccessEndpoint === "string"
+      ? orphan.profileImageAccessEndpoint.trim()
+      : "";
+
+  return preferredEndpoint.startsWith("/api/v1/admin/")
+    ? preferredEndpoint
+    : `/api/v1/admin/orphans/${orphan?.orphanId}/profile-image`;
+}
 
 function orphanStatusLabel(status) {
   return ORPHAN_STATUS_LABELS[status] || status || "—";
@@ -143,7 +155,6 @@ export default function AdminOrphansReviewPage() {
   const [documentReason, setDocumentReason] = useState("");
   const [statusReason, setStatusReason] = useState("");
   const [busy, setBusy] = useState("");
-  const [profileImage, setProfileImage] = useState({ orphanId: null, status: "idle", url: "", error: "" });
 
   const load = useCallback(async ({ silent = false } = {}) => {
     if (!silent) setLoading(true);
@@ -179,37 +190,12 @@ export default function AdminOrphansReviewPage() {
       window.clearTimeout(timeoutId);
   }, [load]);
 
-  useEffect(() => {
-    let active = true;
-    let objectUrl = "";
-
-    if (dialogMode !== "details" || !selected?.profileImageAccessEndpoint) {
-      return undefined;
-    }
-
-    adminApi.getOrphanProfileImage(selected.orphanId)
-      .then((blob) => {
-        objectUrl = URL.createObjectURL(blob);
-        if (active) setProfileImage({ orphanId: selected.orphanId, status: "loaded", url: objectUrl, error: "" });
-        else URL.revokeObjectURL(objectUrl);
-      })
-      .catch((requestError) => {
-        if (active) setProfileImage({ orphanId: selected.orphanId, status: "error", url: "", error: documentFileErrorMessage(requestError) });
-      });
-
-    return () => {
-      active = false;
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
-    };
-  }, [dialogMode, selected?.orphanId, selected?.profileImageAccessEndpoint]);
-
   const fetchDetails = useCallback(async (orphanId) => (
     unwrapResult(await adminApi.getOrphanDetails(orphanId), "تعذر تحميل تفاصيل اليتيم.")
   ), []);
 
   const showOrphan = async (orphanId, { forReview = false, mode = "details" } = {}) => {
     if (busy) return;
-    setProfileImage({ orphanId: null, status: "idle", url: "", error: "" });
     setBusy(`detail-${orphanId}`);
     setActionError("");
     setSuccessMessage("");
@@ -293,7 +279,6 @@ export default function AdminOrphansReviewPage() {
       setSelected(details);
       setEditForm(orphanForm(details));
       setSelectedForReview(details.orphanStatus === "PendingReview");
-      setProfileImage({ orphanId: null, status: "idle", url: "", error: "" });
       setDialogMode("details");
       setSuccessMessage("تم تحديث بيانات اليتيم بنجاح.");
     } catch (requestError) {
@@ -377,13 +362,11 @@ export default function AdminOrphansReviewPage() {
     setSelected(null);
     setDialogMode("");
     setSelectedForReview(false);
-    setProfileImage({ orphanId: null, status: "idle", url: "", error: "" });
 
     setActionError("");
   };
 
   const returnToDetails = () => {
-    setProfileImage({ orphanId: null, status: "idle", url: "", error: "" });
     setDialogMode("details");
   };
 
@@ -432,11 +415,11 @@ export default function AdminOrphansReviewPage() {
     else tabContent = (
       <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"><div className="overflow-x-auto"><table className="w-full min-w-[1200px] text-right text-xs">
         <thead className="bg-[#F5F7FA] text-[11px] text-[#374151]"><tr><th className="whitespace-nowrap px-3 py-3 font-extrabold">الاسم الكامل</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">رقم الهوية</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">العمر</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الجنس</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">العائلة</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الوصي</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الحالة</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">آخر تحديث</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الإجراءات</th></tr></thead>
-        <tbody className="divide-y divide-gray-100">{filteredOrphans.map((orphan) => <tr key={orphan.orphanId} className="hover:bg-gray-50/70"><td title={orphan.fullName || undefined} className="max-w-[170px] truncate px-3 py-3 font-bold text-[#003469]">{orphan.fullName || "—"}</td><td dir="ltr" className="whitespace-nowrap px-3 py-3 text-right text-[11px]">{orphan.nationalId || "—"}</td><td className="px-3 py-3">{orphan.age ?? "—"}</td><td className="px-3 py-3">{localizeStatus(orphan.gender)}</td><td title={orphan.familyHeadOfHouseholdName || undefined} className="max-w-[150px] truncate px-3 py-3">{orphan.familyHeadOfHouseholdName || "—"}</td><td title={orphan.guardianFullName || undefined} className="max-w-[150px] truncate px-3 py-3">{orphan.guardianFullName || "—"}</td><td className="whitespace-nowrap px-3 py-3"><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${orphanStatusClasses(orphan.orphanStatus)}`}>{orphanStatusLabel(orphan.orphanStatus)}</span></td><td className="whitespace-nowrap px-3 py-3 text-[11px] text-gray-600">{formatArabicDateTime(orphan.updatedAt)}</td><td className="px-3 py-3"><div className="flex items-center gap-1 whitespace-nowrap"><AdminTableIconButton label="عرض التفاصيل" tone="view" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId)}><FiEye aria-hidden="true" /></AdminTableIconButton><AdminTableIconButton label="تعديل" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId, { mode: "edit" })}><FiEdit2 aria-hidden="true" /></AdminTableIconButton>{(STATUS_TRANSITIONS[orphan.orphanStatus] || []).map((status) => <AdminTableIconButton key={status} label={statusActionLabel(status)} tone={status === "Active" ? "reactivate" : status === "Hidden" ? "hide" : "suspend"} disabled={Boolean(busy)} onClick={() => openStatusConfirmation(orphan, status)}><StatusActionIcon status={status} /></AdminTableIconButton>)}{orphan.orphanStatus === "PendingReview" && <AdminTableIconButton label="مراجعة واعتماد" tone="approve" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId, { forReview: true })}><FiCheckCircle aria-hidden="true" /></AdminTableIconButton>}<AdminTableIconButton label="حذف نهائي" tone="delete" disabled={Boolean(busy)} onClick={() => setConfirmation({ type: "delete", orphan })}><FiTrash2 aria-hidden="true" /></AdminTableIconButton></div></td></tr>)}</tbody>
+        <tbody className="divide-y divide-gray-100">{filteredOrphans.map((orphan) => <tr key={orphan.orphanId} className="hover:bg-gray-50/70"><td title={orphan.fullName || undefined} className="max-w-[190px] px-3 py-3 font-bold text-[#003469]"><div className="flex min-w-0 items-center gap-2"><AdminEntityAvatar name={orphan.fullName} hasImage={orphan.hasProfileImage} imageEndpoint={orphanProfileImageEndpoint(orphan)} alt={`صورة اليتيم ${orphan.fullName || ""}`.trim()} size="sm" /><span className="truncate">{orphan.fullName || "—"}</span></div></td><td dir="ltr" className="whitespace-nowrap px-3 py-3 text-right text-[11px]">{orphan.nationalId || "—"}</td><td className="px-3 py-3">{orphan.age ?? "—"}</td><td className="px-3 py-3">{localizeStatus(orphan.gender)}</td><td title={orphan.familyHeadOfHouseholdName || undefined} className="max-w-[150px] truncate px-3 py-3">{orphan.familyHeadOfHouseholdName || "—"}</td><td title={orphan.guardianFullName || undefined} className="max-w-[150px] truncate px-3 py-3">{orphan.guardianFullName || "—"}</td><td className="whitespace-nowrap px-3 py-3"><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${orphanStatusClasses(orphan.orphanStatus)}`}>{orphanStatusLabel(orphan.orphanStatus)}</span></td><td className="whitespace-nowrap px-3 py-3 text-[11px] text-gray-600">{formatArabicDateTime(orphan.updatedAt)}</td><td className="px-3 py-3"><div className="flex items-center gap-1 whitespace-nowrap"><AdminTableIconButton label="عرض التفاصيل" tone="view" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId)}><FiEye aria-hidden="true" /></AdminTableIconButton><AdminTableIconButton label="تعديل" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId, { mode: "edit" })}><FiEdit2 aria-hidden="true" /></AdminTableIconButton>{(STATUS_TRANSITIONS[orphan.orphanStatus] || []).map((status) => <AdminTableIconButton key={status} label={statusActionLabel(status)} tone={status === "Active" ? "reactivate" : status === "Hidden" ? "hide" : "suspend"} disabled={Boolean(busy)} onClick={() => openStatusConfirmation(orphan, status)}><StatusActionIcon status={status} /></AdminTableIconButton>)}{orphan.orphanStatus === "PendingReview" && <AdminTableIconButton label="مراجعة واعتماد" tone="approve" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId, { forReview: true })}><FiCheckCircle aria-hidden="true" /></AdminTableIconButton>}<AdminTableIconButton label="حذف نهائي" tone="delete" disabled={Boolean(busy)} onClick={() => setConfirmation({ type: "delete", orphan })}><FiTrash2 aria-hidden="true" /></AdminTableIconButton></div></td></tr>)}</tbody>
       </table></div></div>
     );
   } else {
-    tabContent = pendingOrphans.length ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{pendingOrphans.map((orphan) => <article key={orphan.orphanId} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"><div className="flex justify-between gap-3"><strong>{orphan.fullName || "—"}</strong><span className="text-xs font-bold text-[#0D4B8E]">{orphanStatusLabel(orphan.orphanStatus)}</span></div><p className="mt-2 text-sm text-gray-500">{orphan.familyHeadOfHouseholdName || "—"} · {orphan.guardianFullName || "—"}</p><button type="button" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId, { forReview: true })} className="mt-4 w-full rounded-lg bg-[#0D4B8E] px-4 py-2 text-sm font-bold text-white disabled:opacity-60">عرض ومراجعة</button></article>)}</div> : <EmptyState icon={MdChildCare} title="لا توجد حالات معلقة" description="لا توجد حالات أيتام بانتظار المراجعة." />;
+    tabContent = pendingOrphans.length ? <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{pendingOrphans.map((orphan) => <article key={orphan.orphanId} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"><div className="flex items-start justify-between gap-3"><div className="flex min-w-0 items-center gap-3"><AdminEntityAvatar name={orphan.fullName} hasImage={orphan.hasProfileImage} imageEndpoint={orphanProfileImageEndpoint(orphan)} alt={`صورة اليتيم ${orphan.fullName || ""}`.trim()} size="card" /><strong className="truncate">{orphan.fullName || "—"}</strong></div><span className="shrink-0 text-xs font-bold text-[#0D4B8E]">{orphanStatusLabel(orphan.orphanStatus)}</span></div><p className="mt-2 text-sm text-gray-500">{orphan.familyHeadOfHouseholdName || "—"} · {orphan.guardianFullName || "—"}</p><button type="button" disabled={Boolean(busy)} onClick={() => showOrphan(orphan.orphanId, { forReview: true })} className="mt-4 w-full rounded-lg bg-[#0D4B8E] px-4 py-2 text-sm font-bold text-white disabled:opacity-60">عرض ومراجعة</button></article>)}</div> : <EmptyState icon={MdChildCare} title="لا توجد حالات معلقة" description="لا توجد حالات أيتام بانتظار المراجعة." />;
   }
 
   return (
@@ -454,13 +437,8 @@ export default function AdminOrphansReviewPage() {
       <div className="space-y-5">
         {actionError && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}
         <AdminDetailsHero icon={MdChildCare} eyebrow={selectedForReview ? "ملف بانتظار المراجعة" : "ملف اليتيم"} title={selected.fullName} subtitle={selected.familyHeadOfHouseholdName ? `عائلة ${selected.familyHeadOfHouseholdName}` : "لا توجد بيانات للعائلة"} badges={[{ label: "الحالة", value: orphanStatusLabel(selected.orphanStatus) }, { label: "العمر", value: selected.age != null ? `${selected.age} سنة` : "—" }]}>
-          <div className="flex h-32 w-32 items-center justify-center overflow-hidden rounded-2xl border-4 border-white/25 bg-white/10 shadow-xl" aria-live="polite">
-            {selected.profileImageAccessEndpoint && profileImage.orphanId === selected.orphanId && profileImage.status === "loaded" && <img src={profileImage.url} alt={`صورة ${selected.fullName || "اليتيم"}`} className="h-full w-full object-cover" />}
-            {selected.profileImageAccessEndpoint && profileImage.orphanId !== selected.orphanId && <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/30 border-t-[#47DBE0]" aria-label="جارٍ تحميل صورة اليتيم" />}
-            {(!selected.profileImageAccessEndpoint || (profileImage.orphanId === selected.orphanId && profileImage.status === "error")) && <div className="px-3 text-center"><MdChildCare className="mx-auto text-4xl text-white/60" aria-hidden="true" /><span className="mt-1 block text-[11px] text-white/70">{selected.profileImageAccessEndpoint ? "تعذر تحميل الصورة" : "لا توجد صورة"}</span></div>}
-          </div>
+          <AdminEntityAvatar name={selected.fullName} hasImage={selected.hasProfileImage ?? Boolean(selected.profileImageAccessEndpoint)} imageEndpoint={orphanProfileImageEndpoint(selected)} alt={`صورة اليتيم ${selected.fullName || ""}`.trim()} size="hero" />
         </AdminDetailsHero>
-        {profileImage.orphanId === selected.orphanId && profileImage.error && <p role="alert" className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs font-bold text-amber-800">{profileImage.error}</p>}
         <div className="grid gap-5 lg:grid-cols-2">
           <AdminDetailsSection title="البيانات الشخصية والتعليمية" icon={FiUser}><dl className="grid gap-3 sm:grid-cols-2"><AdminDetailItem label="رقم الهوية" value={selected.nationalId} dir="ltr" /><AdminDetailItem label="تاريخ الميلاد" value={toDateInputValue(selected.dateOfBirth)} /><AdminDetailItem label="العمر" value={selected.age} /><AdminDetailItem label="الجنس" value={localizeStatus(selected.gender)} /><AdminDetailItem label="الحالة التعليمية" value={localizeStatus(selected.educationalStatus)} /><AdminDetailItem label="الوالد المتوفى" value={selected.deceasedParent} /><AdminDetailItem label="تاريخ الإنشاء" value={formatArabicDateTime(selected.createdAt)} /><AdminDetailItem label="تاريخ المراجعة" value={formatArabicDateTime(selected.reviewedAt)} /></dl></AdminDetailsSection>
           <AdminDetailsSection title="بيانات العائلة والوصي" icon={FiHome}><dl className="grid gap-3 sm:grid-cols-2"><AdminDetailItem label="رب الأسرة" value={selected.familyHeadOfHouseholdName} /><AdminDetailItem label="حالة العائلة" value={localizeStatus(selected.familyStatus)} /><AdminDetailItem label="مدينة العائلة" value={selected.familyCity} /><AdminDetailItem label="الوصي" value={selected.guardianFullName} /><AdminDetailItem label="بريد الوصي" value={selected.guardianEmail} wide /><AdminDetailItem label="معرّف العائلة" value={selected.familyId} dir="ltr" /><AdminDetailItem label="معرّف اليتيم" value={selected.orphanId} dir="ltr" /></dl></AdminDetailsSection>

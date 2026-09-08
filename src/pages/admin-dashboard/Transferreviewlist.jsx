@@ -18,6 +18,7 @@ import {
   MdRefresh,
 } from "react-icons/md";
 import AdminLayout from "./Adminlayout";
+import AdminEntityAvatar from "./AdminEntityAvatar";
 import TransferDetailsModal from "./modals/Transferdetailsmodal";
 import { adminApi } from "../../services/adminApi";
 
@@ -47,11 +48,6 @@ function formatDate(value) {
   });
 }
 
-function avatarUrlFor(name) {
-  const safeName = encodeURIComponent(name || "Guardian");
-  return `https://ui-avatars.com/api/?name=${safeName}&background=0D4B8E&color=fff`;
-}
-
 // تحويل عنصر القائمة (بقيم مقنّعة) إلى شكل موحّد يستخدمه العرض
 function mapListItem(raw) {
   return {
@@ -76,7 +72,8 @@ function mapListItem(raw) {
     rejectionReason: raw.rejectionReason,
     needsUpdateReason: raw.needsUpdateReason,
     reviewedAt: raw.reviewedAt,
-    avatar: avatarUrlFor(raw.guardianFullName),
+    guardianHasProfileImage: raw.guardianHasProfileImage,
+    guardianProfileImageUrl: `/api/v1/admin/guardians/${raw.guardianId}/profile-image`,
   };
 }
 
@@ -240,10 +237,12 @@ function ReviewRow({ item, onReview, reviewLoadingId }) {
       className={`flex flex-col gap-4 rounded-xl border border-[#E5E7EB] bg-white p-4 sm:p-5 lg:flex-row lg:items-center lg:justify-between ${cardShadow}`}
     >
       <div className="flex items-center gap-3 lg:w-[220px] lg:shrink-0">
-        <img
-          src={item.avatar}
-          alt={item.name}
-          className="h-11 w-11 shrink-0 rounded-full object-cover"
+        <AdminEntityAvatar
+          name={item.name}
+          hasImage={item.guardianHasProfileImage}
+          imageEndpoint={item.guardianProfileImageUrl}
+          alt={`صورة الوصي ${item.name || ""}`.trim()}
+          size="card"
         />
         <div className="text-right">
           <h4 className="text-sm font-bold text-[#111827]">{item.name}</h4>
