@@ -1,7 +1,23 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FiSearch } from "react-icons/fi";
+import {
+  FiCheckCircle,
+  FiClock,
+  FiEdit2,
+  FiEye,
+  FiFileText,
+  FiMapPin,
+  FiSearch,
+  FiTrash2,
+  FiUser,
+  FiXCircle,
+} from "react-icons/fi";
 import { HiOutlineIdentification } from "react-icons/hi2";
-import { MdDescription } from "react-icons/md";
+import {
+  MdDescription,
+  MdOutlineFamilyRestroom,
+  MdPauseCircleOutline,
+  MdPlayCircleOutline,
+} from "react-icons/md";
 import { Link } from "react-router-dom";
 
 import { adminApi } from "../../services/adminApi";
@@ -10,105 +26,146 @@ import { formatArabicDateTime } from "../../utils/date";
 import {
   localizeStatus,
   localizeVerificationStatus,
+  verificationStatusMeta,
 } from "../../utils/localization";
 
 import AdminLayout from "./Adminlayout";
-import AdminEntityAvatar from "./AdminEntityAvatar";
 import {
-  EmptyState,
-  ErrorState,
-  LoadingState,
-  MiniStatCard,
-} from "./Adminstates";
-import {
-  FiX,
-  FiUser,
-  FiMail,
-  FiPhone,
-  FiShield,
-  FiFileText,
-  FiCheckCircle,
-  FiClock,
-  FiXCircle,
-  FiTrash2
-} from "react-icons/fi";  
+  AdminConfirmationDialog,
+  AdminDetailItem,
+  AdminDetailsHero,
+  AdminDetailsSection,
+  AdminDetailStat,
+  AdminDialog,
+} from "./AdminManagementDialogs";
+import { EmptyState, ErrorState, LoadingState, MiniStatCard } from "./Adminstates";
+import AdminTableIconButton from "./AdminTableIconButton";
 
 const VERIFICATION_FILTERS = [
   { value: "all", label: "كل حالات التحقق" },
-  { value: "Pending", label: "قيد المراجعة" },
-  { value: "Approved", label: "موثق" },
-  { value: "Rejected", label: "مرفوض" },
-  { value: "NeedsUpdate", label: "يحتاج تحديث" },
-  { value: "Suspended", label: "معلق" },
+  ...["Pending", "Approved", "Rejected", "NeedsUpdate", "Suspended"].map((value) => ({
+    value,
+    label: verificationStatusMeta(value).label,
+  })),
 ];
+
+const ACCOUNT_FILTERS = [
+  { value: "all", label: "كل حالات الحساب" },
+  { value: "Active", label: "نشط" },
+  { value: "Suspended", label: "معلّق" },
+];
+
+function accountStatusLabel(status) {
+  return status === "Active" ? "نشط" : status === "Suspended" ? "معلّق" : status || "—";
+}
+
+function accountStatusClasses(status) {
+  return status === "Active" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700";
+}
+
+function VerificationStatusBadge({ status }) {
+  const { label, className } = verificationStatusMeta(status);
+
+  return (
+    <span className={`inline-flex rounded-full border px-2 py-1 text-[10px] font-bold ${className}`}>
+      {label}
+    </span>
+  );
+}
+
+function localizeDocumentType(type) {
+  switch (type) {
+    case "NationalId":
+      return "الهوية الشخصية";
+    case "CustodyDocument":
+      return "حجة الحضانة";
+    case "SelfieVideoWithId":
+      return "فيديو سيلفي مع الهوية";
+    case "GuardianshipProof":
+      return "إثبات الوصاية";
+    default:
+      return type || "وثيقة";
+  }
+}
+
+function localizeDocumentStatus(status) {
+  switch (status) {
+    case "Approved":
+      return "معتمدة";
+    case "Pending":
+      return "قيد المراجعة";
+    case "Rejected":
+      return "مرفوضة";
+    case "NeedsUpdate":
+      return "تحتاج تحديث";
+    default:
+      return status || "—";
+  }
+}
+
+function documentStatusBadgeStyle(status) {
+  switch (status) {
+    case "Approved":
+      return "bg-emerald-50 text-emerald-700 border-emerald-200";
+    case "Pending":
+      return "bg-amber-50 text-amber-700 border-amber-200";
+    case "Rejected":
+      return "bg-red-50 text-red-700 border-red-200";
+    case "NeedsUpdate":
+      return "bg-orange-50 text-orange-700 border-orange-200";
+    default:
+      return "bg-gray-50 text-gray-700 border-gray-200";
+  }
+}
+
+function toDateInputValue(value) {
+  return value ? String(value).slice(0, 10) : "";
+}
+
+function guardianForm(details) {
+  return {
+    firstName: details.firstName || "",
+    fatherName: details.fatherName || "",
+    grandfatherName: details.grandfatherName || "",
+    familyName: details.familyName || "",
+    phoneNumber: details.phoneNumber || "",
+    dateOfBirth: toDateInputValue(details.dateOfBirth),
+    gender: details.gender === "Female" ? "2" : "1",
+    address: details.address || "",
+    city: details.city || "",
+    country: details.country || "",
+    occupation: details.occupation || "",
+  };
+}
 
 export default function AdminGuardiansPage() {
   const [guardians, setGuardians] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [actionError, setActionError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [verificationFilter, setVerificationFilter] = useState("all");
-  const [selectedGuardian, setSelectedGuardian] = useState(null);
-const [guardianDocuments, setGuardianDocuments] = useState([]);
-const approvedDocs = guardianDocuments.filter(
-  (doc) => doc.status === "Approved"
-).length;
+  const [accountFilter, setAccountFilter] = useState("all");
+  const [selected, setSelected] = useState(null);
+  const [dialogMode, setDialogMode] = useState("");
+  const [editForm, setEditForm] = useState(null);
+  const [confirmation, setConfirmation] = useState(null);
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState("");
 
-const pendingDocs = guardianDocuments.filter(
-  (doc) => doc.status === "Pending"
-).length;
+  // الوثائق للمودال
+  const [guardianDocuments, setGuardianDocuments] = useState([]);
+  const [loadingDocs, setLoadingDocs] = useState(false);
+  const [docActionModal, setDocActionModal] = useState(null);
+  const [docReason, setDocReason] = useState("");
 
-const rejectedDocs = guardianDocuments.filter(
-  (doc) => doc.status === "Rejected"
-).length;
-const localizeDocumentType = (type) => {
-  switch (type) {
-    case "NationalId":
-      return "الهوية الشخصية";
-
-    case "CustodyDocument":
-      return "حجة الحضانة";
-
-    case "SelfieVideoWithId":
-      return "فيديو سيلفي مع الهوية";
-
-    case "GuardianshipProof":
-      return "إثبات الوصاية";
-
-    default:
-      return type;
-  }
-};
-const localizeDocumentStatus = (status) => {
-  switch (status) {
-    case "Approved":
-      return "معتمدة";
-
-    case "Pending":
-      return "قيد المراجعة";
-
-    case "Rejected":
-      return "مرفوضة";
-
-    case "NeedsUpdate":
-      return "تحتاج تحديث";
-
-    default:
-      return status;
-  }
-};
-
-
-  const load = useCallback(async () => {
-    setLoading(true);
+  const load = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) setLoading(true);
     setError("");
 
     try {
-      const data = unwrapResult(
-        await adminApi.getAllGuardians(),
-        "تعذر تحميل قائمة الأوصياء.",
-      );
-
+      const data = unwrapResult(await adminApi.getAllGuardians(), "تعذر تحميل قائمة الأوصياء.");
       setGuardians(Array.isArray(data) ? data : []);
     } catch (requestError) {
       setError(
@@ -118,41 +175,9 @@ const localizeDocumentStatus = (status) => {
         ),
       );
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, []);
- const openGuardianDetails = async (guardian) => {
-  setSelectedGuardian(guardian);
-
-  try {
-
-    const response =
-      await adminApi.getAllGuardianDocuments();
-
-    const docs =
-      response.data || response;
-
-
-    const myDocs = docs.filter(
-      (doc) =>
-        doc.guardianId === guardian.guardianId
-    );
-
-
-    setGuardianDocuments(myDocs);
-
-
-  } catch (error) {
-
-    console.error(
-      "Documents Error:",
-      error
-    );
-
-    setGuardianDocuments([]);
-
-  }
-};
 
   useEffect(() => {
     const timeoutId = window.setTimeout(load, 0);
@@ -160,82 +185,269 @@ const localizeDocumentStatus = (status) => {
     return () => window.clearTimeout(timeoutId);
   }, [load]);
 
+  const fetchDetails = useCallback(async (guardianId) => (
+    unwrapResult(await adminApi.getGuardianDetails(guardianId), "تعذر تحميل تفاصيل الوصي.")
+  ), []);
+
+  const fetchGuardianDocs = useCallback(async (guardianId) => {
+    setLoadingDocs(true);
+    try {
+      const response = await adminApi.getAllGuardianDocuments();
+      const docs = Array.isArray(response) ? response : (response?.data || []);
+      const myDocs = docs.filter(
+        (doc) => String(doc.guardianId || doc.guardian_id) === String(guardianId)
+      );
+      setGuardianDocuments(myDocs);
+    } catch (err) {
+      console.error("Error fetching guardian documents:", err);
+      setGuardianDocuments([]);
+    } finally {
+      setLoadingDocs(false);
+    }
+  }, []);
+
+  const openGuardian = async (guardianId, mode = "details") => {
+    if (busy) return;
+    setBusy(`details-${guardianId}`);
+    setActionError("");
+    setSuccessMessage("");
+    try {
+      const details = await fetchDetails(guardianId);
+      setSelected(details);
+      setEditForm(guardianForm(details));
+      setDialogMode(mode);
+      await fetchGuardianDocs(guardianId);
+    } catch (requestError) {
+      setActionError(apiErrorMessage(requestError, "تعذر تحميل تفاصيل الوصي."));
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const openDelete = async (guardianId) => {
+    if (busy) return;
+    setBusy(`delete-details-${guardianId}`);
+    setActionError("");
+    setSuccessMessage("");
+    try {
+      const details = await fetchDetails(guardianId);
+      setConfirmation({ type: "delete", guardian: details });
+      setReason("");
+    } catch (requestError) {
+      setActionError(apiErrorMessage(requestError, "تعذر التحقق من إمكانية حذف الوصي."));
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const refreshDetailsIfOpen = async (guardianId) => {
+    if (selected?.guardianId !== guardianId) return;
+    const details = await fetchDetails(guardianId);
+    setSelected(details);
+    setEditForm(guardianForm(details));
+  };
+
+  const submitEdit = async (event) => {
+    event.preventDefault();
+    if (busy || !selected || !editForm) return;
+    setBusy("edit");
+    setActionError("");
+    setSuccessMessage("");
+    try {
+      unwrapResult(await adminApi.updateGuardian(selected.guardianId, {
+        ...editForm,
+        gender: Number(editForm.gender),
+      }), "تعذر تحديث بيانات الوصي.");
+      await load({ silent: true });
+      const details = await fetchDetails(selected.guardianId);
+      setSelected(details);
+      setEditForm(guardianForm(details));
+      setDialogMode("details");
+      setSuccessMessage("تم تحديث بيانات الوصي بنجاح.");
+    } catch (requestError) {
+      setActionError(apiErrorMessage(requestError, "تعذر تحديث بيانات الوصي."));
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const confirmStatus = async () => {
+    if (busy || confirmation?.type !== "status") return;
+    const { guardian, isActive } = confirmation;
+    setBusy("status");
+    setActionError("");
+    setSuccessMessage("");
+    try {
+      unwrapResult(await adminApi.updateGuardianStatus(guardian.guardianId, isActive, reason), "تعذر تحديث حالة حساب الوصي.");
+      setConfirmation(null);
+      setReason("");
+      await load({ silent: true });
+      await refreshDetailsIfOpen(guardian.guardianId);
+      setSuccessMessage(isActive ? "تمت إعادة تفعيل حساب الوصي بنجاح." : "تم تعليق حساب الوصي بنجاح.");
+    } catch (requestError) {
+      setActionError(apiErrorMessage(requestError, "تعذر تحديث حالة حساب الوصي."));
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (busy || confirmation?.type !== "delete" || !confirmation.guardian.canDelete) return;
+    const guardianId = confirmation.guardian.guardianId;
+    setBusy("delete");
+    setActionError("");
+    setSuccessMessage("");
+    try {
+      unwrapResult(await adminApi.deleteGuardian(guardianId), "تعذر حذف حساب الوصي.");
+      setConfirmation(null);
+      if (selected?.guardianId === guardianId) {
+        setSelected(null);
+        setDialogMode("");
+      }
+      await load({ silent: true });
+      setSuccessMessage("تم حذف حساب الوصي نهائيًا بنجاح.");
+    } catch (requestError) {
+      setActionError(apiErrorMessage(requestError, "تعذر حذف حساب الوصي."));
+    } finally {
+      setBusy("");
+    }
+  };
+
+  // إجراءات التوثيق والوثائق
+  const handleViewDocument = async (doc) => {
+    const docId = doc.id || doc.documentId;
+    if (!docId) return;
+    setBusy(`doc-view-${docId}`);
+    setActionError("");
+    try {
+      const blob = await adminApi.getDocumentFile(docId);
+      const url = URL.createObjectURL(blob);
+      window.open(url, "_blank");
+    } catch (err) {
+      setActionError(apiErrorMessage(err, "تعذر فتح ملف الوثيقة."));
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const handleApproveDocument = async (doc) => {
+    const docId = doc.id || doc.documentId;
+    if (!docId) return;
+    setBusy(`doc-approve-${docId}`);
+    setActionError("");
+    setSuccessMessage("");
+    try {
+      unwrapResult(await adminApi.approveDocument(docId), "تعذر اعتماد الوثيقة.");
+      setSuccessMessage("تم اعتماد الوثيقة بنجاح.");
+      if (selected?.guardianId) {
+        await fetchGuardianDocs(selected.guardianId);
+        await refreshDetailsIfOpen(selected.guardianId);
+      }
+    } catch (err) {
+      setActionError(apiErrorMessage(err, "تعذر اعتماد الوثيقة."));
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const handleRequestDocumentUpdate = async () => {
+    if (!docActionModal?.doc) return;
+    const docId = docActionModal.doc.id || docActionModal.doc.documentId;
+    if (!docId) return;
+    setBusy(`doc-update-${docId}`);
+    setActionError("");
+    setSuccessMessage("");
+    try {
+      unwrapResult(
+        await adminApi.requestDocumentUpdate(docId, docReason),
+        "تعذر طلب تعديل الوثيقة."
+      );
+      setSuccessMessage("تم طلب تعديل الوثيقة بنجاح.");
+      setDocActionModal(null);
+      setDocReason("");
+      if (selected?.guardianId) {
+        await fetchGuardianDocs(selected.guardianId);
+        await refreshDetailsIfOpen(selected.guardianId);
+      }
+    } catch (err) {
+      setActionError(apiErrorMessage(err, "تعذر طلب تعديل الوثيقة."));
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const confirmGuardianApprove = async () => {
+    if (!selected) return;
+    setBusy("guardian-approve");
+    setActionError("");
+    setSuccessMessage("");
+    try {
+      unwrapResult(await adminApi.approveGuardian(selected.guardianId), "تعذر اعتماد توثيق الوصي.");
+      setSuccessMessage("تم اعتماد توثيق الوصي بنجاح.");
+      await load({ silent: true });
+      await refreshDetailsIfOpen(selected.guardianId);
+    } catch (err) {
+      setActionError(apiErrorMessage(err, "تعذر اعتماد توثيق الوصي."));
+    } finally {
+      setBusy("");
+    }
+  };
+
+  const confirmGuardianReject = async () => {
+    if (!selected || confirmation?.type !== "rejectGuardian") return;
+    setBusy("guardian-reject");
+    setActionError("");
+    setSuccessMessage("");
+    try {
+      unwrapResult(await adminApi.rejectGuardian(selected.guardianId, reason), "تعذر رفض توثيق الوصي.");
+      setConfirmation(null);
+      setReason("");
+      setSuccessMessage("تم رفض توثيق الوصي.");
+      await load({ silent: true });
+      await refreshDetailsIfOpen(selected.guardianId);
+    } catch (err) {
+      setActionError(apiErrorMessage(err, "تعذر رفض توثيق الوصي."));
+    } finally {
+      setBusy("");
+    }
+  };
+
   const filteredGuardians = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
 
     return guardians.filter((guardian) => {
-      const matchesStatus =
-        verificationFilter === "all" ||
-        guardian.verificationStatus === verificationFilter;
-
-      const matchesSearch =
-        !query ||
-        [
-          guardian.fullName,
-          guardian.email,
-          guardian.phoneNumber,
-          guardian.city,
-          guardian.country,
-          guardian.guardianId,
-        ].some((value) =>
-          String(value || "")
-            .toLowerCase()
-            .includes(query),
-        );
-
-      return matchesStatus && matchesSearch;
+      const matchesVerification = verificationFilter === "all" || guardian.verificationStatus === verificationFilter;
+      const matchesAccount = accountFilter === "all" || guardian.accountStatus === accountFilter;
+      const matchesSearch = !query || [guardian.fullName, guardian.email, guardian.phoneNumber]
+        .some((value) => String(value || "").toLowerCase().includes(query));
+      return matchesVerification && matchesAccount && matchesSearch;
     });
-  }, [guardians, searchTerm, verificationFilter]);
+  }, [accountFilter, guardians, searchTerm, verificationFilter]);
 
-  /*
-   * ---------------------------------------------------------
-   * Verification Badge Styles
-   * ---------------------------------------------------------
-   */
-
-  const getVerificationStyle = (status) => {
-    switch (status) {
-      case "Approved":
-        return "bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200";
-
-      case "Pending":
-        return "bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200";
-
-      case "Rejected":
-        return "bg-red-50 text-red-700 ring-1 ring-inset ring-red-200";
-
-      case "NeedsUpdate":
-        return "bg-orange-50 text-orange-700 ring-1 ring-inset ring-orange-200";
-
-      case "Suspended":
-        return "bg-gray-100 text-gray-700 ring-1 ring-inset ring-gray-200";
-
-      default:
-        return "bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-200";
-    }
+  const showStatusConfirmation = (guardian, isActive) => {
+    setConfirmation({ type: "status", guardian, isActive });
+    setReason("");
+    setActionError("");
+    setSuccessMessage("");
   };
 
-  /*
-   * ---------------------------------------------------------
-   * Family Status Styles
-   * ---------------------------------------------------------
-   */
+  const approvedDocsCount = useMemo(() => (
+    guardianDocuments.filter((doc) => doc.status === "Approved").length
+  ), [guardianDocuments]);
 
-  const getFamilyStyle = (status) => {
-    switch (status) {
-      case "Active":
-        return "bg-emerald-50 text-emerald-700";
+  const pendingDocsCount = useMemo(() => (
+    guardianDocuments.filter((doc) => doc.status === "Pending").length
+  ), [guardianDocuments]);
 
-      case "Pending":
-        return "bg-amber-50 text-amber-700";
+  const rejectedDocsCount = useMemo(() => (
+    guardianDocuments.filter((doc) => doc.status === "Rejected" || doc.status === "NeedsUpdate").length
+  ), [guardianDocuments]);
 
-      case "Inactive":
-        return "bg-gray-100 text-gray-600";
-
-      default:
-        return "bg-gray-100 text-gray-600";
-    }
-  };
+  // شرط تفعيل زر اعتماد توثيق الوصي: أن يتوفر وثائق وأن تكون جميع الوثائق المرفوعة حائزة على حالة Approved
+  const canApproveGuardian = useMemo(() => (
+    guardianDocuments.length > 0 &&
+    guardianDocuments.every((doc) => doc.status === "Approved")
+  ), [guardianDocuments]);
 
   /*
    * ---------------------------------------------------------
@@ -244,1136 +456,261 @@ const localizeDocumentStatus = (status) => {
    */
 
   let content;
-
-  if (loading) {
-    content = <LoadingState />;
-  } else if (error) {
-    content = (
-      <ErrorState
-        onRetry={load}
-        description={error}
-      />
-    );
-  } else if (guardians.length === 0) {
-    content = (
-      <EmptyState
-        icon={HiOutlineIdentification}
-        title="لا يوجد أوصياء"
-        description="لم يُرجع الخادم أي حسابات أوصياء حتى الآن."
-      />
-    );
-  } else if (filteredGuardians.length === 0) {
-    content = (
-      <EmptyState
-        icon={FiSearch}
-        title="لا توجد نتائج مطابقة"
-        description="جرّب تعديل عبارة البحث أو حالة التحقق."
-      />
-    );
-  } else {
-    content = (
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-
-        {/* =====================================================
-            TABLE HEADER
-        ====================================================== */}
-
-        <div className="flex flex-col gap-3 border-b border-gray-100 bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-
-          <div>
-            <h2 className="text-base font-extrabold text-[#003469]">
-              قائمة الأوصياء
-            </h2>
-
-            <p className="mt-1 text-xs text-gray-500">
-              بيانات الحسابات وحالة التحقق والعائلة المرتبطة
-            </p>
-          </div>
-
-          <div className="inline-flex w-fit items-center rounded-full bg-[#E8F1FA] px-3 py-1.5 text-xs font-bold text-[#0D4B8E]">
-            {filteredGuardians.length} وصي
-          </div>
-
-        </div>
-
-        {/* =====================================================
-            DESKTOP TABLE
-        ====================================================== */}
-
-        <div className="hidden overflow-x-auto lg:block">
-
-          <table className="w-full min-w-[1150px] border-collapse text-right">
-
-            <thead>
-              <tr className="border-b border-gray-100 bg-[#F8FAFC]">
-
-                <th className="w-[190px] px-5 py-4 text-xs font-extrabold text-gray-500">
-                  الوصي
-                </th>
-
-                <th className="w-[235px] px-5 py-4 text-xs font-extrabold text-gray-500">
-                  البريد الإلكتروني
-                </th>
-
-                <th className="w-[155px] px-5 py-4 text-xs font-extrabold text-gray-500">
-                  رقم الهاتف
-                </th>
-
-                <th className="w-[115px] px-5 py-4 text-xs font-extrabold text-gray-500">
-                  المدينة
-                </th>
-
-                <th className="w-[115px] px-5 py-4 text-xs font-extrabold text-gray-500">
-                  الدولة
-                </th>
-
-                <th className="w-[150px] px-5 py-4 text-xs font-extrabold text-gray-500">
-                  حالة التحقق
-                </th>
-
-                <th className="w-[150px] px-5 py-4 text-xs font-extrabold text-gray-500">
-                  حالة العائلة
-                </th>
-
-                <th className="w-[170px] px-5 py-4 text-xs font-extrabold text-gray-500">
-                  تاريخ الانضمام
-                </th>
-                <th className="w-[120px] px-5 py-4 text-xs font-extrabold text-gray-500">
-                   الإجراءات
-                  </th>
-
-              </tr>
-            </thead>
-
-            <tbody className="divide-y divide-gray-100">
-
-              {filteredGuardians.map((guardian) => (
-
-                <tr
-                  key={guardian.guardianId}
-                  className="group transition-colors duration-150 hover:bg-[#F8FAFC]"
-                >
-
-                  {/* =================================================
-                      NAME
-                  ================================================== */}
-
-                  <td className="px-5 py-4">
-
-                    <div className="flex items-center gap-3">
-
-                      <AdminEntityAvatar
-                        name={guardian.fullName}
-                        hasImage={guardian.hasProfileImage}
-                        imageEndpoint={`/api/v1/admin/guardians/${guardian.guardianId}/profile-image`}
-                        alt={`صورة الوصي ${guardian.fullName || ""}`.trim()}
-                      />
-
-                      <div className="min-w-0">
-
-                        <p className="truncate font-extrabold text-[#003469]">
-                          {guardian.fullName || "—"}
-                        </p>
-
-                        <p className="mt-1 truncate text-[10px] text-gray-400">
-                          ID: {guardian.guardianId || "—"}
-                        </p>
-
-                      </div>
-
-                    </div>
-
-                  </td>
-
-                  {/* =================================================
-                      EMAIL
-                  ================================================== */}
-
-                  <td className="whitespace-nowrap px-5 py-4 text-sm text-gray-600">
-                    {guardian.email || "—"}
-                  </td>
-
-                  {/* =================================================
-                      PHONE
-                  ================================================== */}
-
-                  <td
-                    dir="ltr"
-                    className="whitespace-nowrap px-5 py-4 text-right text-sm text-gray-600"
+  if (loading) content = <LoadingState />;
+  else if (error) content = <ErrorState onRetry={load} description={error} />;
+  else if (guardians.length === 0) content = <EmptyState icon={HiOutlineIdentification} title="لا يوجد أوصياء" description="لم يُرجع الخادم أي حسابات أوصياء حتى الآن." />;
+  else if (filteredGuardians.length === 0) content = <EmptyState icon={FiSearch} title="لا توجد نتائج مطابقة" description="جرّب تعديل البحث أو عوامل التصفية." />;
+  else content = (
+    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+      <div className="overflow-x-auto"><table className="w-full min-w-[1080px] text-right text-xs">
+        <thead className="bg-[#F5F7FA] text-[11px] text-[#374151]"><tr><th className="whitespace-nowrap px-3 py-3 font-extrabold">الاسم</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">البريد الإلكتروني</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الهاتف</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الموقع</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">حالة التحقق</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">حالة الحساب</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">العائلة</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الإجراءات</th></tr></thead>
+        <tbody className="divide-y divide-gray-100">{filteredGuardians.map((guardian) => (
+          <tr key={guardian.guardianId} className="hover:bg-gray-50/70">
+            <td title={guardian.fullName || undefined} className="max-w-[170px] truncate px-3 py-3 font-bold text-[#003469]">{guardian.fullName || "—"}</td><td title={guardian.email || undefined} className="max-w-[210px] truncate px-3 py-3 text-[11px] text-gray-600">{guardian.email || "—"}</td><td dir="ltr" className="whitespace-nowrap px-3 py-3 text-right text-[11px] text-gray-600">{guardian.phoneNumber || "—"}</td><td title={[guardian.city, guardian.country].filter(Boolean).join("، ") || undefined} className="max-w-[140px] truncate px-3 py-3">{[guardian.city, guardian.country].filter(Boolean).join("، ") || "—"}</td><td className="whitespace-nowrap px-3 py-3"><VerificationStatusBadge status={guardian.verificationStatus} /></td><td className="whitespace-nowrap px-3 py-3"><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${accountStatusClasses(guardian.accountStatus)}`}>{accountStatusLabel(guardian.accountStatus)}</span></td><td className="max-w-[130px] truncate px-3 py-3">{guardian.hasFamily ? localizeStatus(guardian.familyStatus) : "لا توجد عائلة"}</td>
+            <td className="px-3 py-3">
+              <div className="flex items-center gap-1 whitespace-nowrap">
+                <AdminTableIconButton label="عرض التفاصيل" tone="view" disabled={Boolean(busy)} onClick={() => openGuardian(guardian.guardianId)}><FiEye aria-hidden="true" /></AdminTableIconButton>
+                <AdminTableIconButton label="تعديل" disabled={Boolean(busy)} onClick={() => openGuardian(guardian.guardianId, "edit")}><FiEdit2 aria-hidden="true" /></AdminTableIconButton>
+                {guardian.canSuspend && (
+                  <AdminTableIconButton
+                    label="تعليق الحساب"
+                    tone="suspend"
+                    disabled={Boolean(busy) || guardian.verificationStatus !== "Approved"}
+                    onClick={() => showStatusConfirmation(guardian, false)}
                   >
-                    {guardian.phoneNumber || "—"}
-                  </td>
-
-                  {/* =================================================
-                      CITY
-                  ================================================== */}
-
-                  <td className="whitespace-nowrap px-5 py-4 text-sm text-gray-600">
-                    {guardian.city || "—"}
-                  </td>
-
-                  {/* =================================================
-                      COUNTRY
-                  ================================================== */}
-
-                  <td className="whitespace-nowrap px-5 py-4 text-sm text-gray-600">
-                    {guardian.country || "—"}
-                  </td>
-
-                  {/* =================================================
-                      VERIFICATION
-                  ================================================== */}
-
-                  <td className="px-5 py-4">
-
-                    <span
-                      className={`
-                        inline-flex
-                        min-w-[110px]
-                        items-center
-                        justify-center
-                        whitespace-nowrap
-                        rounded-full
-                        px-3
-                        py-1.5
-                        text-xs
-                        font-bold
-                        ${getVerificationStyle(
-                          guardian.verificationStatus,
-                        )}
-                      `}
-                    >
-                      {localizeVerificationStatus(
-                        guardian.verificationStatus,
-                      )}
-                    </span>
-
-                  </td>
-
-                  {/* =================================================
-                      FAMILY
-                  ================================================== */}
-
-                  <td className="px-5 py-4">
-
-                    {guardian.hasFamily ? (
-
-                      <span
-                        className={`
-                          inline-flex
-                          items-center
-                          justify-center
-                          whitespace-nowrap
-                          rounded-full
-                          px-3
-                          py-1.5
-                          text-xs
-                          font-bold
-                          ${getFamilyStyle(
-                            guardian.familyStatus,
-                          )}
-                        `}
-                      >
-                        {localizeStatus(
-                          guardian.familyStatus,
-                        )}
-                      </span>
-
-                    ) : (
-
-                      <span className="whitespace-nowrap text-xs font-semibold text-gray-400">
-                        لا توجد عائلة
-                      </span>
-
-                    )}
-
-                  </td>
-
-                  {/* =================================================
-                      DATE
-                  ================================================== */}
-
-                  <td className="whitespace-nowrap px-5 py-4 text-sm text-gray-500">
-                    {formatArabicDateTime(
-                      guardian.joinedAt,
-                    )}
-                  </td>
-                      <td className="px-5 py-4">
-
-  <button
-    onClick={() => openGuardianDetails(guardian)}
-    className="
-      rounded-lg
-      bg-[#003469]
-      px-4
-      py-2
-      text-xs
-      font-bold
-      text-white
-      hover:bg-[#0D4B8E]
-    "
-  >
-    التفاصيل
-  </button>
-
-</td>
-                </tr>
-
-              ))}
-
-            </tbody>
-
-          </table>
-
-        </div>
-
-        {/* =====================================================
-            MOBILE CARDS
-        ====================================================== */}
-
-        <div className="divide-y divide-gray-100 lg:hidden">
-
-          {filteredGuardians.map((guardian) => (
-
-            <div
-              key={guardian.guardianId}
-              className="p-4 transition-colors hover:bg-gray-50"
-            >
-
-              {/* TOP */}
-
-              <div className="flex items-start justify-between gap-3">
-
-                <div className="flex min-w-0 items-center gap-3">
-
-                  <AdminEntityAvatar
-                    name={guardian.fullName}
-                    hasImage={guardian.hasProfileImage}
-                    imageEndpoint={`/api/v1/admin/guardians/${guardian.guardianId}/profile-image`}
-                    alt={`صورة الوصي ${guardian.fullName || ""}`.trim()}
-                    size="card"
-                  />
-
-                  <div className="min-w-0">
-
-                    <p className="truncate font-extrabold text-[#003469]">
-                      {guardian.fullName || "—"}
-                    </p>
-
-                    <p className="mt-1 truncate text-xs text-gray-500">
-                      {guardian.email || "—"}
-                    </p>
-
-                  </div>
-
-                </div>
-
-                <span
-                  className={`
-                    inline-flex
-                    shrink-0
-                    items-center
-                    justify-center
-                    whitespace-nowrap
-                    rounded-full
-                    px-3
-                    py-1.5
-                    text-[11px]
-                    font-bold
-                    ${getVerificationStyle(
-                      guardian.verificationStatus,
-                    )}
-                  `}
-                >
-                  {localizeVerificationStatus(
-                    guardian.verificationStatus,
-                  )}
-                </span>
-
+                    <MdPauseCircleOutline aria-hidden="true" />
+                  </AdminTableIconButton>
+                )}
+                {guardian.canReactivate && (
+                  <AdminTableIconButton label="إعادة تفعيل الحساب" tone="reactivate" disabled={Boolean(busy)} onClick={() => showStatusConfirmation(guardian, true)}><MdPlayCircleOutline aria-hidden="true" /></AdminTableIconButton>
+                )}
+                <AdminTableIconButton label="حذف نهائي" tone="delete" disabled={Boolean(busy)} onClick={() => openDelete(guardian.guardianId)}><FiTrash2 aria-hidden="true" /></AdminTableIconButton>
               </div>
-
-              {/* INFORMATION */}
-
-              <div className="mt-4 grid grid-cols-2 gap-3 rounded-xl bg-gray-50 p-3">
-
-                <div>
-                  <p className="text-[11px] text-gray-400">
-                    رقم الهاتف
-                  </p>
-
-                  <p
-                    dir="ltr"
-                    className="mt-1 text-right text-xs font-semibold text-gray-700"
-                  >
-                    {guardian.phoneNumber || "—"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[11px] text-gray-400">
-                    المدينة
-                  </p>
-
-                  <p className="mt-1 text-xs font-semibold text-gray-700">
-                    {guardian.city || "—"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[11px] text-gray-400">
-                    الدولة
-                  </p>
-
-                  <p className="mt-1 text-xs font-semibold text-gray-700">
-                    {guardian.country || "—"}
-                  </p>
-                </div>
-
-                <div>
-                  <p className="text-[11px] text-gray-400">
-                    حالة العائلة
-                  </p>
-
-                  {guardian.hasFamily ? (
-
-                    <span
-                      className={`
-                        mt-1
-                        inline-flex
-                        whitespace-nowrap
-                        rounded-full
-                        px-2.5
-                        py-1
-                        text-[10px]
-                        font-bold
-                        ${getFamilyStyle(
-                          guardian.familyStatus,
-                        )}
-                      `}
-                    >
-                      {localizeStatus(
-                        guardian.familyStatus,
-                      )}
-                    </span>
-
-                  ) : (
-
-                    <p className="mt-1 text-xs font-semibold text-gray-400">
-                      لا توجد عائلة
-                    </p>
-
-                  )}
-
-                </div>
-
-              </div>
-
-              {/* DATE */}
-
-              <div className="mt-3 flex items-center justify-between text-[11px]">
-
-                <span className="text-gray-400">
-                  تاريخ الانضمام
-                </span>
-
-                <span className="font-semibold text-gray-600">
-                  {formatArabicDateTime(
-                    guardian.joinedAt,
-                  )}
-                </span>
-
-              </div>
-
-            </div>
-
-          ))}
-
-        </div>
-
-      </div>
-    );
-  }
+            </td>
+          </tr>
+        ))}</tbody>
+      </table></div>
+    </div>
+  );
 
   /*
    * ---------------------------------------------------------
    * PAGE
    * ---------------------------------------------------------
    */
+
   return (
-    <AdminLayout title="الأوصياء">
+    <AdminLayout title="الأوصياء"><div className="mx-auto w-full max-w-7xl">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-4"><div><h1 className="text-2xl font-extrabold text-[#003469]">إدارة الأوصياء</h1><p className="mt-1 text-sm text-gray-500">عرض بيانات الأوصياء وتعديلها وإدارة حالة الحساب بأمان.</p></div><Link to="/admin-dashboard/guardian-document-reviews" className="inline-flex items-center gap-2 rounded-lg bg-[#0D4B8E] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#003469]"><MdDescription />وثائق الأوصياء</Link></div>
+      <div className="mb-5 max-w-sm"><MiniStatCard label="إجمالي الأوصياء" value={guardians.length} icon={HiOutlineIdentification} tone="bg-[#E8F1FA] text-[#0D4B8E]" /></div>
+      <div className="mb-6 grid gap-3 rounded-xl border border-gray-200 bg-white p-4 lg:grid-cols-[1fr_220px_220px]"><label className="relative"><span className="sr-only">البحث في الأوصياء</span><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="ابحث بالاسم أو البريد أو الهاتف" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none focus:border-[#0D4B8E]" /></label><select value={verificationFilter} onChange={(event) => setVerificationFilter(event.target.value)} aria-label="تصفية حسب حالة التحقق" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{VERIFICATION_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select><select value={accountFilter} onChange={(event) => setAccountFilter(event.target.value)} aria-label="تصفية حسب حالة الحساب" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ACCOUNT_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select></div>
+      {actionError && <p role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}
+      {successMessage && <p role="status" className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700">{successMessage}</p>}
+      <p className="mb-3 text-sm font-bold text-gray-600">النتائج: {filteredGuardians.length}</p>{content}
+    </div>
 
-      <div className="mx-auto w-full max-w-7xl">
-
-        {/* =====================================================
-            PAGE HEADER
-        ====================================================== */}
-
-        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-
-          <div>
-
-            <div className="flex items-center gap-3">
-
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#E8F1FA] text-[#0D4B8E]">
-                <HiOutlineIdentification size={23} />
-              </div>
-
-              <div>
-
-                <h1 className="text-2xl font-extrabold text-[#003469]">
-                  الأوصياء
-                </h1>
-
-                <p className="mt-1 text-sm text-gray-500">
-                  إدارة حسابات الأوصياء ومتابعة حالة التحقق والعائلات المرتبطة.
-                </p>
-
-              </div>
-
-            </div>
-
-          </div>
-
-          <Link
-            to="/admin-dashboard/guardian-document-reviews"
-            className="
-              inline-flex
-              w-full
-              items-center
-              justify-center
-              gap-2
-              rounded-xl
-              bg-[#0D4B8E]
-              px-4
-              py-2.5
-              text-sm
-              font-bold
-              text-white
-              shadow-sm
-              transition
-              hover:bg-[#003469]
-              focus:outline-none
-              focus:ring-4
-              focus:ring-[#0D4B8E]/20
-              sm:w-auto
-            "
+    {selected && dialogMode === "details" && <AdminDialog title="تفاصيل الوصي" size="max-w-5xl" onClose={() => { setSelected(null); setDialogMode(""); }} footer={<>
+      {(selected.verificationStatus === "Pending" || selected.verificationStatus === "ReadyForApproval" || selected.verificationStatus === "NeedsUpdate") && (
+        <>
+          <button
+            type="button"
+            onClick={confirmGuardianApprove}
+            disabled={!canApproveGuardian || Boolean(busy)}
+            title={!canApproveGuardian ? "يجب اعتماد جميع الوثائق أولاً لتفعيل زر اعتماد الوصي" : undefined}
+            className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <MdDescription size={19} />
-            مراجعة وثائق الأوصياء
-          </Link>
-
+            اعتماد توثيق الوصي
+          </button>
+          <button type="button" onClick={() => setConfirmation({ type: "rejectGuardian" })} disabled={Boolean(busy)} className="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-red-700 disabled:opacity-50">رفض توثيق الوصي</button>
+        </>
+      )}
+      <button type="button" onClick={() => setDialogMode("edit")} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white hover:bg-[#003469]">تعديل</button>
+      {selected.canSuspend && (
+        <button
+          type="button"
+          onClick={() => showStatusConfirmation(selected, false)}
+          disabled={Boolean(busy) || selected.verificationStatus !== "Approved"}
+          title={selected.verificationStatus !== "Approved" ? "يمكن تعليق الحساب فقط بعد اعتماده" : undefined}
+          className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          تعليق الحساب
+        </button>
+      )}
+      {selected.canReactivate && <button type="button" onClick={() => showStatusConfirmation(selected, true)} className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-emerald-700">إعادة تفعيل الحساب</button>}
+      <button type="button" onClick={() => setConfirmation({ type: "delete", guardian: selected })} className="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-bold text-red-700 hover:bg-red-50">حذف نهائي</button>
+    </>}>
+      <div className="space-y-5">
+        <AdminDetailsHero icon={HiOutlineIdentification} eyebrow="ملف الوصي" title={selected.fullName} subtitle={selected.email} badges={[{ label: "التحقق", value: localizeVerificationStatus(selected.verificationStatus) }, { label: "الحساب", value: accountStatusLabel(selected.accountStatus) }]} />
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4"><AdminDetailStat label="العائلات" value={selected.familyCount} /><AdminDetailStat label="الأيتام" value={selected.orphanCount} /><AdminDetailStat label="الكفالات" value={selected.sponsorshipCount} /><AdminDetailStat label="الدفعات" value={selected.payoutCount} /></div>
+        <div className="grid gap-5 lg:grid-cols-2">
+          <AdminDetailsSection title="البيانات الشخصية" icon={FiUser}><dl className="grid gap-3 sm:grid-cols-2"><AdminDetailItem label="رقم الهوية" value={selected.nationalId} dir="ltr" /><AdminDetailItem label="رقم الهاتف" value={selected.phoneNumber} dir="ltr" /><AdminDetailItem label="تاريخ الميلاد" value={toDateInputValue(selected.dateOfBirth)} /><AdminDetailItem label="الجنس" value={localizeStatus(selected.gender)} /><AdminDetailItem label="صورة الملف الشخصي" value={selected.hasProfileImage ? "متوفرة" : "غير متوفرة"} /><AdminDetailItem label="تاريخ الانضمام" value={formatArabicDateTime(selected.joinedAt)} /></dl></AdminDetailsSection>
+          <AdminDetailsSection title="السكن والعمل" icon={FiMapPin}><dl className="grid gap-3 sm:grid-cols-2"><AdminDetailItem label="المدينة" value={selected.city} /><AdminDetailItem label="الدولة" value={selected.country} /><AdminDetailItem label="العنوان" value={selected.address} wide /><AdminDetailItem label="المهنة" value={selected.occupation} /><AdminDetailItem label="الدخل الشهري" value={selected.monthlyIncome} /></dl></AdminDetailsSection>
         </div>
+        <AdminDetailsSection title="بيانات العائلة والصلاحيات" icon={MdOutlineFamilyRestroom}><dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"><AdminDetailItem label="عدد أفراد العائلة" value={selected.familyMembersCount} /><AdminDetailItem label="إمكانية التعليق" value={selected.canSuspend ? "متاحة" : "غير متاحة"} /><AdminDetailItem label="إمكانية إعادة التفعيل" value={selected.canReactivate ? "متاحة" : "غير متاحة"} /><AdminDetailItem label="إمكانية الحذف" value={selected.canDelete ? "متاحة" : "غير متاحة لوجود بيانات مرتبطة"} /></dl></AdminDetailsSection>
 
-        {/* =====================================================
-            STAT
-        ====================================================== */}
-
-        <div className="mb-5 max-w-sm">
-
-          <MiniStatCard
-            label="إجمالي الأوصياء"
-            value={guardians.length}
-            icon={HiOutlineIdentification}
-            tone="bg-[#E8F1FA] text-[#0D4B8E]"
-          />
-
-        </div>
-
-        {/* =====================================================
-            SEARCH & FILTER
-        ====================================================== */}
-
-        <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
-
-          <div className="mb-3 flex items-center justify-between">
-
-            <div>
-              <h2 className="text-sm font-extrabold text-[#003469]">
-                البحث والتصفية
-              </h2>
-
-              <p className="mt-0.5 text-xs text-gray-400">
-                ابحث عن وصي أو اعرض حالات تحقق محددة.
-              </p>
+        {/* قسم الوثائق المرفوعة في التفاصيل */}
+        <AdminDetailsSection title="الوثائق المرفوعة وحالة التدقيق" icon={FiFileText}>
+          <div className="mb-4 grid grid-cols-3 gap-3">
+            <div className="rounded-xl bg-emerald-50 p-3 text-center text-emerald-800">
+              <div className="flex items-center justify-center gap-1.5 text-xs font-bold">
+                <FiCheckCircle />
+                وثائق مقبولة
+              </div>
+              <p className="mt-1 text-xl font-extrabold">{approvedDocsCount}</p>
             </div>
-
+            <div className="rounded-xl bg-amber-50 p-3 text-center text-amber-800">
+              <div className="flex items-center justify-center gap-1.5 text-xs font-bold">
+                <FiClock />
+                قيد المراجعة
+              </div>
+              <p className="mt-1 text-xl font-extrabold">{pendingDocsCount}</p>
+            </div>
+            <div className="rounded-xl bg-red-50 p-3 text-center text-red-800">
+              <div className="flex items-center justify-center gap-1.5 text-xs font-bold">
+                <FiXCircle />
+                تتطلب تعديل / مرفوضة
+              </div>
+              <p className="mt-1 text-xl font-extrabold">{rejectedDocsCount}</p>
+            </div>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-[1fr_240px]">
-
-            {/* SEARCH */}
-
-            <label className="relative block">
-
-              <span className="sr-only">
-                البحث في الأوصياء
-              </span>
-
-              <FiSearch
-                className="
-                  absolute
-                  right-3
-                  top-1/2
-                  -translate-y-1/2
-                  text-gray-400
-                "
-                size={18}
-              />
-
-              <input
-                value={searchTerm}
-                onChange={(event) =>
-                  setSearchTerm(event.target.value)
-                }
-                placeholder="ابحث بالاسم أو البريد أو الهاتف أو المدينة..."
-                className="
-                  h-11
-                  w-full
-                  rounded-xl
-                  border
-                  border-gray-200
-                  bg-gray-50
-                  pr-10
-                  pl-4
-                  text-sm
-                  text-gray-700
-                  outline-none
-                  transition
-                  placeholder:text-gray-400
-                  hover:border-gray-300
-                  focus:border-[#0D4B8E]
-                  focus:bg-white
-                  focus:ring-4
-                  focus:ring-[#0D4B8E]/10
-                "
-              />
-
-            </label>
-
-            {/* FILTER */}
-
-            <select
-              value={verificationFilter}
-              onChange={(event) =>
-                setVerificationFilter(
-                  event.target.value,
-                )
-              }
-              aria-label="تصفية حسب حالة التحقق"
-              className="
-                h-11
-                w-full
-                rounded-xl
-                border
-                border-gray-200
-                bg-gray-50
-                px-4
-                text-sm
-                font-semibold
-                text-gray-700
-                outline-none
-                transition
-                hover:border-gray-300
-                focus:border-[#0D4B8E]
-                focus:bg-white
-                focus:ring-4
-                focus:ring-[#0D4B8E]/10
-              "
-            >
-
-              {VERIFICATION_FILTERS.map(
-                (filter) => (
-                  <option
-                    key={filter.value}
-                    value={filter.value}
+          {loadingDocs ? (
+            <div className="py-6 text-center text-sm font-bold text-gray-500">
+              جارٍ تحميل الوثائق...
+            </div>
+          ) : guardianDocuments.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-gray-200 p-6 text-center text-sm text-gray-400">
+              لا توجد وثائق مرفوعة لهذا الوصي حتى الآن.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {guardianDocuments.map((doc) => {
+                const docId = doc.id || doc.documentId;
+                const isApproved = doc.status === "Approved";
+                return (
+                  <div
+                    key={docId}
+                    className="flex flex-col gap-3 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"
                   >
-                    {filter.label}
-                  </option>
-                ),
-              )}
-
-            </select>
-
-          </div>
-
-        </div>
-
-        {/* =====================================================
-            RESULTS COUNT
-        ====================================================== */}
-
-        <div className="mb-3 flex items-center justify-between">
-
-          <p className="text-sm font-bold text-gray-600">
-            النتائج:
-            <span className="mr-1 text-[#0D4B8E]">
-              {filteredGuardians.length}
-            </span>
-          </p>
-
-          {(searchTerm || verificationFilter !== "all") && (
-            <button
-              type="button"
-              onClick={() => {
-                setSearchTerm("");
-                setVerificationFilter("all");
-              }}
-              className="
-                text-xs
-                font-bold
-                text-gray-500
-                transition
-                hover:text-[#0D4B8E]
-              "
-            >
-              مسح الفلاتر
-            </button>
-          )}
-
-        </div>
-
-        {/* =====================================================
-            CONTENT
-        ====================================================== */}
-
-        {content}
-
-      </div>
-          {selectedGuardian && (
-
-<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" dir="rtl">
-
-  <div className="
-    w-full
-    max-w-3xl
-    max-h-[90vh]
-    overflow-hidden
-    rounded-3xl
-    bg-white
-    shadow-2xl
-  ">
-
-
-    {/* Header */}
-
-    <div className="
-      flex
-      items-center
-      justify-between
-      border-b
-      px-6
-      py-5
-    ">
-
-
-      <div className="flex items-center gap-3">
-
-        <div className="
-          flex
-          h-14
-          w-14
-          items-center
-          justify-center
-          rounded-2xl
-          bg-[#E8F1FA]
-          text-[#003469]
-        ">
-          <FiUser size={28}/>
-        </div>
-
-
-        <div>
-
-          <h2 className="
-            text-xl
-            font-extrabold
-            text-[#003469]
-          ">
-            تفاصيل الوصي
-          </h2>
-
-          <p className="text-sm text-gray-400">
-            مراجعة بيانات ووثائق الوصي
-          </p>
-
-        </div>
-
-      </div>
-
-
-
-      <button
-        onClick={()=>setSelectedGuardian(null)}
-        className="
-          rounded-xl
-          bg-gray-100
-          p-2
-          text-gray-500
-          hover:bg-red-50
-          hover:text-red-600
-        "
-      >
-        <FiX size={22}/>
-      </button>
-
-
-    </div>
-
-
-
-
-
-    <div className="
-      max-h-[65vh]
-      overflow-y-auto
-      p-6
-    ">
-
-
-      {/* معلومات الوصي */}
-
-      <div className="
-        rounded-2xl
-        bg-[#F8FAFC]
-        p-5
-      ">
-
-
-        <div className="
-          grid
-          grid-cols-2
-          gap-4
-        ">
-
-
-          <InfoCard
-            icon={<FiUser/>}
-            title="الاسم"
-            value={selectedGuardian.fullName}
-          />
-
-
-          <InfoCard
-            icon={<FiMail/>}
-            title="البريد الإلكتروني"
-            value={selectedGuardian.email}
-          />
-
-
-          <InfoCard
-            icon={<FiPhone/>}
-            title="الهاتف"
-            value={selectedGuardian.phoneNumber}
-          />
-
-
-          <InfoCard
-            icon={<FiShield/>}
-            title="حالة الحساب"
-            value={localizeVerificationStatus(
-              selectedGuardian.verificationStatus
-            )}
-          />
-
-
-        </div>
-
-      </div>
-
-
-
-
-
-
-      {/* الاحصائيات */}
-
-      <div className="
-        mt-5
-        grid
-        grid-cols-3
-        gap-4
-      ">
-
-
-        <StatCard
-          number={approvedDocs}
-          title="وثائق مقبولة"
-          color="green"
-          icon={<FiCheckCircle/>}
-        />
-
-
-        <StatCard
-          number={pendingDocs}
-          title="قيد المراجعة"
-          color="yellow"
-          icon={<FiClock/>}
-        />
-
-
-        <StatCard
-          number={rejectedDocs}
-          title="مرفوضة"
-          color="red"
-          icon={<FiXCircle/>}
-        />
-
-
-      </div>
-
-
-
-
-
-
-
-      {/* الوثائق */}
-
-      <div className="mt-6">
-
-
-        <div className="
-          mb-4
-          flex
-          items-center
-          justify-between
-        ">
-
-
-          <h3 className="
-            text-lg
-            font-extrabold
-            text-[#003469]
-          ">
-            الوثائق المرفوعة
-          </h3>
-
-
-          <span className="
-            rounded-full
-            bg-[#E8F1FA]
-            px-4
-            py-1
-            text-xs
-            font-bold
-            text-[#003469]
-          ">
-            {guardianDocuments.length} وثائق
-          </span>
-
-
-        </div>
-
-
-
-
-        <div className="space-y-3">
-
-
-        {guardianDocuments.map((doc)=>(
-
-
-          <div
-            key={doc.id}
-            className="
-              flex
-              items-center
-              justify-between
-              rounded-2xl
-              border
-              border-gray-100
-              bg-white
-              p-4
-              shadow-sm
-            "
-          >
-
-
-            <div className="flex items-center gap-3">
-
-
-              <div className="
-                flex
-                h-11
-                w-11
-                items-center
-                justify-center
-                rounded-xl
-                bg-[#E8F1FA]
-                text-[#003469]
-              ">
-                <FiFileText/>
-              </div>
-
-
-
-              <div>
-
-                <p className="font-extrabold">
-                  {localizeDocumentType(doc.documentType)}
-                </p>
-
-
-                <p className="
-                  text-xs
-                  text-gray-500
-                ">
-                  {localizeDocumentStatus(doc.status)}
-                </p>
-
-              </div>
-
-
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#E8F1FA] text-[#003469]">
+                        <FiFileText size={20} />
+                      </div>
+                      <div>
+                        <p className="font-extrabold text-[#003469]">
+                          {localizeDocumentType(doc.documentType)}
+                        </p>
+                        <div className="mt-1 flex items-center gap-2">
+                          <span
+                            className={`inline-flex rounded-full border px-2.5 py-0.5 text-[10px] font-bold ${documentStatusBadgeStyle(
+                              doc.status
+                            )}`}
+                          >
+                            {localizeDocumentStatus(doc.status)}
+                          </span>
+                          {doc.rejectionReason && (
+                            <span className="text-xs text-red-600">
+                              السبب: {doc.rejectionReason}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleViewDocument(doc)}
+                        disabled={Boolean(busy)}
+                        className="inline-flex items-center gap-1 rounded-lg bg-[#003469] px-3.5 py-1.5 text-xs font-bold text-white transition hover:bg-[#0D4B8E] disabled:opacity-50"
+                      >
+                        <FiEye />
+                        عرض الوثيقة
+                      </button>
+
+                      {!isApproved && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleApproveDocument(doc)}
+                            disabled={Boolean(busy)}
+                            className="inline-flex items-center gap-1 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-bold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+                          >
+                            <FiCheckCircle />
+                            اعتماد
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDocActionModal({ doc, action: "needsUpdate" });
+                              setDocReason("");
+                            }}
+                            disabled={Boolean(busy)}
+                            className="inline-flex items-center gap-1 rounded-lg bg-red-600 px-3.5 py-1.5 text-xs font-bold text-white transition hover:bg-red-700 disabled:opacity-50"
+                          >
+                            <FiXCircle />
+                            طلب تعديل / رفض
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-
-
-
-
-            {/* <button
-              onClick={()=>openDocument(doc.id)}
-              className="
-                flex
-                items-center
-                gap-2
-                rounded-xl
-                bg-[#003469]
-                px-4
-                py-2
-                text-xs
-                font-bold
-                text-white
-              "
-            >
-              <FiEye/>
-              عرض
-            </button> */}
-
-
-          </div>
-
-
-        ))}
-
-
-        </div>
-
-
+          )}
+        </AdminDetailsSection>
       </div>
+    </AdminDialog>}
 
+    {selected && dialogMode === "edit" && editForm && <AdminDialog title="تعديل بيانات الوصي" onClose={() => setDialogMode("details")} closeDisabled={busy === "edit"} footer={<><button type="button" onClick={() => setDialogMode("details")} disabled={busy === "edit"} className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-bold">إلغاء</button><button type="submit" form="guardian-edit-form" disabled={busy === "edit"} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50">{busy === "edit" ? "جارٍ الحفظ..." : "حفظ التعديلات"}</button></>}>
+      <form id="guardian-edit-form" onSubmit={submitEdit} className="grid gap-4 sm:grid-cols-2">{actionError && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700 sm:col-span-2">{actionError}</p>}{[["firstName", "الاسم الأول"], ["fatherName", "اسم الأب"], ["grandfatherName", "اسم الجد"], ["familyName", "اسم العائلة"], ["phoneNumber", "رقم الهاتف"], ["city", "المدينة"], ["country", "الدولة"]].map(([name, label]) => <label key={name} className="text-sm font-bold text-gray-700">{label}<input name={name} value={editForm[name]} onChange={(event) => setEditForm({ ...editForm, [name]: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-[#0D4B8E]" /></label>)}<label className="text-sm font-bold text-gray-700">تاريخ الميلاد<input type="date" value={editForm.dateOfBirth} onChange={(event) => setEditForm({ ...editForm, dateOfBirth: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5" /></label><label className="text-sm font-bold text-gray-700">الجنس<select value={editForm.gender} onChange={(event) => setEditForm({ ...editForm, gender: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5"><option value="1">ذكر</option><option value="2">أنثى</option></select></label><label className="text-sm font-bold text-gray-700 sm:col-span-2">العنوان<input value={editForm.address} onChange={(event) => setEditForm({ ...editForm, address: event.target.value })} maxLength={300} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5" /></label><label className="text-sm font-bold text-gray-700 sm:col-span-2">المهنة<input value={editForm.occupation} onChange={(event) => setEditForm({ ...editForm, occupation: event.target.value })} maxLength={100} className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5" /></label></form>
+    </AdminDialog>}
 
-    </div>
+    {docActionModal && (
+      <AdminConfirmationDialog
+        title="طلب تعديل الوثيقة"
+        message={`هل تريد طلب تعديل وثيقة (${localizeDocumentType(docActionModal.doc.documentType)})؟`}
+        warning="سيتم إرسال سبب التعديل للوصي لإعادة رفع الوثيقة بالشكل الصحيح."
+        confirmLabel="إرسال طلب التعديل"
+        danger
+        onConfirm={handleRequestDocumentUpdate}
+        onCancel={() => {
+          if (!busy) {
+            setDocActionModal(null);
+            setDocReason("");
+          }
+        }}
+        loading={Boolean(busy.startsWith("doc-update-"))}
+        reason={docReason}
+        onReasonChange={setDocReason}
+        reasonLabel="سبب طلب التعديل أو الرفض"
+        error={actionError}
+      />
+    )}
 
+    {confirmation?.type === "rejectGuardian" && (
+      <AdminConfirmationDialog
+        title="رفض توثيق الوصي"
+        message="هل أنت متأكد من رفض طلب توثيق هذا الوصي؟"
+        warning="سيتم تغيير حالة التحقق إلى (مرفوض)."
+        confirmLabel="تأكيد الرفض"
+        danger
+        onConfirm={confirmGuardianReject}
+        onCancel={() => {
+          if (!busy) setConfirmation(null);
+        }}
+        loading={busy === "guardian-reject"}
+        reason={reason}
+        onReasonChange={setReason}
+        reasonLabel="سبب الرفض (مطلوب)"
+        confirmDisabled={!reason.trim()}
+        error={actionError}
+      />
+    )}
 
-
-
-
-
-    {/* Footer */}
-
-    <div className="
-      flex
-      gap-3
-      border-t
-      p-5
-    ">
-
-
-      <button
-        className="
-          flex-1
-          rounded-xl
-          bg-green-600
-          py-3
-          font-extrabold
-          text-white
-        "
-      >
-        <FiCheckCircle className="inline ml-2"/>
-        اعتماد الحساب
-      </button>
-
-
-
-      <button
-        className="
-          flex-1
-          rounded-xl
-          bg-red-600
-          py-3
-          font-extrabold
-          text-white
-        "
-      >
-        <FiTrash2 className="inline ml-2"/>
-        رفض الحساب
-      </button>
-
-
-    </div>
-
-
-  </div>
-
-</div>
-
-)}
+    {confirmation?.type === "status" && <AdminConfirmationDialog title={confirmation.isActive ? "إعادة تفعيل حساب الوصي" : "تعليق حساب الوصي"} message={confirmation.isActive ? "هل تريد إعادة تفعيل هذا الحساب؟" : "هل أنت متأكد من تعليق هذا الحساب؟"} confirmLabel={confirmation.isActive ? "إعادة التفعيل" : "تأكيد التعليق"} onConfirm={confirmStatus} onCancel={() => { if (!busy) setConfirmation(null); }} loading={busy === "status"} reason={reason} onReasonChange={setReason} error={actionError} />}
+    {confirmation?.type === "delete" && <AdminConfirmationDialog title="حذف حساب الوصي نهائيًا" message="هذا الإجراء نهائي ولا يمكن التراجع عنه." warning={confirmation.guardian.canDelete ? "سيُرسل طلب الحذف إلى الخادم بعد التأكيد." : "لا يمكن حذف هذا الوصي حاليًا لوجود بيانات مرتبطة به. يمكنك تعليق الحساب بدلًا من ذلك."} confirmLabel="حذف نهائي" danger onConfirm={confirmDelete} onCancel={() => { if (!busy) setConfirmation(null); }} loading={busy === "delete"} confirmDisabled={!confirmation.guardian.canDelete} error={actionError} />}
     </AdminLayout>
-    
   );
-  function InfoCard({ icon, title, value }) {
-  return (
-    <div className="rounded-xl bg-white p-4 shadow-sm border border-gray-100">
-
-      <div className="flex items-center gap-2 text-xs text-gray-400">
-        {icon}
-        <span>{title}</span>
-      </div>
-
-      <p className="mt-2 font-bold text-gray-800 truncate">
-        {value || "-"}
-      </p>
-
-    </div>
-  );
-}
-
-
-
-function StatCard({ number, title, color, icon }) {
-
-  const colors = {
-    green: "bg-green-50 text-green-700",
-    yellow: "bg-yellow-50 text-yellow-700",
-    red: "bg-red-50 text-red-700",
-  };
-
-
-  return (
-    <div
-      className={`
-        rounded-2xl
-        p-4
-        text-center
-        ${colors[color]}
-      `}
-    >
-
-      <div className="mb-2 flex justify-center text-xl">
-        {icon}
-      </div>
-
-
-      <p className="text-3xl font-extrabold">
-        {number}
-      </p>
-
-
-      <p className="mt-1 text-xs font-bold">
-        {title}
-      </p>
-
-
-    </div>
-  );
-}
 }
