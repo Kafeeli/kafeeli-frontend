@@ -62,6 +62,7 @@
 //   },
 // };
 import api from "./api";
+import { buildAdminQuery } from "../utils/adminPagination";
 
 const ADMIN_IMAGE_CACHE_LIMIT = 100;
 const adminImageBlobCache = new Map();
@@ -102,13 +103,13 @@ async function getProtectedImageBlob(endpoint) {
 export const adminApi = {
   // ============ مراجعة العائلات ============
 
-  getFamilies: async () => {
-    const response = await api.get("/api/v1/admin/families");
+  getFamilies: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/families", { params: buildAdminQuery(filters) });
     return response.data;
   },
 
-  getPendingFamilies: async () => {
-    const response = await api.get("/api/v1/admin/families/pending");
+  getPendingFamilies: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/families/pending", { params: buildAdminQuery(filters) });
     return response.data;
   },
 
@@ -155,8 +156,10 @@ export const adminApi = {
   },
 
   // GET /api/v1/admin/guardian-bank-accounts/pending
-  getPendingBankAccounts: async () => {
-    const response = await api.get("/api/v1/admin/guardian-bank-accounts/pending");
+  getPendingBankAccounts: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/guardian-bank-accounts/pending", {
+      params: buildAdminQuery(filters),
+    });
     return response.data;
   },
 
@@ -182,11 +185,7 @@ export const adminApi = {
   // ============ مراجعة وثائق الأوصياء ============
 
   getAllGuardianDocuments: async (filters = {}) => {
-    const params = Object.fromEntries(
-      Object.entries(filters)
-        .map(([key, value]) => [key, typeof value === "string" ? value.trim() : value])
-        .filter(([, value]) => value !== "" && value !== "all" && value != null),
-    );
+    const params = buildAdminQuery(filters);
     const response = await api.get("/api/v1/admin/guardian-documents", { params });
     return response.data;
   },
@@ -235,8 +234,8 @@ export const adminApi = {
     return response.data;
   },
 
-  getAllGuardians: async () => {
-    const response = await api.get("/api/v1/admin/guardians");
+  getAllGuardians: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/guardians", { params: buildAdminQuery(filters) });
     return response.data;
   },
 
@@ -265,8 +264,8 @@ export const adminApi = {
     return response.data;
   },
 
-  getAllSponsors: async () => {
-    const response = await api.get("/api/v1/admin/sponsors");
+  getAllSponsors: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/sponsors", { params: buildAdminQuery(filters) });
     return response.data;
   },
 
@@ -318,12 +317,12 @@ export const adminApi = {
     return response.data;
   },
 
-  getPendingOrphans: async () => {
-    const response = await api.get("/api/v1/admin/orphans/pending");
+  getPendingOrphans: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/orphans/pending", { params: buildAdminQuery(filters) });
     return response.data;
   },
-  getAllOrphans: async () => {
-    const response = await api.get("/api/v1/admin/orphans");
+  getAllOrphans: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/orphans", { params: buildAdminQuery(filters) });
     return response.data;
   },
   getOrphanDetails: async (orphanId) => {
@@ -355,11 +354,7 @@ export const adminApi = {
     return response.data;
   },
   getAllOrphanDocuments: async (filters = {}) => {
-    const params = Object.fromEntries(
-      Object.entries(filters)
-        .map(([key, value]) => [key, typeof value === "string" ? value.trim() : value])
-        .filter(([, value]) => value !== "" && value !== "all" && value != null),
-    );
+    const params = buildAdminQuery(filters);
     const response = await api.get("/api/v1/admin/orphan-documents", { params });
     return response.data;
   },
@@ -385,8 +380,8 @@ export const adminApi = {
     return getProtectedImageBlob(`/api/v1/admin/orphans/${orphanId}/profile-image`);
   },
 
-  getPendingPayments: async () => {
-    const response = await api.get("/api/v1/admin/payments/pending");
+  getPendingPayments: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/payments/pending", { params: buildAdminQuery(filters) });
     return response.data;
   },
   getPaymentDetails: async (paymentId) => {
@@ -414,12 +409,12 @@ export const adminApi = {
     });
     return response.data;
   },
-  getPendingPayouts: async () => {
-    const response = await api.get("/api/v1/admin/payouts/pending");
+  getPendingPayouts: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/payouts/pending", { params: buildAdminQuery(filters) });
     return response.data;
   },
-  getEligiblePayouts: async () => {
-    const response = await api.get("/api/v1/admin/payouts/eligible");
+  getEligiblePayouts: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/payouts/eligible", { params: buildAdminQuery(filters) });
     return response.data;
   },
   getPayoutDetails: async (payoutId) => {
@@ -432,6 +427,10 @@ export const adminApi = {
   },
   failPayout: async (payoutId, reason) => {
     const response = await api.post(`/api/v1/admin/payouts/${payoutId}/fail`, { reason });
+    return response.data;
+  },
+  getAuditLogs: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/audit-logs", { params: buildAdminQuery(filters) });
     return response.data;
   },
 //   getAllGuardianDocuments: async () => {

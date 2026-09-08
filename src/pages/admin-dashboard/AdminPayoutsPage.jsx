@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { MdAccountBalance, MdAccountBalanceWallet } from "react-icons/md";
+import { FiSearch } from "react-icons/fi";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
 import { adminApi } from "../../services/adminApi";
 import { apiErrorMessage, unwrapResult } from "../../utils/apiUi";
 import { formatAmount, formatDate } from "../sponsor-dashboard/sponsorFlowUtils";
 import AdminLayout from "./Adminlayout";
 import { ErrorState, LoadingState } from "./Adminstates";
 import { localizeDisplayFields } from "../../utils/localization";
+import { emptyPagedData, normalizePagedData } from "../../utils/adminPagination";
+import AdminPagination from "./AdminPagination";
 
 function CandidateDetails({ candidate }) {
   if (!candidate) return null;
@@ -52,6 +56,18 @@ export default function AdminPayoutsPage() {
   const [sponsorshipId, setSponsorshipId] = useState("");
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const search = useDebouncedValue(searchInput.trim());
+  const [guardianId, setGuardianId] = useState("");
+  const [sponsorId, setSponsorId] = useState("");
+  const [minAmount, setMinAmount] = useState("");
+  const [maxAmount, setMaxAmount] = useState("");
+  const [filterSponsorshipId, setFilterSponsorshipId] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [pagination, setPagination] = useState(emptyPagedData);
 
   const selectedCandidate = useMemo(
     () => eligibleCandidates.find((item) => item.sponsorshipId === sponsorshipId) || null,
@@ -62,13 +78,17 @@ export default function AdminPayoutsPage() {
     setLoading(true);
     setError("");
     try {
+      const query = { page, pageSize, search, guardianId, sponsorId, sponsorshipId: filterSponsorshipId, minAmount, maxAmount, dateFrom, dateTo };
       const [pendingResult, eligibleResult] = await Promise.all([
-        adminApi.getPendingPayouts(),
-        adminApi.getEligiblePayouts(),
+        adminApi.getPendingPayouts(query),
+        adminApi.getEligiblePayouts({ page: 1, pageSize: 100, search }),
       ]);
-      setPayouts((unwrapResult(pendingResult, "تعذر تحميل التحويلات.") || []).map((item) => localizeDisplayFields(item, ["payoutStatus"])));
+      const normalizedPending = normalizePagedData(unwrapResult(pendingResult, "تعذر تحميل التحويلات."), query);
+      setPayouts(normalizedPending.items.map((item) => localizeDisplayFields(item, ["payoutStatus"])));
+      setPagination(normalizedPending);
+      const normalizedEligible = normalizePagedData(unwrapResult(eligibleResult, "تعذر تحميل الكفالات المؤهلة للتحويل."), { pageSize: 100 });
       setEligibleCandidates(
-        (unwrapResult(eligibleResult, "تعذر تحميل الكفالات المؤهلة للتحويل.") || []).map((item) => ({
+        normalizedEligible.items.map((item) => ({
           ...localizeDisplayFields(item, ["sponsorshipStatus", "targetType"]),
           guardianPayoutAccount: localizeDisplayFields(item.guardianPayoutAccount, ["verificationStatus"]),
         })),
@@ -78,7 +98,7 @@ export default function AdminPayoutsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [dateFrom, dateTo, filterSponsorshipId, guardianId, maxAmount, minAmount, page, pageSize, search, sponsorId]);
 
   useEffect(() => {
     const id = window.setTimeout(load, 0);
@@ -149,6 +169,15 @@ export default function AdminPayoutsPage() {
       <div className="space-y-6">
         {loading ? <LoadingState /> : error ? <ErrorState onRetry={load} description={error} /> : (
           <>
+            <div className="grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-5">
+              <label className="relative sm:col-span-2"><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchInput} onChange={(event) => { setSearchInput(event.target.value); setPage(1); }} placeholder="ابحث في دفعات الأوصياء" aria-label="البحث في الدفعات" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm" /></label>
+              <input value={guardianId} onChange={(event) => { setGuardianId(event.target.value); setPage(1); }} placeholder="معرّف الوصي" aria-label="معرّف الوصي" dir="ltr" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
+              <input value={sponsorId} onChange={(event) => { setSponsorId(event.target.value); setPage(1); }} placeholder="معرّف الكفيل" aria-label="معرّف الكفيل" dir="ltr" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
+              <input value={filterSponsorshipId} onChange={(event) => { setFilterSponsorshipId(event.target.value); setPage(1); }} placeholder="معرّف الكفالة" aria-label="معرّف الكفالة" dir="ltr" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
+              <div className="grid grid-cols-2 gap-2"><input type="number" min="0" value={minAmount} onChange={(event) => { setMinAmount(event.target.value); setPage(1); }} placeholder="أدنى مبلغ" aria-label="أدنى مبلغ" className="min-w-0 rounded-lg border border-gray-300 px-2 py-2.5 text-sm" /><input type="number" min="0" value={maxAmount} onChange={(event) => { setMaxAmount(event.target.value); setPage(1); }} placeholder="أعلى مبلغ" aria-label="أعلى مبلغ" className="min-w-0 rounded-lg border border-gray-300 px-2 py-2.5 text-sm" /></div>
+              <label className="text-xs font-bold text-gray-600">من تاريخ<input type="datetime-local" value={dateFrom} onChange={(event) => { setDateFrom(event.target.value); setPage(1); }} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
+              <label className="text-xs font-bold text-gray-600">إلى تاريخ<input type="datetime-local" value={dateTo} onChange={(event) => { setDateTo(event.target.value); setPage(1); }} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
+            </div>
             <form onSubmit={create} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="flex items-center gap-2 font-extrabold text-[#003469]"><MdAccountBalanceWallet />الكفالات المؤهلة للتحويل</h2>
               {eligibleCandidates.length === 0 ? (
@@ -193,6 +222,7 @@ export default function AdminPayoutsPage() {
                 </> : <p className="mt-4 text-sm text-gray-500">اختر تحويلاً لعرض تفاصيله.</p>}
               </aside>
             </div>
+            <AdminPagination pagination={pagination} onPageChange={setPage} onPageSizeChange={(value) => { setPageSize(value); setPage(1); }} />
           </>
         )}
         {successMessage && <p role="status" className="rounded-lg border border-green-200 bg-green-50 p-3 text-sm font-bold text-green-700">{successMessage}</p>}

@@ -21,7 +21,9 @@ import {
 import { Link } from "react-router-dom";
 
 import { adminApi } from "../../services/adminApi";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
 import { apiErrorMessage, unwrapResult } from "../../utils/apiUi";
+import { emptyPagedData, normalizePagedData } from "../../utils/adminPagination";
 import { formatArabicDateTime } from "../../utils/date";
 import {
   localizeStatus,
@@ -40,6 +42,7 @@ import {
 } from "./AdminManagementDialogs";
 import { EmptyState, ErrorState, LoadingState, MiniStatCard } from "./Adminstates";
 import AdminTableIconButton from "./AdminTableIconButton";
+import AdminPagination from "./AdminPagination";
 
 const VERIFICATION_FILTERS = [
   { value: "all", label: "كل حالات التحقق" },
@@ -147,6 +150,12 @@ export default function AdminGuardiansPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [verificationFilter, setVerificationFilter] = useState("all");
   const [accountFilter, setAccountFilter] = useState("all");
+  const [cityFilter, setCityFilter] = useState("");
+  const [countryFilter, setCountryFilter] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [pagination, setPagination] = useState(emptyPagedData);
+  const debouncedSearch = useDebouncedValue(searchTerm.trim());
   const [selected, setSelected] = useState(null);
   const [dialogMode, setDialogMode] = useState("");
   const [editForm, setEditForm] = useState(null);
@@ -165,8 +174,19 @@ export default function AdminGuardiansPage() {
     setError("");
 
     try {
-      const data = unwrapResult(await adminApi.getAllGuardians(), "تعذر تحميل قائمة الأوصياء.");
-      setGuardians(Array.isArray(data) ? data : []);
+      const query = {
+        page,
+        pageSize,
+        search: debouncedSearch,
+        guardianStatus: verificationFilter,
+        accountStatus: accountFilter,
+        city: cityFilter,
+        country: countryFilter,
+      };
+      const data = unwrapResult(await adminApi.getAllGuardians(query), "تعذر تحميل قائمة الأوصياء.");
+      const normalized = normalizePagedData(data, query);
+      setGuardians(normalized.items);
+      setPagination(normalized);
     } catch (requestError) {
       setError(
         apiErrorMessage(
@@ -177,7 +197,7 @@ export default function AdminGuardiansPage() {
     } finally {
       if (!silent) setLoading(false);
     }
-  }, []);
+  }, [accountFilter, cityFilter, countryFilter, debouncedSearch, page, pageSize, verificationFilter]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(load, 0);
@@ -192,8 +212,8 @@ export default function AdminGuardiansPage() {
   const fetchGuardianDocs = useCallback(async (guardianId) => {
     setLoadingDocs(true);
     try {
-      const response = await adminApi.getAllGuardianDocuments();
-      const docs = Array.isArray(response) ? response : (response?.data || []);
+      const response = unwrapResult(await adminApi.getAllGuardianDocuments({ guardianId, pageSize: 100 }));
+      const docs = normalizePagedData(response, { pageSize: 100 }).items;
       const myDocs = docs.filter(
         (doc) => String(doc.guardianId || doc.guardian_id) === String(guardianId)
       );
@@ -415,6 +435,7 @@ export default function AdminGuardiansPage() {
   const filteredGuardians = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
 
+    if (!pagination.isLegacyArray) return guardians;
     return guardians.filter((guardian) => {
       const matchesVerification = verificationFilter === "all" || guardian.verificationStatus === verificationFilter;
       const matchesAccount = accountFilter === "all" || guardian.accountStatus === accountFilter;
@@ -422,7 +443,7 @@ export default function AdminGuardiansPage() {
         .some((value) => String(value || "").toLowerCase().includes(query));
       return matchesVerification && matchesAccount && matchesSearch;
     });
-  }, [accountFilter, guardians, searchTerm, verificationFilter]);
+  }, [accountFilter, guardians, pagination.isLegacyArray, searchTerm, verificationFilter]);
 
   const showStatusConfirmation = (guardian, isActive) => {
     setConfirmation({ type: "status", guardian, isActive });
@@ -503,10 +524,11 @@ export default function AdminGuardiansPage() {
     <AdminLayout title="الأوصياء"><div className="mx-auto w-full max-w-7xl">
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4"><div><h1 className="text-2xl font-extrabold text-[#003469]">إدارة الأوصياء</h1><p className="mt-1 text-sm text-gray-500">عرض بيانات الأوصياء وتعديلها وإدارة حالة الحساب بأمان.</p></div><Link to="/admin-dashboard/guardian-document-reviews" className="inline-flex items-center gap-2 rounded-lg bg-[#0D4B8E] px-4 py-2.5 text-sm font-bold text-white hover:bg-[#003469]"><MdDescription />وثائق الأوصياء</Link></div>
       <div className="mb-5 max-w-sm"><MiniStatCard label="إجمالي الأوصياء" value={guardians.length} icon={HiOutlineIdentification} tone="bg-[#E8F1FA] text-[#0D4B8E]" /></div>
-      <div className="mb-6 grid gap-3 rounded-xl border border-gray-200 bg-white p-4 lg:grid-cols-[1fr_220px_220px]"><label className="relative"><span className="sr-only">البحث في الأوصياء</span><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="ابحث بالاسم أو البريد أو الهاتف" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none focus:border-[#0D4B8E]" /></label><select value={verificationFilter} onChange={(event) => setVerificationFilter(event.target.value)} aria-label="تصفية حسب حالة التحقق" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{VERIFICATION_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select><select value={accountFilter} onChange={(event) => setAccountFilter(event.target.value)} aria-label="تصفية حسب حالة الحساب" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ACCOUNT_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select></div>
+      <div className="mb-6 grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-5"><label className="relative sm:col-span-2"><span className="sr-only">البحث في الأوصياء</span><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder="ابحث بالاسم أو البريد أو الهاتف" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none focus:border-[#0D4B8E]" /></label><select value={verificationFilter} onChange={(event) => { setVerificationFilter(event.target.value); setPage(1); }} aria-label="تصفية حسب حالة التحقق" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{VERIFICATION_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select><select value={accountFilter} onChange={(event) => { setAccountFilter(event.target.value); setPage(1); }} aria-label="تصفية حسب حالة الحساب" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ACCOUNT_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select><input value={cityFilter} onChange={(event) => { setCityFilter(event.target.value); setPage(1); }} placeholder="المدينة" aria-label="المدينة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" /><input value={countryFilter} onChange={(event) => { setCountryFilter(event.target.value); setPage(1); }} placeholder="الدولة" aria-label="الدولة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" /></div>
       {actionError && <p role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}
       {successMessage && <p role="status" className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700">{successMessage}</p>}
-      <p className="mb-3 text-sm font-bold text-gray-600">النتائج: {filteredGuardians.length}</p>{content}
+      <p className="mb-3 text-sm font-bold text-gray-600">النتائج: {pagination.isLegacyArray ? filteredGuardians.length : pagination.totalCount}</p>{content}
+      {!loading && !error && <div className="mt-4"><AdminPagination pagination={pagination} onPageChange={setPage} onPageSizeChange={(value) => { setPageSize(value); setPage(1); }} /></div>}
     </div>
 
     {selected && dialogMode === "details" && <AdminDialog title="تفاصيل الوصي" size="max-w-5xl" onClose={() => { setSelected(null); setDialogMode(""); }} footer={<>

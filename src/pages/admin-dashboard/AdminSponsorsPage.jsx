@@ -2,7 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FiEdit2, FiEye, FiInfo, FiMapPin, FiSearch, FiTrash2, FiUser } from "react-icons/fi";
 import { MdOutlineVolunteerActivism, MdPauseCircleOutline, MdPlayCircleOutline } from "react-icons/md";
 import { adminApi } from "../../services/adminApi";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
 import { apiErrorMessage, unwrapResult } from "../../utils/apiUi";
+import { emptyPagedData, normalizePagedData } from "../../utils/adminPagination";
 import { formatArabicDateTime } from "../../utils/date";
 import { localizeStatus } from "../../utils/localization";
 import AdminLayout from "./Adminlayout";
@@ -17,6 +19,7 @@ import {
 } from "./AdminManagementDialogs";
 import { EmptyState, ErrorState, LoadingState, MiniStatCard } from "./Adminstates";
 import AdminTableIconButton from "./AdminTableIconButton";
+import AdminPagination from "./AdminPagination";
 
 const ACCOUNT_FILTERS = [
   { value: "all", label: "كل حالات الحساب" },
@@ -58,6 +61,12 @@ export default function AdminSponsorsPage() {
   const [successMessage, setSuccessMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [accountFilter, setAccountFilter] = useState("all");
+  const [cityFilter, setCityFilter] = useState("");
+  const [countryFilter, setCountryFilter] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [pagination, setPagination] = useState(emptyPagedData);
+  const debouncedSearch = useDebouncedValue(searchTerm.trim());
   const [selected, setSelected] = useState(null);
   const [dialogMode, setDialogMode] = useState("");
   const [editForm, setEditForm] = useState(null);
@@ -69,14 +78,17 @@ export default function AdminSponsorsPage() {
     if (!silent) setLoading(true);
     setError("");
     try {
-      const data = unwrapResult(await adminApi.getAllSponsors(), "تعذر تحميل قائمة الكفلاء.");
-      setSponsors(Array.isArray(data) ? data : []);
+      const query = { page, pageSize, search: debouncedSearch, accountStatus: accountFilter, city: cityFilter, country: countryFilter };
+      const data = unwrapResult(await adminApi.getAllSponsors(query), "تعذر تحميل قائمة الكفلاء.");
+      const normalized = normalizePagedData(data, query);
+      setSponsors(normalized.items);
+      setPagination(normalized);
     } catch (requestError) {
       setError(apiErrorMessage(requestError, "تعذر تحميل قائمة الكفلاء."));
     } finally {
       if (!silent) setLoading(false);
     }
-  }, []);
+  }, [accountFilter, cityFilter, countryFilter, debouncedSearch, page, pageSize]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(load, 0);
@@ -195,13 +207,14 @@ export default function AdminSponsorsPage() {
 
   const filteredSponsors = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
+    if (!pagination.isLegacyArray) return sponsors;
     return sponsors.filter((sponsor) => {
       const matchesAccount = accountFilter === "all" || sponsor.accountStatus === accountFilter;
       const matchesSearch = !query || [sponsor.fullName, sponsor.email, sponsor.phoneNumber]
         .some((value) => String(value || "").toLowerCase().includes(query));
       return matchesAccount && matchesSearch;
     });
-  }, [accountFilter, searchTerm, sponsors]);
+  }, [accountFilter, pagination.isLegacyArray, searchTerm, sponsors]);
 
   const showStatusConfirmation = (sponsor, isActive) => {
     setConfirmation({ type: "status", sponsor, isActive });
@@ -226,8 +239,9 @@ export default function AdminSponsorsPage() {
     <AdminLayout title="الكفلاء"><div className="mx-auto w-full max-w-7xl">
       <div className="mb-6"><h1 className="text-2xl font-extrabold text-[#003469]">إدارة الكفلاء</h1><p className="mt-1 text-sm text-gray-500">عرض بيانات الكفلاء وتعديلها وإدارة حالة الحساب بأمان.</p></div>
       <div className="mb-5 max-w-sm"><MiniStatCard label="إجمالي الكفلاء" value={sponsors.length} icon={MdOutlineVolunteerActivism} tone="bg-[#E8F1FA] text-[#0D4B8E]" /></div>
-      <div className="mb-6 grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-[1fr_220px]"><label className="relative"><span className="sr-only">البحث في الكفلاء</span><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="ابحث بالاسم أو البريد أو الهاتف" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none focus:border-[#0D4B8E]" /></label><select value={accountFilter} onChange={(event) => setAccountFilter(event.target.value)} aria-label="تصفية حسب حالة الحساب" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ACCOUNT_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select></div>
-      {actionError && <p role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}{successMessage && <p role="status" className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700">{successMessage}</p>}<p className="mb-3 text-sm font-bold text-gray-600">النتائج: {filteredSponsors.length}</p>{content}
+      <div className="mb-6 grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-5"><label className="relative sm:col-span-2"><span className="sr-only">البحث في الكفلاء</span><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder="ابحث بالاسم أو البريد أو الهاتف" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none focus:border-[#0D4B8E]" /></label><select value={accountFilter} onChange={(event) => { setAccountFilter(event.target.value); setPage(1); }} aria-label="تصفية حسب حالة الحساب" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ACCOUNT_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select><input value={cityFilter} onChange={(event) => { setCityFilter(event.target.value); setPage(1); }} placeholder="المدينة" aria-label="المدينة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" /><input value={countryFilter} onChange={(event) => { setCountryFilter(event.target.value); setPage(1); }} placeholder="الدولة" aria-label="الدولة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" /></div>
+      {actionError && <p role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}{successMessage && <p role="status" className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700">{successMessage}</p>}<p className="mb-3 text-sm font-bold text-gray-600">النتائج: {pagination.isLegacyArray ? filteredSponsors.length : pagination.totalCount}</p>{content}
+      {!loading && !error && <div className="mt-4"><AdminPagination pagination={pagination} onPageChange={setPage} onPageSizeChange={(value) => { setPageSize(value); setPage(1); }} /></div>}
     </div>
 
     {selected && dialogMode === "details" && <AdminDialog title="تفاصيل الكفيل" size="max-w-5xl" onClose={() => { setSelected(null); setDialogMode(""); }} footer={<><button type="button" onClick={() => setDialogMode("edit")} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white">تعديل</button>{selected.canSuspend && <button type="button" onClick={() => showStatusConfirmation(selected, false)} className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-bold text-white">تعليق الحساب</button>}{selected.canReactivate && <button type="button" onClick={() => showStatusConfirmation(selected, true)} className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white">إعادة تفعيل الحساب</button>}<button type="button" onClick={() => setConfirmation({ type: "delete", sponsor: selected })} className="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-bold text-red-700">حذف نهائي</button></>}>
