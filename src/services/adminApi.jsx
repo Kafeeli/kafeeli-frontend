@@ -63,6 +63,39 @@
 // };
 import api from "./api";
 
+const ADMIN_IMAGE_CACHE_LIMIT = 100;
+const adminImageBlobCache = new Map();
+
+async function fetchAdminImageBlob(endpoint) {
+  const normalizedEndpoint = typeof endpoint === "string" ? endpoint.trim() : "";
+
+  if (!normalizedEndpoint.startsWith("/api/v1/admin/")) {
+    throw new Error("A relative Admin image endpoint is required.");
+  }
+
+  const cachedRequest = adminImageBlobCache.get(normalizedEndpoint);
+  if (cachedRequest) return cachedRequest;
+
+  const request = api
+    .get(normalizedEndpoint, { responseType: "blob" })
+    .then((response) => response.data)
+    .catch((error) => {
+      if (adminImageBlobCache.get(normalizedEndpoint) === request) {
+        adminImageBlobCache.delete(normalizedEndpoint);
+      }
+      throw error;
+    });
+
+  adminImageBlobCache.set(normalizedEndpoint, request);
+
+  if (adminImageBlobCache.size > ADMIN_IMAGE_CACHE_LIMIT) {
+    const oldestEndpoint = adminImageBlobCache.keys().next().value;
+    adminImageBlobCache.delete(oldestEndpoint);
+  }
+
+  return request;
+}
+
 export const adminApi = {
   // ============ مراجعة العائلات ============
 
@@ -204,6 +237,8 @@ export const adminApi = {
     return response.data;
   },
 
+  getAdminImageBlob: fetchAdminImageBlob,
+
   getGuardianDetails: async (guardianId) => {
     const response = await api.get(`/api/v1/admin/guardians/${guardianId}`);
     return response.data;
@@ -344,10 +379,7 @@ export const adminApi = {
     return response.data;
   },
   getOrphanProfileImage: async (orphanId) => {
-    const response = await api.get(`/api/v1/admin/orphans/${orphanId}/profile-image`, {
-      responseType: "blob",
-    });
-    return response.data;
+    return fetchAdminImageBlob(`/api/v1/admin/orphans/${orphanId}/profile-image`);
   },
 
   getPendingPayments: async () => {

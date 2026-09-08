@@ -13,6 +13,7 @@ import {
 } from "../../utils/localization";
 
 import AdminLayout from "./Adminlayout";
+import AdminEntityAvatar from "./AdminEntityAvatar";
 import {
   EmptyState,
   ErrorState,
@@ -26,7 +27,6 @@ import {
   FiPhone,
   FiShield,
   FiFileText,
-  FiEye,
   FiCheckCircle,
   FiClock,
   FiXCircle,
@@ -50,7 +50,6 @@ export default function AdminGuardiansPage() {
   const [verificationFilter, setVerificationFilter] = useState("all");
   const [selectedGuardian, setSelectedGuardian] = useState(null);
 const [guardianDocuments, setGuardianDocuments] = useState([]);
-const [detailsLoading, setDetailsLoading] = useState(false);
 const approvedDocs = guardianDocuments.filter(
   (doc) => doc.status === "Approved"
 ).length;
@@ -124,7 +123,6 @@ const localizeDocumentStatus = (status) => {
   }, []);
  const openGuardianDetails = async (guardian) => {
   setSelectedGuardian(guardian);
-  setDetailsLoading(true);
 
   try {
 
@@ -152,10 +150,6 @@ const localizeDocumentStatus = (status) => {
     );
 
     setGuardianDocuments([]);
-
-  } finally {
-
-    setDetailsLoading(false);
 
   }
 };
@@ -368,11 +362,12 @@ const localizeDocumentStatus = (status) => {
 
                     <div className="flex items-center gap-3">
 
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E8F1FA] text-sm font-extrabold text-[#0D4B8E]">
-
-                        {(guardian.fullName || "و").charAt(0)}
-
-                      </div>
+                      <AdminEntityAvatar
+                        name={guardian.fullName}
+                        hasImage={guardian.hasProfileImage}
+                        imageEndpoint={guardian.profileImageUrl}
+                        alt={`صورة الوصي ${guardian.fullName || ""}`.trim()}
+                      />
 
                       <div className="min-w-0">
 
@@ -551,9 +546,13 @@ const localizeDocumentStatus = (status) => {
 
                 <div className="flex min-w-0 items-center gap-3">
 
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#E8F1FA] text-sm font-extrabold text-[#0D4B8E]">
-                    {(guardian.fullName || "و").charAt(0)}
-                  </div>
+                  <AdminEntityAvatar
+                    name={guardian.fullName}
+                    hasImage={guardian.hasProfileImage}
+                    imageEndpoint={guardian.profileImageUrl}
+                    alt={`صورة الوصي ${guardian.fullName || ""}`.trim()}
+                    size="card"
+                  />
 
                   <div className="min-w-0">
 
@@ -700,21 +699,6 @@ const localizeDocumentStatus = (status) => {
    * PAGE
    * ---------------------------------------------------------
    */
- const openDocument = async (id) => {
-  try {
-
-    const file = await adminApi.getDocumentFile(id);
-
-    const url = URL.createObjectURL(file);
-
-    window.open(url, "_blank");
-
-  } catch(error){
-
-    console.error(error);
-
-  }
-};
   return (
     <AdminLayout title="الأوصياء">
 
