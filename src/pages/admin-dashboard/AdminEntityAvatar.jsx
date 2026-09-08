@@ -9,14 +9,19 @@ const SIZE_CLASSES = {
   hero: "h-32 w-32 rounded-2xl border-4 border-white/25 bg-white/10 text-white/80 shadow-xl",
 };
 
-function initialFor(name) {
-  return Array.from(String(name || "").trim())[0] || "؟";
+function initialFor(name, fallbackInitial) {
+  return (
+    Array.from(String(fallbackInitial || "").trim())[0] ||
+    Array.from(String(name || "").trim())[0] ||
+    "؟"
+  );
 }
 
 export default function AdminEntityAvatar({
   name,
   hasImage,
   imageEndpoint,
+  fallbackInitial,
   alt,
   size = "md",
 }) {
@@ -31,7 +36,7 @@ export default function AdminEntityAvatar({
     let objectUrl = "";
 
     adminApi
-      .getAdminImageBlob(endpoint)
+      .getProtectedImageBlob(endpoint)
       .then((blob) => {
         objectUrl = URL.createObjectURL(blob);
         if (active) {
@@ -83,7 +88,7 @@ export default function AdminEntityAvatar({
           aria-label={`جارٍ تحميل ${alt || "الصورة الشخصية"}`}
         />
       ) : (
-        <span aria-hidden="true">{initialFor(name)}</span>
+        <span aria-hidden="true">{initialFor(name, fallbackInitial)}</span>
       )}
     </div>
   );

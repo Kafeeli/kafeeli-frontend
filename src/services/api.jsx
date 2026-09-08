@@ -125,6 +125,11 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Optional media must fail locally instead of redirecting the whole page.
+    if (error.response?.status === 401 && originalRequest?.skipAuthRedirect) {
+      return Promise.reject(error);
+    }
+
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&

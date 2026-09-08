@@ -73,7 +73,7 @@ function mapListItem(raw) {
     needsUpdateReason: raw.needsUpdateReason,
     reviewedAt: raw.reviewedAt,
     guardianHasProfileImage: raw.guardianHasProfileImage,
-    guardianProfileImageUrl: raw.guardianProfileImageUrl,
+    guardianProfileImageUrl: `/api/v1/admin/guardians/${raw.guardianId}/profile-image`,
   };
 }
 

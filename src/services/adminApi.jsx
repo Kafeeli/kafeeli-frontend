@@ -66,7 +66,7 @@ import api from "./api";
 const ADMIN_IMAGE_CACHE_LIMIT = 100;
 const adminImageBlobCache = new Map();
 
-async function fetchAdminImageBlob(endpoint) {
+async function getProtectedImageBlob(endpoint) {
   const normalizedEndpoint = typeof endpoint === "string" ? endpoint.trim() : "";
 
   if (!normalizedEndpoint.startsWith("/api/v1/admin/")) {
@@ -77,7 +77,10 @@ async function fetchAdminImageBlob(endpoint) {
   if (cachedRequest) return cachedRequest;
 
   const request = api
-    .get(normalizedEndpoint, { responseType: "blob" })
+    .get(normalizedEndpoint, {
+      responseType: "blob",
+      skipAuthRedirect: true,
+    })
     .then((response) => response.data)
     .catch((error) => {
       if (adminImageBlobCache.get(normalizedEndpoint) === request) {
@@ -237,7 +240,7 @@ export const adminApi = {
     return response.data;
   },
 
-  getAdminImageBlob: fetchAdminImageBlob,
+  getProtectedImageBlob,
 
   getGuardianDetails: async (guardianId) => {
     const response = await api.get(`/api/v1/admin/guardians/${guardianId}`);
@@ -379,7 +382,7 @@ export const adminApi = {
     return response.data;
   },
   getOrphanProfileImage: async (orphanId) => {
-    return fetchAdminImageBlob(`/api/v1/admin/orphans/${orphanId}/profile-image`);
+    return getProtectedImageBlob(`/api/v1/admin/orphans/${orphanId}/profile-image`);
   },
 
   getPendingPayments: async () => {

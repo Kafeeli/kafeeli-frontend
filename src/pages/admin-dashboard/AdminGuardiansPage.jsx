@@ -365,7 +365,7 @@ const localizeDocumentStatus = (status) => {
                       <AdminEntityAvatar
                         name={guardian.fullName}
                         hasImage={guardian.hasProfileImage}
-                        imageEndpoint={guardian.profileImageUrl}
+                        imageEndpoint={`/api/v1/admin/guardians/${guardian.guardianId}/profile-image`}
                         alt={`صورة الوصي ${guardian.fullName || ""}`.trim()}
                       />
 
@@ -549,7 +549,7 @@ const localizeDocumentStatus = (status) => {
                   <AdminEntityAvatar
                     name={guardian.fullName}
                     hasImage={guardian.hasProfileImage}
-                    imageEndpoint={guardian.profileImageUrl}
+                    imageEndpoint={`/api/v1/admin/guardians/${guardian.guardianId}/profile-image`}
                     alt={`صورة الوصي ${guardian.fullName || ""}`.trim()}
                     size="card"
                   />
