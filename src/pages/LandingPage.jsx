@@ -1,7 +1,7 @@
 // LandingPage.jsx
 import Header from "./header";
 import Footer from "./Footer";
-import heroImage from "../assets/smileChildern.jpg";
+import heroBg from "../assets/hero-bg.png";
 import orphan1 from "../assets/orphan1.jpg";
 import orphan2 from "../assets/orphan2.jpg";
 import orphan3 from "../assets/orphan3.jpg";
@@ -158,56 +158,46 @@ export default function LandingPage() {
       <Header primaryDestination="/register" />
 
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          <div className="text-center lg:text-right">
-            <span className="inline-flex items-center gap-2 bg-[#0D4B8E]/[0.05] text-[#0D4B8E] px-6 py-2.5 rounded-full text-sm font-bold mb-6 border border-[#0D4B8E]/[0.10]">
-              <FaHandHoldingHeart className="w-4 h-4" />
+      <section className="relative w-full py-12 md:py-0 md:h-screen md:min-h-screen flex items-center overflow-hidden bg-white pt-14 lg:pt-16">
+        {/* Background Image - Hidden on mobile, visible on tablet/desktop */}
+        <img
+          src={heroBg}
+          alt="خلفية كفيلي"
+          className="hidden md:block absolute inset-0 w-full h-full object-cover opacity-70 pointer-events-none"
+        />
+
+        {/* Content Container */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full py-8 lg:py-14">
+          <div className="max-w-2xl text-right">
+            <span className="inline-flex items-center gap-2 bg-[#0D4B8E]/[0.08] text-[#0D4B8E] px-6 py-2.5 rounded-full text-sm font-bold mb-6 border border-[#0D4B8E]/[0.15]">
+              <FaHandHoldingHeart className="w-4 h-4 text-[#0D4B8E]" />
               بوابة العطاء الموثوقة
             </span>
 
-            <h1 className="text-4xl lg:text-3xl xl:text-6xl font-bold text-blue-900 leading-tight mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-blue-900 leading-tight mb-6">
               معاً لنمنحهم <span className="text-[#2DBCC3]">الأمان </span>والأمل
             </h1>
 
-            <p className="text-[#424750] text-lg leading-relaxed mb-8 max-w-lg mx-auto lg:mx-0">
+            <p className="text-[#424750] text-lg sm:text-xl leading-relaxed mb-8 font-medium">
               انضم إلينا في رحلة صناعة الأثر من خلال كفيلي. يمكنك توفير مستقبل
               مشرق لليتيم وتأمين احتياجاته الأساسية بكل شفافية وحب.
             </p>
 
-            <div className="flex  flex-col sm:flex-row gap-4 justify-center lg:justify-start items-stretch sm:items-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-start items-stretch sm:items-center">
               <Link
                 to={destinations.sponsorBrowse}
-                className="cursor-pointer bg-[#2DBCC3] hover:bg-[#2DBCC3]/90 text-white text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-8 rounded-xl shadow-lg shadow-[#2DBCC3]/20 w-full sm:w-auto"
+                className="cursor-pointer bg-[#2DBCC3] hover:bg-[#2DBCC3]/90 text-white text-lg font-semibold transition-all active:scale-95 py-3.5 px-8 rounded-xl shadow-lg shadow-[#2DBCC3]/20 w-full sm:w-auto text-center"
               >
                 ابدأ الكفالة الآن
               </Link>
 
               <Link
                 to="/about"
-                className="bg-white cursor-pointer hover:bg-gray-50 text-[#0D4B8E] text-lg font-semibold transition-all active:scale-95 py-3 sm:py-3.5 px-6 sm:px-10 rounded-xl border-2 border-[#0D4B8E]/10 w-full sm:w-auto whitespace-nowrap"
+                className="bg-white cursor-pointer hover:bg-gray-50 text-[#0D4B8E] text-lg font-semibold transition-all active:scale-95 py-3.5 px-10 rounded-xl border-2 border-[#0D4B8E]/10 w-full sm:w-auto text-center whitespace-nowrap"
               >
                 تعرف علينا
               </Link>
             </div>
-          </div>
-
-          <div className="hidden lg:block relative">
-            <div
-              className="rounded-3xl border-[3px] border-white shadow-2xl overflow-hidden"
-              style={{ transform: "rotate(-2deg)" }}
-            >
-              <img
-                src={heroImage}
-                alt="طفل سعيد"
-                className="w-full h-auto object-cover"
-                style={{ transform: "rotate(2deg) scale(1.05)" }}
-              />
-            </div>
-            <div
-              className="absolute -inset-4 bg-blue-50/50 rounded-[2rem] -z-10 blur-2xl"
-              style={{ transform: "rotate(-2deg)" }}
-            />
           </div>
         </div>
       </section>
@@ -216,7 +206,7 @@ export default function LandingPage() {
       <section
         id="impact"
         ref={sectionRef}
-        className="max-w-7xl scroll-mt-24 mx-auto px-4 sm:px-6 lg:px-8 pb-12 lg:pb-20"
+        className="max-w-7xl scroll-mt-24 mx-auto px-4 sm:px-6 lg:px-8 pt-16 lg:pt-24 pb-12 lg:pb-20"
       >
         <div className="lg:bg-[#0D4B8E] lg:rounded-2xl lg:rounded-3xl lg:p-8 lg:p-12 lg:shadow-xl lg:shadow-[#0D4B8E]/20 relative lg:overflow-hidden">
           <div className="hidden lg:block absolute top-0 right-1/4 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2" />
