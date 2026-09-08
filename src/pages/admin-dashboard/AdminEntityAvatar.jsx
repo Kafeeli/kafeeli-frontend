@@ -38,6 +38,14 @@ export default function AdminEntityAvatar({
     adminApi
       .getProtectedImageBlob(endpoint)
       .then((blob) => {
+        if (
+          !(blob instanceof Blob) ||
+          blob.size === 0 ||
+          blob.type.toLowerCase().includes("json")
+        ) {
+          throw new Error("The protected image response is not a valid image blob.");
+        }
+
         objectUrl = URL.createObjectURL(blob);
         if (active) {
           setImage({ endpoint, status: "loaded", url: objectUrl });

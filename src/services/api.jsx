@@ -125,11 +125,6 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Optional media must fail locally instead of redirecting the whole page.
-    if (error.response?.status === 401 && originalRequest?.skipAuthRedirect) {
-      return Promise.reject(error);
-    }
-
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
@@ -138,7 +133,11 @@ api.interceptors.response.use(
     ) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
+          failedQueue.push({
+            resolve,
+            reject,
+            skipAuthRedirect: Boolean(originalRequest?.skipAuthRedirect),
+          });
         }).then((token) => {
           originalRequest.headers.Authorization = `Bearer ${token}`;
           return api(originalRequest);
@@ -153,7 +152,9 @@ api.interceptors.response.use(
       if (!refreshToken) {
         isRefreshing = false;
         processQueue(new Error("No refresh token"), null);
-        clearSessionAndRedirect();
+        if (!originalRequest?.skipAuthRedirect) {
+          clearSessionAndRedirect();
+        }
         return Promise.reject(error);
       }
 
@@ -177,8 +178,14 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
         return api(originalRequest);
       } catch (refreshError) {
+        const shouldRedirect =
+          !originalRequest?.skipAuthRedirect ||
+          failedQueue.some((request) => !request.skipAuthRedirect);
+
         processQueue(refreshError, null);
-        clearSessionAndRedirect();
+        if (shouldRedirect) {
+          clearSessionAndRedirect();
+        }
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
