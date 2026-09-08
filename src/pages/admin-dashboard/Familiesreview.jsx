@@ -2,8 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FiChevronDown,
-  FiChevronLeft,
-  FiChevronRight,
   FiEye,
   FiSearch,
 } from "react-icons/fi";
@@ -25,9 +23,11 @@ import { STATUS_MAP } from "./Familystatus";
 import FamilyDetailsModal from "./modals/Familydetailsmodal";
 import { adminApi } from "../../services/adminApi";
 import { mapFamilyStatus } from "../../config/familyStatus";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
+import { emptyPagedData, normalizePagedData } from "../../utils/adminPagination";
+import AdminPagination from "./AdminPagination";
 
 const cardShadow = "shadow-[0_2px_10px_rgba(31,41,55,0.06)]";
-const ITEMS_PER_PAGE = 6;
 
 function getApiErrorMessage(error, fallback) {
   const responseData = error?.response?.data || {};
@@ -38,30 +38,30 @@ function getApiErrorMessage(error, fallback) {
   return responseData.message || errors.join(" - ") || error?.message || fallback;
 }
 
-async function loadFamilies() {
-  const result = await adminApi.getFamilies();
+async function loadFamilies(query) {
+  const result = await adminApi.getFamilies(query);
   if (result?.success === false) {
     throw new Error(
       result.message || result.errors?.join(" - ") || "تعذر تحميل العائلات.",
     );
   }
-  return Array.isArray(result?.data) ? result.data : [];
+  return normalizePagedData(result?.data, query);
 }
 
-async function loadPendingFamilies() {
-  const result = await adminApi.getPendingFamilies();
+async function loadPendingFamilies(query) {
+  const result = await adminApi.getPendingFamilies(query);
   if (result?.success === false) {
     throw new Error(
       result.message || result.errors?.join(" - ") || "تعذر تحميل طلبات العائلات.",
     );
   }
-  return Array.isArray(result?.data) ? result.data : [];
+  return normalizePagedData(result?.data, query);
 }
 
-async function loadAdminFamilies() {
+async function loadAdminFamilies(allQuery, pendingQuery) {
   const [families, pendingFamilies] = await Promise.all([
-    loadFamilies(),
-    loadPendingFamilies(),
+    loadFamilies(allQuery),
+    loadPendingFamilies(pendingQuery),
   ]);
   return { families, pendingFamilies };
 }
@@ -225,6 +225,13 @@ export default function FamiliesReview() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [guardianId, setGuardianId] = useState("");
+  const [hasOrphans, setHasOrphans] = useState("all");
+  const [documentStatus, setDocumentStatus] = useState("all");
+  const [familiesPagination, setFamiliesPagination] = useState(emptyPagedData);
+  const [pendingPagination, setPendingPagination] = useState(emptyPagedData);
+  const debouncedSearch = useDebouncedValue(searchTerm.trim());
   const [loadError, setLoadError] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
   const [actionError, setActionError] = useState("");
@@ -237,30 +244,30 @@ export default function FamiliesReview() {
     setStatus("loading");
     setLoadError("");
     try {
-      const data = await loadAdminFamilies();
-      setFamilies(data.families);
-      setPendingFamilies(data.pendingFamilies);
-      setStatus(data.families.length === 0 ? "empty" : "success");
-      setPage(1);
+      const statusMap = { pending: "PendingReview", active: "Active", hidden: "Hidden", stopped: "Suspended", needsEdit: "NeedsUpdate" };
+      const sharedQuery = { page, pageSize, search: debouncedSearch, guardianId, hasOrphans, documentStatus };
+      const data = await loadAdminFamilies({ ...sharedQuery, status: statusMap[statusFilter] }, sharedQuery);
+      setFamilies(data.families.items);
+      setPendingFamilies(data.pendingFamilies.items);
+      setFamiliesPagination(data.families);
+      setPendingPagination(data.pendingFamilies);
+      setStatus(data.families.items.length === 0 ? "empty" : "success");
       return data;
     } catch (error) {
       setLoadError(getApiErrorMessage(error, "تعذر تحميل العائلات."));
       setStatus("error");
       return false;
     }
-  }, []);
+  }, [debouncedSearch, documentStatus, guardianId, hasOrphans, page, pageSize, statusFilter]);
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadInitialFamilies() {
       try {
-        const data = await loadAdminFamilies();
+        const data = await fetchFamilies();
         if (cancelled) return;
-        setFamilies(data.families);
-        setPendingFamilies(data.pendingFamilies);
-        setStatus(data.families.length === 0 ? "empty" : "success");
-        setPage(1);
+        if (!data) return;
       } catch (error) {
         if (cancelled) return;
         setLoadError(getApiErrorMessage(error, "تعذر تحميل العائلات."));
@@ -274,11 +281,13 @@ export default function FamiliesReview() {
       if (certificateTimerRef.current) clearTimeout(certificateTimerRef.current);
       if (certificateUrlRef.current) URL.revokeObjectURL(certificateUrlRef.current);
     };
-  }, []);
+  }, [fetchFamilies]);
 
   const filtered = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
     const source = activeSection === "pending" ? pendingFamilies : families;
+    const currentPagination = activeSection === "pending" ? pendingPagination : familiesPagination;
+    if (!currentPagination.isLegacyArray) return source;
     return source.filter((family) => {
       const matchesStatus =
         activeSection === "pending" ||
@@ -295,13 +304,10 @@ export default function FamiliesReview() {
         ].some((value) => String(value || "").toLowerCase().includes(query));
       return matchesStatus && matchesQuery;
     });
-  }, [activeSection, families, pendingFamilies, searchTerm, statusFilter]);
+  }, [activeSection, families, familiesPagination, pendingFamilies, pendingPagination, searchTerm, statusFilter]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
-  const pageItems = useMemo(() => {
-    const start = (page - 1) * ITEMS_PER_PAGE;
-    return filtered.slice(start, start + ITEMS_PER_PAGE);
-  }, [filtered, page]);
+  const pageItems = filtered;
+  const currentPagination = activeSection === "pending" ? pendingPagination : familiesPagination;
 
   const handleDecision = async (family, targetStatus, reason) => {
     if (actionLoading) return false;
@@ -483,7 +489,7 @@ export default function FamiliesReview() {
           >
             <div
               dir="rtl"
-              className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_220px]"
+              className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5"
             >
               <div className="relative">
                 <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -498,6 +504,9 @@ export default function FamiliesReview() {
                   className="h-11 w-full rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] pr-10 pl-4 text-sm text-right outline-none focus:border-[#0D4B8E] transition"
                 />
               </div>
+              <input value={guardianId} onChange={(event) => { setGuardianId(event.target.value); setPage(1); }} placeholder="معرّف الوصي" aria-label="معرّف الوصي" dir="ltr" className="h-11 rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-3 text-sm" />
+              <select value={hasOrphans} onChange={(event) => { setHasOrphans(event.target.value); setPage(1); }} aria-label="وجود أيتام" className="h-11 rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-3 text-sm"><option value="all">كل العائلات</option><option value="true">لديها أيتام</option><option value="false">دون أيتام</option></select>
+              <select value={documentStatus} onChange={(event) => { setDocumentStatus(event.target.value); setPage(1); }} aria-label="حالة الوثيقة" className="h-11 rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-3 text-sm"><option value="all">كل حالات الوثيقة</option><option value="Pending">قيد المراجعة</option><option value="Approved">معتمدة</option><option value="Rejected">مرفوضة</option><option value="NeedsUpdate">تحتاج تحديث</option></select>
 
               <div className="relative">
                 <select
@@ -523,7 +532,7 @@ export default function FamiliesReview() {
 
           <p dir="rtl" className="mb-4 text-right text-sm text-[#6B7280]">
             عدد النتائج: {" "}
-            <strong className="text-[#1F2937]">{filtered.length}</strong>
+            <strong className="text-[#1F2937]">{currentPagination.isLegacyArray ? filtered.length : currentPagination.totalCount}</strong>
           </p>
 
           {filtered.length === 0 ? (
@@ -548,41 +557,7 @@ export default function FamiliesReview() {
                 ))}
               </div>
 
-              {totalPages > 1 && (
-                <div className="mt-8 flex items-center justify-center gap-2">
-                  <button
-                    onClick={() => setPage((current) => Math.max(1, current - 1))}
-                    disabled={page === 1}
-                    className="grid h-9 w-9 place-items-center rounded-lg border border-[#E5E7EB] bg-white text-[#6B7280] transition hover:border-[#0D4B8E] hover:text-[#0D4B8E] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-                  >
-                    <FiChevronRight />
-                  </button>
-                  {Array.from({ length: totalPages }, (_, index) => index + 1).map(
-                    (number) => (
-                      <button
-                        key={number}
-                        onClick={() => setPage(number)}
-                        className={`h-9 w-9 rounded-lg text-sm font-bold transition cursor-pointer ${
-                          page === number
-                            ? "bg-[#0D4B8E] text-white"
-                            : "border border-[#E5E7EB] bg-white text-[#6B7280] hover:border-[#0D4B8E] hover:text-[#0D4B8E]"
-                        }`}
-                      >
-                        {number}
-                      </button>
-                    ),
-                  )}
-                  <button
-                    onClick={() =>
-                      setPage((current) => Math.min(totalPages, current + 1))
-                    }
-                    disabled={page === totalPages}
-                    className="grid h-9 w-9 place-items-center rounded-lg border border-[#E5E7EB] bg-white text-[#6B7280] transition hover:border-[#0D4B8E] hover:text-[#0D4B8E] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-                  >
-                    <FiChevronLeft />
-                  </button>
-                </div>
-              )}
+              <div className="mt-8"><AdminPagination pagination={currentPagination} onPageChange={setPage} onPageSizeChange={(value) => { setPageSize(value); setPage(1); }} /></div>
             </>
           )}
 

@@ -37,6 +37,7 @@ import AdminGuardiansPage from "./pages/admin-dashboard/AdminGuardiansPage";
 import AdminSponsorsPage from "./pages/admin-dashboard/AdminSponsorsPage";
 import AdminPaymentsReviewPage from "./pages/admin-dashboard/AdminPaymentsReviewPage";
 import AdminPayoutsPage from "./pages/admin-dashboard/AdminPayoutsPage";
+import AdminAuditLogsPage from "./pages/admin-dashboard/AdminAuditLogsPage";
 
 // 🔌 صفحات العائلات (الوصي) — بعد التوحيد، صار عندنا صفحة وحدة لكل حالة
 // بدل ملف منفصل لكل حالة (كانت جوّا Families/status/ وصارت محذوفة).
@@ -586,6 +587,7 @@ function AnimatedRoutes() {
         />
         <Route path="/admin-dashboard/guardians" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminGuardiansPage /></PageWrapper></ProtectedRoute>} />
         <Route path="/admin-dashboard/sponsors" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminSponsorsPage /></PageWrapper></ProtectedRoute>} />
+        <Route path="/admin-dashboard/audit-logs" element={<ProtectedRoute allowedRoles={["SuperAdmin"]}><PageWrapper><AdminAuditLogsPage /></PageWrapper></ProtectedRoute>} />
 
         <Route
           path="/error-404"

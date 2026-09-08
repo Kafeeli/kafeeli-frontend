@@ -10,12 +10,14 @@ import {
 } from "../../config/adminDocumentReviewConfig";
 import { adminApi } from "../../services/adminApi";
 import { apiErrorMessage, openProtectedBlob, unwrapResult } from "../../utils/apiUi";
+import { emptyPagedData, normalizePagedData } from "../../utils/adminPagination";
 import { formatArabicDateTime } from "../../utils/date";
 import AdminLayout from "./Adminlayout";
 import AdminBreadcrumbs from "./AdminBreadcrumbs";
 import AdminDocumentStatusModal from "./AdminDocumentStatusModal";
 import { EmptyState, ErrorState, LoadingState } from "./Adminstates";
 import AdminTableIconButton from "./AdminTableIconButton";
+import AdminPagination from "./AdminPagination";
 
 function documentFileErrorMessage(error) {
   if (error?.response?.status === 401) return "انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى.";
@@ -30,6 +32,15 @@ export default function AdminOrphanDocumentsPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [documentTypeFilter, setDocumentTypeFilter] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [pagination, setPagination] = useState(emptyPagedData);
+  const [orphanId, setOrphanId] = useState("");
+  const [guardianId, setGuardianId] = useState("");
+  const [uploadedFrom, setUploadedFrom] = useState("");
+  const [uploadedTo, setUploadedTo] = useState("");
+  const [reviewedFrom, setReviewedFrom] = useState("");
+  const [reviewedTo, setReviewedTo] = useState("");
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
@@ -48,32 +59,45 @@ export default function AdminOrphanDocumentsPage() {
     else setRefreshing(true);
     setError("");
     try {
-      const result = await adminApi.getAllOrphanDocuments({
+      const query = {
+        page,
+        pageSize,
         search: debouncedSearch,
         status: statusFilter,
         documentType: documentTypeFilter,
-      });
-      setDocuments(unwrapResult(result, "تعذر تحميل وثائق الأيتام.") || []);
+        orphanId,
+        guardianId,
+        uploadedFrom,
+        uploadedTo,
+        reviewedFrom,
+        reviewedTo,
+      };
+      const result = await adminApi.getAllOrphanDocuments(query);
+      const normalized = normalizePagedData(unwrapResult(result, "تعذر تحميل وثائق الأيتام."), query);
+      setDocuments(normalized.items);
+      setPagination(normalized);
     } catch (requestError) {
       setError(apiErrorMessage(requestError, "تعذر تحميل وثائق الأيتام."));
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [debouncedSearch, documentTypeFilter, statusFilter]);
+  }, [debouncedSearch, documentTypeFilter, guardianId, orphanId, page, pageSize, reviewedFrom, reviewedTo, statusFilter, uploadedFrom, uploadedTo]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(loadDocuments, 0);
     return () => window.clearTimeout(timeoutId);
   }, [loadDocuments]);
 
-  const hasActiveFilters = Boolean(searchInput.trim() || statusFilter || documentTypeFilter);
+  const hasActiveFilters = Boolean(searchInput.trim() || statusFilter || documentTypeFilter || orphanId || guardianId || uploadedFrom || uploadedTo || reviewedFrom || reviewedTo);
 
   const clearFilters = () => {
     setSearchInput("");
     setDebouncedSearch("");
     setStatusFilter("");
     setDocumentTypeFilter("");
+    setPage(1);
+    setOrphanId(""); setGuardianId(""); setUploadedFrom(""); setUploadedTo(""); setReviewedFrom(""); setReviewedTo("");
   };
 
   const viewDocument = async (document) => {
@@ -123,16 +147,22 @@ export default function AdminOrphanDocumentsPage() {
           <button type="button" onClick={() => loadDocuments({ silent: true })} disabled={refreshing || loading} className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-[#0D4B8E] disabled:opacity-50"><FiRefreshCw className={refreshing ? "animate-spin" : ""} aria-hidden="true" />تحديث</button>
         </div>
 
-        <div className="grid gap-3 rounded-xl border border-gray-200 bg-white p-4 md:grid-cols-[minmax(260px,1fr)_210px_230px_auto]">
-          <label className="relative"><span className="sr-only">البحث في وثائق الأيتام</span><FiSearch className="absolute right-3 top-3 text-gray-400" aria-hidden="true" /><input value={searchInput} onChange={(event) => setSearchInput(event.target.value)} placeholder="ابحث باسم اليتيم أو الوصي أو رقم الهوية..." className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none focus:border-[#0D4B8E]" /></label>
-          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value ? Number(event.target.value) : "")} aria-label="تصفية حسب حالة الوثيقة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{DOCUMENT_STATUS_FILTERS.map((filter) => <option key={filter.label} value={filter.value}>{filter.label}</option>)}</select>
-          <select value={documentTypeFilter} onChange={(event) => setDocumentTypeFilter(event.target.value ? Number(event.target.value) : "")} aria-label="تصفية حسب نوع الوثيقة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ORPHAN_DOCUMENT_TYPE_FILTERS.map((filter) => <option key={filter.label} value={filter.value}>{filter.label}</option>)}</select>
+        <div className="grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-4">
+          <label className="relative"><span className="sr-only">البحث في وثائق الأيتام</span><FiSearch className="absolute right-3 top-3 text-gray-400" aria-hidden="true" /><input value={searchInput} onChange={(event) => { setSearchInput(event.target.value); setPage(1); }} placeholder="ابحث باسم اليتيم أو الوصي أو رقم الهوية..." className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none focus:border-[#0D4B8E]" /></label>
+          <select value={statusFilter} onChange={(event) => { setStatusFilter(event.target.value ? Number(event.target.value) : ""); setPage(1); }} aria-label="تصفية حسب حالة الوثيقة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{DOCUMENT_STATUS_FILTERS.map((filter) => <option key={filter.label} value={filter.value}>{filter.label}</option>)}</select>
+          <select value={documentTypeFilter} onChange={(event) => { setDocumentTypeFilter(event.target.value ? Number(event.target.value) : ""); setPage(1); }} aria-label="تصفية حسب نوع الوثيقة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ORPHAN_DOCUMENT_TYPE_FILTERS.map((filter) => <option key={filter.label} value={filter.value}>{filter.label}</option>)}</select>
+          <input value={orphanId} onChange={(event) => { setOrphanId(event.target.value); setPage(1); }} placeholder="معرّف اليتيم" aria-label="معرّف اليتيم" dir="ltr" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
+          <input value={guardianId} onChange={(event) => { setGuardianId(event.target.value); setPage(1); }} placeholder="معرّف الوصي" aria-label="معرّف الوصي" dir="ltr" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
+          <label className="text-xs font-bold text-gray-600">رفع من<input type="datetime-local" value={uploadedFrom} onChange={(event) => { setUploadedFrom(event.target.value); setPage(1); }} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
+          <label className="text-xs font-bold text-gray-600">رفع إلى<input type="datetime-local" value={uploadedTo} onChange={(event) => { setUploadedTo(event.target.value); setPage(1); }} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
+          <label className="text-xs font-bold text-gray-600">مراجعة من<input type="datetime-local" value={reviewedFrom} onChange={(event) => { setReviewedFrom(event.target.value); setPage(1); }} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
+          <label className="text-xs font-bold text-gray-600">مراجعة إلى<input type="datetime-local" value={reviewedTo} onChange={(event) => { setReviewedTo(event.target.value); setPage(1); }} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
           {hasActiveFilters && <button type="button" onClick={clearFilters} className="rounded-lg px-3 py-2.5 text-sm font-bold text-red-700 hover:bg-red-50">مسح الفلاتر</button>}
         </div>
 
         {actionError && !statusChangeDocument && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}
         {successMessage && <p role="status" className="rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700">{successMessage}</p>}
-        <p className="text-sm font-bold text-gray-600">النتائج: {documents.length}</p>
+        <p className="text-sm font-bold text-gray-600">النتائج: {pagination.totalCount}</p>
 
         {loading ? <LoadingState /> : error ? <ErrorState onRetry={loadDocuments} description={error} /> : documents.length === 0 ? (
           <EmptyState icon={hasActiveFilters ? FiSearch : MdDescription} title={hasActiveFilters ? "لا توجد نتائج مطابقة." : "لا توجد وثائق أيتام."} description={hasActiveFilters ? "جرّب تعديل البحث أو الفلاتر المحددة." : "لم يُرجع الخادم أي وثائق أيتام حالية."} />
@@ -151,6 +181,7 @@ export default function AdminOrphanDocumentsPage() {
             ))}</tbody>
           </table></div></div>
         )}
+        {!loading && !error && <AdminPagination pagination={pagination} onPageChange={setPage} onPageSizeChange={(value) => { setPageSize(value); setPage(1); }} />}
       </div>
 
       {statusChangeDocument && <AdminDocumentStatusModal document={statusChangeDocument} currentStatus={statusChangeDocument.verificationStatus} entityType="orphan" loading={busy === `status-${statusChangeDocument.documentId}`} error={actionError} onSubmit={changeDocumentStatus} onCancel={() => { if (!busy) { setStatusChangeDocument(null); setActionError(""); } }} />}

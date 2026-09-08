@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { FiCheckCircle, FiEdit2, FiEye, FiEyeOff, FiFileText, FiHome, FiSearch, FiTrash2, FiUser } from "react-icons/fi";
 import { MdChildCare, MdOutlineSchool, MdPauseCircleOutline, MdPlayCircleOutline } from "react-icons/md";
 import { adminApi } from "../../services/adminApi";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
 import {
   apiErrorMessage,
   openProtectedBlob,
@@ -9,6 +10,7 @@ import {
 } from "../../utils/apiUi";
 
 import { formatArabicDateTime } from "../../utils/date";
+import { emptyPagedData, normalizePagedData } from "../../utils/adminPagination";
 
 import { localizeStatus } from "../../utils/localization";
 
@@ -23,6 +25,7 @@ import {
 } from "./AdminManagementDialogs";
 import { EmptyState, ErrorState, LoadingState, MiniStatCard } from "./Adminstates";
 import AdminTableIconButton from "./AdminTableIconButton";
+import AdminPagination from "./AdminPagination";
 
 const ORPHAN_STATUS_FILTERS = [
   { value: "all", label: "كل الحالات" },
@@ -141,6 +144,17 @@ export default function AdminOrphansReviewPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [genderFilter, setGenderFilter] = useState("all");
+  const [sponsorshipFilter, setSponsorshipFilter] = useState("all");
+  const [minAge, setMinAge] = useState("");
+  const [maxAge, setMaxAge] = useState("");
+  const [familyId, setFamilyId] = useState("");
+  const [guardianId, setGuardianId] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [allPagination, setAllPagination] = useState(emptyPagedData);
+  const [pendingPagination, setPendingPagination] = useState(emptyPagedData);
+  const debouncedSearch = useDebouncedValue(searchTerm.trim());
 
   const [selected, setSelected] = useState(null);
   const [selectedForReview, setSelectedForReview] = useState(false);
@@ -161,12 +175,18 @@ export default function AdminOrphansReviewPage() {
     setError("");
 
     try {
+      const sharedQuery = { page, pageSize, search: debouncedSearch, gender: genderFilter, minAge, maxAge, familyId, guardianId, sponsorshipStatus: sponsorshipFilter };
+      const allQuery = { ...sharedQuery, status: statusFilter };
       const [allResult, pendingResult] = await Promise.all([
-        adminApi.getAllOrphans(),
-        adminApi.getPendingOrphans(),
+        adminApi.getAllOrphans(allQuery),
+        adminApi.getPendingOrphans(sharedQuery),
       ]);
-      setAllOrphans(unwrapResult(allResult, "تعذر تحميل جميع الأيتام.") || []);
-      setPendingOrphans(unwrapResult(pendingResult, "تعذر تحميل الأيتام المعلقين.") || []);
+      const normalizedAll = normalizePagedData(unwrapResult(allResult, "تعذر تحميل جميع الأيتام."), allQuery);
+      const normalizedPending = normalizePagedData(unwrapResult(pendingResult, "تعذر تحميل الأيتام المعلقين."), sharedQuery);
+      setAllOrphans(normalizedAll.items);
+      setPendingOrphans(normalizedPending.items);
+      setAllPagination(normalizedAll);
+      setPendingPagination(normalizedPending);
     } catch (requestError) {
       setError(
         apiErrorMessage(
@@ -177,7 +197,7 @@ export default function AdminOrphansReviewPage() {
     } finally {
       if (!silent) setLoading(false);
     }
-  }, []);
+  }, [debouncedSearch, familyId, genderFilter, guardianId, maxAge, minAge, page, pageSize, sponsorshipFilter, statusFilter]);
 
 
   useEffect(() => {
@@ -332,16 +352,18 @@ export default function AdminOrphansReviewPage() {
 
   const filteredOrphans = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
+    if (!allPagination.isLegacyArray) return allOrphans;
     return allOrphans.filter((orphan) => {
       const matchesStatus = statusFilter === "all" || orphan.orphanStatus === statusFilter;
       const matchesSearch = !query || [orphan.fullName, orphan.nationalId]
         .some((value) => String(value || "").toLowerCase().includes(query));
       return matchesStatus && matchesSearch;
     });
-  }, [allOrphans, searchTerm, statusFilter]);
+  }, [allOrphans, allPagination.isLegacyArray, searchTerm, statusFilter]);
 
   const selectTab = (tab) => {
     setActiveTab(tab);
+    setPage(1);
 
     setSelected(null);
     setDialogMode("");
@@ -425,12 +447,22 @@ export default function AdminOrphansReviewPage() {
   return (
     <AdminLayout title="إدارة الأيتام"><div className="space-y-6">
       <div><h1 className="text-2xl font-extrabold text-[#003469]">إدارة الأيتام</h1><p className="mt-1 text-sm text-gray-500">إدارة جميع الأيتام مع إبقاء المراجعة الأولية ومسار تصحيح الوثائق منفصلين.</p></div>
-      <div className="max-w-sm"><MiniStatCard label="إجمالي الأيتام" value={allOrphans.length} icon={MdChildCare} tone="bg-[#E8F1FA] text-[#0D4B8E]" /></div>
-      <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-3">{[{ key: "all", label: `جميع الأيتام (${allOrphans.length})` }, { key: "pending", label: `بانتظار المراجعة (${pendingOrphans.length})` }].map((tab) => <button key={tab.key} type="button" onClick={() => selectTab(tab.key)} className={`rounded-lg px-4 py-2.5 text-sm font-bold transition ${activeTab === tab.key ? "bg-[#0D4B8E] text-white" : "bg-white text-[#0D4B8E] hover:bg-[#E8F1FA]"}`}>{tab.label}</button>)}</div>
-      {activeTab === "all" && <div className="grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-[1fr_220px]"><label className="relative"><span className="sr-only">البحث في الأيتام</span><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="ابحث بالاسم أو رقم الهوية" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none focus:border-[#0D4B8E]" /></label><select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} aria-label="تصفية حسب حالة اليتيم" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ORPHAN_STATUS_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select></div>}
+      <div className="max-w-sm"><MiniStatCard label="إجمالي الأيتام" value={allPagination.totalCount} icon={MdChildCare} tone="bg-[#E8F1FA] text-[#0D4B8E]" /></div>
+      <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-3">{[{ key: "all", label: `جميع الأيتام (${allPagination.totalCount})` }, { key: "pending", label: `بانتظار المراجعة (${pendingPagination.totalCount})` }].map((tab) => <button key={tab.key} type="button" onClick={() => selectTab(tab.key)} className={`rounded-lg px-4 py-2.5 text-sm font-bold transition ${activeTab === tab.key ? "bg-[#0D4B8E] text-white" : "bg-white text-[#0D4B8E] hover:bg-[#E8F1FA]"}`}>{tab.label}</button>)}</div>
+      <div className="grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-4">
+        <label className="relative sm:col-span-2"><span className="sr-only">البحث في الأيتام</span><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder="ابحث بالاسم أو رقم الهوية" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm" /></label>
+        {activeTab === "all" && <select value={statusFilter} onChange={(event) => { setStatusFilter(event.target.value); setPage(1); }} aria-label="حالة اليتيم" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ORPHAN_STATUS_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select>}
+        <select value={genderFilter} onChange={(event) => { setGenderFilter(event.target.value); setPage(1); }} aria-label="الجنس" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm"><option value="all">كل الأجناس</option><option value="Male">ذكر</option><option value="Female">أنثى</option></select>
+        <input type="number" min="0" max="120" value={minAge} onChange={(event) => { setMinAge(event.target.value); setPage(1); }} placeholder="العمر الأدنى" aria-label="العمر الأدنى" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
+        <input type="number" min="0" max="120" value={maxAge} onChange={(event) => { setMaxAge(event.target.value); setPage(1); }} placeholder="العمر الأعلى" aria-label="العمر الأعلى" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
+        <select value={sponsorshipFilter} onChange={(event) => { setSponsorshipFilter(event.target.value); setPage(1); }} aria-label="حالة الكفالة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm"><option value="all">كل حالات الكفالة</option><option value="Sponsored">مكفول</option><option value="Unsponsored">غير مكفول</option></select>
+        <input value={familyId} onChange={(event) => { setFamilyId(event.target.value); setPage(1); }} placeholder="معرّف العائلة" aria-label="معرّف العائلة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" dir="ltr" />
+        <input value={guardianId} onChange={(event) => { setGuardianId(event.target.value); setPage(1); }} placeholder="معرّف الوصي" aria-label="معرّف الوصي" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" dir="ltr" />
+      </div>
       {actionError && !selected && !confirmation && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}{successMessage && <p role="status" className="rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700">{successMessage}</p>}
-      {activeTab === "all" && <p className="text-sm font-bold text-gray-600">النتائج: {filteredOrphans.length}</p>}
+      {activeTab === "all" && <p className="text-sm font-bold text-gray-600">النتائج: {allPagination.isLegacyArray ? filteredOrphans.length : allPagination.totalCount}</p>}
       {loading ? <LoadingState /> : error ? <ErrorState onRetry={load} description={error} /> : tabContent}
+      {!loading && !error && <AdminPagination pagination={activeTab === "all" ? allPagination : pendingPagination} onPageChange={setPage} onPageSizeChange={(value) => { setPageSize(value); setPage(1); }} />}
     </div>
 
     {selected && dialogMode === "details" && <AdminDialog title={selectedForReview ? "مراجعة ملف اليتيم" : "تفاصيل اليتيم"} onClose={closeDetails} closeDisabled={Boolean(busy)} size="max-w-5xl" footer={!selectedForReview ? <><button type="button" onClick={() => setDialogMode("edit")} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white">تعديل</button>{(STATUS_TRANSITIONS[selected.orphanStatus] || []).map((status) => <button key={status} type="button" onClick={() => openStatusConfirmation(selected, status)} className={`rounded-lg px-5 py-2.5 text-sm font-bold text-white ${status === "Active" ? "bg-emerald-600" : status === "Hidden" ? "bg-slate-600" : "bg-amber-600"}`}>{statusActionLabel(status)}</button>)}<button type="button" onClick={() => { setActionError(""); setConfirmation({ type: "delete", orphan: selected }); }} className="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-bold text-red-700">حذف نهائي</button></> : undefined}>

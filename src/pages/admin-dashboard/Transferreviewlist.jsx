@@ -1,13 +1,10 @@
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FiChevronLeft,
-  FiChevronRight,
-  FiFilter,
   FiExternalLink,
+  FiSearch,
 } from "react-icons/fi";
-import { TbArrowsSort } from "react-icons/tb";
 import {
   HiOutlineBuildingLibrary,
   HiOutlineClipboardDocumentList,
@@ -21,9 +18,11 @@ import AdminLayout from "./Adminlayout";
 import AdminEntityAvatar from "./AdminEntityAvatar";
 import TransferDetailsModal from "./modals/Transferdetailsmodal";
 import { adminApi } from "../../services/adminApi";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
+import { emptyPagedData, normalizePagedData } from "../../utils/adminPagination";
+import AdminPagination from "./AdminPagination";
 
 const cardShadow = "shadow-[0_2px_10px_rgba(31,41,55,0.06)]";
-const ITEMS_PER_PAGE = 4;
 
 const STATUS_LABELS = {
   Pending: "بانتظار المراجعة",
@@ -276,6 +275,12 @@ export default function TransferReviewList() {
   const navigate = useNavigate();
   const [selectedItem, setSelectedItem] = useState(null);
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [pagination, setPagination] = useState(emptyPagedData);
+  const [searchInput, setSearchInput] = useState("");
+  const [guardianId, setGuardianId] = useState("");
+  const [bankName, setBankName] = useState("");
+  const search = useDebouncedValue(searchInput.trim());
 
   /* status: "loading" | "success" | "empty" | "error" */
   const [status, setStatus] = useState("loading");
@@ -294,7 +299,8 @@ export default function TransferReviewList() {
     setErrorMessage(null);
 
     try {
-      const response = await adminApi.getPendingBankAccounts();
+      const query = { page, pageSize, search, guardianId, bankName };
+      const response = await adminApi.getPendingBankAccounts(query);
 
       if (!response?.success) {
         setErrorMessage(response?.message || "تعذر تحميل بيانات المراجعة");
@@ -302,22 +308,24 @@ export default function TransferReviewList() {
         return;
       }
 
-      const mapped = (response.data || []).map(mapListItem);
+      const normalized = normalizePagedData(response.data, query);
+      const mapped = normalized.items.map(mapListItem);
       setReviewItems(mapped);
+      setPagination(normalized);
       setStatus(mapped.length === 0 ? "empty" : "success");
-      setPage(1);
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "تعذر تحميل بيانات المراجعة"));
       setStatus("error");
     }
-  }, []);
+  }, [bankName, guardianId, page, pageSize, search]);
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadInitialReviewItems() {
       try {
-        const response = await adminApi.getPendingBankAccounts();
+        const query = { page, pageSize, search, guardianId, bankName };
+        const response = await adminApi.getPendingBankAccounts(query);
         if (cancelled) return;
 
         if (!response?.success) {
@@ -326,10 +334,11 @@ export default function TransferReviewList() {
           return;
         }
 
-        const mapped = (response.data || []).map(mapListItem);
+        const normalized = normalizePagedData(response.data, query);
+        const mapped = normalized.items.map(mapListItem);
         setReviewItems(mapped);
+        setPagination(normalized);
         setStatus(mapped.length === 0 ? "empty" : "success");
-        setPage(1);
       } catch (error) {
         if (cancelled) return;
         setErrorMessage(getErrorMessage(error, "تعذر تحميل بيانات المراجعة"));
@@ -341,14 +350,9 @@ export default function TransferReviewList() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [bankName, guardianId, page, pageSize, search]);
 
-  const totalPages = Math.ceil(reviewItems.length / ITEMS_PER_PAGE) || 1;
-
-  const pageItems = useMemo(() => {
-    const start = (page - 1) * ITEMS_PER_PAGE;
-    return reviewItems.slice(start, start + ITEMS_PER_PAGE);
-  }, [page, reviewItems]);
+  const pageItems = reviewItems;
 
   // عند الضغط على "مراجعة بيانات التحويل": نجيب التفاصيل الكاملة (IBAN ورقم الحساب غير مقنّعين) أولاً
   const handleReviewClick = async (item) => {
@@ -467,19 +471,15 @@ export default function TransferReviewList() {
             />
           </div>
 
-          {/* عنوان القائمة + أدوات */}
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h3 className="text-lg font-extrabold text-[#08386B]">
               قائمة المراجعة (قيد الانتظار)
             </h3>
-            <div className="flex items-center gap-2">
-              <button className="grid h-9 w-9 place-items-center rounded-lg border border-[#E5E7EB] bg-white text-[#6B7280] hover:border-[#0D4B8E] hover:text-[#0D4B8E] transition cursor-pointer">
-                <TbArrowsSort />
-              </button>
-              <button className="grid h-9 w-9 place-items-center rounded-lg border border-[#E5E7EB] bg-white text-[#6B7280] hover:border-[#0D4B8E] hover:text-[#0D4B8E] transition cursor-pointer">
-                <FiFilter />
-              </button>
-            </div>
+          </div>
+          <div className="mb-5 grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-3">
+            <label className="relative"><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchInput} onChange={(event) => { setSearchInput(event.target.value); setPage(1); }} placeholder="البحث في طلبات التحويل" aria-label="البحث في طلبات التحويل" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm" /></label>
+            <input value={guardianId} onChange={(event) => { setGuardianId(event.target.value); setPage(1); }} placeholder="معرّف الوصي" aria-label="معرّف الوصي" dir="ltr" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
+            <input value={bankName} onChange={(event) => { setBankName(event.target.value); setPage(1); }} placeholder="اسم البنك" aria-label="اسم البنك" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
           </div>
 
           {actionError && !selectedItem && (
@@ -503,48 +503,7 @@ export default function TransferReviewList() {
             ))}
           </div>
 
-          {/* Pagination */}
-          <div className="mt-8 flex flex-col items-center gap-3 border-t border-[#E5E7EB] pt-6">
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-                className="grid h-9 w-9 place-items-center rounded-lg border border-[#E5E7EB] bg-white text-[#6B7280] transition hover:border-[#0D4B8E] hover:text-[#0D4B8E] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-              >
-                <FiChevronRight />
-              </button>
-
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (num) => (
-                  <button
-                    key={num}
-                    onClick={() => setPage(num)}
-                    className={`h-9 w-9 rounded-lg text-sm font-bold transition cursor-pointer ${
-                      page === num
-                        ? "bg-[#0D4B8E] text-white"
-                        : "border border-[#E5E7EB] bg-white text-[#6B7280] hover:border-[#0D4B8E] hover:text-[#0D4B8E]"
-                    }`}
-                  >
-                    {num}
-                  </button>
-                ),
-              )}
-
-              <button
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="grid h-9 w-9 place-items-center rounded-lg border border-[#E5E7EB] bg-white text-[#6B7280] transition hover:border-[#0D4B8E] hover:text-[#0D4B8E] disabled:cursor-not-allowed disabled:opacity-40 cursor-pointer"
-              >
-                <FiChevronLeft />
-              </button>
-            </div>
-
-            <p className="text-xs text-[#9CA3AF]">
-              عرض {(page - 1) * ITEMS_PER_PAGE + 1}-
-              {Math.min(page * ITEMS_PER_PAGE, reviewItems.length)} من أصل{" "}
-              {reviewItems.length} طلب مراجعة
-            </p>
-          </div>
+          <div className="mt-8"><AdminPagination pagination={pagination} onPageChange={setPage} onPageSizeChange={(value) => { setPageSize(value); setPage(1); }} /></div>
         </>
       )}
 
