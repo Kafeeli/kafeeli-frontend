@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { authApi } from "../services/authApi";
 
 import logo from "../assets/title.png";
+import PrivacyPolicyModal from "../components/PrivacyPolicyModal";
 import guardianIcon from "../assets/guardian-icon.png";
 import sponsorIcon from "../assets/sponsor-icon.png";
 import sideIcon from "../assets/hand.png";
@@ -43,6 +44,9 @@ export default function RegistrationPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [acceptTerms, setAcceptTerms] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+
   const [formData, setFormData] = useState({
     firstName: "",
     fatherName: "",
@@ -58,6 +62,12 @@ export default function RegistrationPage() {
   });
 
   const [errors, setErrors] = useState({});
+
+  const passwordVal = formData.password || "";
+  const hasMinLength = passwordVal.length >= 8;
+  const hasUppercase = /[A-Z]/.test(passwordVal);
+  const hasLowercase = /[a-z]/.test(passwordVal);
+  const hasNumberOrSpecial = /[0-9!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(passwordVal);
 
   const accountTypeMap = {
     sponsor: 1,
@@ -161,8 +171,8 @@ export default function RegistrationPage() {
 
     if (!formData.password) {
       newErrors.password = "كلمة المرور مطلوبة";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "كلمة المرور يجب أن تكون 8 أحرف على الأقل";
+    } else if (!hasMinLength || !hasUppercase || !hasLowercase || !hasNumberOrSpecial) {
+      newErrors.password = "كلمة المرور يجب أن تستوفي جميع المتطلبات الموضحة أسفل الحقل";
     }
 
     if (!formData.confirmPassword) {
@@ -170,6 +180,10 @@ export default function RegistrationPage() {
     } else if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword =
         "كلمة المرور وتأكيد كلمة المرور غير متطابقتين";
+    }
+
+    if (!acceptTerms) {
+      newErrors.acceptTerms = "يجب الموافقة على الشروط والأحكام وسياسة الخصوصية للمتابعة";
     }
 
     setErrors(newErrors);
@@ -573,6 +587,63 @@ export default function RegistrationPage() {
                 </div>
 
                 <FieldError message={errors.password} />
+
+                {/* متطلبات كلمة المرور */}
+                <div className="mt-3 rounded-2xl border border-gray-200 bg-[#F8FAFC] p-4 text-right">
+                  <p className="mb-3 text-sm font-bold text-[#003469]">
+                    متطلبات كلمة المرور:
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-3 text-xs sm:text-sm">
+                    {/* 8 أحرف على الأقل */}
+                    <div className="flex items-center justify-start gap-2">
+                      {hasMinLength ? (
+                        <FaCheckCircle className="h-4 w-4 shrink-0 text-emerald-600 transition" />
+                      ) : (
+                        <span className="h-4 w-4 shrink-0 rounded-full border-2 border-gray-300 bg-white transition inline-block" />
+                      )}
+                      <span className={hasMinLength ? "font-bold text-emerald-700 transition" : "text-gray-500 transition"}>
+                        8 أحرف على الأقل
+                      </span>
+                    </div>
+
+                    {/* أحرف كبيرة (A-Z) */}
+                    <div className="flex items-center justify-start gap-2">
+                      {hasUppercase ? (
+                        <FaCheckCircle className="h-4 w-4 shrink-0 text-emerald-600 transition" />
+                      ) : (
+                        <span className="h-4 w-4 shrink-0 rounded-full border-2 border-gray-300 bg-white transition inline-block" />
+                      )}
+                      <span className={hasUppercase ? "font-bold text-emerald-700 transition" : "text-gray-500 transition"}>
+                        أحرف كبيرة (A-Z)
+                      </span>
+                    </div>
+
+                    {/* أحرف صغيرة (a-z) */}
+                    <div className="flex items-center justify-start gap-2">
+                      {hasLowercase ? (
+                        <FaCheckCircle className="h-4 w-4 shrink-0 text-emerald-600 transition" />
+                      ) : (
+                        <span className="h-4 w-4 shrink-0 rounded-full border-2 border-gray-300 bg-white transition inline-block" />
+                      )}
+                      <span className={hasLowercase ? "font-bold text-emerald-700 transition" : "text-gray-500 transition"}>
+                        أحرف صغيرة (a-z)
+                      </span>
+                    </div>
+
+                    {/* أرقام أو رموز خاصة */}
+                    <div className="flex items-center justify-start gap-2">
+                      {hasNumberOrSpecial ? (
+                        <FaCheckCircle className="h-4 w-4 shrink-0 text-emerald-600 transition" />
+                      ) : (
+                        <span className="h-4 w-4 shrink-0 rounded-full border-2 border-gray-300 bg-white transition inline-block" />
+                      )}
+                      <span className={hasNumberOrSpecial ? "font-bold text-emerald-700 transition" : "text-gray-500 transition"}>
+                        أرقام أو رموز خاصة
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div className="flex flex-col gap-1 max-w-lg mx-auto w-full mt-4">
@@ -607,6 +678,44 @@ export default function RegistrationPage() {
                 </pre>
               )}
 
+              {/* موافقة على الشروط والخصوصية */}
+              <div className="mt-4 flex flex-col gap-1 max-w-lg mx-auto w-full">
+                <div className="flex items-start gap-2.5 text-right">
+                  <input
+                    type="checkbox"
+                    id="acceptTerms"
+                    name="acceptTerms"
+                    checked={acceptTerms}
+                    onChange={(e) => {
+                      setAcceptTerms(e.target.checked);
+                      if (e.target.checked) {
+                        setErrors((prev) => ({ ...prev, acceptTerms: "" }));
+                      }
+                    }}
+                    className="mt-1 h-4 w-4 shrink-0 rounded border-gray-300 text-[#0D4B8E] focus:ring-[#0D4B8E] cursor-pointer"
+                  />
+                  <label htmlFor="acceptTerms" className="text-sm text-gray-700 cursor-pointer select-none leading-relaxed">
+                    أوافق على{" "}
+                    <button
+                      type="button"
+                      onClick={() => setShowPrivacyModal(true)}
+                      className="font-bold text-[#0D4B8E] underline hover:text-[#003469] cursor-pointer inline"
+                    >
+                      الشروط والأحكام
+                    </button>{" "}
+                    و{" "}
+                    <button
+                      type="button"
+                      onClick={() => setShowPrivacyModal(true)}
+                      className="font-bold text-[#0D4B8E] underline hover:text-[#003469] cursor-pointer inline"
+                    >
+                      سياسة الخصوصية
+                    </button>
+                  </label>
+                </div>
+                <FieldError message={errors.acceptTerms} />
+              </div>
+
               <div className="mt-4 max-w-lg mx-auto w-full">
                 <button
                   type="submit"
@@ -621,16 +730,24 @@ export default function RegistrationPage() {
                   <FaArrowLeft />
                 </button>
 
-                <p className="text-center text-sm text-gray-500 mt-3">
+                {/* <p className="text-center text-sm text-gray-500 mt-3">
                   بنقرك على "إنشاء حساب"، أنت توافق على{" "}
-                  <a href="#" className="text-[#0D4B8E] font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setShowPrivacyModal(true)}
+                    className="text-[#0D4B8E] font-bold underline hover:text-[#003469] cursor-pointer"
+                  >
                     الشروط والأحكام
-                  </a>{" "}
+                  </button>{" "}
                   و{" "}
-                  <a href="#" className="text-[#0D4B8E] font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setShowPrivacyModal(true)}
+                    className="text-[#0D4B8E] font-bold underline hover:text-[#003469] cursor-pointer"
+                  >
                     سياسة الخصوصية
-                  </a>
-                </p>
+                  </button>
+                </p> */}
               </div>
             </form>
           </div>
@@ -646,13 +763,21 @@ export default function RegistrationPage() {
             اتصل بنا
           </a>
 
-          <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
+          <button
+            type="button"
+            onClick={() => setShowPrivacyModal(true)}
+            className="text-sm text-gray-500 hover:text-blue-700 cursor-pointer"
+          >
             الشروط والأحكام
-          </a>
+          </button>
 
-          <a href="#" className="text-sm text-gray-500 hover:text-blue-700">
+          <button
+            type="button"
+            onClick={() => setShowPrivacyModal(true)}
+            className="text-sm text-gray-500 hover:text-blue-700 cursor-pointer"
+          >
             سياسة الخصوصية
-          </a>
+          </button>
         </div>
 
         <p className="text-sm text-gray-500 order-2 text-center">
@@ -663,6 +788,15 @@ export default function RegistrationPage() {
           كفيلي
         </p>
       </footer>
+
+      <PrivacyPolicyModal
+        isOpen={showPrivacyModal}
+        onClose={() => setShowPrivacyModal(false)}
+        onAccept={() => {
+          setAcceptTerms(true);
+          setErrors((prev) => ({ ...prev, acceptTerms: "" }));
+        }}
+      />
     </>
   );
 }
