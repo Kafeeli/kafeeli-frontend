@@ -26,14 +26,10 @@ const sidebarItems = [
     path: "/admin-dashboard/transfer-review",
   },
   {
-  label: "الأوصياء",
-  icon: HiOutlineIdentification,
-  path: "/admin-dashboard/guardians",
-  activePaths: [
-    "/admin-dashboard/guardians",
-    "/admin-dashboard/guardian-document-reviews",
-  ],
-},
+    label: "الأوصياء",
+    icon: HiOutlineIdentification,
+    path: "/admin-dashboard/guardians",
+  },
   {
     label: "الكفلاء",
     icon: MdOutlineVolunteerActivism,

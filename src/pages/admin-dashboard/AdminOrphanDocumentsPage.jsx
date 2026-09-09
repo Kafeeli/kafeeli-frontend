@@ -147,17 +147,112 @@ export default function AdminOrphanDocumentsPage() {
           <button type="button" onClick={() => loadDocuments({ silent: true })} disabled={refreshing || loading} className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-sm font-bold text-[#0D4B8E] disabled:opacity-50"><FiRefreshCw className={refreshing ? "animate-spin" : ""} aria-hidden="true" />تحديث</button>
         </div>
 
-        <div className="grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-4">
-          <label className="relative"><span className="sr-only">البحث في وثائق الأيتام</span><FiSearch className="absolute right-3 top-3 text-gray-400" aria-hidden="true" /><input value={searchInput} onChange={(event) => { setSearchInput(event.target.value); setPage(1); }} placeholder="ابحث باسم اليتيم أو الوصي أو رقم الهوية..." className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none focus:border-[#0D4B8E]" /></label>
-          <select value={statusFilter} onChange={(event) => { setStatusFilter(event.target.value ? Number(event.target.value) : ""); setPage(1); }} aria-label="تصفية حسب حالة الوثيقة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{DOCUMENT_STATUS_FILTERS.map((filter) => <option key={filter.label} value={filter.value}>{filter.label}</option>)}</select>
-          <select value={documentTypeFilter} onChange={(event) => { setDocumentTypeFilter(event.target.value ? Number(event.target.value) : ""); setPage(1); }} aria-label="تصفية حسب نوع الوثيقة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ORPHAN_DOCUMENT_TYPE_FILTERS.map((filter) => <option key={filter.label} value={filter.value}>{filter.label}</option>)}</select>
-          <input value={orphanId} onChange={(event) => { setOrphanId(event.target.value); setPage(1); }} placeholder="معرّف اليتيم" aria-label="معرّف اليتيم" dir="ltr" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
-          <input value={guardianId} onChange={(event) => { setGuardianId(event.target.value); setPage(1); }} placeholder="معرّف الوصي" aria-label="معرّف الوصي" dir="ltr" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
-          <label className="text-xs font-bold text-gray-600">رفع من<input type="datetime-local" value={uploadedFrom} onChange={(event) => { setUploadedFrom(event.target.value); setPage(1); }} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
-          <label className="text-xs font-bold text-gray-600">رفع إلى<input type="datetime-local" value={uploadedTo} onChange={(event) => { setUploadedTo(event.target.value); setPage(1); }} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
-          <label className="text-xs font-bold text-gray-600">مراجعة من<input type="datetime-local" value={reviewedFrom} onChange={(event) => { setReviewedFrom(event.target.value); setPage(1); }} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
-          <label className="text-xs font-bold text-gray-600">مراجعة إلى<input type="datetime-local" value={reviewedTo} onChange={(event) => { setReviewedTo(event.target.value); setPage(1); }} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
-          {hasActiveFilters && <button type="button" onClick={clearFilters} className="rounded-lg px-3 py-2.5 text-sm font-bold text-red-700 hover:bg-red-50">مسح الفلاتر</button>}
+        <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-4">
+          {/* الصف الأول: البحث وحالة الوثيقة ونوع الوثيقة */}
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="orphan-doc-search" className="text-xs font-bold text-gray-600">البحث</label>
+              <div className="relative flex items-center">
+                <FiSearch className="absolute right-3.5 text-gray-400 text-base pointer-events-none" aria-hidden="true" />
+                <input
+                  id="orphan-doc-search"
+                  value={searchInput}
+                  onChange={(event) => { setSearchInput(event.target.value); setPage(1); }}
+                  placeholder="ابحث باسم اليتيم أو الوصي أو رقم الهوية..."
+                  className="w-full h-10 rounded-lg border border-gray-300 bg-white py-2 pr-10 pl-3 text-sm text-gray-800 placeholder-gray-400 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label htmlFor="orphan-doc-status" className="text-xs font-bold text-gray-600">حالة الوثيقة</label>
+              <select
+                id="orphan-doc-status"
+                value={statusFilter}
+                onChange={(event) => { setStatusFilter(event.target.value ? Number(event.target.value) : ""); setPage(1); }}
+                aria-label="تصفية حسب حالة الوثيقة"
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E] cursor-pointer"
+              >
+                {DOCUMENT_STATUS_FILTERS.map((filter) => (
+                  <option key={filter.label} value={filter.value}>{filter.label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label htmlFor="orphan-doc-type" className="text-xs font-bold text-gray-600">نوع الوثيقة</label>
+              <select
+                id="orphan-doc-type"
+                value={documentTypeFilter}
+                onChange={(event) => { setDocumentTypeFilter(event.target.value ? Number(event.target.value) : ""); setPage(1); }}
+                aria-label="تصفية حسب نوع الوثيقة"
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E] cursor-pointer"
+              >
+                {ORPHAN_DOCUMENT_TYPE_FILTERS.map((filter) => (
+                  <option key={filter.label} value={filter.value}>{filter.label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* الصف الثاني: فلاتر التواريخ */}
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 pt-3 border-t border-gray-100">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="uploaded-from-orphan" className="text-xs font-bold text-gray-600">تاريخ الرفع (من)</label>
+              <input
+                id="uploaded-from-orphan"
+                type="datetime-local"
+                value={uploadedFrom}
+                onChange={(event) => { setUploadedFrom(event.target.value); setPage(1); }}
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label htmlFor="uploaded-to-orphan" className="text-xs font-bold text-gray-600">تاريخ الرفع (إلى)</label>
+              <input
+                id="uploaded-to-orphan"
+                type="datetime-local"
+                value={uploadedTo}
+                onChange={(event) => { setUploadedTo(event.target.value); setPage(1); }}
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label htmlFor="reviewed-from-orphan" className="text-xs font-bold text-gray-600">تاريخ المراجعة (من)</label>
+              <input
+                id="reviewed-from-orphan"
+                type="datetime-local"
+                value={reviewedFrom}
+                onChange={(event) => { setReviewedFrom(event.target.value); setPage(1); }}
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label htmlFor="reviewed-to-orphan" className="text-xs font-bold text-gray-600">تاريخ المراجعة (إلى)</label>
+              <input
+                id="reviewed-to-orphan"
+                type="datetime-local"
+                value={reviewedTo}
+                onChange={(event) => { setReviewedTo(event.target.value); setPage(1); }}
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+              />
+            </div>
+          </div>
+
+          {hasActiveFilters && (
+            <div className="flex justify-end pt-1">
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="rounded-lg px-4 py-2 text-sm font-bold text-red-700 hover:bg-red-50 border border-red-200 transition cursor-pointer"
+              >
+                مسح جميع الفلاتر
+              </button>
+            </div>
+          )}
         </div>
 
         {actionError && !statusChangeDocument && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}

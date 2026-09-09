@@ -58,11 +58,8 @@ export default function AdminPayoutsPage() {
   const [busy, setBusy] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const search = useDebouncedValue(searchInput.trim());
-  const [guardianId, setGuardianId] = useState("");
-  const [sponsorId, setSponsorId] = useState("");
   const [minAmount, setMinAmount] = useState("");
   const [maxAmount, setMaxAmount] = useState("");
-  const [filterSponsorshipId, setFilterSponsorshipId] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(1);
@@ -78,7 +75,7 @@ export default function AdminPayoutsPage() {
     setLoading(true);
     setError("");
     try {
-      const query = { page, pageSize, search, guardianId, sponsorId, sponsorshipId: filterSponsorshipId, minAmount, maxAmount, dateFrom, dateTo };
+      const query = { page, pageSize, search, minAmount, maxAmount, dateFrom, dateTo };
       const [pendingResult, eligibleResult] = await Promise.all([
         adminApi.getPendingPayouts(query),
         adminApi.getEligiblePayouts({ page: 1, pageSize: 100, search }),
@@ -98,7 +95,7 @@ export default function AdminPayoutsPage() {
     } finally {
       setLoading(false);
     }
-  }, [dateFrom, dateTo, filterSponsorshipId, guardianId, maxAmount, minAmount, page, pageSize, search, sponsorId]);
+  }, [dateFrom, dateTo, maxAmount, minAmount, page, pageSize, search]);
 
   useEffect(() => {
     const id = window.setTimeout(load, 0);
@@ -169,14 +166,77 @@ export default function AdminPayoutsPage() {
       <div className="space-y-6">
         {loading ? <LoadingState /> : error ? <ErrorState onRetry={load} description={error} /> : (
           <>
-            <div className="grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-5">
-              <label className="relative sm:col-span-2"><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchInput} onChange={(event) => { setSearchInput(event.target.value); setPage(1); }} placeholder="ابحث في دفعات الأوصياء" aria-label="البحث في الدفعات" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm" /></label>
-              <input value={guardianId} onChange={(event) => { setGuardianId(event.target.value); setPage(1); }} placeholder="معرّف الوصي" aria-label="معرّف الوصي" dir="ltr" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
-              <input value={sponsorId} onChange={(event) => { setSponsorId(event.target.value); setPage(1); }} placeholder="معرّف الكفيل" aria-label="معرّف الكفيل" dir="ltr" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
-              <input value={filterSponsorshipId} onChange={(event) => { setFilterSponsorshipId(event.target.value); setPage(1); }} placeholder="معرّف الكفالة" aria-label="معرّف الكفالة" dir="ltr" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
-              <div className="grid grid-cols-2 gap-2"><input type="number" min="0" value={minAmount} onChange={(event) => { setMinAmount(event.target.value); setPage(1); }} placeholder="أدنى مبلغ" aria-label="أدنى مبلغ" className="min-w-0 rounded-lg border border-gray-300 px-2 py-2.5 text-sm" /><input type="number" min="0" value={maxAmount} onChange={(event) => { setMaxAmount(event.target.value); setPage(1); }} placeholder="أعلى مبلغ" aria-label="أعلى مبلغ" className="min-w-0 rounded-lg border border-gray-300 px-2 py-2.5 text-sm" /></div>
-              <label className="text-xs font-bold text-gray-600">من تاريخ<input type="datetime-local" value={dateFrom} onChange={(event) => { setDateFrom(event.target.value); setPage(1); }} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
-              <label className="text-xs font-bold text-gray-600">إلى تاريخ<input type="datetime-local" value={dateTo} onChange={(event) => { setDateTo(event.target.value); setPage(1); }} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
+            <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-4">
+              {/* الصف الأول: البحث ونطاق المبلغ */}
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="payout-search-input" className="text-xs font-bold text-gray-600">البحث</label>
+                  <div className="relative flex items-center">
+                    <FiSearch className="absolute right-3.5 text-gray-400 text-base pointer-events-none" aria-hidden="true" />
+                    <input
+                      id="payout-search-input"
+                      value={searchInput}
+                      onChange={(event) => { setSearchInput(event.target.value); setPage(1); }}
+                      placeholder="ابحث في دفعات الأوصياء..."
+                      aria-label="البحث في الدفعات"
+                      className="w-full h-10 rounded-lg border border-gray-300 bg-white py-2 pr-10 pl-3 text-sm text-gray-800 placeholder-gray-400 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="payout-min-amount" className="text-xs font-bold text-gray-600">أدنى مبلغ</label>
+                  <input
+                    id="payout-min-amount"
+                    type="number"
+                    min="0"
+                    value={minAmount}
+                    onChange={(event) => { setMinAmount(event.target.value); setPage(1); }}
+                    placeholder="مثال: 50"
+                    aria-label="أدنى مبلغ"
+                    className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="payout-max-amount" className="text-xs font-bold text-gray-600">أعلى مبلغ</label>
+                  <input
+                    id="payout-max-amount"
+                    type="number"
+                    min="0"
+                    value={maxAmount}
+                    onChange={(event) => { setMaxAmount(event.target.value); setPage(1); }}
+                    placeholder="مثال: 500"
+                    aria-label="أعلى مبلغ"
+                    className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+                  />
+                </div>
+              </div>
+
+              {/* الصف الثاني: نطاق التواريخ */}
+              <div className="grid gap-3 sm:grid-cols-2 pt-3 border-t border-gray-100">
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="payout-date-from" className="text-xs font-bold text-gray-600">من تاريخ</label>
+                  <input
+                    id="payout-date-from"
+                    type="datetime-local"
+                    value={dateFrom}
+                    onChange={(event) => { setDateFrom(event.target.value); setPage(1); }}
+                    className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="payout-date-to" className="text-xs font-bold text-gray-600">إلى تاريخ</label>
+                  <input
+                    id="payout-date-to"
+                    type="datetime-local"
+                    value={dateTo}
+                    onChange={(event) => { setDateTo(event.target.value); setPage(1); }}
+                    className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+                  />
+                </div>
+              </div>
             </div>
             <form onSubmit={create} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="flex items-center gap-2 font-extrabold text-[#003469]"><MdAccountBalanceWallet />الكفالات المؤهلة للتحويل</h2>
