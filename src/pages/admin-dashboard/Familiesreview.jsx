@@ -447,89 +447,82 @@ export default function FamiliesReview() {
         </div>
       )}
 
-      {status === "loading" && <LoadingState count={6} />}
-
-      {status === "error" && (
-        <ErrorState onRetry={fetchFamilies} description={loadError} />
-      )}
-
-      {status === "empty" && (
-        <EmptyState
-          icon={MdOutlineFamilyRestroom}
-          title="لا توجد عائلات"
-          description="لا توجد عائلات مسجلة في المنصة حاليًا."
+      {/* Stat Cards */}
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <MiniStatCard
+          label={activeSection === "pending" ? "إجمالي الطلبات" : "إجمالي العائلات"}
+          value={activeSection === "pending" ? pendingFamilies.length : families.length}
+          icon={HiOutlineUsers}
+          tone="bg-[#0D4B8E]/10 text-[#0D4B8E]"
         />
-      )}
+        <MiniStatCard
+          label="شهادات وفاة مرفوعة"
+          value={(activeSection === "pending" ? pendingFamilies : families).filter((family) => family.hasFatherDeathCertificate).length}
+          icon={MdOutlineVerified}
+          tone="bg-green-100 text-green-700"
+        />
+        <MiniStatCard
+          label="طلبات قيد المراجعة"
+          value={pendingFamilies.length}
+          icon={HiOutlineIdentification}
+          tone="bg-[#F0C86A]/50 text-[#B07B11]"
+        />
+      </div>
 
-      {status === "success" && (
-        <>
-          <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <MiniStatCard
-              label={activeSection === "pending" ? "إجمالي الطلبات" : "إجمالي العائلات"}
-              value={activeSection === "pending" ? pendingFamilies.length : families.length}
-              icon={HiOutlineUsers}
-              tone="bg-[#0D4B8E]/10 text-[#0D4B8E]"
-            />
-            <MiniStatCard
-              label="شهادات وفاة مرفوعة"
-              value={(activeSection === "pending" ? pendingFamilies : families).filter((family) => family.hasFatherDeathCertificate).length}
-              icon={MdOutlineVerified}
-              tone="bg-green-100 text-green-700"
-            />
-            <MiniStatCard
-              label="طلبات قيد المراجعة"
-              value={pendingFamilies.length}
-              icon={HiOutlineIdentification}
-              tone="bg-[#F0C86A]/50 text-[#B07B11]"
+      {/* Search and Filter Bar */}
+      <div
+        className={`mb-6 rounded-xl border border-[#E5E7EB] bg-white p-4 ${cardShadow}`}
+      >
+        <div
+          dir="rtl"
+          className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5"
+        >
+          <div className="relative">
+            <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(event) => {
+                setSearchTerm(event.target.value);
+                setPage(1);
+              }}
+              placeholder="ابحث باسم رب الأسرة أو الوصي أو البريد الإلكتروني"
+              className="h-11 w-full rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] pr-10 pl-4 text-sm text-right outline-none focus:border-[#0D4B8E] transition"
             />
           </div>
+          <input value={guardianId} onChange={(event) => { setGuardianId(event.target.value); setPage(1); }} placeholder="معرّف الوصي" aria-label="معرّف الوصي" dir="ltr" className="h-11 rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-3 text-sm" />
+          <select value={hasOrphans} onChange={(event) => { setHasOrphans(event.target.value); setPage(1); }} aria-label="وجود أيتام" className="h-11 rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-3 text-sm"><option value="all">كل العائلات</option><option value="true">لديها أيتام</option><option value="false">دون أيتام</option></select>
+          <select value={documentStatus} onChange={(event) => { setDocumentStatus(event.target.value); setPage(1); }} aria-label="حالة الوثيقة" className="h-11 rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-3 text-sm"><option value="all">كل حالات الوثيقة</option><option value="Pending">قيد المراجعة</option><option value="Approved">معتمدة</option><option value="Rejected">مرفوضة</option><option value="NeedsUpdate">تحتاج تحديث</option></select>
 
-          <div
-            className={`mb-6 rounded-xl border border-[#E5E7EB] bg-white p-4 ${cardShadow}`}
-          >
-            <div
-              dir="rtl"
-              className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5"
+          <div className="relative">
+            <select
+              value={activeSection === "pending" ? "pending" : statusFilter}
+              onChange={(event) => {
+                setStatusFilter(event.target.value);
+                setPage(1);
+              }}
+              disabled={activeSection === "pending"}
+              className="h-11 w-full appearance-none rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-4 text-sm text-right text-[#6B7280] outline-none focus:border-[#0D4B8E] disabled:cursor-not-allowed"
             >
-              <div className="relative">
-                <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(event) => {
-                    setSearchTerm(event.target.value);
-                    setPage(1);
-                  }}
-                  placeholder="ابحث باسم رب الأسرة أو الوصي أو البريد الإلكتروني"
-                  className="h-11 w-full rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] pr-10 pl-4 text-sm text-right outline-none focus:border-[#0D4B8E] transition"
-                />
-              </div>
-              <input value={guardianId} onChange={(event) => { setGuardianId(event.target.value); setPage(1); }} placeholder="معرّف الوصي" aria-label="معرّف الوصي" dir="ltr" className="h-11 rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-3 text-sm" />
-              <select value={hasOrphans} onChange={(event) => { setHasOrphans(event.target.value); setPage(1); }} aria-label="وجود أيتام" className="h-11 rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-3 text-sm"><option value="all">كل العائلات</option><option value="true">لديها أيتام</option><option value="false">دون أيتام</option></select>
-              <select value={documentStatus} onChange={(event) => { setDocumentStatus(event.target.value); setPage(1); }} aria-label="حالة الوثيقة" className="h-11 rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-3 text-sm"><option value="all">كل حالات الوثيقة</option><option value="Pending">قيد المراجعة</option><option value="Approved">معتمدة</option><option value="Rejected">مرفوضة</option><option value="NeedsUpdate">تحتاج تحديث</option></select>
-
-              <div className="relative">
-                <select
-                  value={activeSection === "pending" ? "pending" : statusFilter}
-                  onChange={(event) => {
-                    setStatusFilter(event.target.value);
-                    setPage(1);
-                  }}
-                  disabled={activeSection === "pending"}
-                  className="h-11 w-full appearance-none rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-4 text-sm text-right text-[#6B7280] outline-none focus:border-[#0D4B8E] disabled:cursor-not-allowed"
-                >
-                  <option value="all">جميع الحالات</option>
-                  <option value="pending">قيد المراجعة</option>
-                  <option value="active">نشطة</option>
-                  <option value="hidden">مخفية</option>
-                  <option value="stopped">موقوفة</option>
-                  <option value="needsEdit">تحتاج تعديل</option>
-                </select>
-                <FiChevronDown className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              </div>
-            </div>
+              <option value="all">جميع الحالات</option>
+              <option value="pending">قيد المراجعة</option>
+              <option value="active">نشطة</option>
+              <option value="hidden">مخفية</option>
+              <option value="stopped">موقوفة</option>
+              <option value="needsEdit">تحتاج تعديل</option>
+            </select>
+            <FiChevronDown className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           </div>
+        </div>
+      </div>
 
+      {/* Main Content Area */}
+      {status === "loading" ? (
+        <LoadingState count={6} />
+      ) : status === "error" ? (
+        <ErrorState onRetry={fetchFamilies} description={loadError} />
+      ) : (
+        <>
           <p dir="rtl" className="mb-4 text-right text-sm text-[#6B7280]">
             عدد النتائج: {" "}
             <strong className="text-[#1F2937]">{currentPagination.isLegacyArray ? filtered.length : currentPagination.totalCount}</strong>
@@ -561,7 +554,7 @@ export default function FamiliesReview() {
             </>
           )}
 
-          {activeSection === "pending" && (
+          {activeSection === "pending" && pendingFamilies.length > 0 && (
             <PendingRequestsTable
               items={pendingFamilies}
               onView={(item) => {
