@@ -475,7 +475,7 @@ export default function FamiliesReview() {
       >
         <div
           dir="rtl"
-          className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5"
+          className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4"
         >
           <div className="relative">
             <FiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -490,7 +490,6 @@ export default function FamiliesReview() {
               className="h-11 w-full rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] pr-10 pl-4 text-sm text-right outline-none focus:border-[#0D4B8E] transition"
             />
           </div>
-          <input value={guardianId} onChange={(event) => { setGuardianId(event.target.value); setPage(1); }} placeholder="معرّف الوصي" aria-label="معرّف الوصي" dir="ltr" className="h-11 rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-3 text-sm" />
           <select value={hasOrphans} onChange={(event) => { setHasOrphans(event.target.value); setPage(1); }} aria-label="وجود أيتام" className="h-11 rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-3 text-sm"><option value="all">كل العائلات</option><option value="true">لديها أيتام</option><option value="false">دون أيتام</option></select>
           <select value={documentStatus} onChange={(event) => { setDocumentStatus(event.target.value); setPage(1); }} aria-label="حالة الوثيقة" className="h-11 rounded-lg border border-[#D0D5DD] bg-[#F8FAFC] px-3 text-sm"><option value="all">كل حالات الوثيقة</option><option value="Pending">قيد المراجعة</option><option value="Approved">معتمدة</option><option value="Rejected">مرفوضة</option><option value="NeedsUpdate">تحتاج تحديث</option></select>
 

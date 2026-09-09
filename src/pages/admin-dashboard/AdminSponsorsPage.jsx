@@ -27,6 +27,17 @@ const ACCOUNT_FILTERS = [
   { value: "Suspended", label: "معلّق" },
 ];
 
+const CITY_OPTIONS = [
+  "غزة",
+  "خان يونس",
+  "بيت لاهيا",
+  "بيت حانون",
+  "نصيرات",
+  "دير البلح",
+  "رفح",
+  "جباليا",
+];
+
 function accountStatusLabel(status) {
   return status === "Active" ? "نشط" : status === "Suspended" ? "معلّق" : status || "—";
 }
@@ -49,7 +60,7 @@ function sponsorForm(details) {
     dateOfBirth: toDateInputValue(details.dateOfBirth),
     gender: details.gender === "Female" ? "2" : "1",
     city: details.city || "",
-    country: details.country || "",
+    country: "فلسطين",
   };
 }
 
@@ -239,7 +250,7 @@ export default function AdminSponsorsPage() {
     <AdminLayout title="الكفلاء"><div className="mx-auto w-full max-w-7xl">
       <div className="mb-6"><h1 className="text-2xl font-extrabold text-[#003469]">إدارة الكفلاء</h1><p className="mt-1 text-sm text-gray-500">عرض بيانات الكفلاء وتعديلها وإدارة حالة الحساب بأمان.</p></div>
       <div className="mb-5 max-w-sm"><MiniStatCard label="إجمالي الكفلاء" value={sponsors.length} icon={MdOutlineVolunteerActivism} tone="bg-[#E8F1FA] text-[#0D4B8E]" /></div>
-      <div className="mb-6 grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-5"><label className="relative sm:col-span-2"><span className="sr-only">البحث في الكفلاء</span><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder="ابحث بالاسم أو البريد أو الهاتف" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none focus:border-[#0D4B8E]" /></label><select value={accountFilter} onChange={(event) => { setAccountFilter(event.target.value); setPage(1); }} aria-label="تصفية حسب حالة الحساب" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ACCOUNT_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select><input value={cityFilter} onChange={(event) => { setCityFilter(event.target.value); setPage(1); }} placeholder="المدينة" aria-label="المدينة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" /><input value={countryFilter} onChange={(event) => { setCountryFilter(event.target.value); setPage(1); }} placeholder="الدولة" aria-label="الدولة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" /></div>
+      <div className="mb-6 grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-5"><label className="relative sm:col-span-2"><span className="sr-only">البحث في الكفلاء</span><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder="ابحث بالاسم أو البريد أو الهاتف" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none focus:border-[#0D4B8E]" /></label><select value={accountFilter} onChange={(event) => { setAccountFilter(event.target.value); setPage(1); }} aria-label="تصفية حسب حالة الحساب" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ACCOUNT_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select><select value={cityFilter} onChange={(event) => { setCityFilter(event.target.value); setPage(1); }} aria-label="تصفية حسب المدينة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm"><option value="">كل المدن</option>{CITY_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}</select><input value="فلسطين" disabled readOnly aria-label="الدولة" title="الدولة محدودة بفلسطين" className="rounded-lg border border-gray-200 bg-gray-100 px-3 py-2.5 text-sm font-bold text-gray-500 cursor-not-allowed" /></div>
       {actionError && <p role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}{successMessage && <p role="status" className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700">{successMessage}</p>}<p className="mb-3 text-sm font-bold text-gray-600">النتائج: {pagination.isLegacyArray ? filteredSponsors.length : pagination.totalCount}</p>{content}
       {!loading && !error && <div className="mt-4"><AdminPagination pagination={pagination} onPageChange={setPage} onPageSizeChange={(value) => { setPageSize(value); setPage(1); }} /></div>}
     </div>
@@ -259,7 +270,32 @@ export default function AdminSponsorsPage() {
     </AdminDialog>}
 
     {selected && dialogMode === "edit" && editForm && <AdminDialog title="تعديل بيانات الكفيل" onClose={() => setDialogMode("details")} closeDisabled={busy === "edit"} footer={<><button type="button" onClick={() => setDialogMode("details")} disabled={busy === "edit"} className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-bold">إلغاء</button><button type="submit" form="sponsor-edit-form" disabled={busy === "edit"} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50">{busy === "edit" ? "جارٍ الحفظ..." : "حفظ التعديلات"}</button></>}>
-      <form id="sponsor-edit-form" onSubmit={submitEdit} className="grid gap-4 sm:grid-cols-2">{actionError && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700 sm:col-span-2">{actionError}</p>}{[["firstName", "الاسم الأول"], ["fatherName", "اسم الأب"], ["grandfatherName", "اسم الجد"], ["familyName", "اسم العائلة"], ["phoneNumber", "رقم الهاتف"], ["city", "المدينة"], ["country", "الدولة"]].map(([name, label]) => <label key={name} className="text-sm font-bold text-gray-700">{label}<input name={name} value={editForm[name]} onChange={(event) => setEditForm({ ...editForm, [name]: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-[#0D4B8E]" /></label>)}<label className="text-sm font-bold text-gray-700">تاريخ الميلاد<input type="date" value={editForm.dateOfBirth} onChange={(event) => setEditForm({ ...editForm, dateOfBirth: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5" /></label><label className="text-sm font-bold text-gray-700">الجنس<select value={editForm.gender} onChange={(event) => setEditForm({ ...editForm, gender: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5"><option value="1">ذكر</option><option value="2">أنثى</option></select></label></form>
+      <form id="sponsor-edit-form" onSubmit={submitEdit} className="grid gap-4 sm:grid-cols-2">
+        {actionError && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700 sm:col-span-2">{actionError}</p>}
+        {[["firstName", "الاسم الأول"], ["fatherName", "اسم الأب"], ["grandfatherName", "اسم الجد"], ["familyName", "اسم العائلة"], ["phoneNumber", "رقم الهاتف"]].map(([name, label]) => (
+          <label key={name} className="text-sm font-bold text-gray-700">{label}
+            <input name={name} value={editForm[name]} onChange={(event) => setEditForm({ ...editForm, [name]: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-[#0D4B8E]" />
+          </label>
+        ))}
+        <label className="text-sm font-bold text-gray-700">المدينة
+          <select value={editForm.city} onChange={(e) => setEditForm({ ...editForm, city: e.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-[#0D4B8E]">
+            <option value="">اختر المدينة</option>
+            {CITY_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </label>
+        <label className="text-sm font-bold text-gray-700">الدولة
+          <input value="فلسطين" disabled readOnly title="الدولة كلمة ثابته غير قابلة للتعديل" className="mt-2 w-full rounded-lg border border-gray-200 bg-gray-100 px-3 py-2.5 font-bold text-gray-500 cursor-not-allowed" />
+        </label>
+        <label className="text-sm font-bold text-gray-700">تاريخ الميلاد
+          <input type="date" value={editForm.dateOfBirth} onChange={(event) => setEditForm({ ...editForm, dateOfBirth: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5" />
+        </label>
+        <label className="text-sm font-bold text-gray-700">الجنس
+          <select value={editForm.gender} onChange={(event) => setEditForm({ ...editForm, gender: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5">
+            <option value="1">ذكر</option>
+            <option value="2">أنثى</option>
+          </select>
+        </label>
+      </form>
     </AdminDialog>}
 
     {confirmation?.type === "status" && <AdminConfirmationDialog title={confirmation.isActive ? "إعادة تفعيل حساب الكفيل" : "تعليق حساب الكفيل"} message={confirmation.isActive ? "هل تريد إعادة تفعيل هذا الحساب؟" : "هل أنت متأكد من تعليق هذا الحساب؟"} confirmLabel={confirmation.isActive ? "إعادة التفعيل" : "تأكيد التعليق"} onConfirm={confirmStatus} onCancel={() => { if (!busy) setConfirmation(null); }} loading={busy === "status"} reason={reason} onReasonChange={setReason} error={actionError} />}
