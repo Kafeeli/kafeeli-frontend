@@ -16,10 +16,8 @@ import AdminPagination from "./AdminPagination";
 import { EmptyState, ErrorState, LoadingState } from "./Adminstates";
 
 const initialFilters = {
-  adminId: "",
   actionType: "",
   targetType: "",
-  targetId: "",
   createdFrom: "",
   createdTo: "",
 };
@@ -106,21 +104,92 @@ export default function AdminAuditLogsPage() {
           </button>
         </div>
 
-        <div className="grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-4">
-          <label className="relative sm:col-span-2"><span className="sr-only">البحث في السجلات</span><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchInput} onChange={(event) => { setSearchInput(event.target.value); setPage(1); }} placeholder="ابحث باسم المنفذ أو المستهدف أو العملية" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm" /></label>
-          <input value={filters.adminId} onChange={(event) => updateFilter("adminId", event.target.value)} placeholder="معرّف المشرف" aria-label="معرّف المشرف" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" dir="ltr" />
-          <select value={filters.actionType} onChange={(event) => updateFilter("actionType", event.target.value)} aria-label="نوع العملية" className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm">
-            <option value="">كل العمليات</option>
-            {Object.entries(actionOptions).map(([code, label]) => <option key={code} value={code}>{label}</option>)}
-          </select>
-          <select value={filters.targetType} onChange={(event) => updateFilter("targetType", event.target.value)} aria-label="نوع المستهدف" className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm">
-            <option value="">كل أنواع المستهدف</option>
-            {Object.entries(targetTypeOptions).map(([type, label]) => <option key={type} value={type}>{label}</option>)}
-          </select>
-          <input value={filters.targetId} onChange={(event) => updateFilter("targetId", event.target.value)} placeholder="معرّف الهدف" aria-label="معرّف الهدف" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" dir="ltr" />
-          <label className="text-xs font-bold text-gray-600">من تاريخ<input type="datetime-local" value={filters.createdFrom} onChange={(event) => updateFilter("createdFrom", event.target.value)} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
-          <label className="text-xs font-bold text-gray-600">إلى تاريخ<input type="datetime-local" value={filters.createdTo} onChange={(event) => updateFilter("createdTo", event.target.value)} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
-          {hasActiveFilters && <button type="button" onClick={clearFilters} className="rounded-lg px-3 py-2.5 text-sm font-bold text-red-700 hover:bg-red-50">مسح الفلاتر</button>}
+        <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-4">
+          {/* الصف الأول: البحث ونوع العملية ونوع المستهدف */}
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="audit-search-input" className="text-xs font-bold text-gray-600">البحث</label>
+              <div className="relative flex items-center">
+                <FiSearch className="absolute right-3.5 text-gray-400 text-base pointer-events-none" aria-hidden="true" />
+                <input
+                  id="audit-search-input"
+                  value={searchInput}
+                  onChange={(event) => { setSearchInput(event.target.value); setPage(1); }}
+                  placeholder="ابحث باسم المنفذ أو المستهدف أو العملية..."
+                  className="w-full h-10 rounded-lg border border-gray-300 bg-white py-2 pr-10 pl-3 text-sm text-gray-800 placeholder-gray-400 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label htmlFor="audit-action-type-select" className="text-xs font-bold text-gray-600">نوع العملية</label>
+              <select
+                id="audit-action-type-select"
+                value={filters.actionType}
+                onChange={(event) => updateFilter("actionType", event.target.value)}
+                aria-label="نوع العملية"
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E] cursor-pointer"
+              >
+                <option value="">كل العمليات</option>
+                {Object.entries(actionOptions).map(([code, label]) => (
+                  <option key={code} value={code}>{label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label htmlFor="audit-target-type-select" className="text-xs font-bold text-gray-600">نوع المستهدف</label>
+              <select
+                id="audit-target-type-select"
+                value={filters.targetType}
+                onChange={(event) => updateFilter("targetType", event.target.value)}
+                aria-label="نوع المستهدف"
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E] cursor-pointer"
+              >
+                <option value="">كل أنواع المستهدف</option>
+                {Object.entries(targetTypeOptions).map(([type, label]) => (
+                  <option key={type} value={type}>{label}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* الصف الثاني: نطاق التواريخ */}
+          <div className="grid gap-3 sm:grid-cols-2 pt-3 border-t border-gray-100">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="audit-date-from" className="text-xs font-bold text-gray-600">من تاريخ</label>
+              <input
+                id="audit-date-from"
+                type="datetime-local"
+                value={filters.createdFrom}
+                onChange={(event) => updateFilter("createdFrom", event.target.value)}
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label htmlFor="audit-date-to" className="text-xs font-bold text-gray-600">إلى تاريخ</label>
+              <input
+                id="audit-date-to"
+                type="datetime-local"
+                value={filters.createdTo}
+                onChange={(event) => updateFilter("createdTo", event.target.value)}
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+              />
+            </div>
+          </div>
+
+          {hasActiveFilters && (
+            <div className="flex justify-end pt-1">
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="rounded-lg px-4 py-2 text-sm font-bold text-red-700 hover:bg-red-50 border border-red-200 transition cursor-pointer"
+              >
+                مسح جميع الفلاتر
+              </button>
+            </div>
+          )}
         </div>
 
         {loading ? <LoadingState /> : error ? <ErrorState onRetry={load} description={error} /> : pagination.items.length === 0 ? (

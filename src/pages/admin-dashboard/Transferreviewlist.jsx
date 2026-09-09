@@ -2,9 +2,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  FiExternalLink,
+  FiEye,
   FiSearch,
 } from "react-icons/fi";
+import { BANK_OPTIONS } from "../guardian-dashboard/transferDataConfig";
 import {
   HiOutlineBuildingLibrary,
   HiOutlineClipboardDocumentList,
@@ -144,7 +145,7 @@ function LoadingState() {
   );
 }
 
-function EmptyState() {
+function EmptyState({ isFiltered = false, onClearFilters }) {
   return (
     <div className="flex flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-gray-300 bg-white/40 px-6 py-16 text-center">
       <div className="grid h-16 w-16 place-items-center rounded-full bg-[#F3F4F5] text-[#9CA3AF]">
@@ -152,13 +153,24 @@ function EmptyState() {
       </div>
       <div>
         <h4 className="text-lg font-extrabold text-[#1F2937]">
-          لا توجد بيانات تحويل بانتظار المراجعة
+          {isFiltered
+            ? "لا توجد نتائج مطابقة للبحث"
+            : "لا توجد بيانات تحويل بانتظار المراجعة"}
         </h4>
         <p className="mt-2 max-w-md text-sm text-gray-400">
-          تمت مراجعة جميع بيانات التحويل المرسلة حاليًا. يمكنك العودة لاحقًا أو
-          التحقق من سجل الأرشيف.
+          {isFiltered
+            ? "لم يتم العثور على أي طلبات تحويل تطابق معايير البحث الحالية. جرب تغيير كلمة البحث أو اختيار بنك آخر."
+            : "تمت مراجعة جميع بيانات التحويل المرسلة حاليًا. يمكنك العودة لاحقًا أو التحقق من سجل الأرشيف."}
         </p>
       </div>
+      {isFiltered && onClearFilters && (
+        <button
+          onClick={onClearFilters}
+          className="mt-2 rounded-lg bg-[#003469] px-5 py-2 text-sm font-bold text-white transition hover:bg-[#002850] cursor-pointer"
+        >
+          إعادة تعيين الفلاتر
+        </button>
+      )}
     </div>
   );
 }
@@ -262,10 +274,15 @@ function ReviewRow({ item, onReview, reviewLoadingId }) {
       <button
         onClick={() => onReview(item)}
         disabled={isLoadingThis}
-        className="flex h-10 w-full shrink-0 items-center justify-center gap-2 rounded-md border-2 border-[#0D4B8E] px-4 text-sm font-bold text-[#0D4B8E] transition hover:bg-[#0D4B8E] hover:text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 lg:w-auto"
+        title="مراجعة بيانات التحويل"
+        aria-label="مراجعة بيانات التحويل"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-[#0D4B8E] bg-[#E8F1FA] text-[#0D4B8E] transition hover:bg-[#0D4B8E] hover:text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
       >
-        <FiExternalLink />
-        {isLoadingThis ? "جاري التحميل..." : "مراجعة بيانات التحويل"}
+        {isLoadingThis ? (
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-[#0D4B8E] border-t-transparent" />
+        ) : (
+          <FiEye className="text-xl" />
+        )}
       </button>
     </div>
   );
@@ -278,7 +295,6 @@ export default function TransferReviewList() {
   const [pageSize, setPageSize] = useState(20);
   const [pagination, setPagination] = useState(emptyPagedData);
   const [searchInput, setSearchInput] = useState("");
-  const [guardianId, setGuardianId] = useState("");
   const [bankName, setBankName] = useState("");
   const search = useDebouncedValue(searchInput.trim());
 
@@ -299,7 +315,7 @@ export default function TransferReviewList() {
     setErrorMessage(null);
 
     try {
-      const query = { page, pageSize, search, guardianId, bankName };
+      const query = { page, pageSize, search, bankName };
       const response = await adminApi.getPendingBankAccounts(query);
 
       if (!response?.success) {
@@ -317,14 +333,14 @@ export default function TransferReviewList() {
       setErrorMessage(getErrorMessage(error, "تعذر تحميل بيانات المراجعة"));
       setStatus("error");
     }
-  }, [bankName, guardianId, page, pageSize, search]);
+  }, [bankName, page, pageSize, search]);
 
   useEffect(() => {
     let cancelled = false;
 
     async function loadInitialReviewItems() {
       try {
-        const query = { page, pageSize, search, guardianId, bankName };
+        const query = { page, pageSize, search, bankName };
         const response = await adminApi.getPendingBankAccounts(query);
         if (cancelled) return;
 
@@ -350,7 +366,7 @@ export default function TransferReviewList() {
     return () => {
       cancelled = true;
     };
-  }, [bankName, guardianId, page, pageSize, search]);
+  }, [bankName, page, pageSize, search]);
 
   const pageItems = reviewItems;
 
@@ -431,15 +447,9 @@ export default function TransferReviewList() {
         الاعتماد.
       </p>
 
-      {status === "loading" && <LoadingState />}
-
-      {status === "error" && (
+      {status === "error" ? (
         <ErrorState message={errorMessage} onRetry={fetchReviewItems} />
-      )}
-
-      {status === "empty" && <EmptyState />}
-
-      {status === "success" && (
+      ) : (
         <>
           {/* Mini stats */}
           <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -476,10 +486,41 @@ export default function TransferReviewList() {
               قائمة المراجعة (قيد الانتظار)
             </h3>
           </div>
-          <div className="mb-5 grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-3">
-            <label className="relative"><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchInput} onChange={(event) => { setSearchInput(event.target.value); setPage(1); }} placeholder="البحث في طلبات التحويل" aria-label="البحث في طلبات التحويل" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm" /></label>
-            <input value={guardianId} onChange={(event) => { setGuardianId(event.target.value); setPage(1); }} placeholder="معرّف الوصي" aria-label="معرّف الوصي" dir="ltr" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
-            <input value={bankName} onChange={(event) => { setBankName(event.target.value); setPage(1); }} placeholder="اسم البنك" aria-label="اسم البنك" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
+
+          {/* الفلاتر (البحث واسم البنك) تظل ظاهرة دائمًا */}
+          <div className="mb-5 grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-2">
+            <div className="relative flex items-center">
+              <FiSearch className="absolute right-3.5 text-gray-400 text-lg pointer-events-none" />
+              <input
+                type="text"
+                value={searchInput}
+                onChange={(event) => {
+                  setSearchInput(event.target.value);
+                  setPage(1);
+                }}
+                placeholder="البحث في طلبات التحويل..."
+                aria-label="البحث في طلبات التحويل"
+                className="w-full h-11 rounded-lg border border-gray-300 bg-white py-2.5 pr-10 pl-3 text-sm text-gray-800 placeholder-gray-400 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+              />
+            </div>
+            <div className="relative flex items-center">
+              <select
+                value={bankName}
+                onChange={(event) => {
+                  setBankName(event.target.value);
+                  setPage(1);
+                }}
+                aria-label="اسم البنك"
+                className="w-full h-11 rounded-lg border border-gray-300 bg-white py-2.5 px-3 text-sm text-gray-800 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E] cursor-pointer"
+              >
+                <option value="">جميع البنوك والمحافظ</option>
+                {BANK_OPTIONS.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
           {actionError && !selectedItem && (
@@ -491,19 +532,45 @@ export default function TransferReviewList() {
             </div>
           )}
 
-          {/* القائمة */}
-          <div className="space-y-4">
-            {pageItems.map((item) => (
-              <ReviewRow
-                key={item.id}
-                item={item}
-                onReview={handleReviewClick}
-                reviewLoadingId={reviewLoadingId}
-              />
-            ))}
-          </div>
+          {status === "loading" && <LoadingState />}
 
-          <div className="mt-8"><AdminPagination pagination={pagination} onPageChange={setPage} onPageSizeChange={(value) => { setPageSize(value); setPage(1); }} /></div>
+          {status !== "loading" && pageItems.length === 0 && (
+            <EmptyState
+              isFiltered={Boolean(search || bankName)}
+              onClearFilters={() => {
+                setSearchInput("");
+                setBankName("");
+                setPage(1);
+              }}
+            />
+          )}
+
+          {status !== "loading" && pageItems.length > 0 && (
+            <>
+              {/* القائمة */}
+              <div className="space-y-4">
+                {pageItems.map((item) => (
+                  <ReviewRow
+                    key={item.id}
+                    item={item}
+                    onReview={handleReviewClick}
+                    reviewLoadingId={reviewLoadingId}
+                  />
+                ))}
+              </div>
+
+              <div className="mt-8">
+                <AdminPagination
+                  pagination={pagination}
+                  onPageChange={setPage}
+                  onPageSizeChange={(value) => {
+                    setPageSize(value);
+                    setPage(1);
+                  }}
+                />
+              </div>
+            </>
+          )}
         </>
       )}
 

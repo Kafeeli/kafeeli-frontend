@@ -11,7 +11,7 @@ import AdminLayout from "./Adminlayout";
 import AdminPagination from "./AdminPagination";
 import { EmptyState, ErrorState, LoadingState } from "./Adminstates";
 
-const initialFilters = { sponsorId: "", sponsorshipId: "", minAmount: "", maxAmount: "", dateFrom: "", dateTo: "" };
+const initialFilters = { minAmount: "", maxAmount: "", dateFrom: "", dateTo: "" };
 
 export default function AdminPaymentsReviewPage() {
   const [payments, setPayments] = useState([]);
@@ -109,15 +109,89 @@ export default function AdminPaymentsReviewPage() {
   return (
     <AdminLayout title="مراجعة المدفوعات">
       <div className="space-y-5" dir="rtl">
-        <div className="grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-4">
-          <label className="relative sm:col-span-2"><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchInput} onChange={(event) => { setSearchInput(event.target.value); setPage(1); }} placeholder="ابحث باسم الكفيل أو الهدف أو المرجع" aria-label="البحث في المدفوعات" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm" /></label>
-          <input value={filters.sponsorId} onChange={(event) => updateFilter("sponsorId", event.target.value)} placeholder="معرّف الكفيل" aria-label="معرّف الكفيل" dir="ltr" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
-          <input value={filters.sponsorshipId} onChange={(event) => updateFilter("sponsorshipId", event.target.value)} placeholder="معرّف الكفالة" aria-label="معرّف الكفالة" dir="ltr" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
-          <input type="number" min="0" value={filters.minAmount} onChange={(event) => updateFilter("minAmount", event.target.value)} placeholder="المبلغ الأدنى" aria-label="المبلغ الأدنى" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
-          <input type="number" min="0" value={filters.maxAmount} onChange={(event) => updateFilter("maxAmount", event.target.value)} placeholder="المبلغ الأعلى" aria-label="المبلغ الأعلى" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
-          <label className="text-xs font-bold text-gray-600">من تاريخ<input type="datetime-local" value={filters.dateFrom} onChange={(event) => updateFilter("dateFrom", event.target.value)} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
-          <label className="text-xs font-bold text-gray-600">إلى تاريخ<input type="datetime-local" value={filters.dateTo} onChange={(event) => updateFilter("dateTo", event.target.value)} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm" /></label>
-          {hasFilters && <button type="button" onClick={() => { setSearchInput(""); setFilters(initialFilters); setPage(1); }} className="text-sm font-bold text-red-700">مسح الفلاتر</button>}
+        <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-4">
+          {/* الصف الأول: البحث ونطاق المبلغ */}
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="payment-search-input" className="text-xs font-bold text-gray-600">البحث</label>
+              <div className="relative flex items-center">
+                <FiSearch className="absolute right-3.5 text-gray-400 text-base pointer-events-none" aria-hidden="true" />
+                <input
+                  id="payment-search-input"
+                  value={searchInput}
+                  onChange={(event) => { setSearchInput(event.target.value); setPage(1); }}
+                  placeholder="ابحث باسم الكفيل أو الهدف أو المرجع..."
+                  aria-label="البحث في المدفوعات"
+                  className="w-full h-10 rounded-lg border border-gray-300 bg-white py-2 pr-10 pl-3 text-sm text-gray-800 placeholder-gray-400 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label htmlFor="min-amount-input" className="text-xs font-bold text-gray-600">المبلغ الأدنى</label>
+              <input
+                id="min-amount-input"
+                type="number"
+                min="0"
+                value={filters.minAmount}
+                onChange={(event) => updateFilter("minAmount", event.target.value)}
+                placeholder="مثال: 50"
+                aria-label="المبلغ الأدنى"
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label htmlFor="max-amount-input" className="text-xs font-bold text-gray-600">المبلغ الأعلى</label>
+              <input
+                id="max-amount-input"
+                type="number"
+                min="0"
+                value={filters.maxAmount}
+                onChange={(event) => updateFilter("maxAmount", event.target.value)}
+                placeholder="مثال: 500"
+                aria-label="المبلغ الأعلى"
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+              />
+            </div>
+          </div>
+
+          {/* الصف الثاني: نطاق التواريخ */}
+          <div className="grid gap-3 sm:grid-cols-2 pt-3 border-t border-gray-100">
+            <div className="flex flex-col gap-1">
+              <label htmlFor="date-from-input" className="text-xs font-bold text-gray-600">من تاريخ</label>
+              <input
+                id="date-from-input"
+                type="datetime-local"
+                value={filters.dateFrom}
+                onChange={(event) => updateFilter("dateFrom", event.target.value)}
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label htmlFor="date-to-input" className="text-xs font-bold text-gray-600">إلى تاريخ</label>
+              <input
+                id="date-to-input"
+                type="datetime-local"
+                value={filters.dateTo}
+                onChange={(event) => updateFilter("dateTo", event.target.value)}
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+              />
+            </div>
+          </div>
+
+          {hasFilters && (
+            <div className="flex justify-end pt-1">
+              <button
+                type="button"
+                onClick={() => { setSearchInput(""); setFilters(initialFilters); setPage(1); }}
+                className="rounded-lg px-4 py-2 text-sm font-bold text-red-700 hover:bg-red-50 border border-red-200 transition cursor-pointer"
+              >
+                مسح جميع الفلاتر
+              </button>
+            </div>
+          )}
         </div>
 
         {loading ? <LoadingState /> : error ? <ErrorState onRetry={load} description={error} /> : !payments.length ? (

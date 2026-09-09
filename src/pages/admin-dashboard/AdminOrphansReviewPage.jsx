@@ -148,8 +148,6 @@ export default function AdminOrphansReviewPage() {
   const [sponsorshipFilter, setSponsorshipFilter] = useState("all");
   const [minAge, setMinAge] = useState("");
   const [maxAge, setMaxAge] = useState("");
-  const [familyId, setFamilyId] = useState("");
-  const [guardianId, setGuardianId] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
   const [allPagination, setAllPagination] = useState(emptyPagedData);
@@ -175,7 +173,7 @@ export default function AdminOrphansReviewPage() {
     setError("");
 
     try {
-      const sharedQuery = { page, pageSize, search: debouncedSearch, gender: genderFilter, minAge, maxAge, familyId, guardianId, sponsorshipStatus: sponsorshipFilter };
+      const sharedQuery = { page, pageSize, search: debouncedSearch, gender: genderFilter, minAge, maxAge, sponsorshipStatus: sponsorshipFilter };
       const allQuery = { ...sharedQuery, status: statusFilter };
       const [allResult, pendingResult] = await Promise.all([
         adminApi.getAllOrphans(allQuery),
@@ -197,7 +195,7 @@ export default function AdminOrphansReviewPage() {
     } finally {
       if (!silent) setLoading(false);
     }
-  }, [debouncedSearch, familyId, genderFilter, guardianId, maxAge, minAge, page, pageSize, sponsorshipFilter, statusFilter]);
+  }, [debouncedSearch, genderFilter, maxAge, minAge, page, pageSize, sponsorshipFilter, statusFilter]);
 
 
   useEffect(() => {
@@ -449,15 +447,120 @@ export default function AdminOrphansReviewPage() {
       <div><h1 className="text-2xl font-extrabold text-[#003469]">إدارة الأيتام</h1><p className="mt-1 text-sm text-gray-500">إدارة جميع الأيتام مع إبقاء المراجعة الأولية ومسار تصحيح الوثائق منفصلين.</p></div>
       <div className="max-w-sm"><MiniStatCard label="إجمالي الأيتام" value={allPagination.totalCount} icon={MdChildCare} tone="bg-[#E8F1FA] text-[#0D4B8E]" /></div>
       <div className="flex flex-wrap gap-2 border-b border-gray-200 pb-3">{[{ key: "all", label: `جميع الأيتام (${allPagination.totalCount})` }, { key: "pending", label: `بانتظار المراجعة (${pendingPagination.totalCount})` }].map((tab) => <button key={tab.key} type="button" onClick={() => selectTab(tab.key)} className={`rounded-lg px-4 py-2.5 text-sm font-bold transition ${activeTab === tab.key ? "bg-[#0D4B8E] text-white" : "bg-white text-[#0D4B8E] hover:bg-[#E8F1FA]"}`}>{tab.label}</button>)}</div>
-      <div className="grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-4">
-        <label className="relative sm:col-span-2"><span className="sr-only">البحث في الأيتام</span><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder="ابحث بالاسم أو رقم الهوية" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm" /></label>
-        {activeTab === "all" && <select value={statusFilter} onChange={(event) => { setStatusFilter(event.target.value); setPage(1); }} aria-label="حالة اليتيم" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ORPHAN_STATUS_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select>}
-        <select value={genderFilter} onChange={(event) => { setGenderFilter(event.target.value); setPage(1); }} aria-label="الجنس" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm"><option value="all">كل الأجناس</option><option value="Male">ذكر</option><option value="Female">أنثى</option></select>
-        <input type="number" min="0" max="120" value={minAge} onChange={(event) => { setMinAge(event.target.value); setPage(1); }} placeholder="العمر الأدنى" aria-label="العمر الأدنى" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
-        <input type="number" min="0" max="120" value={maxAge} onChange={(event) => { setMaxAge(event.target.value); setPage(1); }} placeholder="العمر الأعلى" aria-label="العمر الأعلى" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" />
-        <select value={sponsorshipFilter} onChange={(event) => { setSponsorshipFilter(event.target.value); setPage(1); }} aria-label="حالة الكفالة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm"><option value="all">كل حالات الكفالة</option><option value="Sponsored">مكفول</option><option value="Unsponsored">غير مكفول</option></select>
-        <input value={familyId} onChange={(event) => { setFamilyId(event.target.value); setPage(1); }} placeholder="معرّف العائلة" aria-label="معرّف العائلة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" dir="ltr" />
-        <input value={guardianId} onChange={(event) => { setGuardianId(event.target.value); setPage(1); }} placeholder="معرّف الوصي" aria-label="معرّف الوصي" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm" dir="ltr" />
+      <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-4">
+        {/* الصف الأول: البحث وحالة اليتيم وحالة الكفالة */}
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="flex flex-col gap-1">
+            <label htmlFor="orphan-search-input" className="text-xs font-bold text-gray-600">البحث</label>
+            <div className="relative flex items-center">
+              <FiSearch className="absolute right-3.5 text-gray-400 text-base pointer-events-none" aria-hidden="true" />
+              <input
+                id="orphan-search-input"
+                value={searchTerm}
+                onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }}
+                placeholder="ابحث بالاسم أو رقم الهوية..."
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white py-2 pr-10 pl-3 text-sm text-gray-800 placeholder-gray-400 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+              />
+            </div>
+          </div>
+
+          {activeTab === "all" ? (
+            <div className="flex flex-col gap-1">
+              <label htmlFor="orphan-status-select" className="text-xs font-bold text-gray-600">حالة اليتيم</label>
+              <select
+                id="orphan-status-select"
+                value={statusFilter}
+                onChange={(event) => { setStatusFilter(event.target.value); setPage(1); }}
+                aria-label="حالة اليتيم"
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E] cursor-pointer"
+              >
+                {ORPHAN_STATUS_FILTERS.map((filter) => (
+                  <option key={filter.value} value={filter.value}>{filter.label}</option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-1">
+              <label htmlFor="orphan-gender-select-top" className="text-xs font-bold text-gray-600">الجنس</label>
+              <select
+                id="orphan-gender-select-top"
+                value={genderFilter}
+                onChange={(event) => { setGenderFilter(event.target.value); setPage(1); }}
+                aria-label="الجنس"
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E] cursor-pointer"
+              >
+                <option value="all">كل الأجناس</option>
+                <option value="Male">ذكر</option>
+                <option value="Female">أنثى</option>
+              </select>
+            </div>
+          )}
+
+          <div className="flex flex-col gap-1">
+            <label htmlFor="orphan-sponsorship-select" className="text-xs font-bold text-gray-600">حالة الكفالة</label>
+            <select
+              id="orphan-sponsorship-select"
+              value={sponsorshipFilter}
+              onChange={(event) => { setSponsorshipFilter(event.target.value); setPage(1); }}
+              aria-label="حالة الكفالة"
+              className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E] cursor-pointer"
+            >
+              <option value="all">كل حالات الكفالة</option>
+              <option value="Sponsored">مكفول</option>
+              <option value="Unsponsored">غير مكفول</option>
+            </select>
+          </div>
+        </div>
+
+        {/* الصف الثاني: الجنس ونطاق العمر */}
+        <div className="grid gap-3 sm:grid-cols-3 pt-3 border-t border-gray-100">
+          {activeTab === "all" && (
+            <div className="flex flex-col gap-1">
+              <label htmlFor="orphan-gender-select" className="text-xs font-bold text-gray-600">الجنس</label>
+              <select
+                id="orphan-gender-select"
+                value={genderFilter}
+                onChange={(event) => { setGenderFilter(event.target.value); setPage(1); }}
+                aria-label="الجنس"
+                className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E] cursor-pointer"
+              >
+                <option value="all">كل الأجناس</option>
+                <option value="Male">ذكر</option>
+                <option value="Female">أنثى</option>
+              </select>
+            </div>
+          )}
+
+          <div className="flex flex-col gap-1">
+            <label htmlFor="min-age-input" className="text-xs font-bold text-gray-600">العمر الأدنى</label>
+            <input
+              id="min-age-input"
+              type="number"
+              min="0"
+              max="120"
+              value={minAge}
+              onChange={(event) => { setMinAge(event.target.value); setPage(1); }}
+              placeholder="مثال: 5"
+              aria-label="العمر الأدنى"
+              className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <label htmlFor="max-age-input" className="text-xs font-bold text-gray-600">العمر الأعلى</label>
+            <input
+              id="max-age-input"
+              type="number"
+              min="0"
+              max="120"
+              value={maxAge}
+              onChange={(event) => { setMaxAge(event.target.value); setPage(1); }}
+              placeholder="مثال: 18"
+              aria-label="العمر الأعلى"
+              className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+            />
+          </div>
+        </div>
       </div>
       {actionError && !selected && !confirmation && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}{successMessage && <p role="status" className="rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700">{successMessage}</p>}
       {activeTab === "all" && <p className="text-sm font-bold text-gray-600">النتائج: {allPagination.isLegacyArray ? filteredOrphans.length : allPagination.totalCount}</p>}
