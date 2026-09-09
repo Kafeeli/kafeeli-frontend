@@ -5,6 +5,8 @@ import { apiErrorMessage, unwrapResult } from "../utils/apiUi";
 import { getStoredUser, getUserRoles } from "../utils/session";
 import CurrentUserProvider from "../context/CurrentUserProvider";
 
+import KafeeliLoader from "../components/KafeeliLoader";
+
 function ProtectedRoute({ children, allowedRoles = [] }) {
   const token = localStorage.getItem("token");
   const user = getStoredUser();
@@ -36,7 +38,7 @@ function ProtectedRoute({ children, allowedRoles = [] }) {
   }
 
   if (checking) {
-    return <div dir="rtl" className="grid min-h-screen place-items-center bg-gray-50 font-[Cairo] font-bold text-[#003469]">جارٍ التحقق من الجلسة...</div>;
+    return <KafeeliLoader text="منصة كفيلي .. انتظر قليلاً" fullScreen />;
   }
 
   if (checkError) {
