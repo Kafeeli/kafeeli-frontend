@@ -65,7 +65,7 @@ export default function KafeeliLoader({
         <img
           src={kafeeliLogo}
           alt="شعار منصة كفيلي"
-          className="h-16 w-auto object-contain drop-shadow-sm transition-transform duration-300 hover:scale-105 sm:h-20"
+          className="h-24 w-auto object-contain drop-shadow-sm transition-transform duration-300 hover:scale-105 sm:h-32 md:h-36"
         />
         {/* Diamond SVG Animation */}
         <div className="mt-5 text-[#0D4B8E]">
