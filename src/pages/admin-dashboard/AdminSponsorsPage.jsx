@@ -7,6 +7,7 @@ import { apiErrorMessage, unwrapResult } from "../../utils/apiUi";
 import { emptyPagedData, normalizePagedData } from "../../utils/adminPagination";
 import { formatArabicDateTime } from "../../utils/date";
 import { localizeStatus } from "../../utils/localization";
+import { PALESTINIAN_CITIES } from "../../config/cities";
 import AdminLayout from "./Adminlayout";
 import AdminEntityAvatar from "./AdminEntityAvatar";
 import {
@@ -27,16 +28,7 @@ const ACCOUNT_FILTERS = [
   { value: "Suspended", label: "معلّق" },
 ];
 
-const CITY_OPTIONS = [
-  "غزة",
-  "خان يونس",
-  "بيت لاهيا",
-  "بيت حانون",
-  "نصيرات",
-  "دير البلح",
-  "رفح",
-  "جباليا",
-];
+const CITY_OPTIONS = PALESTINIAN_CITIES;
 
 function accountStatusLabel(status) {
   return status === "Active" ? "نشط" : status === "Suspended" ? "معلّق" : status || "—";

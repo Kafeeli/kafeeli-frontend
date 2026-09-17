@@ -4,6 +4,7 @@ import { guardianApi } from "../../services/guardianApi";
 import { bankAccountApi } from "../../services/bankAccountApi";
 import AuthenticatedHeader from "../../components/layout/AuthenticatedHeader";
 import AuthenticatedFooter from "../../components/layout/AuthenticatedFooter";
+import { PALESTINIAN_CITIES } from "../../config/cities";
 
 import {
   // إدارة القوائم والهيدر
@@ -80,17 +81,8 @@ const GENDER_OPTIONS = [
   { value: "Female", label: "أنثى" },
 ];
 
-// نفس قائمة المدن المستخدمة بصفحة الكفيل
-const CITY_OPTIONS = [
-  "غزة",
-  "خان يونس",
-  "بيت لاهيا",
-  "بيت حانون",
-  "نصيرات",
-  "دير البلح",
-  "رفح",
-  "جباليا",
-];
+// نفس قائمة المدن المستخدمة بجميع الصفحات
+const CITY_OPTIONS = PALESTINIAN_CITIES;
 const VERIFICATION_LABELS = {
   Approved: {
     text: "معتمد",

@@ -136,11 +136,50 @@ export const adminApi = {
     return response.data;
   },
 
-  updateFamilyStatus: async (familyId, status, reason = null) => {
+  updateFamilyStatus: async (familyId, status, reason = null, guardianId = null) => {
+    if (status === "Active") {
+      try {
+        return await adminApi.approveFamily(familyId);
+      } catch {
+        if (guardianId) {
+          try {
+            await adminApi.recalculateGuardianStatus(guardianId);
+            return await adminApi.approveFamily(familyId);
+          } catch {
+            // Proceed to patch fallback
+          }
+        }
+      }
+    }
+
+    if (status === "NeedsUpdate") {
+      try {
+        return await adminApi.requestFamilyUpdate(familyId, reason);
+      } catch {
+        // Proceed to patch fallback
+      }
+    }
+
+    if (status === "Hidden") {
+      try {
+        return await adminApi.hideFamily(familyId);
+      } catch {
+        // Proceed to patch fallback
+      }
+    }
+
+    if (status === "Suspended") {
+      try {
+        return await adminApi.suspendFamily(familyId);
+      } catch {
+        // Proceed to patch fallback
+      }
+    }
+
     const response = await api.patch(
       `/api/v1/admin/families/${familyId}/status`,
       {
-        status,
+        status: status,
         reason: status === "NeedsUpdate" ? reason?.trim() : null,
       },
     );
@@ -345,7 +384,14 @@ export const adminApi = {
     const response = await api.delete(`/api/v1/admin/orphans/${orphanId}`);
     return response.data;
   },
-  approveOrphan: async (orphanId) => {
+  approveOrphan: async (orphanId, documentId = null) => {
+    if (documentId) {
+      try {
+        await adminApi.updateOrphanDocumentStatus(documentId, "Approved");
+      } catch {
+        // Document may already be approved
+      }
+    }
     const response = await api.post(`/api/v1/admin/orphans/${orphanId}/approve`);
     return response.data;
   },

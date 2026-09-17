@@ -38,8 +38,8 @@ export const STATUS_MAP = {
 // الحالات النهائية لا تملك مسارات عكسية في الـ API الحالي.
 export const FAMILY_STATUS_ACTIONS = {
   pending: ["approve", "needsUpdate"],
-  active: ["hide", "suspend"],
-  hidden: [],
-  stopped: [],
+  active: ["hide", "suspend", "needsUpdate"],
+  hidden: ["reactivate"],
+  stopped: ["reactivate"],
   needsEdit: [],
 };

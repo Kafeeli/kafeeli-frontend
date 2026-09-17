@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaCheckCircle, FaEye, FaEyeSlash, FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { authApi } from "../services/authApi";
+import { PALESTINIAN_CITIES } from "../config/cities";
 
 import logo from "../assets/title.png";
 import PrivacyPolicyModal from "../components/PrivacyPolicyModal";
@@ -516,14 +517,11 @@ export default function RegistrationPage() {
                       <option value="" hidden>
                         اختر المدينة
                       </option>
-                      <option value="غزة">غزة</option>
-                      <option value="خانيونس">خان يونس</option>
-                      <option value="بيت لاهيا">بيت لاهيا</option>
-                      <option value="بيت حانون">بيت حانون</option>
-                      <option value="نصيرات">نصيرات</option>
-                      <option value="دير البلح">دير البلح</option>
-                      <option value="رفح">رفح</option>
-                      <option value="جباليا">جباليا</option>
+                      {PALESTINIAN_CITIES.map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
                     </select>
                     <FieldError message={errors.city} />
                   </div>

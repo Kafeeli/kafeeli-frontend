@@ -30,6 +30,7 @@ import {
   localizeVerificationStatus,
   verificationStatusMeta,
 } from "../../utils/localization";
+import { PALESTINIAN_CITIES } from "../../config/cities";
 
 import AdminLayout from "./Adminlayout";
 import {
@@ -59,16 +60,6 @@ const ACCOUNT_FILTERS = [
   { value: "Suspended", label: "معلّق" },
 ];
 
-const PALESTINIAN_CITIES = [
-  "غزة",
-  "خان يونس",
-  "رفح",
-  "دير البلح",
-  "نصيرات",
-  "جباليا",
-  "بيت لاهيا",
-  "بيت حانون"
-];
 
 function accountStatusLabel(status) {
   return status === "Active" ? "نشط" : status === "Suspended" ? "معلّق" : status || "—";
