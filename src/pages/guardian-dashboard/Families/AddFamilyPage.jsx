@@ -4,6 +4,7 @@ import Sidebar from "../Sidebar";
 import { familyApi } from "../../../services/familyApi";
 import AuthenticatedHeader from "../../../components/layout/AuthenticatedHeader";
 import AuthenticatedFooter from "../../../components/layout/AuthenticatedFooter";
+import { PALESTINIAN_CITIES } from "../../../config/cities";
 
 import {
   MdKeyboardArrowLeft,
@@ -130,10 +131,11 @@ function SelectInput({ name, value, onChange, error, disabled }) {
         }`}
       >
         <option value="">اختر المدينة</option>
-        <option value="غزة">غزة</option>
-        <option value="رفح">رفح</option>
-        <option value="خان يونس">خان يونس</option>
-        <option value="دير البلح">دير البلح</option>
+        {PALESTINIAN_CITIES.map((city) => (
+          <option key={city} value={city}>
+            {city}
+          </option>
+        ))}
       </select>
 
       {error && (
@@ -309,14 +311,16 @@ function AddFamilyForm() {
     } catch (err) {
       const status = err?.response?.status;
       const apiErrors = err?.response?.data?.errors;
-      if (status === 400) {
-        setServerError(
-          Array.isArray(apiErrors) && apiErrors.length ? apiErrors.join(" - ") : "تحقق من صحة البيانات المدخلة."
-        );
+      const message = err?.response?.data?.message || err?.response?.data?.title;
+
+      const backendMsg = message || (Array.isArray(apiErrors) && apiErrors.length ? apiErrors.join(" - ") : null);
+
+      if (backendMsg) {
+        setServerError(backendMsg);
       } else if (status === 403) {
         setServerError("حسابك غير مؤهل لإضافة عائلة حاليًا.");
       } else {
-        setServerError("تعذر إرسال بيانات العائلة، حاول مجددًا.");
+        setServerError(err?.message || "تعذر إرسال بيانات العائلة، حاول مجددًا.");
       }
     } finally {
       setSubmitting(false);

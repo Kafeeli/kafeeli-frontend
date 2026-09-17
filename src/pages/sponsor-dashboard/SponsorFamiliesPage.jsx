@@ -19,7 +19,12 @@ export default function SponsorFamiliesPage() {
     try {
       const result = await sponsorApi.getFamilies();
       const data = getResultData(result, "تعذر تحميل العائلات.");
-      setFamilies(Array.isArray(data?.families) ? data.families : []);
+      const list = Array.isArray(data?.families) ? data.families : [];
+      // ضمان عرض العائلات النشطة (Active) فقط للكفلاء
+      const activeOnly = list.filter(
+        (f) => !f.status || f.status === "Active" || f.status === "active"
+      );
+      setFamilies(activeOnly);
     } catch (requestError) {
       setError(getApiErrorMessage(requestError, "تعذر تحميل العائلات."));
     } finally {

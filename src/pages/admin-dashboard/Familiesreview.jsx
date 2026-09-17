@@ -320,6 +320,7 @@ export default function FamiliesReview() {
         family.familyId,
         targetStatus,
         reason,
+        family.guardianId || family.guardian?.id,
       );
 
       if (result?.success === false) {
@@ -344,8 +345,8 @@ export default function FamiliesReview() {
       const refreshed = await fetchFamilies();
       if (refreshed) {
         const refreshedFamily = [
-          ...refreshed.families,
-          ...refreshed.pendingFamilies,
+          ...(refreshed.families?.items || []),
+          ...(refreshed.pendingFamilies?.items || []),
         ].find((item) => item.familyId === family.familyId);
 
         if (refreshedFamily) {

@@ -89,39 +89,46 @@ export default function FamilyDetailsModal({
   const normalizedStatus = mapFamilyStatus(family?.status);
   const statusInfo = STATUS_MAP[normalizedStatus] || STATUS_MAP.pending;
 
-  const [targetStatus, setTargetStatus] = useState(
-    () =>
-      BACKEND_STATUS_BY_NORMALIZED_STATUS[normalizedStatus] || "PendingReview",
-  );
-
+  const [showReasonBox, setShowReasonBox] = useState(false);
   const [reason, setReason] = useState("");
   const [validationError, setValidationError] = useState("");
 
   if (!family) return null;
 
-  const handleStatusSubmit = async (event) => {
-    event.preventDefault();
+  const updateReasonText =
+    family.needsUpdateReason ||
+    family.reason ||
+    family.rejectionReason ||
+    family.reviewReason ||
+    "";
 
+  const handleActionClick = async (targetStatus, needReason = false) => {
     if (actionLoading) return;
 
-    const trimmedReason = reason.trim();
+    if (needReason) {
+      if (!showReasonBox) {
+        setShowReasonBox(true);
+        setValidationError("");
+        return;
+      }
 
-    if (targetStatus === "NeedsUpdate" && !trimmedReason) {
-      setValidationError("يرجى كتابة سبب طلب التحديث.");
+      const trimmedReason = reason.trim();
+      if (!trimmedReason) {
+        setValidationError("يرجى كتابة سبب طلب التحديث.");
+        return;
+      }
+      setValidationError("");
+
+      const succeeded = await onDecision?.(family, targetStatus, trimmedReason);
+      if (succeeded) {
+        setReason("");
+        setShowReasonBox(false);
+      }
       return;
     }
 
     setValidationError("");
-
-    const succeeded = await onDecision?.(
-      family,
-      targetStatus,
-      targetStatus === "NeedsUpdate" ? trimmedReason : null,
-    );
-
-    if (succeeded && targetStatus !== "NeedsUpdate") {
-      setReason("");
-    }
+    await onDecision?.(family, targetStatus, null);
   };
 
   return (
@@ -171,8 +178,7 @@ export default function FamilyDetailsModal({
 
             {/* Info Box */}
             <div className="mt-8 max-w-[220px] rounded-2xl border border-white/10 bg-white/10 p-4 text-center text-sm leading-7 text-white/75 shadow-lg backdrop-blur-sm">
-              اختر حالة العائلة المطلوبة، وسيعرض النظام الحالة التي يعيدها
-              الخادم بعد الحفظ.
+              راجع بيانات العائلة وشهادة الوفاة، ثم اتخذ القرار المناسب.
             </div>
           </aside>
 
@@ -336,96 +342,170 @@ export default function FamilyDetailsModal({
             )}
 
             {/* =========================
-                Status Management
+                Status Management Section
             ========================== */}
             <section className="border-t border-slate-200 pt-6">
               <div className="mb-4">
-                <h3 className="font-bold text-[#0D4B8E]">إدارة حالة العائلة</h3>
-
+                <h3 className="font-bold text-[#0D4B8E]">إجراء الإدارة على العائلة</h3>
                 <p className="mt-1 text-xs text-slate-500">
-                  اختر الحالة المناسبة ثم احفظ التغيير.
+                  اتخذ الإجراء المناسب بناءً على حالة الطلب الحالية.
                 </p>
               </div>
 
-              <form
-                onSubmit={handleStatusSubmit}
-                className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-              >
-                {/* Status Select */}
-                <label
-                  htmlFor="family-status"
-                  className="mb-2 block text-sm font-bold text-[#183B56]"
-                >
-                  الحالة المطلوبة
-                </label>
-
-                <select
-                  id="family-status"
-                  value={targetStatus}
-                  onChange={(event) => {
-                    setTargetStatus(event.target.value);
-                    setValidationError("");
-                  }}
-                  disabled={actionLoading}
-                  className="w-full cursor-pointer rounded-xl border border-slate-200 bg-[#F8F9FA] px-4 py-3 text-sm font-bold text-[#183B56] outline-none transition-all focus:border-[#2DBCC3] focus:bg-white focus:ring-2 focus:ring-[#2DBCC3]/20 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {FAMILY_STATUS_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-
-                {/* Update Reason */}
-                {targetStatus === "NeedsUpdate" && (
-                  <div className="mt-4">
-                    <label
-                      htmlFor="family-status-reason"
-                      className="mb-2 block text-sm font-bold text-[#183B56]"
-                    >
-                      سبب طلب التحديث
-                    </label>
-
-                    <textarea
-                      id="family-status-reason"
-                      value={reason}
-                      onChange={(event) => {
-                        setReason(event.target.value);
-                        setValidationError("");
-                      }}
-                      maxLength={500}
-                      rows={4}
-                      disabled={actionLoading}
-                      placeholder="اكتب البيانات أو المستندات التي تحتاج إلى تحديث."
-                      className="w-full resize-none rounded-xl border border-slate-200 bg-[#F8F9FA] p-3 text-sm leading-7 text-[#183B56] outline-none transition-all placeholder:text-slate-400 focus:border-[#2DBCC3] focus:bg-white focus:ring-2 focus:ring-[#2DBCC3]/20 disabled:cursor-not-allowed disabled:opacity-60"
-                    />
-
-                    <p className="mt-1 text-left text-xs text-slate-500">
-                      {reason.length}/٥٠٠
-                    </p>
-                  </div>
-                )}
-
-                {/* Validation Error */}
-                {validationError && (
-                  <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-sm font-semibold leading-6 text-red-600">
-                    {validationError}
+              {/* Status: NeedsUpdate (تحتاج تعديل) */}
+              {normalizedStatus === "needsEdit" && (
+                <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-5 shadow-sm">
+                  <h4 className="font-bold text-amber-900">سبب طلب التعديل الحالي:</h4>
+                  <p className="mt-2 rounded-xl bg-white p-3 text-sm text-amber-950 border border-amber-200">
+                    {updateReasonText || "تم طلب تعديل بيانات العائلة من قبل الإدارة."}
                   </p>
-                )}
-
-                {/* Submit */}
-                <div className="mt-5 flex justify-end">
-                  <button
-                    type="submit"
-                    disabled={actionLoading}
-                    className="inline-flex min-w-40 items-center justify-center gap-2 rounded-xl bg-[#0D4B8E] px-6 py-3 font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#0A3D75] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    <MdOutlineEditNote className="text-xl" />
-
-                    {actionLoading ? "جارٍ حفظ الحالة..." : "حفظ الحالة"}
-                  </button>
+                  <p className="mt-3 text-xs leading-6 text-amber-800 font-medium">
+                    ⚠️ هذه العائلة بانتظار تعديل الوصي للبيانات أو الشهادة وإعادة الإرسال. ستعود تلقائيًا إلى حالة <strong>"قيد المراجعة"</strong> بعد الإرسال لتتمكن الإدارة من اعتمادها أو طلب تعديل مجددًا.
+                  </p>
                 </div>
-              </form>
+              )}
+
+              {/* Status: PendingReview (قيد المراجعة) */}
+              {normalizedStatus === "pending" && (
+                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      disabled={actionLoading}
+                      onClick={() => handleActionClick("Active", false)}
+                      className="rounded-xl bg-emerald-600 px-6 py-3 font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-60 cursor-pointer"
+                    >
+                      {actionLoading ? "جارٍ الاعتماد..." : "اعتماد العائلة"}
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={actionLoading}
+                      onClick={() => setShowReasonBox(!showReasonBox)}
+                      className="rounded-xl bg-amber-600 px-6 py-3 font-bold text-white shadow-sm transition hover:bg-amber-700 disabled:opacity-60 cursor-pointer"
+                    >
+                      طلب تعديل
+                    </button>
+                  </div>
+
+                  {showReasonBox && (
+                    <div className="mt-4 pt-4 border-t border-slate-100">
+                      <label htmlFor="reason-input" className="block text-sm font-bold text-[#183B56] mb-2">
+                        سبب طلب التعديل (إجباري):
+                      </label>
+                      <textarea
+                        id="reason-input"
+                        value={reason}
+                        onChange={(e) => {
+                          setReason(e.target.value);
+                          setValidationError("");
+                        }}
+                        rows={3}
+                        placeholder="اكتب سبب طلب التعديل ليظهر للوصي..."
+                        className="w-full resize-none rounded-xl border border-slate-200 bg-[#F8F9FA] p-3 text-sm outline-none focus:border-[#2DBCC3]"
+                      />
+                      {validationError && (
+                        <p className="mt-2 text-xs font-bold text-red-600">{validationError}</p>
+                      )}
+                      <div className="mt-3 flex justify-end">
+                        <button
+                          type="button"
+                          disabled={actionLoading}
+                          onClick={() => handleActionClick("NeedsUpdate", true)}
+                          className="rounded-xl bg-amber-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-amber-800 disabled:opacity-60 cursor-pointer"
+                        >
+                          إرسال طلب التعديل
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Status: Active (نشطة ومعتمدة) */}
+              {normalizedStatus === "active" && (
+                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      disabled={actionLoading}
+                      onClick={() => handleActionClick("Hidden", false)}
+                      className="rounded-xl bg-slate-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-slate-700 disabled:opacity-60 cursor-pointer"
+                    >
+                      إخفاء العائلة
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={actionLoading}
+                      onClick={() => handleActionClick("Suspended", false)}
+                      className="rounded-xl bg-red-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-red-700 disabled:opacity-60 cursor-pointer"
+                    >
+                      تعليق العائلة
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={actionLoading}
+                      onClick={() => setShowReasonBox(!showReasonBox)}
+                      className="rounded-xl bg-amber-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-amber-700 disabled:opacity-60 cursor-pointer"
+                    >
+                      طلب تعديل
+                    </button>
+                  </div>
+
+                  {showReasonBox && (
+                    <div className="mt-4 pt-4 border-t border-slate-100">
+                      <label htmlFor="reason-input-active" className="block text-sm font-bold text-[#183B56] mb-2">
+                        سبب طلب التعديل (إجباري):
+                      </label>
+                      <textarea
+                        id="reason-input-active"
+                        value={reason}
+                        onChange={(e) => {
+                          setReason(e.target.value);
+                          setValidationError("");
+                        }}
+                        rows={3}
+                        placeholder="اكتب سبب طلب التعديل ليظهر للوصي..."
+                        className="w-full resize-none rounded-xl border border-slate-200 bg-[#F8F9FA] p-3 text-sm outline-none focus:border-[#2DBCC3]"
+                      />
+                      {validationError && (
+                        <p className="mt-2 text-xs font-bold text-red-600">{validationError}</p>
+                      )}
+                      <div className="mt-3 flex justify-end">
+                        <button
+                          type="button"
+                          disabled={actionLoading}
+                          onClick={() => handleActionClick("NeedsUpdate", true)}
+                          className="rounded-xl bg-amber-700 px-5 py-2.5 text-sm font-bold text-white hover:bg-amber-800 disabled:opacity-60 cursor-pointer"
+                        >
+                          إرسال طلب التعديل
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Status: Hidden (مخفية) or Suspended (معلقة / موقوفة) */}
+              {(normalizedStatus === "hidden" || normalizedStatus === "stopped") && (
+                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-slate-600">
+                      هذه العائلة {normalizedStatus === "hidden" ? "مخفية حاليًا" : "معلقة حاليًا"}.
+                    </p>
+                    <button
+                      type="button"
+                      disabled={actionLoading}
+                      onClick={() => handleActionClick("Active", false)}
+                      className="rounded-xl bg-emerald-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-60 cursor-pointer"
+                    >
+                      {actionLoading ? "جارٍ التفعيل..." : "إعادة التفعيل"}
+                    </button>
+                  </div>
+                </div>
+              )}
             </section>
           </main>
         </div>
