@@ -1,14 +1,3 @@
-// import usePageTitle from "./hooks/usePageTitle";
-// import { Routes, Route, useLocation, Navigate } from "react-router-dom";
-// import { AnimatePresence, motion } from "framer-motion";
-
-// import Login from "./pages/Login";
-// import RegistrationPage from "./pages/RegistrationPage";
-// import EmailVerification from "./pages/EmailVerification";
-// import EmailVerificationSuccess from "./pages/EmailVerificationSuccess";
-// import ForgotPassword from "./pages/ForgotPassword";
-// import ResetPassword from "./pages/ResetPassword";
-// import InvalidEmail from "./pages/InvalidEmail";
 // import SideBar from "./pages/admin-dashboard/sideBar";
 // import AdminDashboard from "./pages/admin-dashboard/AdminDashboard";
 // import TransferReviewList from "./pages/admin-dashboard/Transferreviewlist";
@@ -425,6 +414,7 @@ import PublicRoute from "./routes/PublicRoute";
 import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
 import Contact from "./pages/contact";
+
 import KafeeliPresentation from "./pages/KafeeliPresentation";
 
 function PageWrapper({ children }) {
@@ -946,10 +936,28 @@ function AnimatedRoutes() {
             </ProtectedRoute>
           }
         />
-<<<<<<< Updated upstream
-        <Route path="/admin-dashboard/guardians" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminGuardiansPage /></PageWrapper></ProtectedRoute>} />
-        <Route path="/admin-dashboard/sponsors" element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}><PageWrapper><AdminSponsorsPage /></PageWrapper></ProtectedRoute>} />
-=======
+
+        <Route
+          path="/admin-dashboard/guardians"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <AdminGuardiansPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin-dashboard/sponsors"
+          element={
+            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
+              <PageWrapper>
+                <AdminSponsorsPage />
+              </PageWrapper>
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/admin-dashboard/orphans"
           element={
@@ -1000,7 +1008,6 @@ function AnimatedRoutes() {
             </ProtectedRoute>
           }
         />
->>>>>>> Stashed changes
 
         <Route
           path="/error-404"
