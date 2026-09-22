@@ -62,17 +62,54 @@
 //   },
 // };
 import api from "./api";
+import { buildAdminQuery } from "../utils/adminPagination";
+
+const ADMIN_IMAGE_CACHE_LIMIT = 100;
+const adminImageBlobCache = new Map();
+
+async function getProtectedImageBlob(endpoint) {
+  const normalizedEndpoint = typeof endpoint === "string" ? endpoint.trim() : "";
+
+  if (!normalizedEndpoint.startsWith("/api/v1/admin/")) {
+    throw new Error("A relative Admin image endpoint is required.");
+  }
+
+  const cachedRequest = adminImageBlobCache.get(normalizedEndpoint);
+  if (cachedRequest) return cachedRequest;
+
+  const request = api
+    .get(normalizedEndpoint, {
+      responseType: "blob",
+      skipAuthRedirect: true,
+    })
+    .then((response) => response.data)
+    .catch((error) => {
+      if (adminImageBlobCache.get(normalizedEndpoint) === request) {
+        adminImageBlobCache.delete(normalizedEndpoint);
+      }
+      throw error;
+    });
+
+  adminImageBlobCache.set(normalizedEndpoint, request);
+
+  if (adminImageBlobCache.size > ADMIN_IMAGE_CACHE_LIMIT) {
+    const oldestEndpoint = adminImageBlobCache.keys().next().value;
+    adminImageBlobCache.delete(oldestEndpoint);
+  }
+
+  return request;
+}
 
 export const adminApi = {
   // ============ مراجعة العائلات ============
 
-  getFamilies: async () => {
-    const response = await api.get("/api/v1/admin/families");
+  getFamilies: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/families", { params: buildAdminQuery(filters) });
     return response.data;
   },
 
-  getPendingFamilies: async () => {
-    const response = await api.get("/api/v1/admin/families/pending");
+  getPendingFamilies: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/families/pending", { params: buildAdminQuery(filters) });
     return response.data;
   },
 
@@ -99,11 +136,50 @@ export const adminApi = {
     return response.data;
   },
 
-  updateFamilyStatus: async (familyId, status, reason = null) => {
+  updateFamilyStatus: async (familyId, status, reason = null, guardianId = null) => {
+    if (status === "Active") {
+      try {
+        return await adminApi.approveFamily(familyId);
+      } catch {
+        if (guardianId) {
+          try {
+            await adminApi.recalculateGuardianStatus(guardianId);
+            return await adminApi.approveFamily(familyId);
+          } catch {
+            // Proceed to patch fallback
+          }
+        }
+      }
+    }
+
+    if (status === "NeedsUpdate") {
+      try {
+        return await adminApi.requestFamilyUpdate(familyId, reason);
+      } catch {
+        // Proceed to patch fallback
+      }
+    }
+
+    if (status === "Hidden") {
+      try {
+        return await adminApi.hideFamily(familyId);
+      } catch {
+        // Proceed to patch fallback
+      }
+    }
+
+    if (status === "Suspended") {
+      try {
+        return await adminApi.suspendFamily(familyId);
+      } catch {
+        // Proceed to patch fallback
+      }
+    }
+
     const response = await api.patch(
       `/api/v1/admin/families/${familyId}/status`,
       {
-        status,
+        status: status,
         reason: status === "NeedsUpdate" ? reason?.trim() : null,
       },
     );
@@ -119,8 +195,10 @@ export const adminApi = {
   },
 
   // GET /api/v1/admin/guardian-bank-accounts/pending
-  getPendingBankAccounts: async () => {
-    const response = await api.get("/api/v1/admin/guardian-bank-accounts/pending");
+  getPendingBankAccounts: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/guardian-bank-accounts/pending", {
+      params: buildAdminQuery(filters),
+    });
     return response.data;
   },
 
@@ -145,9 +223,9 @@ export const adminApi = {
 
   // ============ مراجعة وثائق الأوصياء ============
 
-  // GET /api/v1/admin/guardian-documents/pending
-  getPendingDocuments: async () => {
-    const response = await api.get("/api/v1/admin/guardian-documents/pending");
+  getAllGuardianDocuments: async (filters = {}) => {
+    const params = buildAdminQuery(filters);
+    const response = await api.get("/api/v1/admin/guardian-documents", { params });
     return response.data;
   },
 
@@ -176,6 +254,15 @@ export const adminApi = {
     );
     return response.data;
   },
+
+  updateGuardianDocumentStatus: async (documentId, status, reason = "") => {
+    const trimmedReason = typeof reason === "string" ? reason.trim() : "";
+    const response = await api.patch(
+      `/api/v1/admin/guardian-documents/${documentId}/status`,
+      { status, ...(trimmedReason ? { reason: trimmedReason } : {}) },
+    );
+    return response.data;
+  },
   // ============ توثيق الوصي (الحساب ككل) ============
 
   // GET /api/v1/admin/guardians/{guardianId}/verification
@@ -186,10 +273,12 @@ export const adminApi = {
     return response.data;
   },
 
-  getAllGuardians: async () => {
-    const response = await api.get("/api/v1/admin/guardians");
+  getAllGuardians: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/guardians", { params: buildAdminQuery(filters) });
     return response.data;
   },
+
+  getProtectedImageBlob,
 
   getGuardianDetails: async (guardianId) => {
     const response = await api.get(`/api/v1/admin/guardians/${guardianId}`);
@@ -214,8 +303,8 @@ export const adminApi = {
     return response.data;
   },
 
-  getAllSponsors: async () => {
-    const response = await api.get("/api/v1/admin/sponsors");
+  getAllSponsors: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/sponsors", { params: buildAdminQuery(filters) });
     return response.data;
   },
 
@@ -267,12 +356,12 @@ export const adminApi = {
     return response.data;
   },
 
-  getPendingOrphans: async () => {
-    const response = await api.get("/api/v1/admin/orphans/pending");
+  getPendingOrphans: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/orphans/pending", { params: buildAdminQuery(filters) });
     return response.data;
   },
-  getAllOrphans: async () => {
-    const response = await api.get("/api/v1/admin/orphans");
+  getAllOrphans: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/orphans", { params: buildAdminQuery(filters) });
     return response.data;
   },
   getOrphanDetails: async (orphanId) => {
@@ -295,7 +384,14 @@ export const adminApi = {
     const response = await api.delete(`/api/v1/admin/orphans/${orphanId}`);
     return response.data;
   },
-  approveOrphan: async (orphanId) => {
+  approveOrphan: async (orphanId, documentId = null) => {
+    if (documentId) {
+      try {
+        await adminApi.updateOrphanDocumentStatus(documentId, "Approved");
+      } catch {
+        // Document may already be approved
+      }
+    }
     const response = await api.post(`/api/v1/admin/orphans/${orphanId}/approve`);
     return response.data;
   },
@@ -303,12 +399,21 @@ export const adminApi = {
     const response = await api.post(`/api/v1/admin/orphans/${orphanId}/needs-update`, { reason });
     return response.data;
   },
-  getPendingOrphanDocuments: async () => {
-    const response = await api.get("/api/v1/admin/orphan-documents/pending");
+  getAllOrphanDocuments: async (filters = {}) => {
+    const params = buildAdminQuery(filters);
+    const response = await api.get("/api/v1/admin/orphan-documents", { params });
     return response.data;
   },
   requestOrphanDocumentUpdate: async (documentId, reason) => {
     const response = await api.post(`/api/v1/admin/orphan-documents/${documentId}/needs-update`, { reason });
+    return response.data;
+  },
+  updateOrphanDocumentStatus: async (documentId, status, reason = "") => {
+    const trimmedReason = typeof reason === "string" ? reason.trim() : "";
+    const response = await api.patch(
+      `/api/v1/admin/orphan-documents/${documentId}/status`,
+      { status, ...(trimmedReason ? { reason: trimmedReason } : {}) },
+    );
     return response.data;
   },
   getOrphanDocumentFile: async (documentId) => {
@@ -318,14 +423,11 @@ export const adminApi = {
     return response.data;
   },
   getOrphanProfileImage: async (orphanId) => {
-    const response = await api.get(`/api/v1/admin/orphans/${orphanId}/profile-image`, {
-      responseType: "blob",
-    });
-    return response.data;
+    return getProtectedImageBlob(`/api/v1/admin/orphans/${orphanId}/profile-image`);
   },
 
-  getPendingPayments: async () => {
-    const response = await api.get("/api/v1/admin/payments/pending");
+  getPendingPayments: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/payments/pending", { params: buildAdminQuery(filters) });
     return response.data;
   },
   getPaymentDetails: async (paymentId) => {
@@ -353,12 +455,12 @@ export const adminApi = {
     });
     return response.data;
   },
-  getPendingPayouts: async () => {
-    const response = await api.get("/api/v1/admin/payouts/pending");
+  getPendingPayouts: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/payouts/pending", { params: buildAdminQuery(filters) });
     return response.data;
   },
-  getEligiblePayouts: async () => {
-    const response = await api.get("/api/v1/admin/payouts/eligible");
+  getEligiblePayouts: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/payouts/eligible", { params: buildAdminQuery(filters) });
     return response.data;
   },
   getPayoutDetails: async (payoutId) => {
@@ -373,4 +475,15 @@ export const adminApi = {
     const response = await api.post(`/api/v1/admin/payouts/${payoutId}/fail`, { reason });
     return response.data;
   },
+  getAuditLogs: async (filters = {}) => {
+    const response = await api.get("/api/v1/admin/audit-logs", { params: buildAdminQuery(filters) });
+    return response.data;
+  },
+//   getAllGuardianDocuments: async () => {
+//   const response = await api.get(
+//     "/api/v1/admin/guardian-documents"
+//   );
+
+//   return response.data;
+// },
 };

@@ -8,13 +8,15 @@ import {
 } from "react-icons/hi2";
 import {
   MdDashboard,
+  MdDescription,
   MdOutlineFamilyRestroom,
   MdOutlineVolunteerActivism,
 } from "react-icons/md";
 import { PiBaby, PiMoneyWavy } from "react-icons/pi";
 import { TbReportAnalytics } from "react-icons/tb";
 import { authApi } from "../../services/authApi";
-import { clearSessionStorage } from "../../utils/session";
+import { clearSessionStorage, getUserRoles } from "../../utils/session";
+import useCurrentUser from "../../hooks/useCurrentUser";
 import kafeeliLogo from "../../assets/title.png";
 const sidebarItems = [
   { label: "لوحة المراجعة", icon: MdDashboard, path: "/admin-dashboard" },
@@ -39,6 +41,16 @@ const sidebarItems = [
     path: "/admin-dashboard/families",
   },
   { label: "الأيتام", icon: PiBaby, path: "/admin-dashboard/orphans" },
+  {
+    label: "وثائق الأوصياء",
+    icon: MdDescription,
+    path: "/admin-dashboard/guardian-document-reviews",
+  },
+  {
+    label: "وثائق الأيتام",
+    icon: MdDescription,
+    path: "/admin-dashboard/orphan-document-reviews",
+  },
   { label: "المدفوعات", icon: PiMoneyWavy, path: "/admin-dashboard/payments" },
   {
     label: "دفعات الأوصياء",
@@ -46,13 +58,18 @@ const sidebarItems = [
     path: "/admin-dashboard/payouts",
   },
   { label: "التحديثات الدورية", icon: FiClock },
-  { label: "سجلات المدير", icon: TbReportAnalytics },
+  { label: "سجلات التدقيق", icon: TbReportAnalytics, path: "/admin-dashboard/audit-logs", roles: ["SuperAdmin"] },
 ];
 
 function SidebarContent({ onItemClick }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [loggingOut, setLoggingOut] = useState(false);
+  const user = useCurrentUser();
+  const roles = getUserRoles(user);
+  const visibleItems = sidebarItems.filter((item) => (
+    !item.roles || item.roles.some((role) => roles.includes(role))
+  ));
 
   const handleItemClick = (item) => {
     if (item.path) {
@@ -115,8 +132,13 @@ function SidebarContent({ onItemClick }) {
           hover:scrollbar-thumb-white/40
         "
       >
-        {sidebarItems.map(function (item) {
-          const isActive = item.path && location.pathname === item.path;
+        {visibleItems.map(function (item) {
+          // const isActive = item.path && location.pathname === item.path;
+          const isActive =
+  item.activePaths?.some((path) =>
+    location.pathname.startsWith(path)
+  ) ||
+  (item.path && location.pathname === item.path);
 
           return (
             <button
