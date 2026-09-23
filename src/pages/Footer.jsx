@@ -4,40 +4,58 @@ import logo from "../assets/title.png";
 
 export default function Footer() {
   const quickLinks = [
-    { label: "من نحن", href: "/About" },
-    { label: "الأسئلة الشائعة", href: "#faq" },
-    { label: "سياسة الخصوصية", href: "#privacy" },
-    { label: "اتصل بنا", href: "/contact" },
+    { label: "كيف يعمل كفيلي", href: "#how" },
+    { label: "المؤسسات", href: "#institutions" },
+    { label: "تسجيل الدخول", href: "#login" },
   ];
 
   return (
-    <footer id="contact" dir="rtl" className="scroll-mt-24 bg-gray-50 border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-8">
-          {/* About */}
-          <div className="text-center md:text-right">
-            <div className="flex flex-col items-center md:items-start">
+    <footer
+      id="contact"
+      dir="rtl"
+      className="w-full border-t-2 border-[#2DBCC3] bg-[#0D4B8E] text-white"
+    >
+      {/* Main Footer */}
+      <div className="mx-auto w-full max-w-[1216px] px-6 py-12 sm:px-8 lg:py-14">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
+          {/* ================= المنصة ================= */}
+          <div className="text-right">
+            <div className="mb-4 flex items-center gap-3">
               <img
                 src={logo}
                 alt="كفيلي"
-                className="h-16 w-auto object-contain mb-4"
+                className="h-10 w-auto object-contain"
               />
-              <p className="text-gray-600 text-sm leading-relaxed max-w-xs">
-                منصة "كفيلي" هي جسر الثقة الذي يجمع بين قلوب المحسنين وحاجات
-                الأيتام. نسعى لتمكين الجيل القادم بحب وكرامة.
-              </p>
+
+              <h2 className="font-['Cairo'] text-2xl font-black text-white">
+                كفيلي
+              </h2>
+            </div>
+
+            <p className="max-w-[330px] font-['Cairo'] text-sm font-medium leading-7 text-white/75">
+              منصة رقمية لإدارة وتنظيم رحلة الكفالة، تربط المؤسسة والكفيل والوصي
+              ضمن تجربة واضحة وموثقة وقابلة للمتابعة.
+            </p>
+
+            <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#2DBCC3]/15 px-3 py-1.5">
+              <span className="text-xs text-[#B9F1F3] whitespace-nowrap">
+                كفيلي — نحو عمل خيري وإنساني أكثر شفافية
+              </span>
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="text-center md:text-right">
-            <h3 className="text-blue-900 font-bold text-lg mb-6">المنصة</h3>
+          {/* ================= المنصة ================= */}
+          <div className="text-right">
+            <h3 className="mb-5 font-['Cairo'] text-lg font-bold text-white">
+              المنصة
+            </h3>
+
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-gray-600 hover:text-blue-900 transition-colors duration-200 text-sm"
+                    className="font-['Cairo'] text-sm text-white/70 transition-colors duration-200 hover:text-[#2DBCC3]"
                   >
                     {link.label}
                   </a>
@@ -46,34 +64,93 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
-          <div className="text-center md:text-right">
-            <h3 className="text-blue-900 font-bold text-lg mb-6">
-              تواصل مباشر
+          {/* ================= عن كفيلي ================= */}
+          <div className="text-right">
+            <h3 className="mb-5 font-['Cairo'] text-lg font-bold text-white">
+              عن كفيلي
             </h3>
+
+            <ul className="space-y-3">
+              <li>
+                <a
+                  href="#about"
+                  className="font-['Cairo'] text-sm text-white/70 transition-colors hover:text-[#2DBCC3]"
+                >
+                  من نحن
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="#contact"
+                  className="font-['Cairo'] text-sm text-white/70 transition-colors hover:text-[#2DBCC3]"
+                >
+                  تواصل معنا
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* ================= تواصل ================= */}
+          <div className="min-w-0 text-right">
+            <h3 className="mb-5 font-['Cairo'] text-lg font-bold text-white">
+              تواصل
+            </h3>
+
             <ul className="space-y-4">
-              <li className="flex items-center justify-center md:justify-start gap-3 text-sm text-gray-600">
-                <FaMapMarkerAlt className="text-teal-500 flex-shrink-0" />
-                <span>قطاع غزة-فلسطين</span>
+              {/* Email */}
+              <li className="flex min-w-0 items-start gap-3">
+                <FaEnvelope
+                  className="mt-1 shrink-0 text-[#2DBCC3]"
+                  size={15}
+                />
+
+                <a
+                  href="mailto:kafeeli.team@outlook.com"
+                  dir="ltr"
+                  className="min-w-0 break-all text-left font-['Cairo'] text-sm leading-6 text-white/75 transition-colors hover:text-[#2DBCC3]"
+                >
+                  kafeeli.team@outlook.com
+                </a>
               </li>
-              <li className="flex items-center justify-center md:justify-start gap-3 text-sm text-gray-600">
-                <FaPhone className="text-teal-500 flex-shrink-0" />
-                <a href="tel:+970593205914" dir="ltr">+970593205914</a>
+
+              {/* Location */}
+              <li className="flex items-start gap-3">
+                <FaMapMarkerAlt
+                  className="mt-1 shrink-0 text-[#2DBCC3]"
+                  size={15}
+                />
+
+                <span className="font-['Cairo'] text-sm leading-6 text-white/75">
+                  قطاع غزة - فلسطين
+                </span>
               </li>
-              <li className="flex items-center justify-center md:justify-start gap-3 text-sm text-gray-600">
-                <FaEnvelope className="text-teal-500 flex-shrink-0" />
-                <a href="mailto:kafeeli.team@outlook.com" className="hover:text-blue-900">kafeeli.team@outlook.com</a>
+
+              {/* Phone */}
+              <li className="flex items-start gap-3">
+                <FaPhone className="mt-1 shrink-0 text-[#2DBCC3]" size={14} />
+
+                <a
+                  href="tel:+970593205914"
+                  dir="ltr"
+                  className="font-['Cairo'] text-sm text-white/75 transition-colors hover:text-[#2DBCC3]"
+                >
+                  +970 5000 000
+                </a>
               </li>
             </ul>
           </div>
         </div>
-      </div>
 
-      <div className="border-t border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <p className="text-center text-gray-500 text-sm">
-            © 2026 كفيلي - منصة رعاية الأيتام. جميع الحقوق محفوظة
-          </p>
+        {/* ================= Bottom ================= */}
+        <div className="mt-12 border-t border-white/10 pt-5">
+          <div className="flex flex-col gap-3 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-right">© 2026 كفيلي - جميع الحقوق محفوظة</p>
+
+            <p className="text-right">
+              صُمم بعناية لخدمة الكفالات الإنسانية الشفافة
+            </p>
+          </div>
         </div>
       </div>
     </footer>
