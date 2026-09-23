@@ -47,7 +47,7 @@ import {
   FiZap,
 } from "react-icons/fi";
 
-import heroSection from "../assets/HeroSection (4).png";
+import heroSection from "../assets/hero-bg.png";
 
 export default function LandingPage() {
   // Counter Animation States
