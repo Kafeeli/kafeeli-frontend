@@ -22,7 +22,7 @@ import {
   FiMail,
 } from "react-icons/fi";
 
-import kafeeliOrphans from "../assets/about.png";
+import kafeeliOrphans from "../assets/kaf.png";
 import { LuMonitor, LuLightbulb, LuPalette, LuCode } from "react-icons/lu";
 import { IoEye } from "react-icons/io5";
 import {
