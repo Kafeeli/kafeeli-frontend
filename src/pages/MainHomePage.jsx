@@ -35,7 +35,7 @@ import {
 
 import { PiCheckCircle } from "react-icons/pi";
 
-import heroSection from "../assets/HeroSection (4).png";
+import heroSection from "../assets/hero-bg.png";
 const MainHomePage = () => {
   return (
     <>
