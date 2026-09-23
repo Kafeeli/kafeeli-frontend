@@ -4,6 +4,7 @@ import { guardianApi } from "../../services/guardianApi";
 import { bankAccountApi } from "../../services/bankAccountApi";
 import AuthenticatedHeader from "../../components/layout/AuthenticatedHeader";
 import AuthenticatedFooter from "../../components/layout/AuthenticatedFooter";
+import { PALESTINIAN_CITIES } from "../../config/cities";
 
 import {
   // إدارة القوائم والهيدر
@@ -80,17 +81,8 @@ const GENDER_OPTIONS = [
   { value: "Female", label: "أنثى" },
 ];
 
-// نفس قائمة المدن المستخدمة بصفحة الكفيل
-const CITY_OPTIONS = [
-  "غزة",
-  "خان يونس",
-  "بيت لاهيا",
-  "بيت حانون",
-  "نصيرات",
-  "دير البلح",
-  "رفح",
-  "جباليا",
-];
+// نفس قائمة المدن المستخدمة بجميع الصفحات
+const CITY_OPTIONS = PALESTINIAN_CITIES;
 const VERIFICATION_LABELS = {
   Approved: {
     text: "معتمد",
@@ -348,13 +340,26 @@ function GuardianProfile() {
       });
 
       const mapped = mapProfileToFormData(res.data);
-      setFormData(mapped);
-      setOriginalData(mapped);
-      if (imagePreview) URL.revokeObjectURL(imagePreview);
-      setNewProfileImage(null);
-      setImagePreview(null);
-      setIsEditing(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+
+setFormData(mapped);
+setOriginalData(mapped);
+
+// تحديث صورة الهيدر مباشرة بدون Refresh
+window.dispatchEvent(
+  new CustomEvent("profileImageUpdated", {
+    detail: mapped.profileImageUrl,
+  })
+);
+
+if (imagePreview) URL.revokeObjectURL(imagePreview);
+
+setNewProfileImage(null);
+setImagePreview(null);
+setIsEditing(false);
+
+if (fileInputRef.current) {
+  fileInputRef.current.value = "";
+}
     } catch (err) {
       const status = err?.response?.status;
       if (status === 400) {

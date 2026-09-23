@@ -88,11 +88,11 @@ function FamilyCard({ family }) {
             </div>
           )}
 
-          {family.statusKey === "needsEdit" && family.needsUpdateReason && (
+          {family.statusKey === "needsEdit" && (family.needsUpdateReason || family.reason || family.rejectionReason || family.reviewReason) && (
             <div className="rounded-[8px] bg-[#FFD8D8] border border-[#F5A9A9] px-4 py-4">
               <p className="font-[Cairo] text-[13px] leading-7 text-[#C81E1E]">
-                <span className="font-bold">السبب: </span>
-                {family.needsUpdateReason}
+                <span className="font-bold">سبب التعديل: </span>
+                {family.needsUpdateReason || family.reason || family.rejectionReason || family.reviewReason}
               </p>
             </div>
           )}

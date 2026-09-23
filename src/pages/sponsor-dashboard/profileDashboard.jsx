@@ -32,6 +32,7 @@ import personalImage from "../../assets/personal.jpg";
 import AuthenticatedHeader from "../../components/layout/AuthenticatedHeader";
 import AuthenticatedFooter from "../../components/layout/AuthenticatedFooter";
 import { localizeStatus } from "../../utils/localization";
+import { PALESTINIAN_CITIES } from "../../config/cities";
 
 function getApiBody(response) {
   if (!response || typeof response !== "object") return response;
@@ -680,14 +681,11 @@ function SponsorProfile() {
                             <option value="" hidden>
                               اختر المدينة
                             </option>
-                            <option value="غزة">غزة</option>
-                            <option value="خان يونس">خان يونس</option>
-                            <option value="بيت لاهيا">بيت لاهيا</option>
-                            <option value="بيت حانون">بيت حانون</option>
-                            <option value="نصيرات">نصيرات</option>
-                            <option value="دير البلح">دير البلح</option>
-                            <option value="رفح">رفح</option>
-                            <option value="جباليا">جباليا</option>
+                            {PALESTINIAN_CITIES.map((city) => (
+                              <option key={city} value={city}>
+                                {city}
+                              </option>
+                            ))}
                           </select>
                           <MdOutlineLocationOn className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#003469] text-lg" />
                         </div>
@@ -997,14 +995,11 @@ function SponsorProfile() {
                       <option value="" hidden>
                         اختر المدينة
                       </option>
-                      <option value="غزة">غزة</option>
-                      <option value="خان يونس">خان يونس</option>
-                      <option value="بيت لاهيا">بيت لاهيا</option>
-                      <option value="بيت حانون">بيت حانون</option>
-                      <option value="نصيرات">نصيرات</option>
-                      <option value="دير البلح">دير البلح</option>
-                      <option value="رفح">رفح</option>
-                      <option value="جباليا">جباليا</option>
+                      {PALESTINIAN_CITIES.map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
                     </select>
                     <MdOutlineLocationOn className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#003469] text-lg" />
                   </div>

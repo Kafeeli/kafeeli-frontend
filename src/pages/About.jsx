@@ -54,10 +54,9 @@ import {
 import Header from "./header";
 import Footer from "./Footer";
 
-import heroSection from "../assets/HeroSection (4).png";
+import heroSection from "../assets/hero-bg.png";
 import backendImg from "../assets/backendimg.png";
 import frontendImg from "../assets/frontimg.png";
-import about from "../assets/about.png";
 const team = [
   {
     name: "تالة رأفت أبو شيحة",

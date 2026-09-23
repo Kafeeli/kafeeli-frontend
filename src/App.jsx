@@ -393,10 +393,12 @@ import GuardianOrphanDetailsPage from "./pages/guardian-dashboard/GuardianOrphan
 import GuardianOrphanFormPage from "./pages/guardian-dashboard/GuardianOrphanFormPage";
 import GuardianPayoutsPage from "./pages/guardian-dashboard/GuardianPayoutsPage";
 import AdminOrphansReviewPage from "./pages/admin-dashboard/AdminOrphansReviewPage";
+import AdminOrphanDocumentsPage from "./pages/admin-dashboard/AdminOrphanDocumentsPage";
 import AdminGuardiansPage from "./pages/admin-dashboard/AdminGuardiansPage";
 import AdminSponsorsPage from "./pages/admin-dashboard/AdminSponsorsPage";
 import AdminPaymentsReviewPage from "./pages/admin-dashboard/AdminPaymentsReviewPage";
 import AdminPayoutsPage from "./pages/admin-dashboard/AdminPayoutsPage";
+import AdminAuditLogsPage from "./pages/admin-dashboard/AdminAuditLogsPage";
 
 // 🔌 صفحات العائلات (الوصي) — بعد التوحيد، صار عندنا صفحة وحدة لكل حالة
 // بدل ملف منفصل لكل حالة (كانت جوّا Families/status/ وصارت محذوفة).
@@ -415,7 +417,7 @@ import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
 import Contact from "./pages/contact";
 
-import KafeeliPresentation from "./pages/KafeeliPresentation";
+// import KafeeliPresentation from "./pages/KafeeliPresentation";
 
 function PageWrapper({ children }) {
   return (
@@ -917,17 +919,7 @@ function AnimatedRoutes() {
           }
         />
         <Route
-          path="/admin-dashboard/payments"
-          element={
-            <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
-              <PageWrapper>
-                <AdminPaymentsReviewPage />
-              </PageWrapper>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin-dashboard/payouts"
+          path="/admin-dashboard/orphan-document-reviews"
           element={
             <ProtectedRoute allowedRoles={["Admin", "SuperAdmin"]}>
               <PageWrapper>
@@ -1018,7 +1010,6 @@ function AnimatedRoutes() {
           }
         />
 
-        <Route path="/presentation" element={<KafeeliPresentation />} />
         <Route
           path="/auth-401"
           element={

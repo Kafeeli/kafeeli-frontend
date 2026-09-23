@@ -12,10 +12,26 @@ export const FAMILY_STATUS_MAP = {
   Active: "active",
   Hidden: "hidden",
   Suspended: "stopped",
+  pendingreview: "pending",
+  needsupdate: "needsEdit",
+  active: "active",
+  hidden: "hidden",
+  suspended: "stopped",
+  stopped: "stopped",
+  pending: "pending",
+  needsedit: "needsEdit",
 };
 
-export function mapFamilyStatus(apiStatusNumber) {
-  return FAMILY_STATUS_MAP[apiStatusNumber] || "pending";
+export function mapFamilyStatus(apiStatus) {
+  if (apiStatus === null || apiStatus === undefined) return "pending";
+  if (FAMILY_STATUS_MAP[apiStatus]) return FAMILY_STATUS_MAP[apiStatus];
+  if (typeof apiStatus === "string") {
+    const trimmed = apiStatus.trim();
+    if (FAMILY_STATUS_MAP[trimmed]) return FAMILY_STATUS_MAP[trimmed];
+    const lower = trimmed.toLowerCase();
+    if (FAMILY_STATUS_MAP[lower]) return FAMILY_STATUS_MAP[lower];
+  }
+  return "pending";
 }
 
 // إعدادات إضافية خاصة بكروت صفحة القائمة (ManagingFamilyCards) — تصميمها أغنى

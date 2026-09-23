@@ -55,8 +55,9 @@ const pageTitles = {
   "/admin-dashboard/families": "إدارة العائلات",
   "/admin-dashboard/guardians": "الأوصياء",
   "/admin-dashboard/sponsors": "الكفلاء",
-  "/admin-dashboard/guardian-document-reviews": "مراجعة وثائق الأوصياء",
+  "/admin-dashboard/guardian-document-reviews": "وثائق الأوصياء",
   "/admin-dashboard/orphans": "إدارة الأيتام",
+  "/admin-dashboard/orphan-document-reviews": "وثائق الأيتام",
   "/admin-dashboard/payments": "مراجعة المدفوعات",
   "/admin-dashboard/payouts": "دفعات الأوصياء",
 

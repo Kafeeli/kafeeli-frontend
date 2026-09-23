@@ -1,4 +1,7 @@
 import { MdWarningAmber, MdRefresh } from "react-icons/md";
+import KafeeliLoader from "../../components/KafeeliLoader";
+
+export { KafeeliLoader };
 
 const cardShadow = "shadow-[0_2px_10px_rgba(31,41,55,0.06)]";
 
@@ -41,7 +44,13 @@ function SkeletonCard() {
 export function LoadingState({
   count = 6,
   columns = "sm:grid-cols-2 lg:grid-cols-3",
+  variant = "skeleton",
+  text = "منصة كفيلي .. انتظر قليلاً",
 }) {
+  if (variant === "kafeeli" || variant === "diamond") {
+    return <KafeeliLoader text={text} fullScreen={false} />;
+  }
+
   return (
     <div className={`grid grid-cols-1 gap-4 ${columns}`}>
       {Array.from({ length: count }).map((_, i) => (
