@@ -74,23 +74,39 @@ const Header = ({ primaryDestination = "/register" }) => {
     };
   }, []);
 
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <>
-      <header className="sticky top-0 z-50 w-full bg-white/95 backdrop-blur-md border-b border-gray-100">
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 border-b ${
+          isScrolled
+            ? "bg-white/95 backdrop-blur-md border-gray-200/80 shadow-md"
+            : "bg-white/90 backdrop-blur-sm border-gray-100 shadow-sm"
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
+          <div className="flex items-center justify-between h-14 lg:h-16">
             {/* Logo */}
             <Link
               to="/landing-page"
-              className="flex items-center"
+              className="flex items-center gap-2"
               aria-label="العودة إلى أعلى الصفحة"
             >
               <img
                 src={logo}
                 alt="كفيلي"
-                className="h-14 w-auto object-contain"
+                className="h-9 lg:h-10 w-auto object-contain"
               />
-              <span className="hidden md:inline text-2xl font-bold text-blue-900 tracking-tight">
+              <span className="hidden md:inline text-xl lg:text-2xl font-bold text-blue-900 tracking-tight">
                 كفيلي
               </span>
             </Link>

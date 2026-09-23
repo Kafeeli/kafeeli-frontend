@@ -1,20 +1,34 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FiEdit2, FiEye, FiSearch, FiTrash2 } from "react-icons/fi";
+import { FiEdit2, FiEye, FiInfo, FiMapPin, FiSearch, FiTrash2, FiUser } from "react-icons/fi";
 import { MdOutlineVolunteerActivism, MdPauseCircleOutline, MdPlayCircleOutline } from "react-icons/md";
 import { adminApi } from "../../services/adminApi";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
 import { apiErrorMessage, unwrapResult } from "../../utils/apiUi";
+import { emptyPagedData, normalizePagedData } from "../../utils/adminPagination";
 import { formatArabicDateTime } from "../../utils/date";
 import { localizeStatus } from "../../utils/localization";
+import { PALESTINIAN_CITIES } from "../../config/cities";
 import AdminLayout from "./Adminlayout";
-import { AdminConfirmationDialog, AdminDialog } from "./AdminManagementDialogs";
+import AdminEntityAvatar from "./AdminEntityAvatar";
+import {
+  AdminConfirmationDialog,
+  AdminDetailItem,
+  AdminDetailsHero,
+  AdminDetailsSection,
+  AdminDetailStat,
+  AdminDialog,
+} from "./AdminManagementDialogs";
 import { EmptyState, ErrorState, LoadingState, MiniStatCard } from "./Adminstates";
 import AdminTableIconButton from "./AdminTableIconButton";
+import AdminPagination from "./AdminPagination";
 
 const ACCOUNT_FILTERS = [
   { value: "all", label: "كل حالات الحساب" },
   { value: "Active", label: "نشط" },
   { value: "Suspended", label: "معلّق" },
 ];
+
+const CITY_OPTIONS = PALESTINIAN_CITIES;
 
 function accountStatusLabel(status) {
   return status === "Active" ? "نشط" : status === "Suspended" ? "معلّق" : status || "—";
@@ -38,12 +52,8 @@ function sponsorForm(details) {
     dateOfBirth: toDateInputValue(details.dateOfBirth),
     gender: details.gender === "Female" ? "2" : "1",
     city: details.city || "",
-    country: details.country || "",
+    country: "فلسطين",
   };
-}
-
-function DetailItem({ label, value, dir }) {
-  return <div><dt className="text-xs font-bold text-gray-500">{label}</dt><dd dir={dir} className="mt-1 break-words text-sm font-bold text-gray-900">{value ?? "—"}</dd></div>;
 }
 
 export default function AdminSponsorsPage() {
@@ -54,6 +64,12 @@ export default function AdminSponsorsPage() {
   const [successMessage, setSuccessMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [accountFilter, setAccountFilter] = useState("all");
+  const [cityFilter, setCityFilter] = useState("");
+  const [countryFilter, setCountryFilter] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [pagination, setPagination] = useState(emptyPagedData);
+  const debouncedSearch = useDebouncedValue(searchTerm.trim());
   const [selected, setSelected] = useState(null);
   const [dialogMode, setDialogMode] = useState("");
   const [editForm, setEditForm] = useState(null);
@@ -65,14 +81,17 @@ export default function AdminSponsorsPage() {
     if (!silent) setLoading(true);
     setError("");
     try {
-      const data = unwrapResult(await adminApi.getAllSponsors(), "تعذر تحميل قائمة الكفلاء.");
-      setSponsors(Array.isArray(data) ? data : []);
+      const query = { page, pageSize, search: debouncedSearch, accountStatus: accountFilter, city: cityFilter, country: countryFilter };
+      const data = unwrapResult(await adminApi.getAllSponsors(query), "تعذر تحميل قائمة الكفلاء.");
+      const normalized = normalizePagedData(data, query);
+      setSponsors(normalized.items);
+      setPagination(normalized);
     } catch (requestError) {
       setError(apiErrorMessage(requestError, "تعذر تحميل قائمة الكفلاء."));
     } finally {
       if (!silent) setLoading(false);
     }
-  }, []);
+  }, [accountFilter, cityFilter, countryFilter, debouncedSearch, page, pageSize]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(load, 0);
@@ -191,13 +210,14 @@ export default function AdminSponsorsPage() {
 
   const filteredSponsors = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
+    if (!pagination.isLegacyArray) return sponsors;
     return sponsors.filter((sponsor) => {
       const matchesAccount = accountFilter === "all" || sponsor.accountStatus === accountFilter;
       const matchesSearch = !query || [sponsor.fullName, sponsor.email, sponsor.phoneNumber]
         .some((value) => String(value || "").toLowerCase().includes(query));
       return matchesAccount && matchesSearch;
     });
-  }, [accountFilter, searchTerm, sponsors]);
+  }, [accountFilter, pagination.isLegacyArray, searchTerm, sponsors]);
 
   const showStatusConfirmation = (sponsor, isActive) => {
     setConfirmation({ type: "status", sponsor, isActive });
@@ -214,7 +234,7 @@ export default function AdminSponsorsPage() {
   else content = (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm"><div className="overflow-x-auto"><table className="w-full min-w-[960px] text-right text-xs">
       <thead className="bg-[#F5F7FA] text-[11px] text-[#374151]"><tr><th className="whitespace-nowrap px-3 py-3 font-extrabold">الاسم</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">البريد الإلكتروني</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الهاتف</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الموقع</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الحساب</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">عدد الكفالات</th><th className="whitespace-nowrap px-3 py-3 font-extrabold">الإجراءات</th></tr></thead>
-      <tbody className="divide-y divide-gray-100">{filteredSponsors.map((sponsor) => <tr key={sponsor.sponsorId} className="hover:bg-gray-50/70"><td title={sponsor.fullName || undefined} className="max-w-[170px] truncate px-3 py-3 font-bold text-[#003469]">{sponsor.fullName || "—"}</td><td title={sponsor.email || undefined} className="max-w-[210px] truncate px-3 py-3 text-[11px] text-gray-600">{sponsor.email || "—"}</td><td dir="ltr" className="whitespace-nowrap px-3 py-3 text-right text-[11px] text-gray-600">{sponsor.phoneNumber || "—"}</td><td title={[sponsor.city, sponsor.country].filter(Boolean).join("، ") || undefined} className="max-w-[140px] truncate px-3 py-3">{[sponsor.city, sponsor.country].filter(Boolean).join("، ") || "—"}</td><td className="whitespace-nowrap px-3 py-3"><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${accountStatusClasses(sponsor.accountStatus)}`}>{accountStatusLabel(sponsor.accountStatus)}</span></td><td className="px-3 py-3 font-extrabold text-[#0D4B8E]">{sponsor.totalSponsorships ?? 0}</td><td className="px-3 py-3"><div className="flex items-center gap-1 whitespace-nowrap"><AdminTableIconButton label="عرض التفاصيل" tone="view" disabled={Boolean(busy)} onClick={() => openSponsor(sponsor.sponsorId)}><FiEye aria-hidden="true" /></AdminTableIconButton><AdminTableIconButton label="تعديل" disabled={Boolean(busy)} onClick={() => openSponsor(sponsor.sponsorId, "edit")}><FiEdit2 aria-hidden="true" /></AdminTableIconButton>{sponsor.canSuspend && <AdminTableIconButton label="تعليق الحساب" tone="suspend" disabled={Boolean(busy)} onClick={() => showStatusConfirmation(sponsor, false)}><MdPauseCircleOutline aria-hidden="true" /></AdminTableIconButton>}{sponsor.canReactivate && <AdminTableIconButton label="إعادة تفعيل الحساب" tone="reactivate" disabled={Boolean(busy)} onClick={() => showStatusConfirmation(sponsor, true)}><MdPlayCircleOutline aria-hidden="true" /></AdminTableIconButton>}<AdminTableIconButton label="حذف نهائي" tone="delete" disabled={Boolean(busy)} onClick={() => openDelete(sponsor.sponsorId)}><FiTrash2 aria-hidden="true" /></AdminTableIconButton></div></td></tr>)}</tbody>
+      <tbody className="divide-y divide-gray-100">{filteredSponsors.map((sponsor) => <tr key={sponsor.sponsorId} className="hover:bg-gray-50/70"><td title={sponsor.fullName || undefined} className="max-w-[190px] px-3 py-3 font-bold text-[#003469]"><div className="flex min-w-0 items-center gap-2"><AdminEntityAvatar name={sponsor.fullName} hasImage={sponsor.hasProfileImage} imageEndpoint={`/api/v1/admin/sponsors/${sponsor.sponsorId}/profile-image`} alt={`صورة الكفيل ${sponsor.fullName || ""}`.trim()} size="sm" /><span className="truncate">{sponsor.fullName || "—"}</span></div></td><td title={sponsor.email || undefined} className="max-w-[210px] truncate px-3 py-3 text-[11px] text-gray-600">{sponsor.email || "—"}</td><td dir="ltr" className="whitespace-nowrap px-3 py-3 text-right text-[11px] text-gray-600">{sponsor.phoneNumber || "—"}</td><td title={[sponsor.city, sponsor.country].filter(Boolean).join("، ") || undefined} className="max-w-[140px] truncate px-3 py-3">{[sponsor.city, sponsor.country].filter(Boolean).join("، ") || "—"}</td><td className="whitespace-nowrap px-3 py-3"><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${accountStatusClasses(sponsor.accountStatus)}`}>{accountStatusLabel(sponsor.accountStatus)}</span></td><td className="px-3 py-3 font-extrabold text-[#0D4B8E]">{sponsor.totalSponsorships ?? 0}</td><td className="px-3 py-3"><div className="flex items-center gap-1 whitespace-nowrap"><AdminTableIconButton label="عرض التفاصيل" tone="view" disabled={Boolean(busy)} onClick={() => openSponsor(sponsor.sponsorId)}><FiEye aria-hidden="true" /></AdminTableIconButton><AdminTableIconButton label="تعديل" disabled={Boolean(busy)} onClick={() => openSponsor(sponsor.sponsorId, "edit")}><FiEdit2 aria-hidden="true" /></AdminTableIconButton>{sponsor.canSuspend && <AdminTableIconButton label="تعليق الحساب" tone="suspend" disabled={Boolean(busy)} onClick={() => showStatusConfirmation(sponsor, false)}><MdPauseCircleOutline aria-hidden="true" /></AdminTableIconButton>}{sponsor.canReactivate && <AdminTableIconButton label="إعادة تفعيل الحساب" tone="reactivate" disabled={Boolean(busy)} onClick={() => showStatusConfirmation(sponsor, true)}><MdPlayCircleOutline aria-hidden="true" /></AdminTableIconButton>}<AdminTableIconButton label="حذف نهائي" tone="delete" disabled={Boolean(busy)} onClick={() => openDelete(sponsor.sponsorId)}><FiTrash2 aria-hidden="true" /></AdminTableIconButton></div></td></tr>)}</tbody>
     </table></div></div>
   );
 
@@ -222,16 +242,52 @@ export default function AdminSponsorsPage() {
     <AdminLayout title="الكفلاء"><div className="mx-auto w-full max-w-7xl">
       <div className="mb-6"><h1 className="text-2xl font-extrabold text-[#003469]">إدارة الكفلاء</h1><p className="mt-1 text-sm text-gray-500">عرض بيانات الكفلاء وتعديلها وإدارة حالة الحساب بأمان.</p></div>
       <div className="mb-5 max-w-sm"><MiniStatCard label="إجمالي الكفلاء" value={sponsors.length} icon={MdOutlineVolunteerActivism} tone="bg-[#E8F1FA] text-[#0D4B8E]" /></div>
-      <div className="mb-6 grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-[1fr_220px]"><label className="relative"><span className="sr-only">البحث في الكفلاء</span><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="ابحث بالاسم أو البريد أو الهاتف" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none focus:border-[#0D4B8E]" /></label><select value={accountFilter} onChange={(event) => setAccountFilter(event.target.value)} aria-label="تصفية حسب حالة الحساب" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ACCOUNT_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select></div>
-      {actionError && <p role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}{successMessage && <p role="status" className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700">{successMessage}</p>}<p className="mb-3 text-sm font-bold text-gray-600">النتائج: {filteredSponsors.length}</p>{content}
+      <div className="mb-6 grid gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:grid-cols-2 xl:grid-cols-5"><label className="relative sm:col-span-2"><span className="sr-only">البحث في الكفلاء</span><FiSearch className="absolute right-3 top-3 text-gray-400" /><input value={searchTerm} onChange={(event) => { setSearchTerm(event.target.value); setPage(1); }} placeholder="ابحث بالاسم أو البريد أو الهاتف" className="w-full rounded-lg border border-gray-300 py-2.5 pr-10 pl-3 text-sm outline-none focus:border-[#0D4B8E]" /></label><select value={accountFilter} onChange={(event) => { setAccountFilter(event.target.value); setPage(1); }} aria-label="تصفية حسب حالة الحساب" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{ACCOUNT_FILTERS.map((filter) => <option key={filter.value} value={filter.value}>{filter.label}</option>)}</select><select value={cityFilter} onChange={(event) => { setCityFilter(event.target.value); setPage(1); }} aria-label="تصفية حسب المدينة" className="rounded-lg border border-gray-300 px-3 py-2.5 text-sm"><option value="">كل المدن</option>{CITY_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}</select><input value="فلسطين" disabled readOnly aria-label="الدولة" title="الدولة محدودة بفلسطين" className="rounded-lg border border-gray-200 bg-gray-100 px-3 py-2.5 text-sm font-bold text-gray-500 cursor-not-allowed" /></div>
+      {actionError && <p role="alert" className="mb-4 rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700">{actionError}</p>}{successMessage && <p role="status" className="mb-4 rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700">{successMessage}</p>}<p className="mb-3 text-sm font-bold text-gray-600">النتائج: {pagination.isLegacyArray ? filteredSponsors.length : pagination.totalCount}</p>{content}
+      {!loading && !error && <div className="mt-4"><AdminPagination pagination={pagination} onPageChange={setPage} onPageSizeChange={(value) => { setPageSize(value); setPage(1); }} /></div>}
     </div>
 
-    {selected && dialogMode === "details" && <AdminDialog title="تفاصيل الكفيل" onClose={() => { setSelected(null); setDialogMode(""); }} footer={<><button type="button" onClick={() => setDialogMode("edit")} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white">تعديل</button>{selected.canSuspend && <button type="button" onClick={() => showStatusConfirmation(selected, false)} className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-bold text-white">تعليق الحساب</button>}{selected.canReactivate && <button type="button" onClick={() => showStatusConfirmation(selected, true)} className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white">إعادة تفعيل الحساب</button>}<button type="button" onClick={() => setConfirmation({ type: "delete", sponsor: selected })} className="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-bold text-red-700">حذف نهائي</button></>}>
-      <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3"><DetailItem label="الاسم الكامل" value={selected.fullName} /><DetailItem label="البريد الإلكتروني" value={selected.email} /><DetailItem label="رقم الهاتف" value={selected.phoneNumber} dir="ltr" /><DetailItem label="تاريخ الميلاد" value={toDateInputValue(selected.dateOfBirth)} /><DetailItem label="الجنس" value={localizeStatus(selected.gender)} /><DetailItem label="المدينة" value={selected.city} /><DetailItem label="الدولة" value={selected.country} /><DetailItem label="حالة الحساب" value={accountStatusLabel(selected.accountStatus)} /><DetailItem label="تاريخ الانضمام" value={formatArabicDateTime(selected.joinedAt)} /><DetailItem label="صورة ملف شخصي" value={selected.hasProfileImage ? "متوفرة" : "غير متوفرة"} /><DetailItem label="عدد الكفالات" value={selected.sponsorshipCount} /><DetailItem label="عدد المدفوعات" value={selected.paymentCount} /><DetailItem label="عدد الشهادات" value={selected.certificateCount} /><DetailItem label="معرّف الكفيل" value={selected.sponsorId} dir="ltr" /><DetailItem label="معرّف المستخدم" value={selected.userId} dir="ltr" /><DetailItem label="إمكانية التعليق" value={selected.canSuspend ? "متاحة" : "غير متاحة"} /><DetailItem label="إمكانية إعادة التفعيل" value={selected.canReactivate ? "متاحة" : "غير متاحة"} /><DetailItem label="إمكانية الحذف" value={selected.canDelete ? "متاح" : "غير متاح لوجود بيانات مرتبطة"} /></dl>
+    {selected && dialogMode === "details" && <AdminDialog title="تفاصيل الكفيل" size="max-w-5xl" onClose={() => { setSelected(null); setDialogMode(""); }} footer={<><button type="button" onClick={() => setDialogMode("edit")} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white">تعديل</button>{selected.canSuspend && <button type="button" onClick={() => showStatusConfirmation(selected, false)} className="rounded-lg bg-amber-600 px-5 py-2.5 text-sm font-bold text-white">تعليق الحساب</button>}{selected.canReactivate && <button type="button" onClick={() => showStatusConfirmation(selected, true)} className="rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white">إعادة تفعيل الحساب</button>}<button type="button" onClick={() => setConfirmation({ type: "delete", sponsor: selected })} className="rounded-lg border border-red-200 px-5 py-2.5 text-sm font-bold text-red-700">حذف نهائي</button></>}>
+      <div className="space-y-5">
+        <AdminDetailsHero icon={MdOutlineVolunteerActivism} eyebrow="ملف الكفيل" title={selected.fullName} subtitle={selected.email} badges={[{ label: "الحساب", value: accountStatusLabel(selected.accountStatus) }, { label: "الموقع", value: [selected.city, selected.country].filter(Boolean).join("، ") }]}>
+          <AdminEntityAvatar name={selected.fullName} hasImage={selected.hasProfileImage} imageEndpoint={`/api/v1/admin/sponsors/${selected.sponsorId}/profile-image`} alt={`صورة الكفيل ${selected.fullName || ""}`.trim()} size="hero" />
+        </AdminDetailsHero>
+        <div className="grid grid-cols-3 gap-3"><AdminDetailStat label="الكفالات" value={selected.sponsorshipCount} /><AdminDetailStat label="المدفوعات" value={selected.paymentCount} /><AdminDetailStat label="الشهادات" value={selected.certificateCount} /></div>
+        <div className="grid gap-5 lg:grid-cols-2">
+          <AdminDetailsSection title="البيانات الشخصية" icon={FiUser}><dl className="grid gap-3 sm:grid-cols-2"><AdminDetailItem label="رقم الهاتف" value={selected.phoneNumber} dir="ltr" /><AdminDetailItem label="تاريخ الميلاد" value={toDateInputValue(selected.dateOfBirth)} /><AdminDetailItem label="الجنس" value={localizeStatus(selected.gender)} /><AdminDetailItem label="صورة الملف الشخصي" value={selected.hasProfileImage ? "متوفرة" : "غير متوفرة"} /><AdminDetailItem label="تاريخ الانضمام" value={formatArabicDateTime(selected.joinedAt)} wide /></dl></AdminDetailsSection>
+          <AdminDetailsSection title="الموقع وحالة الحساب" icon={FiMapPin}><dl className="grid gap-3 sm:grid-cols-2"><AdminDetailItem label="المدينة" value={selected.city} /><AdminDetailItem label="الدولة" value={selected.country} /><AdminDetailItem label="حالة الحساب" value={accountStatusLabel(selected.accountStatus)} /><AdminDetailItem label="إمكانية الحذف" value={selected.canDelete ? "متاحة" : "غير متاحة لوجود بيانات مرتبطة"} /><AdminDetailItem label="إمكانية التعليق" value={selected.canSuspend ? "متاحة" : "غير متاحة"} /><AdminDetailItem label="إمكانية إعادة التفعيل" value={selected.canReactivate ? "متاحة" : "غير متاحة"} /></dl></AdminDetailsSection>
+        </div>
+        <AdminDetailsSection title="المعرّفات التقنية" icon={FiInfo}><dl className="grid gap-3 sm:grid-cols-2"><AdminDetailItem label="معرّف الكفيل" value={selected.sponsorId} dir="ltr" /><AdminDetailItem label="معرّف المستخدم" value={selected.userId} dir="ltr" /></dl></AdminDetailsSection>
+      </div>
     </AdminDialog>}
 
     {selected && dialogMode === "edit" && editForm && <AdminDialog title="تعديل بيانات الكفيل" onClose={() => setDialogMode("details")} closeDisabled={busy === "edit"} footer={<><button type="button" onClick={() => setDialogMode("details")} disabled={busy === "edit"} className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-bold">إلغاء</button><button type="submit" form="sponsor-edit-form" disabled={busy === "edit"} className="rounded-lg bg-[#0D4B8E] px-5 py-2.5 text-sm font-bold text-white disabled:opacity-50">{busy === "edit" ? "جارٍ الحفظ..." : "حفظ التعديلات"}</button></>}>
-      <form id="sponsor-edit-form" onSubmit={submitEdit} className="grid gap-4 sm:grid-cols-2">{actionError && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700 sm:col-span-2">{actionError}</p>}{[["firstName", "الاسم الأول"], ["fatherName", "اسم الأب"], ["grandfatherName", "اسم الجد"], ["familyName", "اسم العائلة"], ["phoneNumber", "رقم الهاتف"], ["city", "المدينة"], ["country", "الدولة"]].map(([name, label]) => <label key={name} className="text-sm font-bold text-gray-700">{label}<input name={name} value={editForm[name]} onChange={(event) => setEditForm({ ...editForm, [name]: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-[#0D4B8E]" /></label>)}<label className="text-sm font-bold text-gray-700">تاريخ الميلاد<input type="date" value={editForm.dateOfBirth} onChange={(event) => setEditForm({ ...editForm, dateOfBirth: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5" /></label><label className="text-sm font-bold text-gray-700">الجنس<select value={editForm.gender} onChange={(event) => setEditForm({ ...editForm, gender: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5"><option value="1">ذكر</option><option value="2">أنثى</option></select></label></form>
+      <form id="sponsor-edit-form" onSubmit={submitEdit} className="grid gap-4 sm:grid-cols-2">
+        {actionError && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm font-bold text-red-700 sm:col-span-2">{actionError}</p>}
+        {[["firstName", "الاسم الأول"], ["fatherName", "اسم الأب"], ["grandfatherName", "اسم الجد"], ["familyName", "اسم العائلة"], ["phoneNumber", "رقم الهاتف"]].map(([name, label]) => (
+          <label key={name} className="text-sm font-bold text-gray-700">{label}
+            <input name={name} value={editForm[name]} onChange={(event) => setEditForm({ ...editForm, [name]: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-[#0D4B8E]" />
+          </label>
+        ))}
+        <label className="text-sm font-bold text-gray-700">المدينة
+          <select value={editForm.city} onChange={(e) => setEditForm({ ...editForm, city: e.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 outline-none focus:border-[#0D4B8E]">
+            <option value="">اختر المدينة</option>
+            {CITY_OPTIONS.map((c) => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </label>
+        <label className="text-sm font-bold text-gray-700">الدولة
+          <input value="فلسطين" disabled readOnly title="الدولة كلمة ثابته غير قابلة للتعديل" className="mt-2 w-full rounded-lg border border-gray-200 bg-gray-100 px-3 py-2.5 font-bold text-gray-500 cursor-not-allowed" />
+        </label>
+        <label className="text-sm font-bold text-gray-700">تاريخ الميلاد
+          <input type="date" value={editForm.dateOfBirth} onChange={(event) => setEditForm({ ...editForm, dateOfBirth: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5" />
+        </label>
+        <label className="text-sm font-bold text-gray-700">الجنس
+          <select value={editForm.gender} onChange={(event) => setEditForm({ ...editForm, gender: event.target.value })} required className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5">
+            <option value="1">ذكر</option>
+            <option value="2">أنثى</option>
+          </select>
+        </label>
+      </form>
     </AdminDialog>}
 
     {confirmation?.type === "status" && <AdminConfirmationDialog title={confirmation.isActive ? "إعادة تفعيل حساب الكفيل" : "تعليق حساب الكفيل"} message={confirmation.isActive ? "هل تريد إعادة تفعيل هذا الحساب؟" : "هل أنت متأكد من تعليق هذا الحساب؟"} confirmLabel={confirmation.isActive ? "إعادة التفعيل" : "تأكيد التعليق"} onConfirm={confirmStatus} onCancel={() => { if (!busy) setConfirmation(null); }} loading={busy === "status"} reason={reason} onReasonChange={setReason} error={actionError} />}

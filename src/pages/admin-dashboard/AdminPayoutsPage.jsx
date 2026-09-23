@@ -1,11 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { MdAccountBalance, MdAccountBalanceWallet } from "react-icons/md";
+import { FiSearch } from "react-icons/fi";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
 import { adminApi } from "../../services/adminApi";
 import { apiErrorMessage, unwrapResult } from "../../utils/apiUi";
 import { formatAmount, formatDate } from "../sponsor-dashboard/sponsorFlowUtils";
 import AdminLayout from "./Adminlayout";
 import { ErrorState, LoadingState } from "./Adminstates";
 import { localizeDisplayFields } from "../../utils/localization";
+import { emptyPagedData, normalizePagedData } from "../../utils/adminPagination";
+import AdminPagination from "./AdminPagination";
 
 function CandidateDetails({ candidate }) {
   if (!candidate) return null;
@@ -52,6 +56,15 @@ export default function AdminPayoutsPage() {
   const [sponsorshipId, setSponsorshipId] = useState("");
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
+  const [searchInput, setSearchInput] = useState("");
+  const search = useDebouncedValue(searchInput.trim());
+  const [minAmount, setMinAmount] = useState("");
+  const [maxAmount, setMaxAmount] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(20);
+  const [pagination, setPagination] = useState(emptyPagedData);
 
   const selectedCandidate = useMemo(
     () => eligibleCandidates.find((item) => item.sponsorshipId === sponsorshipId) || null,
@@ -62,13 +75,17 @@ export default function AdminPayoutsPage() {
     setLoading(true);
     setError("");
     try {
+      const query = { page, pageSize, search, minAmount, maxAmount, dateFrom, dateTo };
       const [pendingResult, eligibleResult] = await Promise.all([
-        adminApi.getPendingPayouts(),
-        adminApi.getEligiblePayouts(),
+        adminApi.getPendingPayouts(query),
+        adminApi.getEligiblePayouts({ page: 1, pageSize: 100, search }),
       ]);
-      setPayouts((unwrapResult(pendingResult, "تعذر تحميل التحويلات.") || []).map((item) => localizeDisplayFields(item, ["payoutStatus"])));
+      const normalizedPending = normalizePagedData(unwrapResult(pendingResult, "تعذر تحميل التحويلات."), query);
+      setPayouts(normalizedPending.items.map((item) => localizeDisplayFields(item, ["payoutStatus"])));
+      setPagination(normalizedPending);
+      const normalizedEligible = normalizePagedData(unwrapResult(eligibleResult, "تعذر تحميل الكفالات المؤهلة للتحويل."), { pageSize: 100 });
       setEligibleCandidates(
-        (unwrapResult(eligibleResult, "تعذر تحميل الكفالات المؤهلة للتحويل.") || []).map((item) => ({
+        normalizedEligible.items.map((item) => ({
           ...localizeDisplayFields(item, ["sponsorshipStatus", "targetType"]),
           guardianPayoutAccount: localizeDisplayFields(item.guardianPayoutAccount, ["verificationStatus"]),
         })),
@@ -78,7 +95,7 @@ export default function AdminPayoutsPage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [dateFrom, dateTo, maxAmount, minAmount, page, pageSize, search]);
 
   useEffect(() => {
     const id = window.setTimeout(load, 0);
@@ -149,6 +166,78 @@ export default function AdminPayoutsPage() {
       <div className="space-y-6">
         {loading ? <LoadingState /> : error ? <ErrorState onRetry={load} description={error} /> : (
           <>
+            <div className="space-y-4 rounded-xl border border-gray-200 bg-white p-4">
+              {/* الصف الأول: البحث ونطاق المبلغ */}
+              <div className="grid gap-3 sm:grid-cols-3">
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="payout-search-input" className="text-xs font-bold text-gray-600">البحث</label>
+                  <div className="relative flex items-center">
+                    <FiSearch className="absolute right-3.5 text-gray-400 text-base pointer-events-none" aria-hidden="true" />
+                    <input
+                      id="payout-search-input"
+                      value={searchInput}
+                      onChange={(event) => { setSearchInput(event.target.value); setPage(1); }}
+                      placeholder="ابحث في دفعات الأوصياء..."
+                      aria-label="البحث في الدفعات"
+                      className="w-full h-10 rounded-lg border border-gray-300 bg-white py-2 pr-10 pl-3 text-sm text-gray-800 placeholder-gray-400 transition-colors focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="payout-min-amount" className="text-xs font-bold text-gray-600">أدنى مبلغ</label>
+                  <input
+                    id="payout-min-amount"
+                    type="number"
+                    min="0"
+                    value={minAmount}
+                    onChange={(event) => { setMinAmount(event.target.value); setPage(1); }}
+                    placeholder="مثال: 50"
+                    aria-label="أدنى مبلغ"
+                    className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="payout-max-amount" className="text-xs font-bold text-gray-600">أعلى مبلغ</label>
+                  <input
+                    id="payout-max-amount"
+                    type="number"
+                    min="0"
+                    value={maxAmount}
+                    onChange={(event) => { setMaxAmount(event.target.value); setPage(1); }}
+                    placeholder="مثال: 500"
+                    aria-label="أعلى مبلغ"
+                    className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+                  />
+                </div>
+              </div>
+
+              {/* الصف الثاني: نطاق التواريخ */}
+              <div className="grid gap-3 sm:grid-cols-2 pt-3 border-t border-gray-100">
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="payout-date-from" className="text-xs font-bold text-gray-600">من تاريخ</label>
+                  <input
+                    id="payout-date-from"
+                    type="datetime-local"
+                    value={dateFrom}
+                    onChange={(event) => { setDateFrom(event.target.value); setPage(1); }}
+                    className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label htmlFor="payout-date-to" className="text-xs font-bold text-gray-600">إلى تاريخ</label>
+                  <input
+                    id="payout-date-to"
+                    type="datetime-local"
+                    value={dateTo}
+                    onChange={(event) => { setDateTo(event.target.value); setPage(1); }}
+                    className="w-full h-10 rounded-lg border border-gray-300 bg-white px-3 text-sm text-gray-800 focus:border-[#0D4B8E] focus:outline-none focus:ring-1 focus:ring-[#0D4B8E]"
+                  />
+                </div>
+              </div>
+            </div>
             <form onSubmit={create} className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
               <h2 className="flex items-center gap-2 font-extrabold text-[#003469]"><MdAccountBalanceWallet />الكفالات المؤهلة للتحويل</h2>
               {eligibleCandidates.length === 0 ? (
@@ -193,6 +282,7 @@ export default function AdminPayoutsPage() {
                 </> : <p className="mt-4 text-sm text-gray-500">اختر تحويلاً لعرض تفاصيله.</p>}
               </aside>
             </div>
+            <AdminPagination pagination={pagination} onPageChange={setPage} onPageSizeChange={(value) => { setPageSize(value); setPage(1); }} />
           </>
         )}
         {successMessage && <p role="status" className="rounded-lg border border-green-200 bg-green-50 p-3 text-sm font-bold text-green-700">{successMessage}</p>}
