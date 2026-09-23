@@ -417,7 +417,7 @@ import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
 import Contact from "./pages/contact";
 
-import KafeeliPresentation from "./pages/KafeeliPresentation";
+// import KafeeliPresentation from "./pages/KafeeliPresentation";
 
 function PageWrapper({ children }) {
   return (
