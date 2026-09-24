@@ -16,16 +16,18 @@ export default function Footer() {
       className="w-full border-t-2 border-[#2DBCC3] bg-[#0D4B8E] text-white"
     >
       {/* Main Footer */}
-      <div className="mx-auto w-full max-w-[1216px] px-6 py-12 sm:px-8 lg:py-14">
+      <div className="mx-auto w-full max-w-[1216px] px-6 py-8 sm:px-8 lg:py-10">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
           {/* ================= المنصة ================= */}
           <div className="text-right">
             <div className="mb-4 flex items-center gap-3">
-              <img
-                src={logo}
-                alt="كفيلي"
-                className="h-10 w-auto object-contain"
-              />
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#2DBCC3]/10 border border-[#2DBCC3]/20 backdrop-blur-sm">
+                <img
+                  src={logo}
+                  alt="كفيلي"
+                  className="h-12 w-auto object-contain"
+                />
+              </div>
 
               <h2 className="font-['Cairo'] text-2xl font-black text-white">
                 كفيلي
@@ -33,13 +35,13 @@ export default function Footer() {
             </div>
 
             <p className="max-w-[330px] font-['Cairo'] text-sm font-medium leading-7 text-white/75">
-              منصة رقمية لإدارة وتنظيم رحلة الكفالة، تربط المؤسسة والكفيل والوصي
-              ضمن تجربة واضحة وموثقة وقابلة للمتابعة.
+              منصة رقمية لإدارة وتنظيم رحلة الكفالة، تربط المؤسسة والكفيل
+              والوصي ضمن تجربة واضحة وموثقة وقابلة للمتابعة.
             </p>
 
             <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#2DBCC3]/15 px-3 py-1.5">
               <span className="text-xs text-[#B9F1F3] whitespace-nowrap">
-                كفيلي — نحو عمل خيري وإنساني أكثر شفافية
+                كفيلي — حلول تقنية لدعم العمل الخيري والإنساني
               </span>
             </div>
           </div>
@@ -131,11 +133,11 @@ export default function Footer() {
                 <FaPhone className="mt-1 shrink-0 text-[#2DBCC3]" size={14} />
 
                 <a
-                  href="tel:+970593205914"
+                  href="tel:+970594828270"
                   dir="ltr"
                   className="font-['Cairo'] text-sm text-white/75 transition-colors hover:text-[#2DBCC3]"
                 >
-                  +970 5000 000
+                  +970594828270
                 </a>
               </li>
             </ul>
@@ -143,7 +145,7 @@ export default function Footer() {
         </div>
 
         {/* ================= Bottom ================= */}
-        <div className="mt-12 border-t border-white/10 pt-5">
+        <div className="mt-8 border-t border-white/10 pt-4">
           <div className="flex flex-col gap-3 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-right">© 2026 كفيلي - جميع الحقوق محفوظة</p>
 
