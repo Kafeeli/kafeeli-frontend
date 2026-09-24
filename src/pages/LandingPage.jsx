@@ -171,11 +171,15 @@ export default function LandingPage() {
     <div dir="rtl" className="min-h-screen bg-[#F8F9FA]">
       <Header />
       {/* Hero Section */}
+<<<<<<< Updated upstream
       <section
         id="home"
         className="relative h-screen min-h-screen overflow-hidden"
       >
         {/* Background */}
+=======
+      <section id="home" className="relative h-screen overflow-hidden">
+>>>>>>> Stashed changes
         {/* Background */}
         <div className="absolute inset-0">
           <img
@@ -204,8 +208,10 @@ export default function LandingPage() {
         </div>
 
         {/* Content */}
+        {/* Content */}
         <div
           className="
+<<<<<<< Updated upstream
       relative z-10 mx-auto flex
       h-full
       max-w-7xl
@@ -241,11 +247,48 @@ export default function LandingPage() {
     [@media(max-height:760px)]:translate-x-14
     [@media(max-height:700px)]:translate-x-16
   "
+=======
+    relative z-10 mx-auto flex
+    min-h-[650px]
+    max-w-7xl
+    items-start
+    px-5
+    pt-5
+    sm:px-8
+    lg:px-10
+  "
+        >
+          <div
+            className="
+      ml-auto
+      w-full
+      max-w-2xl
+      text-right
+      origin-top-right
+      transition-transform
+
+      [@media(max-height:900px)]:scale-[0.58]
+      [@media(max-height:820px)]:scale-[0.48]
+      [@media(max-height:760px)]:scale-[0.38]
+      [@media(max-height:700px)]:scale-[0.32]
+
+      [@media(max-height:900px)]:translate-y-20
+[@media(max-height:820px)]:translate-y-24
+[@media(max-height:760px)]:translate-y-28
+[@media(max-height:700px)]:translate-y-32
+
+      [@media(max-height:900px)]:translate-x-8
+      [@media(max-height:820px)]:translate-x-10
+      [@media(max-height:760px)]:translate-x-14
+      [@media(max-height:700px)]:translate-x-16
+    "
+>>>>>>> Stashed changes
           >
             {/* Small Label */}
             <div
               dir="rtl"
               className="
+<<<<<<< Updated upstream
           relative z-20
           mb-5
           inline-flex
@@ -266,12 +309,31 @@ export default function LandingPage() {
           backdrop-blur-sm
           sm:text-sm
         "
+=======
+        mb-5
+        inline-flex
+        w-fit
+        items-center
+        gap-2
+        rounded-[9999px]
+        border
+        border-[#5B7D9F]
+        bg-[#183B60]/70
+        px-[14px]
+        py-[6px]
+        text-xs
+        text-white
+        backdrop-blur-sm
+        sm:text-sm
+      "
+>>>>>>> Stashed changes
             >
               <span className="h-3 w-3 shrink-0 rounded-full bg-[#19C6D2]" />
 
               <span>منصة رقمية لإدارة رحلة الكفالة</span>
             </div>
 
+<<<<<<< Updated upstream
             {/* Heading */}
             <h1
               dir="rtl"
@@ -485,6 +547,171 @@ export default function LandingPage() {
                     <PiCheckCircle size={18} />
                   </span>
                   شفافية في كل خطوة
+=======
+            {/* باقي الكود تبعك كما هو */}
+
+            <div className="ml-auto w-full max-w-2xl text-right">
+              {/* Heading */}
+              <h1
+                dir="rtl"
+                className="
+                      font-['Cairo']
+                      text-[40px]
+                      font-black
+                      leading-[60px]
+                      tracking-[-1px]
+                      text-right
+                      text-white
+                      sm:text-[50px]
+                      sm:leading-[75px]
+                      lg:text-[60px]
+                      lg:leading-[96px]
+                      lg:tracking-[-1.5px]
+                    "
+              >
+                كفالة أوضح.
+                <br />
+                <span className="text-[#19C6D2]">متابعة أسهل.</span>
+                <br />
+                <span className="text-[#A9D9EA]">رحلة موثقة.</span>
+              </h1>
+
+              {/* Description */}
+              <p
+                dir="rtl"
+                className="
+                      mt-3
+                      font-['Cairo']
+                      text-[16px]
+                      font-medium
+                      leading-[28px]
+                      text-right
+                      text-white
+                      sm:text-[18px]
+                    "
+              >
+                كفيلي منصة رقمية تنظّم رحلة الكفالة بين المؤسسة والكفيل والوصي،
+                وتجمع الإجراءات والدفعات والتحديثات ضمن رحلة واحدة واضحة وقابلة
+                للمتابعة.
+              </p>
+
+              {/* Buttons */}
+              <div
+                className="
+                      mt-7
+                      flex
+                      flex-col
+                      items-start
+                      gap-3
+                      sm:flex-row
+                      sm:justify-start
+                    "
+              >
+                {/* Start Button */}
+                <button
+                  className="
+                        flex
+                        w-full
+                        items-center
+                        justify-center
+                        gap-2
+                        rounded-xl
+                        bg-[#19C6D2]
+                        px-6
+                        py-3.5
+                        font-['Cairo']
+                        font-bold
+                        text-[#06345A]
+                        transition
+                        hover:-translate-y-1
+                        hover:bg-[#22D3DF]
+                        sm:w-auto
+                      "
+                >
+                  ابدأ الآن
+                  <FiChevronLeft
+                    size={28}
+                    strokeWidth={2.5}
+                    className="text-[#06345A]"
+                  />
+                </button>
+
+                {/* How it works */}
+                <button
+                  className="
+                        flex
+                        w-full
+                        items-center
+                        justify-center
+                        gap-2
+                        rounded-xl
+                        border
+                        border-white/30
+                        bg-white/10
+                        px-6
+                        py-3.5
+                        font-['Cairo']
+                        font-bold
+                        text-white
+                        backdrop-blur-sm
+                        transition
+                        hover:-translate-y-1
+                        hover:bg-white/20
+                        sm:w-auto
+                      "
+                >
+                  <FiInfo size={14} className="text-[#19C6D2]" />
+                  كيف تعمل كفيلي
+                </button>
+              </div>
+
+              {/* Trust Points */}
+              <div className="mt-8 border-t border-white/20 pt-5">
+                <div
+                  className="
+                        flex
+                        flex-col
+                        items-start
+                        gap-3
+                        sm:flex-row
+                        sm:flex-wrap
+                        sm:justify-start
+                        sm:gap-x-6
+                      "
+                >
+                  {/* Point 1 */}
+                  <div
+                    dir="rtl"
+                    className="flex items-center gap-2 text-xs text-gray-200 sm:text-sm"
+                  >
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#164263] text-[#19C6D2]">
+                      <PiCheckCircle size={18} />
+                    </span>
+                    إجراءات منظمة وموثقة
+                  </div>
+
+                  {/* Point 2 */}
+                  <div
+                    dir="rtl"
+                    className="flex items-center gap-2 text-xs text-gray-200 sm:text-sm"
+                  >
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#164263] text-[#19C6D2]">
+                      <PiCheckCircle size={18} />
+                    </span>
+                    خصوصية وصلاحيات متقدمة
+                  </div>
+
+                  {/* Point 3 */}
+                  <div
+                    dir="rtl"
+                    className="flex items-center gap-2 text-xs text-gray-200 sm:text-sm"
+                  >
+                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#164263] text-[#19C6D2]">
+                      <PiCheckCircle size={18} />
+                    </span>
+                    شفافية في كل خطوة
+                  </div>
+>>>>>>> Stashed changes
                 </div>
               </div>
             </div>
