@@ -2158,6 +2158,7 @@ export default function About() {
       border-white/10
       shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)]
     "
+            s
           >
             {/* ================= BACKGROUND IMAGE ================= */}
             <div className="absolute inset-0">
