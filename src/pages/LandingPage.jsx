@@ -171,15 +171,12 @@ export default function LandingPage() {
     <div dir="rtl" className="min-h-screen bg-[#F8F9FA]">
       <Header />
       {/* Hero Section */}
-<<<<<<< Updated upstream
       <section
         id="home"
         className="relative h-screen min-h-screen overflow-hidden"
       >
         {/* Background */}
-=======
       <section id="home" className="relative h-screen overflow-hidden">
->>>>>>> Stashed changes
         {/* Background */}
         <div className="absolute inset-0">
           <img
@@ -211,7 +208,6 @@ export default function LandingPage() {
         {/* Content */}
         <div
           className="
-<<<<<<< Updated upstream
       relative z-10 mx-auto flex
       h-full
       max-w-7xl
@@ -247,7 +243,6 @@ export default function LandingPage() {
     [@media(max-height:760px)]:translate-x-14
     [@media(max-height:700px)]:translate-x-16
   "
-=======
     relative z-10 mx-auto flex
     min-h-[650px]
     max-w-7xl
@@ -282,13 +277,11 @@ export default function LandingPage() {
       [@media(max-height:760px)]:translate-x-14
       [@media(max-height:700px)]:translate-x-16
     "
->>>>>>> Stashed changes
           >
             {/* Small Label */}
             <div
               dir="rtl"
               className="
-<<<<<<< Updated upstream
           relative z-20
           mb-5
           inline-flex
@@ -309,7 +302,6 @@ export default function LandingPage() {
           backdrop-blur-sm
           sm:text-sm
         "
-=======
         mb-5
         inline-flex
         w-fit
@@ -326,14 +318,12 @@ export default function LandingPage() {
         backdrop-blur-sm
         sm:text-sm
       "
->>>>>>> Stashed changes
             >
               <span className="h-3 w-3 shrink-0 rounded-full bg-[#19C6D2]" />
 
               <span>منصة رقمية لإدارة رحلة الكفالة</span>
             </div>
 
-<<<<<<< Updated upstream
             {/* Heading */}
             <h1
               dir="rtl"
