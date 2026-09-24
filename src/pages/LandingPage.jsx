@@ -4106,7 +4106,7 @@ export default function LandingPage() {
                               sm:w-auto
                             "
               >
-                . كفيلي للمؤسسات
+                .. كفيلي للمؤسسات
               </button>
             </div>
           </div>
