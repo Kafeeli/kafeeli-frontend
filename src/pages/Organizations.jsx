@@ -172,16 +172,17 @@ export default function Organizations() {
       <Header />
 
       {/* =========================================================
-          HERO SECTION: FULL-SCREEN (MIN-H-[100SVH]) NO WHITE SPACE
+          HERO SECTION: FULL IMAGE - NO CROPPING / NO ZOOM
       ========================================================= */}
-      <section className="relative min-h-[100svh] min-h-screen pt-20 lg:pt-24 pb-12 flex items-center justify-center overflow-hidden">
-        {/* Full-Bleed Background Image with Dark Blue Overlay */}
+      <section className="relative w-full overflow-hidden">
+        <img
+          src={orgHeroBg}
+          alt="شبكة كفيلي للمؤسسات"
+          className="block w-full h-auto"
+        />
+
+        {/* Overlay + Hero Content */}
         <div className="absolute inset-0 z-0">
-          <img
-            src={orgHeroBg}
-            alt="شبكة كفيلي للمؤسسات"
-            className="w-full h-full object-cover object-center scale-105"
-          />
           {/* Rich Dark Blue Gradient Overlay */}
           <div
             className="absolute inset-0"
@@ -196,97 +197,98 @@ export default function Organizations() {
         <div className="absolute top-12 right-12 w-96 h-96 rounded-full bg-[#2DBCC3]/15 blur-3xl pointer-events-none" />
         <div className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-[#0D4B8E]/30 blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center lg:text-right my-auto">
-          <div className="max-w-3xl mx-auto lg:mx-0">
-            {/* Top Pill Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 bg-[#09233F]/90 border border-white/20 px-4 py-1.5 rounded-full text-xs font-bold text-white shadow-lg mb-6"
-            >
-              <span className="w-2.5 h-2.5 rounded-full bg-[#2DBCC3] animate-pulse" />
-              <span>خاص للمؤسسات</span>
-            </motion.div>
-
-            {/* Main Title */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-3xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.2] mb-6 tracking-tight"
-            >
-              إدارة الكفالات،
-              <br />
-              <span className="text-[#3BD4DC]">في نظام واحد</span>
-            </motion.h1>
-
-            {/* Subtitle */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              className="text-white/90 text-base sm:text-lg leading-relaxed max-w-2xl mb-8 font-normal"
-            >
-              نظام رقمي متكامل يتيح للمؤسسات إدارة بيانات الأيتام والكفلاء،
-              متابعة الحوالات والتقارير، وأتمتة العمليات بسهولة وأمان.
-            </motion.p>
-
-            {/* Call to Action Buttons */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-12"
-            >
-              <a
-                href="/register?type=organization"
-                className="inline-flex items-center gap-2.5 bg-[#2DBCC3] hover:bg-[#25B2B9] text-white px-8 py-3.5 rounded-xl font-bold text-sm transition-all duration-200 shadow-xl shadow-[#2DBCC3]/30 active:scale-95 border border-white/10"
+        <div className="absolute mb-20 inset-0 z-10 flex items-center">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center lg:text-right">
+            <div className="max-w-3xl mx-auto lg:mx-0">
+              {/* Top Pill Badge */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="inline-flex items-center gap-2 bg-[#09233F]/90 border border-white/20 px-4 py-1.5 rounded-full text-xs font-bold text-white shadow-lg mb-6"
               >
-                <span>إنشاء حساب مؤسسة</span>
-                <FaArrowLeft className="text-xs" />
-              </a>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#2DBCC3] animate-pulse" />
+                <span>خاص للمؤسسات</span>
+              </motion.div>
 
-              <a
-                href="#dashboard"
-                className="inline-flex items-center gap-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/25 px-7 py-3.5 rounded-xl font-bold text-sm backdrop-blur-md transition-all duration-200 active:scale-95"
+              {/* Main Title */}
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                className="text-3xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.2] mb-6 tracking-tight"
               >
-                <span>استكشف النظام +</span>
-              </a>
-            </motion.div>
+                إدارة الكفالات،
+                <br />
+                <span className="text-[#3BD4DC]">في نظام واحد</span>
+              </motion.h1>
 
-            {/* Hero Key Value Badges */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.7, delay: 0.4 }}
-              className="pt-6 border-t border-white/15 flex flex-wrap items-center justify-center lg:justify-start gap-8 text-white/90 text-xs sm:text-sm font-medium"
-            >
-              <div className="flex items-center gap-2.5">
-                <span className="text-[#3BD4DC] font-black text-base sm:text-lg">
-                  100%
-                </span>
-                <span>حماية وتشفير معتمد</span>
-              </div>
+              {/* Subtitle */}
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="text-white/90 text-base sm:text-lg leading-relaxed max-w-2xl mb-8 font-normal"
+              >
+                نظام رقمي متكامل يتيح للمؤسسات إدارة بيانات الأيتام والكفلاء،
+                متابعة الحوالات والتقارير، وأتمتة العمليات بسهولة وأمان.
+              </motion.p>
 
-              <div className="w-1.5 h-1.5 rounded-full bg-white/30 hidden sm:block" />
+              {/* Call to Action Buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-12"
+              >
+                <a
+                  href="/register?type=organization"
+                  className="inline-flex items-center gap-2.5 bg-[#2DBCC3] hover:bg-[#25B2B9] text-white px-8 py-3.5 rounded-xl font-bold text-sm transition-all duration-200 shadow-xl shadow-[#2DBCC3]/30 active:scale-95 border border-white/10"
+                >
+                  <span>إنشاء حساب مؤسسة</span>
+                  <FaArrowLeft className="text-xs" />
+                </a>
 
-              <div className="flex items-center gap-2.5">
-                <span className="text-[#3BD4DC] font-black text-base sm:text-lg">
-                  0 أخطاء
-                </span>
-                <span>في المزامنة وإدخال البيانات</span>
-              </div>
+                <a
+                  href="#dashboard"
+                  className="inline-flex items-center gap-2.5 bg-white/10 hover:bg-white/20 text-white border border-white/25 px-7 py-3.5 rounded-xl font-bold text-sm backdrop-blur-md transition-all duration-200 active:scale-95"
+                >
+                  <span>استكشف النظام +</span>
+                </a>
+              </motion.div>
 
-              <div className="w-1.5 h-1.5 rounded-full bg-white/30 hidden sm:block" />
+              {/* Hero Key Value Badges */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.7, delay: 0.4 }}
+                className="pt-6 border-t border-white/15 flex flex-wrap items-center justify-center lg:justify-start gap-8 text-white/90 text-xs sm:text-sm font-medium"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[#3BD4DC] font-black text-base sm:text-lg">
+                    100%
+                  </span>
+                  <span>حماية وتشفير معتمد</span>
+                </div>
 
-              <div className="flex items-center gap-2.5">
-                <span className="text-[#3BD4DC] font-black text-base sm:text-lg">
-                  دقة كاملة
-                </span>
-                <span>في التقارير وإثباتات السداد</span>
-              </div>
-            </motion.div>
+                <div className="w-1.5 h-1.5 rounded-full bg-white/30 hidden sm:block" />
+
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[#3BD4DC] font-black text-base sm:text-lg">
+                    0 أخطاء
+                  </span>
+                  <span>في المزامنة وإدخال البيانات</span>
+                </div>
+
+
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[#3BD4DC] font-black text-base sm:text-lg">
+                    دقة كاملة
+                  </span>
+                  <span>في التقارير وإثباتات السداد</span>
+                </div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>

@@ -1,6 +1,18 @@
 // Header.jsx
 import { useState, useEffect, useRef } from "react";
-import { FaBars, FaTimes } from "react-icons/fa";
+import {
+  FaBars,
+  FaTimes,
+  FaHome,
+  FaInfoCircle,
+  FaCogs,
+  FaBuilding,
+  FaPhoneAlt,
+  FaArrowLeft,
+  FaSignInAlt,
+  FaUserPlus,
+  FaCheckCircle,
+} from "react-icons/fa";
 import { Link, useLocation } from "react-router-dom";
 import logo from "../assets/title.png";
 
@@ -12,9 +24,7 @@ const Header = ({ primaryDestination = "/register" }) => {
   const handleNavClick = (e, href) => {
     if (href.startsWith("#")) {
       e.preventDefault();
-
       const section = document.querySelector(href);
-
       if (section) {
         section.scrollIntoView({
           behavior: "smooth",
@@ -22,26 +32,34 @@ const Header = ({ primaryDestination = "/register" }) => {
         });
       }
     }
-
     setIsMenuOpen(false);
   };
 
-  // لازم الروابط دي تكون مطابقة تمامًا لمسارات App.jsx
+  // Nav links matching App.jsx routes and Figma design
   const navLinks = [
-    { label: "الرئيسية", href: "/landing-page" },
-    { label: "من نحن", href: "/about" },
-    { label: "كيفية العمل", href: "/how-it-works" },
-    { label: "المؤسسات", href: "/organizations" },
-    { label: "اتصل بنا", href: "/contact" },
+    { label: "الرئيسية", href: "/landing-page", icon: <FaHome className="text-base" /> },
+    { label: "من نحن", href: "/about", icon: <FaInfoCircle className="text-base" /> },
+    { label: "كيف يعمل كفيلي", href: "/how-it-works", icon: <FaCogs className="text-base" /> },
+    { label: "للمؤسسات", href: "/organizations", icon: <FaBuilding className="text-base" /> },
+    { label: "تواصل معنا", href: "/contact", icon: <FaPhoneAlt className="text-base" /> },
   ];
 
-  // دالة تحدد هل الرابط ده active ولا لأ حسب المسار الحالي
+  // Active state checker
   const isActive = (href) => {
     if (href.startsWith("#")) return false;
-    return location.pathname.toLowerCase() === href.toLowerCase();
+    const currentPath = location.pathname.toLowerCase();
+    const targetPath = href.toLowerCase();
+
+    if (targetPath === "/landing-page" && (currentPath === "/" || currentPath === "/landing-page")) {
+      return true;
+    }
+    if (targetPath === "/organizations" && (currentPath === "/organizations" || currentPath === "/institutions")) {
+      return true;
+    }
+    return currentPath === targetPath;
   };
 
-  // إغلاق القائمة عند الضغط خارجها
+  // Close menu on click outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -60,19 +78,15 @@ const Header = ({ primaryDestination = "/register" }) => {
     };
   }, [isMenuOpen]);
 
-  // إغلاق القائمة بالـ Escape
+  // Close menu on Escape
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === "Escape") {
         setIsMenuOpen(false);
       }
     };
-
     window.addEventListener("keydown", handleEscape);
-
-    return () => {
-      window.removeEventListener("keydown", handleEscape);
-    };
+    return () => window.removeEventListener("keydown", handleEscape);
   }, []);
 
   const [isScrolled, setIsScrolled] = useState(false);
@@ -88,70 +102,83 @@ const Header = ({ primaryDestination = "/register" }) => {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 border-b ${
-          isScrolled
-            ? "bg-white/95 backdrop-blur-md border-gray-200/80 shadow-md"
-            : "bg-white/90 backdrop-blur-sm border-gray-100 shadow-sm"
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 border-b ${isScrolled
+            ? "bg-white/95 backdrop-blur-md border-gray-200/80 shadow-md py-1"
+            : "bg-white/90 backdrop-blur-sm border-gray-100/90 shadow-sm py-1.5"
+          }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 lg:h-16">
-            {/* Logo */}
+            {/* Right: Brand Logo & Title */}
             <Link
               to="/landing-page"
-              className="flex items-center gap-2"
-              aria-label="العودة إلى أعلى الصفحة"
+              className="flex items-center gap-2.5 group cursor-pointer"
+              aria-label="العودة إلى الصفحة الرئيسية"
             >
-              <img
-                src={logo}
-                alt="كفيلي"
-                className="h-9 lg:h-10 w-auto object-contain"
-              />
-              <span className="hidden md:inline text-xl lg:text-2xl font-bold text-blue-900 tracking-tight">
+              <div className="relative flex items-center justify-center">
+                <img
+                  src={logo}
+                  alt="كفيلي"
+                  className="h-14 lg:h-14 w-auto object-contain transition-transform group-hover:scale-105"
+                />
+              </div>
+              <span className="text-xl lg:text-2xl font-black text-[#0D4B8E] tracking-tight">
                 كفيلي
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  to={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className={`relative font-medium transition-colors duration-200 ${
-                    isActive(link.href)
-                      ? "text-blue-900 font-semibold"
-                      : "text-gray-600 hover:text-blue-900"
-                  }`}
-                >
-                  {link.label}
+            {/* Center: Desktop Navigation Links */}
+            <nav className="hidden lg:flex items-center gap-7">
+              {navLinks.map((link) => {
+                const active = isActive(link.href);
+                return (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    className={`relative text-sm sm:text-base font-bold transition-all duration-200 py-1 ${active
+                        ? "text-[#0D4B8E]"
+                        : "text-gray-600 hover:text-[#0D4B8E]"
+                      }`}
+                  >
+                    {link.label}
 
-                  {isActive(link.href) && (
-                    <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-blue-900 rounded-full" />
-                  )}
-                </Link>
-              ))}
+                    {active && (
+                      <span className="absolute -bottom-1 left-0 right-0 h-[2.5px] bg-[#0D4B8E] rounded-full shadow-sm" />
+                    )}
+                  </Link>
+                );
+              })}
             </nav>
 
-            {/* Desktop CTA */}
-            <div className="hidden lg:block">
+            {/* Left: Desktop Action Buttons (Login & Register) */}
+            <div className="hidden lg:flex items-center gap-4">
+              {/* Login Link */}
+              <Link
+                to="/login"
+                className="text-[#0D4B8E] hover:text-[#083463] font-bold text-sm px-3 py-2 rounded-xl transition-all cursor-pointer"
+              >
+                تسجيل الدخول
+              </Link>
+
+              {/* Get Started / Register Primary Button */}
               <Link
                 to={primaryDestination}
-                className="block bg-blue-900 cursor-pointer hover:bg-blue-800 text-white px-6 py-2.5 rounded-lg font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-blue-900/20 active:scale-95"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-[#0D4B8E] to-[#2DBCC3] hover:from-[#09396C] hover:to-[#25B2B9] text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md shadow-[#0D4B8E]/20 hover:shadow-lg transition-all duration-200 cursor-pointer active:scale-95 border border-white/10"
               >
-                سجّل الآن
+                <span>ابدأ الآن</span>
+                <FaArrowLeft className="text-xs" />
               </Link>
             </div>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Toggle Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden cursor-pointer p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+              className="lg:hidden cursor-pointer p-2.5 rounded-xl text-gray-700 hover:bg-gray-100 hover:text-[#0D4B8E] transition-colors"
               aria-label={isMenuOpen ? "إغلاق القائمة" : "فتح القائمة"}
             >
               {isMenuOpen ? (
-                <FaTimes className="w-6 h-6" />
+                <FaTimes className="w-6 h-6 text-[#0D4B8E]" />
               ) : (
                 <FaBars className="w-6 h-6" />
               )}
@@ -160,60 +187,100 @@ const Header = ({ primaryDestination = "/register" }) => {
         </div>
       </header>
 
-      {/* Mobile Menu */}
+      {/* =========================================================
+          RICH MOBILE RESPONSIVE DRAWER / SIDEBAR (UX ENHANCED)
+      ========================================================= */}
       <div
-        className={`fixed inset-0 z-40 lg:hidden transition-all duration-300 ${
-          isMenuOpen ? "visible" : "invisible"
-        }`}
-      >
-        <div
-          className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
-            isMenuOpen ? "opacity-100" : "opacity-0"
+        className={`fixed inset-0 z-50 lg:hidden transition-all duration-300 ${isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"
           }`}
+      >
+        {/* Backdrop overlay with blur */}
+        <div
+          className="absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-300"
+          onClick={() => setIsMenuOpen(false)}
         />
 
+        {/* Sliding Drawer Container */}
         <div
           ref={menuRef}
-          className={`absolute top-0 left-0 h-full w-72 max-w-[80vw] bg-white shadow-2xl transform transition-transform duration-300 ease-out ${
-            isMenuOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+          className={`absolute top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-2xl flex flex-col justify-between transform transition-transform duration-300 ease-out dir-rtl ${isMenuOpen ? "translate-x-0" : "translate-x-full"
+            }`}
         >
-          <div className="flex items-center justify-between p-4 border-b border-gray-100">
-            <span className="text-lg font-bold text-blue-900">القائمة</span>
-            <button
-              onClick={() => setIsMenuOpen(false)}
-              className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
-              aria-label="إغلاق القائمة"
-            >
-              <FaTimes className="w-5 h-5" />
-            </button>
-          </div>
+          {/* Top Drawer Header */}
+          <div>
+            <div className="flex items-center justify-between p-5 border-b border-gray-100 bg-[#F8FAFC]">
+              <div className="flex items-center gap-2.5">
+                <img src={logo} alt="كفيلي" className="h-8 w-auto object-contain" />
+                <span className="text-xl font-black text-[#0D4B8E]">كفيلي</span>
+              </div>
 
-          <div className="p-4 space-y-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                to={link.href}
-                onClick={(e) => handleNavClick(e, link.href)}
-                className={`block px-4 py-3 rounded-lg text-base font-medium transition-colors ${
-                  isActive(link.href)
-                    ? "bg-blue-50 text-blue-900"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-blue-900"
-                }`}
+              <button
+                onClick={() => setIsMenuOpen(false)}
+                className="w-9 h-9 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-[#0D4B8E] hover:border-[#0D4B8E]/30 transition-all cursor-pointer"
+                aria-label="إغلاق القائمة"
               >
-                {link.label}
-              </Link>
-            ))}
+                <FaTimes className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Mobile Nav Links List */}
+            <div className="p-4 space-y-1.5">
+              <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider px-3 mb-2">
+                التصفح السريع
+              </p>
+
+              {navLinks.map((link) => {
+                const active = isActive(link.href);
+                return (
+                  <Link
+                    key={link.label}
+                    to={link.href}
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    className={`flex items-center gap-3.5 px-4 py-3.5 rounded-2xl text-sm font-bold transition-all ${active
+                        ? "bg-gradient-to-r from-[#0D4B8E]/10 to-[#2DBCC3]/10 text-[#0D4B8E] border-r-4 border-[#0D4B8E] shadow-sm"
+                        : "text-gray-700 hover:bg-gray-50 hover:text-[#0D4B8E]"
+                      }`}
+                  >
+                    <span
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${active
+                          ? "bg-[#0D4B8E] text-white shadow-md shadow-[#0D4B8E]/20"
+                          : "bg-gray-100 text-gray-500"
+                        }`}
+                    >
+                      {link.icon}
+                    </span>
+                    <span>{link.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-100 bg-white">
+          {/* Bottom Drawer Actions & Trust Badge */}
+          <div className="p-5 border-t border-gray-100 bg-[#FAFBFD] space-y-3">
             <Link
               onClick={() => setIsMenuOpen(false)}
               to={primaryDestination}
-              className="block cursor-pointer w-full bg-blue-900 hover:bg-blue-800 text-center text-white px-6 py-3 rounded-lg text-base font-semibold transition-all active:scale-[0.98]"
+              className="w-full bg-gradient-to-r from-[#0D4B8E] to-[#2DBCC3] text-white py-3.5 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-lg shadow-[#0D4B8E]/20 active:scale-95 transition-all cursor-pointer"
             >
-              سجّل الآن
+              <FaUserPlus className="text-xs" />
+              <span>ابدأ الآن — تسجيل جديد</span>
+              <FaArrowLeft className="text-xs" />
             </Link>
+
+            <Link
+              onClick={() => setIsMenuOpen(false)}
+              to="/login"
+              className="w-full bg-white border border-[#0D4B8E]/30 text-[#0D4B8E] hover:bg-blue-50/50 py-3 px-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <FaSignInAlt className="text-xs" />
+              <span>تسجيل الدخول</span>
+            </Link>
+
+            <div className="pt-2 flex items-center justify-center gap-1.5 text-gray-400 text-xs font-semibold">
+              <FaCheckCircle className="text-[#2DBCC3] text-xs" />
+              <span>منصة كفيلي — للعمل الإنساني الشفاف</span>
+            </div>
           </div>
         </div>
       </div>
