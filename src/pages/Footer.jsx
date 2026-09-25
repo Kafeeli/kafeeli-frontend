@@ -4,8 +4,8 @@ import logo from "../assets/title.png";
 
 export default function Footer() {
   const quickLinks = [
-    { label: "كيف يعمل كفيلي", href: "/how-it-works" },
-    { label: "المؤسسات", href: "/organizations" },
+    { label: "كيف تعمل كفيلي", href: "/how-it-works" },
+    { label: "للمؤسسات", href: "/organizations" },
     { label: "تسجيل الدخول", href: "/login" },
   ];
 
@@ -17,11 +17,12 @@ export default function Footer() {
     >
       {/* Main Footer */}
       <div className="mx-auto w-full max-w-[1216px] px-6 py-8 sm:px-8 lg:py-10">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
-          {/* ================= المنصة ================= */}
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5 lg:gap-10">
+
+          {/* ================= كفيلي ================= */}
           <div className="text-right">
             <div className="mb-4 flex items-center gap-3">
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#2DBCC3]/10 border border-[#2DBCC3]/20 backdrop-blur-sm">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-[#2DBCC3]/20 bg-[#2DBCC3]/10 backdrop-blur-sm">
                 <img
                   src={logo}
                   alt="كفيلي"
@@ -35,15 +36,12 @@ export default function Footer() {
             </div>
 
             <p className="max-w-[330px] font-['Cairo'] text-sm font-medium leading-7 text-white/75">
-              منصة رقمية لإدارة وتنظيم رحلة الكفالة، تربط المؤسسة والكفيل
-              والوصي ضمن تجربة واضحة وموثقة وقابلة للمتابعة.
+              منصة رقمية لإدارة وتنظيم رحلة الكفالة،
+              <br />
+              تربط المؤسسة والكفيل والوصي
+              <br />
+              ضمن تجربة واضحة وموثقة وقابلة للمتابعة.
             </p>
-
-            <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#2DBCC3]/15 px-3 py-1.5">
-              <span className="text-xs text-[#B9F1F3] whitespace-nowrap">
-                كفيلي — حلول تقنية لدعم العمل الخيري والإنساني
-              </span>
-            </div>
           </div>
 
           {/* ================= المنصة ================= */}
@@ -75,8 +73,8 @@ export default function Footer() {
             <ul className="space-y-3">
               <li>
                 <a
-                  href="#about"
-                  className="font-['Cairo'] text-sm text-white/70 transition-colors hover:text-[#2DBCC3]"
+                  href="/about"
+                  className="font-['Cairo'] text-sm text-white/70 transition-colors duration-200 hover:text-[#2DBCC3]"
                 >
                   من نحن
                 </a>
@@ -84,10 +82,46 @@ export default function Footer() {
 
               <li>
                 <a
-                  href="#contact"
-                  className="font-['Cairo'] text-sm text-white/70 transition-colors hover:text-[#2DBCC3]"
+                  href="/contact"
+                  className="font-['Cairo'] text-sm text-white/70 transition-colors duration-200 hover:text-[#2DBCC3]"
                 >
                   تواصل معنا
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* ================= قانوني ================= */}
+          <div className="text-right">
+            <h3 className="mb-5 font-['Cairo'] text-lg font-bold text-white">
+              قانوني
+            </h3>
+
+            <ul className="space-y-3">
+              <li>
+                <a
+                  href="/privacy-policy"
+                  className="font-['Cairo'] text-sm text-white/70 transition-colors duration-200 hover:text-[#2DBCC3]"
+                >
+                  سياسة الخصوصية
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="/terms"
+                  className="font-['Cairo'] text-sm text-white/70 transition-colors duration-200 hover:text-[#2DBCC3]"
+                >
+                  الشروط والأحكام
+                </a>
+              </li>
+
+              <li>
+                <a
+                  href="/data-protection"
+                  className="font-['Cairo'] text-sm text-white/70 transition-colors duration-200 hover:text-[#2DBCC3]"
+                >
+                  سياسة حماية البيانات
                 </a>
               </li>
             </ul>
@@ -100,6 +134,7 @@ export default function Footer() {
             </h3>
 
             <ul className="space-y-4">
+
               {/* Email */}
               <li className="flex min-w-0 items-start gap-3">
                 <FaEnvelope
@@ -130,7 +165,10 @@ export default function Footer() {
 
               {/* Phone */}
               <li className="flex items-start gap-3">
-                <FaPhone className="mt-1 shrink-0 text-[#2DBCC3]" size={14} />
+                <FaPhone
+                  className="mt-1 shrink-0 text-[#2DBCC3]"
+                  size={14}
+                />
 
                 <a
                   href="tel:+970594828270"
@@ -147,7 +185,9 @@ export default function Footer() {
         {/* ================= Bottom ================= */}
         <div className="mt-8 border-t border-white/10 pt-4">
           <div className="flex flex-col gap-3 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-right">© 2026 كفيلي - جميع الحقوق محفوظة</p>
+            <p className="text-right">
+              © 2026 كفيلي - جميع الحقوق محفوظة
+            </p>
 
             <p className="text-right">
               صُمم بعناية لخدمة الكفالات الإنسانية الشفافة
