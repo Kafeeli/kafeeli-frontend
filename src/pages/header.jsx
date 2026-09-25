@@ -31,6 +31,7 @@ const Header = ({ primaryDestination = "/register" }) => {
     { label: "الرئيسية", href: "/landing-page" },
     { label: "من نحن", href: "/about" },
     { label: "كيفية العمل", href: "/how-it-works" },
+    { label: "المؤسسات", href: "/organizations" },
     { label: "اتصل بنا", href: "/contact" },
   ];
 
