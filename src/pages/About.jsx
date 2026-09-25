@@ -378,7 +378,7 @@ export default function About() {
           </div>
         </section>
 
-        {/* ================= PILLARS ================= */}
+        {/* ================= PILLARS ================= Az*/}
         <section id="pillars" dir="rtl" className="w-full bg-[#F4F7FB] px-5 py-[56px] sm:px-8 sm:py-[64px] lg:px-8 lg:py-[80px]">
           <div className="mx-auto w-full max-w-[1280px]">
             {/* Header */}
