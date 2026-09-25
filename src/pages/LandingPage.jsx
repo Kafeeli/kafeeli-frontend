@@ -41,7 +41,7 @@ import {
   FiZap,
 } from "react-icons/fi";
 
-import heroSection from "../assets/hero-bg.png";
+import main from "../assets/main.png";
 
 export default function LandingPage() {
   // Counter Animation States
@@ -161,12 +161,18 @@ export default function LandingPage() {
       <Header />
       {/* Hero Section */}
 
-      <section id="home" className="relative h-screen overflow-hidden">
-        {/* Background */}
+      {/* ================= HERO SECTION ================= */}
+      {/* ================= HERO SECTION ================= */}
+      <section id="home" className="relative h-[100vh] w-full overflow-hidden">
+        {/* ================= BACKGROUND ================= */}
         <div className="absolute inset-0">
-          <img src={heroSection} alt="Kafeeli" className="h-full w-full object-cover object-center" />
+          <img
+            src={main}
+            alt="Kafeeli"
+            className="h-full w-full object-cover object-[35%_center] sm:object-[40%_center] lg:object-center"
+          />
 
-          {/* Gradient Overlay: اليمين غامق والشمال فاتح */}
+          {/* Right Gradient */}
           <div
             className="absolute inset-0"
             style={{
@@ -174,7 +180,7 @@ export default function LandingPage() {
             }}
           />
 
-          {/* Exact Gradient Overlay */}
+          {/* Bottom Gradient */}
           <div
             className="absolute inset-0"
             style={{
@@ -183,66 +189,71 @@ export default function LandingPage() {
           />
         </div>
 
-        {/* Content */}
-        {/* Content */}
-        <div className="relative z-10 mx-auto flex h-full w-full max-w-[1280px] items-center justify-end px-5 sm:px-8 lg:px-[64px]">
-          <div className="ml-auto w-full max-w-[760px] origin-right translate-y-[20px] scale-[0.73] text-right">
-            {/* Small Label */}
+        {/* ================= CONTENT WRAPPER ================= */}
+        {/* ================= CONTENT ================= */}
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-[1600px] items-center justify-end px-[clamp(20px,5vw,96px)]">
+          <div className="ml-auto w-full max-w-[820px] translate-y-[clamp(20px,4vh,55px)] text-right 2xl:max-w-[900px]">
+            {/* ================= BADGE ================= */}
             <div
               dir="rtl"
-              className="relative z-20 mb-4 inline-flex w-fit items-center gap-2.5 rounded-full border border-[#5B7D9F] bg-[#183B60]/70 px-4 py-2 font-['Cairo'] text-[13px] font-bold leading-[22px] text-white backdrop-blur-sm sm:text-[14px] lg:text-[15px]"
+              className="mb-[clamp(18px,2.2vh,28px)] inline-flex w-fit items-center gap-[clamp(7px,0.6vw,11px)] rounded-full border border-[#5B7D9F] bg-[#183B60]/70 px-[clamp(12px,1vw,18px)] py-[clamp(5px,0.55vw,9px)] font-['Cairo'] text-[clamp(11px,0.8vw,15px)] font-bold leading-[1.5] text-white backdrop-blur-sm"
             >
-              <span className="h-3 w-3 shrink-0 rounded-full bg-[#19C6D2]" />
+              <span className="h-[clamp(8px,0.6vw,12px)] w-[clamp(8px,0.6vw,12px)] shrink-0 rounded-full bg-[#19C6D2]" />
               <span>منصة رقمية لإدارة رحلة الكفالة</span>
             </div>
 
-            {/* Heading */}
-
+            {/* ================= HEADING ================= */}
             <h1
               dir="rtl"
-              className="font-['Cairo'] text-[36px] font-black tracking-[-1px] text-right text-white sm:text-[52px] lg:text-[64px] lg:tracking-[-1.5px]"
+              className="text-right font-['Cairo'] text-[clamp(38px,4.7vw,76px)] font-black leading-[1.06] tracking-[-1px] text-white lg:tracking-[-1.5px] [@media(max-height:720px)]:text-[clamp(34px,4vw,58px)] [@media(max-height:620px)]:text-[clamp(30px,3.6vw,48px)]"
             >
-              <span className="mb-6 block leading-none">كفالة أوضح.</span>
+              <span className="mb-[clamp(10px,1.4vh,20px)] block">كفالة أوضح.</span>
 
-              <span className="mb-6 block leading-none text-[#19C6D2]">متابعة أسهل.</span>
+              <span className="mb-[clamp(10px,1.4vh,20px)] block text-[#19C6D2]">متابعة أسهل.</span>
 
-              <span className="block leading-none text-[#A9D9EA]">رحلة موثقة.</span>
+              <span className="block text-[#A9D9EA]">رحلة موثقة.</span>
             </h1>
 
-            {/* Description */}
+            {/* ================= DESCRIPTION ================= */}
             <p
               dir="rtl"
-              className="mt-5 max-w-[720px] font-['Cairo'] text-[14px] font-normal leading-[26px] text-right text-white sm:text-[15px] lg:text-[16px] lg:leading-[28px]"
+              className="mt-[clamp(20px,2.6vh,32px)] max-w-[780px] text-right font-['Cairo'] text-[clamp(12px,1vw,17px)] font-normal leading-[1.9] text-white [@media(max-height:700px)]:mt-4 [@media(max-height:700px)]:text-[clamp(11px,0.9vw,14px)] [@media(max-height:620px)]:leading-[1.6]"
             >
               كفيلي منصة رقمية تنظّم رحلة الكفالة بين المؤسسة والكفيل والوصي، وتجمع الإجراءات والدفعات والتحديثات ضمن رحلة واحدة واضحة
               وقابلة للمتابعة.
             </p>
 
-            {/* Buttons */}
-            <div className="mt-5 flex flex-col items-start gap-3 sm:flex-row sm:justify-start">
+            {/* ================= BUTTONS ================= */}
+            <div className="mt-[clamp(20px,2.6vh,32px)] flex flex-col items-start gap-3 min-[480px]:flex-row min-[480px]:justify-start min-[480px]:gap-4">
               {/* Start Button */}
-              <button className="flex h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-[#19C6D2] px-6 font-['Cairo'] text-[14px] font-bold text-[#06345A] transition hover:-translate-y-1 hover:bg-[#22D3DF] sm:w-auto">
-                ابدأ الآن
-                <FiChevronLeft size={22} strokeWidth={2.5} className="text-[#06345A]" />
+              <button
+                type="button"
+                className="inline-flex h-[clamp(44px,4vw,54px)] w-full items-center justify-center gap-2 rounded-[12px] bg-[#19C6D2] px-[clamp(20px,1.8vw,30px)] font-['Cairo'] text-[clamp(12px,0.9vw,15px)] font-bold text-[#06345A] transition-all duration-300 hover:-translate-y-1 hover:bg-[#22D3DF] min-[480px]:w-auto"
+              >
+                <span>ابدأ الآن</span>
+                <FiChevronLeft size={21} strokeWidth={2.5} className="shrink-0 text-[#06345A]" />
               </button>
 
-              {/* How it works */}
-              <button className="flex h-[48px] w-full items-center justify-center gap-2 rounded-xl border border-white/30 bg-white/10 px-6 font-['Cairo'] text-[14px] font-bold text-white backdrop-blur-sm transition hover:-translate-y-1 hover:bg-white/20 sm:w-auto">
-                <FiInfo size={15} className="text-[#19C6D2]" />
-                كيف تعمل كفيلي
+              {/* How It Works */}
+              <button
+                type="button"
+                className="inline-flex h-[clamp(44px,4vw,54px)] w-full items-center justify-center gap-2 rounded-[12px] border border-white/30 bg-white/10 px-[clamp(20px,1.8vw,30px)] font-['Cairo'] text-[clamp(12px,0.9vw,15px)] font-bold text-white backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/20 min-[480px]:w-auto"
+              >
+                <FiInfo size={16} className="shrink-0 text-[#19C6D2]" />
+                <span>كيف تعمل كفيلي</span>
               </button>
             </div>
 
-            {/* Trust Points */}
-            <div className="mt-6 border-t border-white/20 pt-4">
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+            {/* ================= TRUST POINTS ================= */}
+            <div className="mt-[clamp(22px,3vh,38px)] border-t border-white/20 pt-[clamp(16px,2vh,26px)]">
+              <div className="grid grid-cols-1 gap-3 min-[520px]:grid-cols-3 min-[520px]:gap-[clamp(14px,1.4vw,24px)]">
                 {/* Point 1 */}
                 <div
                   dir="rtl"
-                  className="flex items-center gap-2 font-['Cairo'] text-[12px] font-semibold text-gray-200 sm:text-[13px] lg:text-[14px]"
+                  className="flex items-center gap-2.5 font-['Cairo'] text-[clamp(10px,0.8vw,14px)] font-semibold text-gray-200"
                 >
-                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#164263] text-[#19C6D2]">
-                    <PiCheckCircle size={20} />
+                  <span className="grid h-[clamp(26px,2vw,34px)] w-[clamp(26px,2vw,34px)] shrink-0 place-items-center rounded-full bg-[#164263] text-[#19C6D2]">
+                    <PiCheckCircle className="text-[clamp(17px,1.3vw,21px)]" />
                   </span>
                   <span>إجراءات منظمة وموثقة</span>
                 </div>
@@ -250,10 +261,10 @@ export default function LandingPage() {
                 {/* Point 2 */}
                 <div
                   dir="rtl"
-                  className="flex items-center gap-2 font-['Cairo'] text-[12px] font-semibold text-gray-200 sm:text-[13px] lg:text-[14px]"
+                  className="flex items-center gap-2.5 font-['Cairo'] text-[clamp(10px,0.8vw,14px)] font-semibold text-gray-200"
                 >
-                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#164263] text-[#19C6D2]">
-                    <PiCheckCircle size={20} />
+                  <span className="grid h-[clamp(26px,2vw,34px)] w-[clamp(26px,2vw,34px)] shrink-0 place-items-center rounded-full bg-[#164263] text-[#19C6D2]">
+                    <PiCheckCircle className="text-[clamp(17px,1.3vw,21px)]" />
                   </span>
                   <span>خصوصية وصلاحيات متقدمة</span>
                 </div>
@@ -261,10 +272,10 @@ export default function LandingPage() {
                 {/* Point 3 */}
                 <div
                   dir="rtl"
-                  className="flex items-center gap-2 font-['Cairo'] text-[12px] font-semibold text-gray-200 sm:text-[13px] lg:text-[14px]"
+                  className="flex items-center gap-2.5 font-['Cairo'] text-[clamp(10px,0.8vw,14px)] font-semibold text-gray-200"
                 >
-                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-[#164263] text-[#19C6D2]">
-                    <PiCheckCircle size={20} />
+                  <span className="grid h-[clamp(26px,2vw,34px)] w-[clamp(26px,2vw,34px)] shrink-0 place-items-center rounded-full bg-[#164263] text-[#19C6D2]">
+                    <PiCheckCircle className="text-[clamp(17px,1.3vw,21px)]" />
                   </span>
                   <span>شفافية في كل خطوة</span>
                 </div>
@@ -273,134 +284,161 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-      {/* Governance Section */}
-      <section id="governance" className="bg-white px-5 py-12 sm:px-8 lg:px-10">
-        <div className="mx-auto max-w-7xl">
-          {/* Section Header */}
+      {/* ================= GOVERNANCE SECTION ================= */}
+      <section id="governance" className="bg-white px-[clamp(16px,3vw,48px)] py-[clamp(48px,5vw,90px)]">
+        <div className="mx-auto w-full max-w-[clamp(1100px,88vw,1500px)]">
+          {/* ================= HEADER ================= */}
           <div className="flex flex-col items-center text-center">
             <div
               dir="rtl"
-              className="inline-flex h-[31px] w-fit items-center justify-center rounded-[9999px] bg-[rgba(45,188,195,0.1)] px-3 py-[7.5px]"
+              className="inline-flex w-fit items-center justify-center rounded-full bg-[rgba(45,188,195,0.1)] px-[clamp(10px,0.8vw,14px)] py-[clamp(5px,0.4vw,8px)]"
             >
-              <span className="font-['Cairo'] text-sm font-bold leading-[20px] text-[#2DBCC3]">حوكمة الأطراف</span>
+              <span className="font-['Cairo'] text-[clamp(11px,0.8vw,14px)] font-bold leading-[1.5] text-[#2DBCC3]">حوكمة الأطراف</span>
             </div>
 
             <h2
               dir="rtl"
-              className="mt-4 font-['Cairo'] text-[28px] font-black leading-[40px] tracking-[0px] text-center text-[#101828] sm:text-[32px] lg:text-[36px]"
+              className="mt-[clamp(12px,1.2vw,20px)] text-center font-['Cairo'] text-[clamp(26px,2.5vw,44px)] font-black leading-[1.35] tracking-[0px] text-[#101828]"
             >
               رحلة واحدة تجمع أطراف الكفالة
             </h2>
 
             <p
               dir="rtl"
-              className="mt-3 max-w-[650px] font-['Cairo'] text-[14px] font-medium leading-[24px] tracking-[0px] text-center text-[#667085] sm:text-[16px]"
+              className="mt-[clamp(10px,1vw,16px)] max-w-[clamp(600px,50vw,850px)] text-center font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.75] tracking-[0px] text-[#667085]"
             >
               لوحة رقمية متكاملة تضمن معرفة كل طرف بمهامه ومسؤولياته في كل لحظة.
             </p>
           </div>
 
-          {/* Cards */}
-          <div className="mt-8 grid grid-cols-1 justify-items-center gap-5 md:grid-cols-3">
-            {/* Institution */}
-            <div className="flex h-full w-full max-w-[384px] flex-col rounded-[24px] border border-[#E2EBF5] bg-[#F8FAFD] p-6 transition duration-300 hover:-translate-y-1 hover:shadow-md">
-              <div className="flex items-center justify-between">
-                <span dir="rtl" className="rounded-full bg-[#EAF0F7] px-3 py-1 font-['Cairo'] text-[10px] font-semibold text-[#315B8C]">
+          {/* ================= CARDS ================= */}
+          <div className="mt-[clamp(28px,3vw,52px)] grid grid-cols-1 justify-items-center gap-[clamp(16px,1.5vw,26px)] md:grid-cols-3">
+            {/* ================= INSTITUTION ================= */}
+            <div className="flex h-full min-h-[clamp(280px,22vw,360px)] w-full max-w-none flex-col rounded-[clamp(18px,1.5vw,26px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(20px,2vw,32px)] transition duration-300 hover:-translate-y-1 hover:shadow-md">
+              <div className="flex items-center justify-between gap-4">
+                <div className="grid h-[clamp(42px,3.2vw,54px)] w-[clamp(42px,3.2vw,54px)] shrink-0 place-items-center rounded-[clamp(10px,0.8vw,14px)] bg-[#0D4B8E] text-white">
+                  <PiBuildings className="text-[clamp(19px,1.4vw,24px)]" />
+                </div>
+
+                <span
+                  dir="rtl"
+                  className="rounded-full bg-[#EAF0F7] px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-semibold text-[#315B8C]"
+                >
                   الطرف الأول
                 </span>
-
-                <div className="grid h-12 w-12 place-items-center rounded-xl bg-[#0D4B8E] text-white">
-                  <PiBuildings size={22} />
-                </div>
               </div>
 
-              <div className="mt-5 text-right">
-                <h3 dir="rtl" className="font-['Cairo'] text-[20px] font-bold leading-[28px] text-[#101828]">
+              <div className="mt-[clamp(16px,1.5vw,24px)] flex flex-1 flex-col text-right">
+                <h3 dir="rtl" className="font-['Cairo'] text-[clamp(17px,1.4vw,23px)] font-bold leading-[1.45] text-[#101828]">
                   المؤسسة
                 </h3>
 
-                <p dir="rtl" className="mt-1 font-['Cairo'] text-[14px] font-semibold leading-[20px] text-[#2F5D8A]">
+                <p
+                  dir="rtl"
+                  className="mt-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(12px,0.9vw,15px)] font-semibold leading-[1.5] text-[#2F5D8A]"
+                >
                   إدارة وتنظيم الكفالات
                 </p>
 
-                <p dir="rtl" className="mt-3 font-['Cairo'] text-[12px] font-medium leading-[20px] text-[#667085]">
+                <p
+                  dir="rtl"
+                  className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(11px,0.9vw,15px)] font-medium leading-[1.7] text-[#667085]"
+                >
                   إدارة وتنظيم الكفالات ومتابعة الحالات والبيانات والتأكد من استيفاء المتطلبات.
                 </p>
-              </div>
 
-              <div className="mt-auto flex h-[45px] w-full items-center justify-between rounded-[12px] border border-[#E2EBF5] bg-white px-3">
-                <span className="font-['Cairo'] text-[13px] font-bold text-[#334155]">الحالة التشغيلية</span>
+                <div className="mt-auto flex min-h-[clamp(42px,3.5vw,50px)] w-full items-center justify-between gap-2 rounded-[clamp(10px,0.8vw,13px)] border border-[#E2EBF5] bg-white px-[clamp(10px,0.9vw,14px)]">
+                  <span className="font-['Cairo'] text-[clamp(10px,0.8vw,13px)] font-bold text-[#334155]">الحالة التشغيلية</span>
 
-                <span className="rounded-[4px] border border-[#DDE6F0] bg-[#F3F7FB] px-2.5 py-1 font-['Cairo'] text-[11px] font-semibold leading-none text-[#19579A]">
-                  صلاحيات إدارية كاملة
-                </span>
+                  <span className="rounded-[4px] border border-[#DDE6F0] bg-[#F3F7FB] px-[clamp(7px,0.6vw,11px)] py-[clamp(4px,0.3vw,6px)] text-center font-['Cairo'] text-[clamp(9px,0.7vw,12px)] font-semibold leading-none text-[#19579A]">
+                    صلاحيات إدارية كاملة
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* Sponsor */}
-            <div className="w-full max-w-[384px] rounded-[24px] border border-[#E2EBF5] bg-[#F8FAFD] p-6 transition duration-300 hover:-translate-y-1 hover:shadow-md">
-              <div className="flex items-center justify-between">
-                <span dir="rtl" className="rounded-full bg-[#E6F8F9] px-3 py-1 font-['Cairo'] text-[10px] font-semibold text-[#2DBCC3]">
+            {/* ================= SPONSOR ================= */}
+            <div className="flex h-full min-h-[clamp(280px,22vw,360px)] w-full max-w-none flex-col rounded-[clamp(18px,1.5vw,26px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(20px,2vw,32px)] transition duration-300 hover:-translate-y-1 hover:shadow-md">
+              <div className="flex items-center justify-between gap-4">
+                <div className="grid h-[clamp(42px,3.2vw,54px)] w-[clamp(42px,3.2vw,54px)] shrink-0 place-items-center rounded-[clamp(10px,0.8vw,14px)] bg-[#2DBCC3] text-white">
+                  <PiHandHeartFill className="text-[clamp(19px,1.4vw,24px)]" />
+                </div>
+
+                <span
+                  dir="rtl"
+                  className="rounded-full bg-[#E6F8F9] px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-semibold text-[#2DBCC3]"
+                >
                   الطرف الثاني
                 </span>
-
-                <div className="grid h-12 w-12 place-items-center rounded-xl bg-[#2DBCC3] text-white">
-                  <PiHandHeartFill size={22} />
-                </div>
               </div>
 
-              <div className="mt-5 text-right">
-                <h3 dir="rtl" className="font-['Cairo'] text-[20px] font-bold leading-[28px] text-[#101828]">
+              <div className="mt-[clamp(16px,1.5vw,24px)] flex flex-1 flex-col text-right">
+                <h3 dir="rtl" className="font-['Cairo'] text-[clamp(17px,1.4vw,23px)] font-bold leading-[1.45] text-[#101828]">
                   الكفيل
                 </h3>
 
-                <p dir="rtl" className="mt-1 font-['Cairo'] text-[14px] font-semibold leading-[20px] text-[#2DBCC3]">
+                <p
+                  dir="rtl"
+                  className="mt-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(12px,0.9vw,15px)] font-semibold leading-[1.5] text-[#2DBCC3]"
+                >
                   متابعة الكفالة وتوثيقها
                 </p>
 
-                <p dir="rtl" className="mt-3 font-['Cairo'] text-[12px] font-medium leading-[20px] text-[#667085]">
+                <p
+                  dir="rtl"
+                  className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(11px,0.9vw,15px)] font-medium leading-[1.7] text-[#667085]"
+                >
                   اختيار الحالة المناسبة وإنشاء الكفالة ومتابعة الدفعات والتحديثات الخاصة بها.
                 </p>
 
-                <div className="mt-5 flex h-[45px] items-center justify-between rounded-[12px] border border-[#E2EBF5] bg-white px-3">
-                  <span className="font-['Cairo'] text-[13px] font-bold text-[#334155]">قناة المتابعة</span>
+                <div className="mt-auto flex min-h-[clamp(42px,3.5vw,50px)] items-center justify-between gap-2 rounded-[clamp(10px,0.8vw,13px)] border border-[#E2EBF5] bg-white px-[clamp(10px,0.9vw,14px)]">
+                  <span className="font-['Cairo'] text-[clamp(10px,0.8vw,13px)] font-bold text-[#334155]">قناة المتابعة</span>
 
-                  <span className="rounded-[4px] border border-[#BDECEF] bg-[#F2FBFC] px-2.5 py-1 font-['Cairo'] text-[11px] font-semibold leading-none text-[#2DBCC3]">
+                  <span className="rounded-[4px] border border-[#BDECEF] bg-[#F2FBFC] px-[clamp(7px,0.6vw,11px)] py-[clamp(4px,0.3vw,6px)] text-center font-['Cairo'] text-[clamp(9px,0.7vw,12px)] font-semibold leading-none text-[#2DBCC3]">
                     متابعة شفافة ومباشرة
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Guardian */}
-            <div className="w-full max-w-[384px] rounded-[24px] border border-[#E2EBF5] bg-[#F8FAFD] p-6 transition duration-300 hover:-translate-y-1 hover:shadow-md">
-              <div className="flex items-center justify-between">
-                <span dir="rtl" className="rounded-full bg-[#FFF5DF] px-3 py-1 font-['Cairo'] text-[10px] font-semibold text-[#D9A441]">
+            {/* ================= GUARDIAN ================= */}
+            <div className="flex h-full min-h-[clamp(280px,22vw,360px)] w-full max-w-none flex-col rounded-[clamp(18px,1.5vw,26px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(20px,2vw,32px)] transition duration-300 hover:-translate-y-1 hover:shadow-md">
+              <div className="flex items-center justify-between gap-4">
+                <div className="grid h-[clamp(42px,3.2vw,54px)] w-[clamp(42px,3.2vw,54px)] shrink-0 place-items-center rounded-[clamp(10px,0.8vw,14px)] bg-[#D9A441] text-white">
+                  <MdFamilyRestroom className="text-[clamp(19px,1.4vw,24px)]" />
+                </div>
+
+                <span
+                  dir="rtl"
+                  className="rounded-full bg-[#FFF5DF] px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-semibold text-[#D9A441]"
+                >
                   الطرف الثالث
                 </span>
-
-                <div className="grid h-12 w-12 place-items-center rounded-xl bg-[#D9A441] text-white">
-                  <MdFamilyRestroom size={22} />
-                </div>
               </div>
 
-              <div className="mt-5 text-right">
-                <h3 dir="rtl" className="font-['Cairo'] text-[20px] font-bold leading-[28px] text-[#101828]">
+              <div className="mt-[clamp(16px,1.5vw,24px)] flex flex-1 flex-col text-right">
+                <h3 dir="rtl" className="font-['Cairo'] text-[clamp(17px,1.4vw,23px)] font-bold leading-[1.45] text-[#101828]">
                   الوصي
                 </h3>
 
-                <p dir="rtl" className="mt-1 font-['Cairo'] text-[14px] font-semibold leading-[20px] text-[#D9A441]">
+                <p
+                  dir="rtl"
+                  className="mt-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(12px,0.9vw,15px)] font-semibold leading-[1.5] text-[#D9A441]"
+                >
                   استلام ومتابعة الكفالة
                 </p>
 
-                <p dir="rtl" className="mt-3 font-['Cairo'] text-[12px] font-medium leading-[20px] text-[#667085]">
+                <p
+                  dir="rtl"
+                  className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(11px,0.9vw,15px)] font-medium leading-[1.7] text-[#667085]"
+                >
                   تقديم البيانات والوثائق المطلوبة ومتابعة حالة الكفالة والتحويلات المتعلقة بالحالة.
                 </p>
 
-                <div className="mt-5 flex h-[45px] items-center justify-between rounded-[12px] border border-[#E2EBF5] bg-white px-3">
-                  <span className="font-['Cairo'] text-[13px] font-bold text-[#334155]">البيئة التفاعلية</span>
+                <div className="mt-auto flex min-h-[clamp(42px,3.5vw,50px)] items-center justify-between gap-2 rounded-[clamp(10px,0.8vw,13px)] border border-[#E2EBF5] bg-white px-[clamp(10px,0.9vw,14px)]">
+                  <span className="font-['Cairo'] text-[clamp(10px,0.8vw,13px)] font-bold text-[#334155]">البيئة التفاعلية</span>
 
-                  <span className="rounded-[4px] border border-[#F3D9A0] bg-[#FFFBF2] px-2.5 py-1 font-['Cairo'] text-[11px] font-semibold leading-none text-[#D99A22]">
+                  <span className="rounded-[4px] border border-[#F3D9A0] bg-[#FFFBF2] px-[clamp(7px,0.6vw,11px)] py-[clamp(4px,0.3vw,6px)] text-center font-['Cairo'] text-[clamp(9px,0.7vw,12px)] font-semibold leading-none text-[#D99A22]">
                     حفظ الخصوصية والكرامة
                   </span>
                 </div>
@@ -410,96 +448,99 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Problem Section */}
-      {/* Problem Section */}
-      <section id="problem" dir="rtl" className="w-full bg-[#F4F7FB] px-5 py-[56px] sm:px-8 lg:px-8">
-        <div className="mx-auto w-full max-w-[1216px]">
-          {/* Section Header */}
-          <div className="mx-auto flex w-full max-w-[768px] flex-col items-center text-center">
-            <span className="rounded-full bg-[#FFF1F3] px-3 py-1 font-['Cairo'] text-[10px] font-bold leading-[16px] text-[#F04461]">
+      {/* ================= PROBLEM SECTION ================= */}
+      <section id="problem" dir="rtl" className="w-full bg-[#F4F7FB] px-[clamp(16px,3vw,48px)] py-[clamp(50px,5vw,90px)]">
+        <div className="mx-auto w-full max-w-[clamp(1100px,88vw,1500px)]">
+          {/* ================= HEADER ================= */}
+          <div className="mx-auto flex w-full max-w-[clamp(650px,55vw,900px)] flex-col items-center text-center">
+            <span className="rounded-full border border-[#FFD9DF] bg-[#FFF1F2] px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-[clamp(10px,0.75vw,13px)] font-bold leading-[1.5] text-[#F04461]">
               التحدي القائم
             </span>
 
-            <h2 className="mt-2 font-['Cairo'] text-[28px] font-black leading-[40px] tracking-[-0.3px] text-[#101828] sm:text-[32px] lg:text-[36px]">
+            <h2 className="mt-[clamp(12px,1.2vw,20px)] font-['Cairo'] text-[clamp(26px,2.5vw,44px)] font-black leading-[1.35] tracking-[-0.3px] text-[#101828]">
               إدارة الكفالة لا تنتهي عند الدفع
             </h2>
 
-            <p className="mt-1 max-w-[768px] font-['Cairo'] text-[12px] font-medium leading-[20px] text-[#667085] sm:text-[13px]">
+            <p className="mt-[clamp(12px,1.2vw,20px)] max-w-[clamp(620px,55vw,900px)] font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.75] text-[#667085]">
               رحلة الكفالة تشمل بيانات ومستندات ودفعات ومراجعات وتحديثات وشراكات، لكنها لا تنتهي هنا.
               <br className="hidden sm:block" />
               العمليات موزعة بين الملفات والمحادثات والأدوات المختلفة، فيصبح الإدارة والمتابعة والتوثيق أكثر صعوبة.
             </p>
           </div>
 
-          {/* Problem Cards */}
-          <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3">
+          {/* ================= PROBLEM CARDS ================= */}
+          <div className="mt-[clamp(30px,3vw,52px)] grid grid-cols-1 gap-[clamp(16px,1.5vw,26px)] md:grid-cols-3">
             {/* Card 1 */}
-            <div className="flex min-h-[230px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-white px-7 pt-7 pb-6 shadow-[0_4px_12px_rgba(16,24,40,0.03)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <div className="flex min-h-[clamp(200px,16vw,270px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-white p-[clamp(20px,2vw,30px)] shadow-[0_4px_12px_rgba(16,24,40,0.03)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
               <div className="flex justify-start">
-                <div className="grid h-10 w-10 place-items-center rounded-[10px] bg-[#FFF0F2] text-[#F04461]">
-                  <LuFileStack size={18} />
+                <div className="grid h-[clamp(38px,2.8vw,46px)] w-[clamp(38px,2.8vw,46px)] place-items-center rounded-[clamp(9px,0.7vw,11px)] bg-[#FFF0F2] text-[#F04461]">
+                  <LuFileStack className="text-[clamp(17px,1.2vw,21px)]" />
                 </div>
               </div>
 
-              <div className="mt-5">
-                <h3 className="font-['Cairo'] text-[16px] font-bold leading-[24px] text-[#101828]">ملفات وإجراءات متفرقة</h3>
+              <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
+                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-[#101828]">
+                  ملفات وإجراءات متفرقة
+                </h3>
 
-                <p className="mt-2 font-['Cairo'] text-[11px] font-medium leading-[20px] text-[#667085]">
+                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(11px,0.9vw,15px)] font-medium leading-[1.7] text-[#667085]">
                   بيانات الكفالة قد تكون موزعة بين أكثر من أداة، مما يزيد من احتمالية ضياع المعلومات المهمة.
                 </p>
               </div>
             </div>
 
             {/* Card 2 */}
-            <div className="flex min-h-[230px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-white px-7 pt-7 pb-6 shadow-[0_4px_12px_rgba(16,24,40,0.03)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <div className="flex min-h-[clamp(200px,16vw,270px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-white p-[clamp(20px,2vw,30px)] shadow-[0_4px_12px_rgba(16,24,40,0.03)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
               <div className="flex justify-start">
-                <div className="grid h-10 w-10 place-items-center rounded-[10px] bg-[#FFF9E8] text-[#F59E0B]">
-                  <FiAlertTriangle size={18} />
+                <div className="grid h-[clamp(38px,2.8vw,46px)] w-[clamp(38px,2.8vw,46px)] place-items-center rounded-[clamp(9px,0.7vw,11px)] bg-[#FFF9E8] text-[#F59E0B]">
+                  <FiAlertTriangle className="text-[clamp(17px,1.2vw,21px)]" />
                 </div>
               </div>
 
-              <div className="mt-5">
-                <h3 className="font-['Cairo'] text-[16px] font-bold leading-[24px] text-[#101828]">متابعة غير متكاملة</h3>
+              <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
+                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-[#101828]">متابعة غير متكاملة</h3>
 
-                <p className="mt-2 font-['Cairo'] text-[11px] font-medium leading-[20px] text-[#667085]">
+                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(11px,0.9vw,15px)] font-medium leading-[1.7] text-[#667085]">
                   كل طرف قد يرى جزءًا من الرحلة دون رؤية منظومة الإجراءات المرتبطة به أو المعرفة الدقيقة بالمرحلة التالية.
                 </p>
               </div>
             </div>
 
             {/* Card 3 */}
-            <div className="flex min-h-[230px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-white px-7 pt-7 pb-6 shadow-[0_4px_12px_rgba(16,24,40,0.03)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+            <div className="flex min-h-[clamp(200px,16vw,270px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-white p-[clamp(20px,2vw,30px)] shadow-[0_4px_12px_rgba(16,24,40,0.03)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
               <div className="flex justify-start">
-                <div className="grid h-10 w-10 place-items-center rounded-[10px] bg-[#EFF8FF] text-[#1570EF]">
-                  <IoDocumentTextOutline size={18} />
+                <div className="grid h-[clamp(38px,2.8vw,46px)] w-[clamp(38px,2.8vw,46px)] place-items-center rounded-[clamp(9px,0.7vw,11px)] bg-[#EFF8FF] text-[#1570EF]">
+                  <IoDocumentTextOutline className="text-[clamp(17px,1.2vw,21px)]" />
                 </div>
               </div>
 
-              <div className="mt-5">
-                <h3 className="font-['Cairo'] text-[16px] font-bold leading-[24px] text-[#101828]">توثيق يحتاج إلى تنظيم</h3>
+              <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
+                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-[#101828]">
+                  توثيق يحتاج إلى تنظيم
+                </h3>
 
-                <p className="mt-2 font-['Cairo'] text-[11px] font-medium leading-[20px] text-[#667085]">
+                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(11px,0.9vw,15px)] font-medium leading-[1.7] text-[#667085]">
                   المستندات والمعلومات تحتاج إلى سجل واضح وموحد يربط كل كفالة بمراحلها وتحديثاتها.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Bottom CTA */}
+          {/* ================= BOTTOM CTA ================= */}
           <div
             dir="rtl"
-            className="mt-7 flex min-h-[112px] w-full items-center justify-between rounded-[16px] bg-[#0D4B8E] px-6 shadow-[0_8px_20px_rgba(0,0,0,0.10)] sm:px-7"
+            className="mt-[clamp(24px,2.5vw,40px)] flex w-full flex-col items-start justify-between gap-[clamp(18px,2vw,28px)] rounded-[clamp(14px,1vw,18px)] bg-[#0D4B8E] px-[clamp(18px,2vw,30px)] py-[clamp(20px,1.8vw,28px)] shadow-[0_8px_20px_rgba(0,0,0,0.10)] sm:flex-row sm:items-center"
           >
             {/* Right Content */}
-            <div className="flex items-center gap-3">
-              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#0A638F] text-[#2DBCC3]">
-                <FiZap size={19} />
+            <div className="flex items-start gap-[clamp(10px,0.9vw,14px)] sm:items-center">
+              <div className="grid h-[clamp(34px,2.6vw,42px)] w-[clamp(34px,2.6vw,42px)] shrink-0 place-items-center rounded-full bg-[#0A638F] text-[#2DBCC3]">
+                <FiZap className="text-[clamp(17px,1.2vw,21px)]" />
               </div>
 
               <div className="text-right">
-                <h3 className="font-['Cairo'] text-[15px] font-bold leading-[22px] text-white">من هنا جاءت كفيلي.</h3>
+                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-white">من هنا جاءت كفيلي.</h3>
 
-                <p className="mt-0.5 font-['Cairo'] text-[10px] font-medium leading-[18px] text-[#D6E4F0]">
+                <p className="mt-[clamp(6px,0.6vw,10px)] max-w-[clamp(600px,60vw,950px)] font-['Cairo'] text-[clamp(11px,0.9vw,15px)] font-medium leading-[1.7] text-[#D6E4F0]">
                   صممنا تجربة رقمية تجمع أطراف الكفالة في مكان واحد وتساعد على تنظيمها ومتابعتها بأعلى درجات الموثوقية.
                 </p>
               </div>
@@ -508,214 +549,217 @@ export default function LandingPage() {
             {/* Button */}
             <button
               type="button"
-              className="shrink-0 rounded-[7px] bg-[#2DBCC3] px-5 py-2.5 font-['Cairo'] text-[11px] font-bold text-[#073B59] transition duration-200 hover:bg-[#42CBD1]"
+              className="inline-flex h-[clamp(40px,3.2vw,50px)] w-full shrink-0 items-center justify-center rounded-[clamp(7px,0.6vw,10px)] bg-[#2DBCC3] px-[clamp(18px,1.5vw,26px)] font-['Cairo'] text-[clamp(10px,0.8vw,13px)] font-bold text-[#073B59] transition duration-200 hover:-translate-y-0.5 hover:bg-[#42CBD1] sm:w-auto"
             >
               اكتشف كيف نعمل
             </button>
           </div>
         </div>
       </section>
-      {/* Solution Section */}
+      {/* ================= SOLUTION SECTION ================= */}
       <section
         id="solution"
         dir="rtl"
-        className="w-full overflow-hidden bg-gradient-to-b from-[#062246] via-[#0D4B8E] to-[#062246] px-5 py-[72px] sm:px-8 lg:px-8"
+        className="w-full overflow-hidden bg-gradient-to-b from-[#062246] via-[#0D4B8E] to-[#062246] px-[clamp(16px,3vw,48px)] py-[clamp(56px,5vw,96px)]"
       >
-        <div className="mx-auto w-full max-w-[1216px]">
-          {/* Header */}
-          <div className="mx-auto flex w-full max-w-[768px] flex-col items-center text-center">
-            <span className="rounded-full border border-[#2DBCC3]/30 bg-[#2DBCC3]/10 px-3 py-1 font-['Cairo'] text-[10px] font-semibold leading-[16px] text-[#2DBCC3]">
+        <div className="mx-auto w-full max-w-[clamp(1100px,88vw,1500px)]">
+          {/* ================= HEADER ================= */}
+          <div className="mx-auto flex w-full max-w-[clamp(650px,55vw,900px)] flex-col items-center text-center">
+            <span className="rounded-full border border-[#2DBCC3]/30 bg-[#2DBCC3]/10 px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-[clamp(10px,0.75vw,13px)] font-semibold leading-[1.5] text-[#2DBCC3]">
               الحل والتوجيه
             </span>
 
-            <h2 className="mt-2 font-['Cairo'] text-[28px] font-black leading-[40px] text-white sm:text-[32px] lg:text-[36px]">
+            <h2 className="mt-[clamp(10px,0.8vw,14px)] font-['Cairo'] text-[clamp(28px,2.7vw,46px)] font-black leading-[1.3] text-white">
               منظومة واحدة لإدارة رحلة الكفالة
             </h2>
 
-            <p className="mt-2 max-w-[700px] font-['Cairo'] text-[12px] font-medium leading-[20px] text-[#D6E4F0] sm:text-[13px]">
+            <p className="mt-[clamp(12px,1vw,18px)] max-w-[clamp(620px,52vw,850px)] font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.75] text-[#D6E4F0]">
               كفيلي تجمع المؤسسة والكفيل والوصي ضمن رحلة رقمية واحدة، بحيث يعرف كل طرف دوره وما يحتاج إليه.
             </p>
           </div>
 
-          {/* Cards */}
-          <div className="mt-10 grid grid-cols-1 gap-4 md:grid-cols-3">
+          {/* ================= CARDS ================= */}
+          <div className="mt-[clamp(30px,3vw,52px)] grid grid-cols-1 gap-[clamp(14px,1.3vw,22px)] md:grid-cols-3">
             {/* Institution */}
-            <div className="flex min-h-[267px] flex-col rounded-[24px] border border-white/10 bg-white/[0.10] p-7 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.14]">
+            <div className="flex min-h-[clamp(230px,18vw,310px)] flex-col rounded-[clamp(18px,1.4vw,26px)] border border-white/10 bg-white/[0.10] p-[clamp(20px,2vw,32px)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.14]">
               <div className="flex justify-start">
-                <div className="grid h-10 w-10 place-items-center rounded-[10px] bg-white/10 text-[#2DBCC3]">
-                  <PiBuildings size={18} />
+                <div className="grid h-[clamp(38px,2.8vw,46px)] w-[clamp(38px,2.8vw,46px)] place-items-center rounded-[clamp(9px,0.7vw,11px)] bg-white/10 text-[#2DBCC3]">
+                  <PiBuildings className="text-[clamp(17px,1.2vw,21px)]" />
                 </div>
               </div>
 
-              <div className="mt-5 text-right">
-                <h3 className="font-['Cairo'] text-[16px] font-bold leading-[24px] text-white">المؤسسة</h3>
+              <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
+                <h3 className="font-['Cairo'] text-[clamp(20px,1.8vw,30px)] font-bold leading-[1.35] text-white">المؤسسة</h3>
 
-                <p className="mt-2 font-['Cairo'] text-[11px] font-medium leading-[20px] text-[#D6E4F0]">
+                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(12px,0.95vw,16px)] font-medium leading-[1.7] text-[#D6E4F0]">
                   تدير حالات الكفالة والكفلاء، وتراجع المستندات والدفعات وتضمن رحلة منظمة وشفافة.
                 </p>
 
-                <div className="mt-5 flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#2DBCC3]" />
-                  <span className="font-['Cairo'] text-[9px] font-semibold text-[#2DBCC3]">حوكمة وإشراف شامل</span>
+                <div className="mt-[clamp(14px,1.3vw,22px)] flex items-center gap-[clamp(5px,0.4vw,8px)]">
+                  <span className="h-[clamp(5px,0.4vw,7px)] w-[clamp(5px,0.4vw,7px)] rounded-full bg-[#2DBCC3]" />
+                  <span className="font-['Cairo'] text-[clamp(10px,0.8vw,13px)] font-semibold text-[#2DBCC3]">حوكمة وإشراف شامل</span>
                 </div>
               </div>
             </div>
 
             {/* Sponsor */}
-            <div className="flex min-h-[267px] flex-col rounded-[24px] border border-white/10 bg-white/[0.10] p-7 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.14]">
+            <div className="flex min-h-[clamp(230px,18vw,310px)] flex-col rounded-[clamp(18px,1.4vw,26px)] border border-white/10 bg-white/[0.10] p-[clamp(20px,2vw,32px)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.14]">
               <div className="flex justify-start">
-                <div className="grid h-10 w-10 place-items-center rounded-[10px] bg-white/10 text-[#2DBCC3]">
-                  <FiUser size={18} />
+                <div className="grid h-[clamp(38px,2.8vw,46px)] w-[clamp(38px,2.8vw,46px)] place-items-center rounded-[clamp(9px,0.7vw,11px)] bg-white/10 text-[#2DBCC3]">
+                  <FiUser className="text-[clamp(17px,1.2vw,21px)]" />
                 </div>
               </div>
 
-              <div className="mt-5 text-right">
-                <h3 className="font-['Cairo'] text-[16px] font-bold leading-[24px] text-white">الكفيل</h3>
+              <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
+                <h3 className="font-['Cairo'] text-[clamp(20px,1.8vw,30px)] font-bold leading-[1.35] text-white">الكفيل</h3>
 
-                <p className="mt-2 font-['Cairo'] text-[11px] font-medium leading-[20px] text-[#D6E4F0]">
+                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(12px,0.95vw,16px)] font-medium leading-[1.7] text-[#D6E4F0]">
                   يتابع كفالته ومعطياتها والتحديثات المرتبطة بها، ويتمكن من رؤية آخر المستجدات بوضوح.
                 </p>
 
-                <div className="mt-5 flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#2DBCC3]" />
-                  <span className="font-['Cairo'] text-[9px] font-semibold text-[#2DBCC3]">متابعة موثقة ومستمرة</span>
+                <div className="mt-[clamp(14px,1.3vw,22px)] flex items-center gap-[clamp(5px,0.4vw,8px)]">
+                  <span className="h-[clamp(5px,0.4vw,7px)] w-[clamp(5px,0.4vw,7px)] rounded-full bg-[#2DBCC3]" />
+                  <span className="font-['Cairo'] text-[clamp(10px,0.8vw,13px)] font-semibold text-[#2DBCC3]">متابعة موثقة ومستمرة</span>
                 </div>
               </div>
             </div>
 
             {/* Guardian */}
-            <div className="flex min-h-[267px] flex-col rounded-[24px] border border-white/10 bg-white/[0.10] p-7 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.14]">
+            <div className="flex min-h-[clamp(230px,18vw,310px)] flex-col rounded-[clamp(18px,1.4vw,26px)] border border-white/10 bg-white/[0.10] p-[clamp(20px,2vw,32px)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.14]">
               <div className="flex justify-start">
-                <div className="grid h-10 w-10 place-items-center rounded-[10px] bg-white/10 text-[#2DBCC3]">
-                  <FiShield size={18} />
+                <div className="grid h-[clamp(38px,2.8vw,46px)] w-[clamp(38px,2.8vw,46px)] place-items-center rounded-[clamp(9px,0.7vw,11px)] bg-white/10 text-[#2DBCC3]">
+                  <FiShield className="text-[clamp(17px,1.2vw,21px)]" />
                 </div>
               </div>
 
-              <div className="mt-5 text-right">
-                <h3 className="font-['Cairo'] text-[16px] font-bold leading-[24px] text-white">الوصي</h3>
+              <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
+                <h3 className="font-['Cairo'] text-[clamp(20px,1.8vw,30px)] font-bold leading-[1.35] text-white">الوصي</h3>
 
-                <p className="mt-2 font-['Cairo'] text-[11px] font-medium leading-[20px] text-[#D6E4F0]">
+                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(12px,0.95vw,16px)] font-medium leading-[1.7] text-[#D6E4F0]">
                   يتابع الإجراءات المرتبطة بالحالة ويرفع المستندات والتحديثات المطلوبة وفق النظام.
                 </p>
 
-                <div className="mt-5 flex items-center gap-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#2DBCC3]" />
-                  <span className="font-['Cairo'] text-[9px] font-semibold text-[#2DBCC3]">حماية وخصوصية منظمة</span>
+                <div className="mt-[clamp(14px,1.3vw,22px)] flex items-center gap-[clamp(5px,0.4vw,8px)]">
+                  <span className="h-[clamp(5px,0.4vw,7px)] w-[clamp(5px,0.4vw,7px)] rounded-full bg-[#2DBCC3]" />
+                  <span className="font-['Cairo'] text-[clamp(10px,0.8vw,13px)] font-semibold text-[#2DBCC3]">حماية وخصوصية منظمة</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* System Pillars */}
-          <div className="mt-9 flex min-h-[98px] w-full items-center justify-between gap-5 rounded-[16px] border border-black/30 bg-[#062246] px-6 py-5">
+          {/* ================= SYSTEM PILLARS ================= */}
+          <div className="mt-[clamp(26px,2.7vw,44px)] flex w-full flex-col items-start justify-between gap-[clamp(18px,2vw,30px)] rounded-[clamp(14px,1vw,18px)] border border-black/30 bg-[#062246] px-[clamp(18px,2vw,30px)] py-[clamp(18px,1.6vw,26px)] sm:flex-row sm:items-center">
             <div className="text-right">
-              <p className="font-['Cairo'] text-[9px] font-medium leading-[16px] text-[#2DBCC3]">دليل نجاح المنظومة</p>
+              <p className="font-['Cairo'] text-[clamp(10px,0.8vw,13px)] font-medium leading-[1.5] text-[#2DBCC3]">كفيلي تضمن المصداقية</p>
 
-              <h3 className="font-['Cairo'] text-[14px] font-bold leading-[22px] text-white">ركائز المنظومة:</h3>
+              <h3 className="mt-[clamp(7px,0.7vw,12px)] font-['Cairo'] text-[clamp(17px,1.4vw,23px)] font-bold leading-[1.4] text-white">
+                ركائز المنظومة:
+              </h3>
             </div>
 
-            <div className="flex items-center gap-4">
-              <span className="rounded-[8px] bg-[#12385F] px-4 py-2 font-['Cairo'] text-[10px] font-semibold text-white">
+            <div className="flex w-full flex-wrap items-center gap-[clamp(8px,1vw,16px)] sm:w-auto">
+              <span className="rounded-[8px] bg-[#12385F] px-[clamp(12px,1.1vw,18px)] py-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-semibold text-white">
+                <span className="ml-2 text-[#2DBCC3]">✓</span>
                 تنظيم
-                <span className="mr-1 text-[#2DBCC3]">✓</span>
               </span>
 
-              <span className="rounded-[8px] bg-[#12385F] px-4 py-2 font-['Cairo'] text-[10px] font-semibold text-white">
+              <span className="rounded-[8px] bg-[#12385F] px-[clamp(12px,1.1vw,18px)] py-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-semibold text-white">
+                <span className="ml-2 text-[#2DBCC3]">✓</span>
                 توثيق
-                <span className="mr-1 text-[#2DBCC3]">✓</span>
               </span>
 
-              <span className="rounded-[8px] bg-[#12385F] px-4 py-2 font-['Cairo'] text-[10px] font-semibold text-white">
+              <span className="rounded-[8px] bg-[#12385F] px-[clamp(12px,1.1vw,18px)] py-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-semibold text-white">
+                <span className="ml-2 text-[#2DBCC3]">✓</span>
                 متابعة
-                <span className="mr-1 text-[#2DBCC3]">✓</span>
               </span>
             </div>
           </div>
         </div>
       </section>
-      {/* Why Kafeeli Section */}
-      <section id="why-kafeeli" dir="rtl" className="w-full bg-white px-5 py-[60px] sm:px-8 lg:px-8 lg:py-[78px]">
-        <div className="mx-auto w-full max-w-[1216px]">
-          {/* Section Header */}
-          <div className="mx-auto flex w-full max-w-[768px] flex-col items-center text-center">
-            <span className="inline-flex items-center justify-center rounded-full bg-[#EAF0F7] px-3 py-[5px] font-['Cairo'] text-[10px] font-semibold leading-[16px] text-[#19579A]">
+
+      {/* ================= WHY KAFEELI SECTION ================= */}
+      <section id="why-kafeeli" dir="rtl" className="w-full bg-white px-[clamp(16px,3vw,48px)] py-[clamp(50px,5vw,90px)]">
+        <div className="mx-auto w-full max-w-[clamp(1100px,88vw,1500px)]">
+          {/* ================= HEADER ================= */}
+          <div className="mx-auto flex w-full max-w-[clamp(650px,55vw,900px)] flex-col items-center text-center">
+            <span className="inline-flex items-center justify-center rounded-full bg-[#EAF0F7] px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.4vw,7px)] font-['Cairo'] text-[clamp(9px,0.7vw,12px)] font-semibold leading-[1.5] text-[#19579A]">
               القيمة المضافة
             </span>
 
-            <h2 className="mt-2 font-['Cairo'] text-[30px] font-black leading-[40px] tracking-[0px] text-[#0F172A] sm:text-[34px] lg:text-[36px]">
+            <h2 className="mt-[clamp(9px,0.8vw,14px)] font-['Cairo'] text-[clamp(26px,2.5vw,44px)] font-black leading-[1.35] tracking-[0px] text-[#0F172A]">
               لماذا كفيلي؟
             </h2>
 
-            <p className="mt-1 max-w-[768px] font-['Cairo'] text-[14px] font-medium leading-[24px] text-[#667085] sm:text-[15px]">
+            <p className="mt-[clamp(12px,1.2vw,20px)] max-w-[clamp(620px,55vw,900px)] font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.75] text-[#667085]">
               لأن التحدي ليس فقط بدء الكفالة، بل في إدارتها وتوثيقها.
             </p>
           </div>
 
-          {/* Features Cards */}
-          <div className="mt-10 grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-            {/* Card 1 - Institution */}
-            <div className="flex min-h-[230px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,24,40,0.06)]">
+          {/* ================= FEATURE CARDS ================= */}
+          <div className="mt-[clamp(30px,3vw,52px)] grid w-full grid-cols-1 gap-[clamp(14px,1.5vw,26px)] sm:grid-cols-2 lg:grid-cols-4">
+            {/* Card 1 */}
+            <div className="flex min-h-[clamp(200px,16vw,270px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(20px,2vw,30px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,24,40,0.06)]">
               <div className="flex justify-start">
-                <div className="grid h-9 w-9 place-items-center rounded-[10px] bg-[#E7EEF7] text-[#19579A]">
-                  <FiGrid size={18} strokeWidth={2} />
+                <div className="grid h-[clamp(34px,2.6vw,42px)] w-[clamp(34px,2.6vw,42px)] place-items-center rounded-[clamp(9px,0.7vw,11px)] bg-[#E7EEF7] text-[#19579A]">
+                  <FiGrid className="text-[clamp(16px,1.2vw,20px)]" strokeWidth={2} />
                 </div>
               </div>
 
-              <div className="mt-5 text-right">
-                <h3 className="font-['Cairo'] text-[18px] font-bold leading-[28px] text-[#0F172A]">إدارة متكاملة</h3>
+              <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
+                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-[#0F172A]">إدارة متكاملة</h3>
 
-                <p className="mt-2 font-['Cairo'] text-[12px] font-medium leading-[20px] text-[#667085]">
+                <p className="mt-[clamp(7px,0.7vw,11px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-medium leading-[1.7] text-[#667085]">
                   تنظيم الحالات والكفلاء والأوصياء والكفالات من مكان واحد وبدون تشتيت.
                 </p>
               </div>
             </div>
 
-            {/* Card 2 - Tracking */}
-            <div className="flex min-h-[230px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,24,40,0.06)]">
+            {/* Card 2 */}
+            <div className="flex min-h-[clamp(200px,16vw,270px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(20px,2vw,30px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,24,40,0.06)]">
               <div className="flex justify-start">
-                <div className="grid h-9 w-9 place-items-center rounded-[10px] bg-[#E2F5F7] text-[#2DBCC3]">
-                  <FiTrendingUp size={18} strokeWidth={2} />
+                <div className="grid h-[clamp(34px,2.6vw,42px)] w-[clamp(34px,2.6vw,42px)] place-items-center rounded-[clamp(9px,0.7vw,11px)] bg-[#E2F5F7] text-[#2DBCC3]">
+                  <FiTrendingUp className="text-[clamp(16px,1.2vw,20px)]" strokeWidth={2} />
                 </div>
               </div>
 
-              <div className="mt-5 text-right">
-                <h3 className="font-['Cairo'] text-[18px] font-bold leading-[28px] text-[#0F172A]">رحلة قابلة للتتبع</h3>
+              <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
+                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-[#0F172A]">رحلة قابلة للتتبع</h3>
 
-                <p className="mt-2 font-['Cairo'] text-[12px] font-medium leading-[20px] text-[#667085]">
+                <p className="mt-[clamp(7px,0.7vw,11px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-medium leading-[1.7] text-[#667085]">
                   معرفة المرحلة الحالية لكل كفالة والتحديثات المرتبطة بها بوضوح زمني كامل.
                 </p>
               </div>
             </div>
 
-            {/* Card 3 - Documentation */}
-            <div className="flex min-h-[230px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,24,40,0.06)]">
+            {/* Card 3 */}
+            <div className="flex min-h-[clamp(200px,16vw,270px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(20px,2vw,30px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,24,40,0.06)]">
               <div className="flex justify-start">
-                <div className="grid h-9 w-9 place-items-center rounded-[10px] bg-[#F7F0E2] text-[#E5A72D]">
-                  <FiFileText size={18} strokeWidth={2} />
+                <div className="grid h-[clamp(34px,2.6vw,42px)] w-[clamp(34px,2.6vw,42px)] place-items-center rounded-[clamp(9px,0.7vw,11px)] bg-[#F7F0E2] text-[#E5A72D]">
+                  <FiFileText className="text-[clamp(16px,1.2vw,20px)]" strokeWidth={2} />
                 </div>
               </div>
 
-              <div className="mt-5 text-right">
-                <h3 className="font-['Cairo'] text-[18px] font-bold leading-[28px] text-[#0F172A]">توثيق واضح</h3>
+              <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
+                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-[#0F172A]">توثيق واضح</h3>
 
-                <p className="mt-2 font-['Cairo'] text-[12px] font-medium leading-[20px] text-[#667085]">
+                <p className="mt-[clamp(7px,0.7vw,11px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-medium leading-[1.7] text-[#667085]">
                   ربط المستندات والمدفوعات والتحديثات برحلة الكفالة في سجل موثوق ومعتمد.
                 </p>
               </div>
             </div>
 
-            {/* Card 4 - Privacy */}
-            <div className="flex min-h-[230px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,24,40,0.06)]">
+            {/* Card 4 */}
+            <div className="flex min-h-[clamp(200px,16vw,270px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(20px,2vw,30px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(16,24,40,0.06)]">
               <div className="flex justify-start">
-                <div className="grid h-9 w-9 place-items-center rounded-[10px] bg-[#EEEAFE] text-[#6956E5]">
-                  <PiLockKeyOpen size={18} strokeWidth={2} />
+                <div className="grid h-[clamp(34px,2.6vw,42px)] w-[clamp(34px,2.6vw,42px)] place-items-center rounded-[clamp(9px,0.7vw,11px)] bg-[#EEEAFE] text-[#6956E5]">
+                  <PiLockKeyOpen className="text-[clamp(16px,1.2vw,20px)]" strokeWidth={2} />
                 </div>
               </div>
 
-              <div className="mt-5 text-right">
-                <h3 className="font-['Cairo'] text-[18px] font-bold leading-[28px] text-[#0F172A]">صلاحيات وخصوصية</h3>
+              <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
+                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-[#0F172A]">صلاحيات وخصوصية</h3>
 
-                <p className="mt-2 font-['Cairo'] text-[12px] font-medium leading-[20px] text-[#667085]">
+                <p className="mt-[clamp(7px,0.7vw,11px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-medium leading-[1.7] text-[#667085]">
                   لكل مستخدم تجربة وصلاحيات تناسب دوره داخل المنظومة مع الحفاظ على سرية البيانات.
                 </p>
               </div>
@@ -726,312 +770,345 @@ export default function LandingPage() {
       {/* =========================
     Problem / Challenge Section
 ========================= */}
-      <section id="problem" dir="rtl" className="w-full bg-[#F4F7FB] px-4 py-[60px] sm:px-6 sm:py-[70px] lg:px-8 lg:py-[80px]">
-        <div className="mx-auto w-full max-w-[1216px]">
+      {/* ================= PROBLEM / INSTITUTIONS SECTION ================= */}
+      <section id="problem" dir="rtl" className="w-full bg-[#F4F7FB] px-[clamp(16px,3vw,48px)] py-[clamp(50px,5vw,90px)]">
+        <div className="mx-auto w-full max-w-[clamp(1100px,88vw,1500px)]">
           {/* White Container */}
-          <div className="w-full rounded-[24px] border border-[#E2EBF5] bg-white px-5 py-6 sm:px-7 sm:py-8 lg:px-8 lg:py-[40px]">
+          <div className="w-full rounded-[clamp(18px,1.5vw,26px)] border border-[#E2EBF5] bg-white px-[clamp(20px,2.5vw,42px)] py-[clamp(24px,3vw,48px)]">
             {/* Main Grid */}
-            <div className="mx-auto grid w-full max-w-[1118px] min-w-0 grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-[40px] lg:[direction:ltr]">
-              {/* Cards */}
-              <div dir="rtl" className="order-2 grid w-full min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:order-1">
+            <div className="mx-auto grid w-full max-w-[clamp(1000px,82vw,1380px)] min-w-0 grid-cols-1 gap-[clamp(28px,3vw,50px)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:[direction:ltr]">
+              {/* ================= CARDS ================= */}
+              <div dir="rtl" className="order-2 grid w-full min-w-0 grid-cols-1 gap-[clamp(14px,1.2vw,20px)] sm:grid-cols-2 lg:order-1">
                 {/* Card 1 */}
-                <div className="flex min-h-[157px] w-full min-w-0 flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(15,23,42,0.06)]">
-                  <div className="flex h-[36px] w-[36px] shrink-0 items-center justify-center self-start rounded-[10px] bg-[#E7EEF7] text-[#19579A]">
-                    <FiUsers size={19} strokeWidth={2} />
+                <div className="flex min-h-[clamp(150px,12vw,205px)] w-full min-w-0 flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(17px,1.5vw,26px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(15,23,42,0.06)]">
+                  <div className="flex h-[clamp(34px,2.5vw,42px)] w-[clamp(34px,2.5vw,42px)] shrink-0 items-center justify-center self-start rounded-[clamp(9px,0.7vw,11px)] bg-[#E7EEF7] text-[#19579A]">
+                    <FiUsers className="text-[clamp(17px,1.25vw,21px)]" strokeWidth={2} />
                   </div>
 
-                  <div className="mt-auto text-right">
-                    <h3 className="font-['Cairo'] text-[14px] font-bold leading-[20px] text-[#1E293B]">إدارة الحالات والأوصياء</h3>
-                    <p className="mt-1 font-['Cairo'] text-[11px] font-medium leading-[19px] text-[#718096]">
+                  <div className="mt-auto pt-[clamp(14px,1.2vw,20px)] text-right">
+                    <h3 className="font-['Cairo'] text-[clamp(13px,1vw,17px)] font-bold leading-[1.5] text-[#1E293B]">
+                      إدارة الحالات والأوصياء
+                    </h3>
+
+                    <p className="mt-[clamp(4px,0.4vw,7px)] font-['Cairo'] text-[clamp(11px,0.8vw,14px)] font-medium leading-[1.65] text-[#718096]">
                       تنظيم البيانات والمستندات ومتابعة حالة المراجعة.
                     </p>
                   </div>
                 </div>
 
                 {/* Card 2 */}
-                <div className="flex min-h-[157px] w-full min-w-0 flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(15,23,42,0.06)]">
-                  <div className="flex h-[36px] w-[36px] shrink-0 items-center justify-center self-start rounded-[10px] bg-[#E2F5F7] text-[#2DBCC3]">
-                    <FiUserCheck size={19} strokeWidth={2} />
+                <div className="flex min-h-[clamp(150px,12vw,205px)] w-full min-w-0 flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(17px,1.5vw,26px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(15,23,42,0.06)]">
+                  <div className="flex h-[clamp(34px,2.5vw,42px)] w-[clamp(34px,2.5vw,42px)] shrink-0 items-center justify-center self-start rounded-[clamp(9px,0.7vw,11px)] bg-[#E2F5F7] text-[#2DBCC3]">
+                    <FiUserCheck className="text-[clamp(17px,1.25vw,21px)]" strokeWidth={2} />
                   </div>
 
-                  <div className="mt-auto text-right">
-                    <h3 className="font-['Cairo'] text-[14px] font-bold leading-[20px] text-[#1E293B]">إدارة الكفلاء والكفالات</h3>
-                    <p className="mt-1 font-['Cairo'] text-[11px] font-medium leading-[19px] text-[#718096]">
+                  <div className="mt-auto pt-[clamp(14px,1.2vw,20px)] text-right">
+                    <h3 className="font-['Cairo'] text-[clamp(13px,1vw,17px)] font-bold leading-[1.5] text-[#1E293B]">
+                      إدارة الكفلاء والكفالات
+                    </h3>
+
+                    <p className="mt-[clamp(4px,0.4vw,7px)] font-['Cairo'] text-[clamp(11px,0.8vw,14px)] font-medium leading-[1.65] text-[#718096]">
                       ربط الكفالات بأطرافها ومتابعة دورة كل كفالة.
                     </p>
                   </div>
                 </div>
 
                 {/* Card 3 */}
-                <div className="flex min-h-[157px] w-full min-w-0 flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(15,23,42,0.06)]">
-                  <div className="flex h-[36px] w-[36px] shrink-0 items-center justify-center self-start rounded-[10px] bg-[#F7F0E2] text-[#E5A72D]">
-                    <FiCreditCard size={18} strokeWidth={2} />
+                <div className="flex min-h-[clamp(150px,12vw,205px)] w-full min-w-0 flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(17px,1.5vw,26px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(15,23,42,0.06)]">
+                  <div className="flex h-[clamp(34px,2.5vw,42px)] w-[clamp(34px,2.5vw,42px)] shrink-0 items-center justify-center self-start rounded-[clamp(9px,0.7vw,11px)] bg-[#F7F0E2] text-[#E5A72D]">
+                    <FiCreditCard className="text-[clamp(16px,1.2vw,20px)]" strokeWidth={2} />
                   </div>
 
-                  <div className="mt-auto text-right">
-                    <h3 className="font-['Cairo'] text-[14px] font-bold leading-[20px] text-[#1E293B]">متابعة الدفعات</h3>
-                    <p className="mt-1 font-['Cairo'] text-[11px] font-medium leading-[19px] text-[#718096]">
+                  <div className="mt-auto pt-[clamp(14px,1.2vw,20px)] text-right">
+                    <h3 className="font-['Cairo'] text-[clamp(13px,1vw,17px)] font-bold leading-[1.5] text-[#1E293B]">متابعة الدفعات</h3>
+
+                    <p className="mt-[clamp(4px,0.4vw,7px)] font-['Cairo'] text-[clamp(11px,0.8vw,14px)] font-medium leading-[1.65] text-[#718096]">
                       مراجعة إثباتات الدفع وتوثيق حالة الإجراءات المالية.
                     </p>
                   </div>
                 </div>
 
                 {/* Card 4 */}
-                <div className="flex min-h-[157px] w-full min-w-0 flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(15,23,42,0.06)]">
-                  <div className="flex h-[36px] w-[36px] shrink-0 items-center justify-center self-start rounded-[10px] bg-[#EEF0FF] text-[#6155E8]">
-                    <FiRefreshCw size={18} strokeWidth={2} />
+                <div className="flex min-h-[clamp(150px,12vw,205px)] w-full min-w-0 flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(17px,1.5vw,26px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_20px_rgba(15,23,42,0.06)]">
+                  <div className="flex h-[clamp(34px,2.5vw,42px)] w-[clamp(34px,2.5vw,42px)] shrink-0 items-center justify-center self-start rounded-[clamp(9px,0.7vw,11px)] bg-[#EEF0FF] text-[#6155E8]">
+                    <FiRefreshCw className="text-[clamp(16px,1.2vw,20px)]" strokeWidth={2} />
                   </div>
 
-                  <div className="mt-auto text-right">
-                    <h3 className="font-['Cairo'] text-[14px] font-bold leading-[20px] text-[#1E293B]">التحديثات والمتابعة</h3>
-                    <p className="mt-1 font-['Cairo'] text-[11px] font-medium leading-[19px] text-[#718096]">
+                  <div className="mt-auto pt-[clamp(14px,1.2vw,20px)] text-right">
+                    <h3 className="font-['Cairo'] text-[clamp(13px,1vw,17px)] font-bold leading-[1.5] text-[#1E293B]">
+                      التحديثات والمتابعة
+                    </h3>
+
+                    <p className="mt-[clamp(4px,0.4vw,7px)] font-['Cairo'] text-[clamp(11px,0.8vw,14px)] font-medium leading-[1.65] text-[#718096]">
                       إدارة التحديثات المرتبطة بالكفالات وإتاحتها للأطراف المعنية.
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Content */}
+              {/* ================= CONTENT ================= */}
               <div
                 dir="rtl"
                 className="order-1 flex w-full min-w-0 flex-col items-start justify-center overflow-hidden text-right lg:order-2"
               >
-                <span className="inline-flex h-[31px] w-fit items-center rounded-full bg-[#EAF2F9] px-3 font-['Cairo'] text-[11px] font-bold leading-[18px] text-[#19579A]">
+                {/* Badge */}
+                <span className="inline-flex w-fit items-center justify-center rounded-full bg-[#EAF2F9] px-[clamp(10px,0.8vw,14px)] py-[clamp(5px,0.4vw,7px)] font-['Cairo'] text-[clamp(10px,0.75vw,13px)] font-bold leading-[1.5] text-[#19579A]">
                   كفيلي للمؤسسات
                 </span>
 
-                <h2 className="mt-[7px] w-full min-w-0 break-words font-['Cairo'] text-[28px] font-black leading-[38px] tracking-[-0.3px] text-[#0F172A] sm:text-[32px] sm:leading-[40px] lg:text-[36px] lg:leading-[40px]">
+                {/* Title */}
+                <h2 className="mt-[clamp(12px,1.2vw,20px)] w-full min-w-0 break-words font-['Cairo'] text-[clamp(26px,2.5vw,44px)] font-black leading-[1.3] tracking-[-0.3px] text-[#0F172A]">
                   إدارة الكفالات في نظام واحد
                 </h2>
 
-                <p className="mt-[7px] w-full max-w-[485px] min-w-0 break-words font-['Cairo'] text-[14px] font-medium leading-[24px] text-[#475569] sm:text-[15px] sm:leading-[25px] lg:text-[16px] lg:leading-[26px]">
+                {/* Description */}
+                <p className="mt-[clamp(12px,1.2vw,20px)] w-full max-w-[clamp(460px,38vw,620px)] min-w-0 break-words font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.75] text-[#475569]">
                   تساعد كفيلي المؤسسات على تنظيم الحالات والكفلاء والأوصياء والكفالات والإجراءات المرتبطة بها، بدل توزيع رحلة العمل بين
                   أدوات متعددة.
                 </p>
 
+                {/* Button */}
                 <button
                   type="button"
-                  className="mt-[18px] inline-flex h-[40px] max-w-full shrink-0 items-center justify-center gap-2 rounded-[8px] bg-[#0D5BA8] px-4 font-['Cairo'] text-[12px] font-bold leading-[20px] text-white shadow-[0_4px_10px_rgba(13,91,168,0.15)] transition-all duration-300 hover:bg-[#0B4F94]"
+                  className="mt-[clamp(18px,1.8vw,28px)] inline-flex h-[clamp(40px,3.2vw,50px)] max-w-full shrink-0 items-center justify-center gap-[clamp(6px,0.5vw,9px)] rounded-[clamp(8px,0.6vw,10px)] bg-[#0D5BA8] px-[clamp(16px,1.4vw,24px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-bold leading-[1.5] text-white shadow-[0_4px_10px_rgba(13,91,168,0.15)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#0B4F94]"
                 >
-                  <span className="truncate">اكتشف كفيلي للمؤسسات</span>
-                  <FiArrowLeft size={17} strokeWidth={2} className="shrink-0" />
+                  <span>اكتشف كفيلي للمؤسسات</span>
+                  <FiArrowLeft className="shrink-0 text-[clamp(15px,1vw,18px)]" strokeWidth={2} />
                 </button>
               </div>
             </div>
           </div>
         </div>
       </section>
-      {/* =========================
-          Process Section
-      ========================= */}
+
+      {/* ================= PROCESS SECTION ================= */}
       <section
         id="process"
         dir="rtl"
-        className="w-full -translate-y-10 border-b border-[#F4F7FB] bg-white px-5 pt-[70px] pb-[70px] sm:px-8 lg:px-8"
+        className="w-full -translate-y-[clamp(24px,2.5vw,40px)] border-b border-[#F4F7FB] bg-white px-[clamp(16px,3vw,48px)] pt-[clamp(50px,5vw,90px)] pb-[clamp(50px,5vw,90px)]"
       >
-        <div className="mx-auto w-full max-w-[1216px]">
-          {/* Section Header */}
-          <div className="mx-auto flex w-full max-w-[768px] flex-col items-center gap-[7px] text-center">
-            <span className="inline-flex h-[24px] w-fit items-center rounded-full bg-[#EAF2F9] px-[9px] font-['Cairo'] text-[10px] font-bold leading-[16px] text-[#0D4B8E]">
+        <div className="mx-auto w-full max-w-[clamp(1100px,88vw,1500px)]">
+          {/* ================= HEADER ================= */}
+          <div className="mx-auto flex w-full max-w-[clamp(650px,55vw,900px)] flex-col items-center text-center">
+            {/* Badge */}
+            <span className="mb-[clamp(10px,0.8vw,14px)] inline-flex w-fit items-center justify-center rounded-full bg-[#EAF2F9] px-[clamp(9px,0.7vw,13px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-[clamp(10px,0.75vw,13px)] font-bold leading-[1.5] text-[#0D4B8E]">
               التسلسل الإجرائي
             </span>
 
-            <h2 className="font-['Cairo'] text-[28px] font-black leading-[36px] tracking-[0] text-[#0F172A] sm:text-[32px] sm:leading-[38px] lg:text-[36px] lg:leading-[40px]">
+            {/* Title */}
+            <h2 className="font-['Cairo'] text-[clamp(26px,2.5vw,44px)] font-black leading-[1.35] tracking-[0] text-[#0F172A]">
               رحلة واضحة من البداية إلى المتابعة
             </h2>
 
-            <p className="font-['Cairo'] text-[13px] font-medium leading-[22px] text-[#475569] sm:text-[14px] sm:leading-[24px]">
+            {/* Description */}
+            <p className="mt-[clamp(12px,1.2vw,20px)] font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.7] text-[#475569]">
               كل مرحلة لها إجراء واضح، وطرف مسؤول، وحالة يمكن متابعتها.
             </p>
           </div>
 
-          {/* Steps */}
-          <div className="mt-[40px] grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:gap-3">
-            {/* 01 - بدء الكفالة */}
-            <div className="flex min-h-[196px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-5">
+          {/* ================= STEPS ================= */}
+          <div className="mt-[clamp(30px,3vw,52px)] grid w-full grid-cols-1 gap-[clamp(14px,1.2vw,20px)] sm:grid-cols-2 lg:grid-cols-5">
+            {/* ================= 01 ================= */}
+            <div className="flex min-h-[clamp(180px,14vw,235px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(17px,1.5vw,26px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
               <div className="text-right">
-                <span className="font-['Cairo'] text-[30px] font-black leading-[36px] text-[#0D4B8E]/20">01</span>
+                <span className="font-['Cairo'] text-[clamp(26px,2.1vw,36px)] font-black leading-[1.2] text-[#0D4B8E]/20">01</span>
 
-                <h3 className="mt-[2px] font-['Cairo'] text-[16px] font-bold leading-[24px] text-[#0F172A]">بدء الكفالة</h3>
+                <h3 className="mt-[clamp(3px,0.3vw,6px)] font-['Cairo'] text-[clamp(14px,1.05vw,18px)] font-bold leading-[1.5] text-[#0F172A]">
+                  بدء الكفالة
+                </h3>
 
-                <p className="mt-[4px] font-['Cairo'] text-[11px] font-medium leading-[19px] text-[#718096]">
+                <p className="mt-[clamp(8px,0.8vw,14px)] font-['Cairo'] text-[clamp(11px,0.8vw,14px)] font-medium leading-[1.65] text-[#718096]">
                   يبدأ الكفيل إجراءات الكفالة من خلال حسابه.
                 </p>
               </div>
 
-              <div className="mt-auto">
-                <span className="inline-flex h-[24px] items-center rounded-[6px] bg-[#EAF2F9] px-[9px] font-['Cairo'] text-[10px] font-bold leading-[18px] text-[#0D4B8E]">
+              <div className="mt-auto pt-[clamp(14px,1.2vw,20px)]">
+                <span className="inline-flex items-center rounded-[6px] bg-[#EAF2F9] px-[clamp(8px,0.7vw,12px)] py-[clamp(3px,0.3vw,5px)] font-['Cairo'] text-[clamp(10px,0.7vw,12px)] font-bold leading-[1.5] text-[#0D4B8E]">
                   الخطوة الأولى
                 </span>
               </div>
             </div>
 
-            {/* 02 - توثيق الدفع */}
-            <div className="flex min-h-[196px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-5">
+            {/* ================= 02 ================= */}
+            <div className="flex min-h-[clamp(180px,14vw,235px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(17px,1.5vw,26px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
               <div className="text-right">
-                <span className="font-['Cairo'] text-[30px] font-black leading-[36px] text-[#0D4B8E]/20">02</span>
+                <span className="font-['Cairo'] text-[clamp(26px,2.1vw,36px)] font-black leading-[1.2] text-[#0D4B8E]/20">02</span>
 
-                <h3 className="mt-[2px] font-['Cairo'] text-[16px] font-bold leading-[24px] text-[#0F172A]">توثيق الدفع</h3>
+                <h3 className="mt-[clamp(3px,0.3vw,6px)] font-['Cairo'] text-[clamp(14px,1.05vw,18px)] font-bold leading-[1.5] text-[#0F172A]">
+                  توثيق الدفع
+                </h3>
 
-                <p className="mt-[4px] font-['Cairo'] text-[11px] font-medium leading-[19px] text-[#718096]">
+                <p className="mt-[clamp(8px,0.8vw,14px)] font-['Cairo'] text-[clamp(11px,0.8vw,14px)] font-medium leading-[1.65] text-[#718096]">
                   يتم رفع إثبات الدفع وربطه بالكفالة.
                 </p>
               </div>
 
-              <div className="mt-auto">
-                <span className="inline-flex h-[24px] items-center rounded-[6px] bg-[#EAF2F9] px-[9px] font-['Cairo'] text-[10px] font-bold leading-[18px] text-[#0D4B8E]">
+              <div className="mt-auto pt-[clamp(14px,1.2vw,20px)]">
+                <span className="inline-flex items-center rounded-[6px] bg-[#EAF2F9] px-[clamp(8px,0.7vw,12px)] py-[clamp(3px,0.3vw,5px)] font-['Cairo'] text-[clamp(10px,0.7vw,12px)] font-bold leading-[1.5] text-[#0D4B8E]">
                   الخطوة الثانية
                 </span>
               </div>
             </div>
 
-            {/* 03 - مراجعة المؤسسة */}
-            <div className="flex min-h-[196px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-5">
+            {/* ================= 03 ================= */}
+            <div className="flex min-h-[clamp(180px,14vw,235px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(17px,1.5vw,26px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
               <div className="text-right">
-                <span className="font-['Cairo'] text-[30px] font-black leading-[36px] text-[#0D4B8E]/20">03</span>
+                <span className="font-['Cairo'] text-[clamp(26px,2.1vw,36px)] font-black leading-[1.2] text-[#0D4B8E]/20">03</span>
 
-                <h3 className="mt-[2px] font-['Cairo'] text-[16px] font-bold leading-[24px] text-[#0F172A]">مراجعة المؤسسة</h3>
+                <h3 className="mt-[clamp(3px,0.3vw,6px)] font-['Cairo'] text-[clamp(14px,1.05vw,18px)] font-bold leading-[1.5] text-[#0F172A]">
+                  مراجعة المؤسسة
+                </h3>
 
-                <p className="mt-[4px] font-['Cairo'] text-[11px] font-medium leading-[19px] text-[#718096]">
+                <p className="mt-[clamp(8px,0.8vw,14px)] font-['Cairo'] text-[clamp(11px,0.8vw,14px)] font-medium leading-[1.65] text-[#718096]">
                   تراجع المؤسسة العملية والإثباتات المرتبطة بها.
                 </p>
               </div>
 
-              <div className="mt-auto">
-                <span className="inline-flex h-[24px] items-center rounded-[6px] bg-[#EAF2F9] px-[9px] font-['Cairo'] text-[10px] font-bold leading-[18px] text-[#0D4B8E]">
+              <div className="mt-auto pt-[clamp(14px,1.2vw,20px)]">
+                <span className="inline-flex items-center rounded-[6px] bg-[#EAF2F9] px-[clamp(8px,0.7vw,12px)] py-[clamp(3px,0.3vw,5px)] font-['Cairo'] text-[clamp(10px,0.7vw,12px)] font-bold leading-[1.5] text-[#0D4B8E]">
                   الخطوة الثالثة
                 </span>
               </div>
             </div>
 
-            {/* 04 - توثيق التحويل والاستلام */}
-            <div className="flex min-h-[196px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-5">
+            {/* ================= 04 ================= */}
+            <div className="flex min-h-[clamp(180px,14vw,235px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(17px,1.5vw,26px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
               <div className="text-right">
-                <span className="font-['Cairo'] text-[30px] font-black leading-[36px] text-[#0D4B8E]/20">04</span>
+                <span className="font-['Cairo'] text-[clamp(26px,2.1vw,36px)] font-black leading-[1.2] text-[#0D4B8E]/20">04</span>
 
-                <h3 className="mt-[2px] whitespace-nowrap text-right font-['Cairo'] text-[14px] font-bold leading-[24px] tracking-[-0.2px] text-[#0F172A] sm:text-[15px]">
+                <h3 className="mt-[clamp(3px,0.3vw,6px)] font-['Cairo'] text-[clamp(13px,0.95vw,17px)] font-bold leading-[1.5] tracking-[-0.2px] text-[#0F172A]">
                   توثيق التحويل والاستلام
                 </h3>
 
-                <p className="mt-[4px] font-['Cairo'] text-[11px] font-medium leading-[19px] text-[#718096]">
+                <p className="mt-[clamp(8px,0.8vw,14px)] font-['Cairo'] text-[clamp(11px,0.8vw,14px)] font-medium leading-[1.65] text-[#718096]">
                   توثق إجراءات تحويل الكفالة وتأكيد الاستلام.
                 </p>
               </div>
 
-              <div className="mt-auto">
-                <span className="inline-flex h-[24px] items-center rounded-[6px] bg-[#EAF2F9] px-[9px] font-['Cairo'] text-[10px] font-bold leading-[18px] text-[#0D4B8E]">
+              <div className="mt-auto pt-[clamp(14px,1.2vw,20px)]">
+                <span className="inline-flex items-center rounded-[6px] bg-[#EAF2F9] px-[clamp(8px,0.7vw,12px)] py-[clamp(3px,0.3vw,5px)] font-['Cairo'] text-[clamp(10px,0.7vw,12px)] font-bold leading-[1.5] text-[#0D4B8E]">
                   الخطوة الرابعة
                 </span>
               </div>
             </div>
 
-            {/* 05 - المتابعة والتحديثات */}
-            <div className="flex min-h-[196px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-5">
+            {/* ================= 05 ================= */}
+            <div className="flex min-h-[clamp(180px,14vw,235px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(17px,1.5vw,26px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
               <div className="text-right">
-                <span className="font-['Cairo'] text-[30px] font-black leading-[36px] text-[#0D4B8E]/20">05</span>
+                <span className="font-['Cairo'] text-[clamp(26px,2.1vw,36px)] font-black leading-[1.2] text-[#0D4B8E]/20">05</span>
 
-                <h3 className="mt-[2px] font-['Cairo'] text-[16px] font-bold leading-[24px] text-[#0F172A]">المتابعة والتحديثات</h3>
+                <h3 className="mt-[clamp(3px,0.3vw,6px)] font-['Cairo'] text-[clamp(14px,1.05vw,18px)] font-bold leading-[1.5] text-[#0F172A]">
+                  المتابعة والتحديثات
+                </h3>
 
-                <p className="mt-[4px] font-['Cairo'] text-[11px] font-medium leading-[19px] text-[#718096]">
+                <p className="mt-[clamp(8px,0.8vw,14px)] font-['Cairo'] text-[clamp(11px,0.8vw,14px)] font-medium leading-[1.65] text-[#718096]">
                   تستمر رحلة الكفالة والتحديثات المرتبطة بها.
                 </p>
               </div>
 
-              <div className="mt-auto">
-                <span className="inline-flex h-[24px] items-center rounded-[6px] bg-[#EAF2F9] px-[9px] font-['Cairo'] text-[10px] font-bold leading-[18px] text-[#0D4B8E]">
+              <div className="mt-auto pt-[clamp(14px,1.2vw,20px)]">
+                <span className="inline-flex items-center rounded-[6px] bg-[#EAF2F9] px-[clamp(8px,0.7vw,12px)] py-[clamp(3px,0.3vw,5px)] font-['Cairo'] text-[clamp(10px,0.7vw,12px)] font-bold leading-[1.5] text-[#0D4B8E]">
                   الخطوة الخامسة
                 </span>
               </div>
             </div>
           </div>
 
-          {/* Bottom Button */}
-          <div className="mt-[32px] flex justify-center">
+          {/* ================= BOTTOM BUTTON ================= */}
+          <div className="mt-[clamp(24px,2.5vw,40px)] flex justify-center">
             <button
               type="button"
-              className="inline-flex h-[40px] w-fit items-center justify-center gap-2 rounded-[8px] bg-[#0D5BA8] px-4 font-['Cairo'] text-[12px] font-bold leading-[20px] text-white shadow-[0_4px_10px_rgba(13,91,168,0.15)] transition-all duration-300 hover:bg-[#0B4F94]"
+              className="inline-flex h-[clamp(40px,3.2vw,50px)] w-fit items-center justify-center gap-[clamp(6px,0.5vw,9px)] rounded-[clamp(8px,0.6vw,10px)] bg-[#0D5BA8] px-[clamp(16px,1.4vw,24px)] font-['Cairo'] text-[clamp(11px,0.8vw,14px)] font-bold leading-[1.5] text-white shadow-[0_4px_10px_rgba(13,91,168,0.15)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#0B4F94]"
             >
-              شاهد الرحلة بالتفصيل
-              <FiArrowLeft size={16} strokeWidth={2} />
+              <span>شاهد الرحلة بالتفصيل</span>
+              <FiArrowLeft className="text-[clamp(15px,1vw,18px)]" strokeWidth={2} />
             </button>
           </div>
         </div>
       </section>
       {/* Trust Section */}
-      <section id="trust" dir="rtl" className="w-full border-t border-[#E2EBF5] bg-white px-5 pt-[60px] pb-[80px] sm:px-8 lg:px-8">
-        <div className="mx-auto flex w-full max-w-[1280px] flex-col">
-          {/* Header */}
-          <div className="mx-auto flex w-full max-w-[768px] flex-col items-center text-center">
-            <span className="inline-flex h-[31px] w-fit items-center justify-center rounded-[9999px] bg-[rgba(45,188,195,0.1)] px-3 py-[7.5px] font-['Cairo'] text-[12px] font-semibold leading-[16px] text-[#2DBCC3]">
+      {/* ================= TRUST SECTION ================= */}
+      <section
+        id="trust"
+        dir="rtl"
+        className="w-full border-t border-[#E2EBF5] bg-white px-[clamp(16px,3vw,48px)] pt-[clamp(48px,5vw,90px)] pb-[clamp(60px,6vw,105px)]"
+      >
+        <div className="mx-auto flex w-full max-w-[clamp(1100px,88vw,1500px)] flex-col">
+          {/* ================= HEADER ================= */}
+          <div className="mx-auto flex w-full max-w-[clamp(650px,55vw,900px)] flex-col items-center text-center">
+            {/* Badge */}
+            <span className="mb-[clamp(10px,0.9vw,16px)] inline-flex w-fit items-center justify-center rounded-full bg-[rgba(45,188,195,0.1)] px-[clamp(11px,0.8vw,15px)] py-[clamp(6px,0.5vw,9px)] font-['Cairo'] text-[clamp(10px,0.75vw,13px)] font-semibold leading-[1.5] text-[#2DBCC3]">
               الأمان والمصداقية
             </span>
 
-            <h2 className="mt-2 font-['Cairo'] text-[28px] font-black leading-[40px] tracking-[0px] text-[#0F172A] sm:text-[32px] lg:text-[36px]">
+            {/* Title */}
+            <h2 className="font-['Cairo'] text-[clamp(26px,2.5vw,44px)] font-black leading-[1.35] tracking-[0px] text-[#0F172A]">
               الثقة تبدأ من وضوح كل خطوة
             </h2>
 
-            <p className="mt-[7px] max-w-[768px] font-['Cairo'] text-[14px] font-medium leading-[24px] tracking-[0px] text-[#52657D] sm:text-[15px] lg:text-[16px]">
+            {/* Description */}
+            <p className="mt-[clamp(12px,1.2vw,20px)] max-w-[clamp(620px,55vw,900px)] font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.8] tracking-[0px] text-[#52657D]">
               لأن رحلة الكفالة تتعامل مع بيانات حساسة وإجراءات مالية، تساعد كفيلي على جعل المسؤوليات والإجراءات والمتابعة أكثر وضوحًا.
             </p>
           </div>
 
-          {/* Cards */}
-          <div className="mt-10 grid w-full grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
-            {/* Card 1 */}
-            <div className="flex min-h-[177px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-              <div className="flex h-[32px] w-[32px] items-center justify-center rounded-[9px] bg-[#E4ECF6] text-[#19579A]">
-                <FiShield size={17} strokeWidth={2} />
+          {/* ================= CARDS ================= */}
+          <div className="mt-[clamp(30px,3.2vw,52px)] grid w-full grid-cols-1 gap-[clamp(14px,1.5vw,26px)] sm:grid-cols-2 lg:grid-cols-4">
+            {/* ================= CARD 1 ================= */}
+            <div className="flex min-h-[clamp(165px,13vw,220px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(18px,1.8vw,30px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+              <div className="flex h-[clamp(30px,2.4vw,40px)] w-[clamp(30px,2.4vw,40px)] items-center justify-center rounded-[clamp(8px,0.7vw,11px)] bg-[#E4ECF6] text-[#19579A]">
+                <FiShield className="text-[clamp(16px,1.2vw,21px)]" strokeWidth={2} />
               </div>
 
-              <div className="mt-4 text-right">
-                <h3 className="font-['Cairo'] text-[16px] font-bold leading-[24px] text-[#0F172A]">صلاحيات حسب الدور</h3>
+              <div className="mt-[clamp(12px,1.2vw,20px)] text-right">
+                <h3 className="font-['Cairo'] text-[clamp(14px,1.15vw,19px)] font-bold leading-[1.5] text-[#0F172A]">صلاحيات حسب الدور</h3>
 
-                <p className="mt-1 font-['Cairo'] text-[11px] font-medium leading-[20px] text-[#52657D]">
+                <p className="mt-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(11px,0.85vw,14px)] font-medium leading-[1.7] text-[#52657D]">
                   يصل كل مستخدم إلى البيانات والإجراءات المرتبطة بدوره فقط.
                 </p>
               </div>
             </div>
 
-            {/* Card 2 */}
-            <div className="flex min-h-[177px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-              <div className="flex h-[32px] w-[32px] items-center justify-center rounded-[9px] bg-[#DDF4F5] text-[#2DBCC3]">
-                <FiHome size={17} strokeWidth={2} />
+            {/* ================= CARD 2 ================= */}
+            <div className="flex min-h-[clamp(165px,13vw,220px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(18px,1.8vw,30px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+              <div className="flex h-[clamp(30px,2.4vw,40px)] w-[clamp(30px,2.4vw,40px)] items-center justify-center rounded-[clamp(8px,0.7vw,11px)] bg-[#DDF4F5] text-[#2DBCC3]">
+                <FiHome className="text-[clamp(16px,1.2vw,21px)]" strokeWidth={2} />
               </div>
 
-              <div className="mt-4 text-right">
-                <h3 className="font-['Cairo'] text-[16px] font-bold leading-[24px] text-[#0F172A]">مراجعة المؤسسة</h3>
+              <div className="mt-[clamp(12px,1.2vw,20px)] text-right">
+                <h3 className="font-['Cairo'] text-[clamp(14px,1.15vw,19px)] font-bold leading-[1.5] text-[#0F172A]">مراجعة المؤسسة</h3>
 
-                <p className="mt-1 font-['Cairo'] text-[11px] font-medium leading-[20px] text-[#52657D]">
+                <p className="mt-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(11px,0.85vw,14px)] font-medium leading-[1.7] text-[#52657D]">
                   تمر الإجراءات الأساسية عبر المؤسسة المسؤولة قبل اعتمادها نهائيًا.
                 </p>
               </div>
             </div>
 
-            {/* Card 3 */}
-            <div className="flex min-h-[177px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-              <div className="flex h-[32px] w-[32px] items-center justify-center rounded-[9px] bg-[#F7F0E2] text-[#E5A72D]">
-                <FiClipboard size={17} strokeWidth={2} />
+            {/* ================= CARD 3 ================= */}
+            <div className="flex min-h-[clamp(165px,13vw,220px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(18px,1.8vw,30px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+              <div className="flex h-[clamp(30px,2.4vw,40px)] w-[clamp(30px,2.4vw,40px)] items-center justify-center rounded-[clamp(8px,0.7vw,11px)] bg-[#F7F0E2] text-[#E5A72D]">
+                <FiClipboard className="text-[clamp(16px,1.2vw,21px)]" strokeWidth={2} />
               </div>
 
-              <div className="mt-4 text-right">
-                <h3 className="font-['Cairo'] text-[16px] font-bold leading-[24px] text-[#0F172A]">توثيق الإجراءات</h3>
+              <div className="mt-[clamp(12px,1.2vw,20px)] text-right">
+                <h3 className="font-['Cairo'] text-[clamp(14px,1.15vw,19px)] font-bold leading-[1.5] text-[#0F172A]">توثيق الإجراءات</h3>
 
-                <p className="mt-1 font-['Cairo'] text-[11px] font-medium leading-[20px] text-[#52657D]">
+                <p className="mt-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(11px,0.85vw,14px)] font-medium leading-[1.7] text-[#52657D]">
                   تربط المستندات والدفعات والتحديثات برحلة الكفالة كاملة.
                 </p>
               </div>
             </div>
 
-            {/* Card 4 */}
-            <div className="flex min-h-[177px] w-full flex-col rounded-[16px] border border-[#E2EBF5] bg-[#F8FAFD] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
-              <div className="flex h-[32px] w-[32px] items-center justify-center rounded-[9px] bg-[#EAF8F1] text-[#16B77A]">
-                <FiEye size={17} strokeWidth={2} />
+            {/* ================= CARD 4 ================= */}
+            <div className="flex min-h-[clamp(165px,13vw,220px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(18px,1.8vw,30px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+              <div className="flex h-[clamp(30px,2.4vw,40px)] w-[clamp(30px,2.4vw,40px)] items-center justify-center rounded-[clamp(8px,0.7vw,11px)] bg-[#EAF8F1] text-[#16B77A]">
+                <FiEye className="text-[clamp(16px,1.2vw,21px)]" strokeWidth={2} />
               </div>
 
-              <div className="mt-4 text-right">
-                <h3 className="font-['Cairo'] text-[16px] font-bold leading-[24px] text-[#0F172A]">متابعة واضحة</h3>
+              <div className="mt-[clamp(12px,1.2vw,20px)] text-right">
+                <h3 className="font-['Cairo'] text-[clamp(14px,1.15vw,19px)] font-bold leading-[1.5] text-[#0F172A]">متابعة واضحة</h3>
 
-                <p className="mt-1 font-['Cairo'] text-[11px] font-medium leading-[20px] text-[#52657D]">
+                <p className="mt-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(11px,0.85vw,14px)] font-medium leading-[1.7] text-[#52657D]">
                   يمكن لكل طرف متابعة الإجراءات المرتبطة به دون لبس أو غموض.
                 </p>
               </div>
@@ -1041,53 +1118,53 @@ export default function LandingPage() {
       </section>
       {/* ================= Final CTA Section ================= */}
       {/* ================= Final CTA Section ================= */}
-      <section id="final-cta" dir="rtl" className="w-full bg-[#F4F7FB] px-5 py-16 sm:px-8 lg:px-8">
-        <div className="relative mx-auto flex min-h-[364px] w-full max-w-[1216px] items-center justify-center overflow-hidden rounded-[24px] border border-white/10 bg-gradient-to-br from-[#062246] via-[#0D4B8E] to-[#072B53] px-6 py-12 shadow-[0_14px_30px_rgba(6,34,70,0.18)] sm:px-10 lg:px-12">
+      <section id="final-cta" dir="rtl" className="w-full bg-[#F4F7FB] px-[clamp(16px,3vw,48px)] py-[clamp(48px,5vw,88px)]">
+        <div className="relative mx-auto flex min-h-[clamp(300px,27vw,430px)] w-full max-w-[clamp(1100px,85vw,1500px)] items-center justify-center overflow-hidden rounded-[clamp(18px,1.5vw,28px)] border border-white/10 bg-gradient-to-br from-[#062246] via-[#0D4B8E] to-[#072B53] px-[clamp(20px,4vw,64px)] py-[clamp(36px,4vw,64px)] shadow-[0_14px_30px_rgba(6,34,70,0.18)]">
           {/* Decorative circles */}
-          <div className="pointer-events-none absolute -bottom-28 -left-28 h-64 w-64 rounded-full border border-[#2DBCC3]/10 opacity-70" />
-          <div className="pointer-events-none absolute -bottom-20 -left-20 h-44 w-44 rounded-full border border-[#2DBCC3]/10" />
-          <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full border border-[#2DBCC3]/10" />
-          <div className="pointer-events-none absolute -right-12 -top-12 h-40 w-40 rounded-full border border-[#2DBCC3]/10" />
+          <div className="pointer-events-none absolute -bottom-[clamp(70px,7vw,130px)] -left-[clamp(70px,7vw,130px)] h-[clamp(180px,18vw,300px)] w-[clamp(180px,18vw,300px)] rounded-full border border-[#2DBCC3]/10 opacity-70" />
+          <div className="pointer-events-none absolute -bottom-[clamp(50px,5vw,95px)] -left-[clamp(50px,5vw,95px)] h-[clamp(125px,12vw,210px)] w-[clamp(125px,12vw,210px)] rounded-full border border-[#2DBCC3]/10" />
+          <div className="pointer-events-none absolute -right-[clamp(65px,6vw,120px)] -top-[clamp(65px,6vw,120px)] h-[clamp(180px,18vw,300px)] w-[clamp(180px,18vw,300px)] rounded-full border border-[#2DBCC3]/10" />
+          <div className="pointer-events-none absolute -right-[clamp(35px,3.5vw,65px)] -top-[clamp(35px,3.5vw,65px)] h-[clamp(115px,11vw,190px)] w-[clamp(115px,11vw,190px)] rounded-full border border-[#2DBCC3]/10" />
 
           {/* Small decorative dots */}
-          <span className="pointer-events-none absolute bottom-16 left-16 h-2 w-2 rounded-full bg-[#2DBCC3]/40" />
-          <span className="pointer-events-none absolute right-20 top-20 h-2 w-2 rounded-full bg-[#2DBCC3]/50" />
+          <span className="pointer-events-none absolute bottom-[clamp(35px,4vw,75px)] left-[clamp(35px,4vw,75px)] h-[clamp(6px,0.5vw,9px)] w-[clamp(6px,0.5vw,9px)] rounded-full bg-[#2DBCC3]/40" />
+          <span className="pointer-events-none absolute right-[clamp(40px,5vw,90px)] top-[clamp(40px,5vw,90px)] h-[clamp(6px,0.5vw,9px)] w-[clamp(6px,0.5vw,9px)] rounded-full bg-[#2DBCC3]/50" />
 
           {/* Content */}
-          <div className="relative z-10 flex w-full max-w-[672px] flex-col items-center gap-5 text-center">
+          <div className="relative z-10 flex w-full max-w-[clamp(620px,52vw,850px)] flex-col items-center gap-[clamp(16px,1.5vw,26px)] text-center">
             {/* Badge */}
-            <span className="inline-flex w-fit items-center rounded-[9999px] border border-[#2DBCC3]/20 bg-[#2DBCC3]/10 px-3 py-[7.5px] font-['Cairo'] text-[11px] font-semibold leading-[16px] text-[#2DBCC3]">
-              <span className="ml-1.5 h-1.5 w-1.5 rounded-full bg-[#2DBCC3]" />
+            <span className="inline-flex w-fit items-center rounded-full border border-[#2DBCC3]/20 bg-[#2DBCC3]/10 px-[clamp(11px,0.9vw,16px)] py-[clamp(6px,0.5vw,9px)] font-['Cairo'] text-[clamp(10px,0.75vw,13px)] font-semibold leading-[1.5] text-[#2DBCC3]">
+              <span className="ml-[clamp(5px,0.4vw,8px)] h-[clamp(5px,0.4vw,7px)] w-[clamp(5px,0.4vw,7px)] rounded-full bg-[#2DBCC3]" />
               ابدأ رحلتك اليوم مع كفيلي
             </span>
 
             {/* Title */}
-            <h2 className="font-['Cairo'] text-[28px] font-black leading-[40px] tracking-[-0.3px] text-white sm:text-[32px] lg:text-[36px]">
+            <h2 className="font-['Cairo'] text-[clamp(26px,2.5vw,44px)] font-black leading-[1.35] tracking-[-0.3px] text-white">
               رحلة كفالة أوضح تبدأ من هنا
             </h2>
 
             {/* Description */}
-            <p className="max-w-[672px] font-['Cairo'] text-[14px] font-medium leading-[24px] text-[#D6E4F0] sm:text-[15px] lg:text-[16px]">
+            <p className="max-w-[clamp(600px,52vw,850px)] font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.8] text-[#D6E4F0]">
               سواء كنت كفيلاً تريد متابعة كفالتك بوضوح، أو مؤسسة تريد تنظيم وإدارة كفالاتها، يجمع كفيلي الرحلة في منصة واحدة.
             </p>
 
             {/* Buttons */}
-            <div className="mt-1 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
+            <div className="mt-[clamp(2px,0.4vw,7px)] flex w-full flex-col items-center justify-center gap-[clamp(10px,0.8vw,14px)] min-[520px]:w-auto min-[520px]:flex-row">
               {/* Primary */}
               <button
                 type="button"
-                className="flex h-[54px] w-full items-center justify-center gap-2 rounded-[12px] bg-[#2DBCC3] px-8 font-['Cairo'] text-[14px] font-bold leading-[24px] text-[#062246] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#3ACDD4] hover:shadow-[0_8px_18px_rgba(45,188,195,0.25)] sm:w-auto"
+                className="flex h-[clamp(48px,3.8vw,60px)] w-full items-center justify-center gap-[clamp(7px,0.5vw,10px)] rounded-[clamp(10px,0.8vw,14px)] bg-[#2DBCC3] px-[clamp(24px,2vw,38px)] font-['Cairo'] text-[clamp(12px,0.9vw,16px)] font-bold leading-[1.5] text-[#062246] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#3ACDD4] hover:shadow-[0_8px_18px_rgba(45,188,195,0.25)] min-[520px]:w-auto"
               >
-                ابدأ الآن
-                <FiArrowLeft size={18} />
+                <span>ابدأ الآن</span>
+                <FiArrowLeft className="text-[clamp(16px,1.1vw,20px)]" />
               </button>
 
               {/* Secondary */}
               <button
                 type="button"
-                className="flex h-[54px] w-full items-center justify-center rounded-[12px] border border-white/20 bg-white/[0.10] px-8 font-['Cairo'] text-[14px] font-bold leading-[24px] text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/[0.16] sm:w-auto"
+                className="flex h-[clamp(48px,3.8vw,60px)] w-full items-center justify-center rounded-[clamp(10px,0.8vw,14px)] border border-white/20 bg-white/[0.10] px-[clamp(24px,2vw,38px)] font-['Cairo'] text-[clamp(12px,0.9vw,16px)] font-bold leading-[1.5] text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/[0.16] min-[520px]:w-auto"
               >
-                .. كفيلي للمؤسسات
+                كفيلي للمؤسسات
               </button>
             </div>
           </div>
