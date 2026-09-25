@@ -1164,7 +1164,7 @@ export default function LandingPage() {
                 type="button"
                 className="flex h-[clamp(48px,3.8vw,60px)] w-full items-center justify-center rounded-[clamp(10px,0.8vw,14px)] border border-white/20 bg-white/[0.10] px-[clamp(24px,2vw,38px)] font-['Cairo'] text-[clamp(12px,0.9vw,16px)] font-bold leading-[1.5] text-white transition-all duration-300 hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/[0.16] min-[520px]:w-auto"
               >
-                كفيلي للمؤسسات
+                . كفيلي للمؤسسات
               </button>
             </div>
           </div>
