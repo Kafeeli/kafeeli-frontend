@@ -416,6 +416,7 @@ import PublicRoute from "./routes/PublicRoute";
 import About from "./pages/About";
 import HowItWorks from "./pages/HowItWorks";
 import Contact from "./pages/contact";
+import Organizations from "./pages/Organizations";
 
 // import KafeeliPresentation from "./pages/KafeeliPresentation";
 
@@ -590,6 +591,20 @@ function AnimatedRoutes() {
               <Contact />
             </PageWrapper>
           }
+        />
+
+        <Route
+          path="/organizations"
+          element={
+            <PageWrapper>
+              <Organizations />
+            </PageWrapper>
+          }
+        />
+
+        <Route
+          path="/institutions"
+          element={<Navigate to="/organizations" replace />}
         />
 
         {/* Sponsor Dashboard */}

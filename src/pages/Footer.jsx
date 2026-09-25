@@ -4,9 +4,9 @@ import logo from "../assets/title.png";
 
 export default function Footer() {
   const quickLinks = [
-    { label: "كيف يعمل كفيلي", href: "#how" },
-    { label: "المؤسسات", href: "#institutions" },
-    { label: "تسجيل الدخول", href: "#login" },
+    { label: "كيف يعمل كفيلي", href: "/how-it-works" },
+    { label: "المؤسسات", href: "/organizations" },
+    { label: "تسجيل الدخول", href: "/login" },
   ];
 
   return (
