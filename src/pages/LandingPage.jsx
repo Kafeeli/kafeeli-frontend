@@ -157,26 +157,33 @@ export default function LandingPage() {
   ];
 
   return (
-    <div dir="rtl" className="min-h-screen bg-[#F8F9FA]">
+    <div dir="rtl" className="min-h-screen overflow-x-hidden bg-[#F8F9FA] font-['Cairo',sans-serif]">
       <Header />
       {/* Hero Section */}
 
       {/* ================= HERO SECTION ================= */}
-      {/* ================= HERO SECTION ================= */}
-      <section id="home" className="relative h-[100vh] w-full overflow-hidden">
+      <section id="home" dir="rtl" className="relative h-[100vh] w-full overflow-hidden">
         {/* ================= BACKGROUND ================= */}
         <div className="absolute inset-0">
           <img
             src={main}
             alt="Kafeeli"
-            className="h-full w-full object-cover object-[35%_center] sm:object-[40%_center] lg:object-center"
+            className="
+        h-full
+        w-full
+        object-cover
+        object-[35%_center]
+
+        sm:object-[40%_center]
+        lg:object-center
+      "
           />
 
           {/* Right Gradient */}
           <div
             className="absolute inset-0"
             style={{
-              background: "linear-gradient(270deg, rgba(4, 23, 48, 0.95) 0%, rgba(4, 23, 48, 0.65) 45%, rgba(4, 23, 48, 0.15) 100%)",
+              background: "linear-gradient(270deg, rgba(4,23,48,0.96) 0%, rgba(4,23,48,0.72) 45%, rgba(4,23,48,0.18) 100%)",
             }}
           />
 
@@ -184,100 +191,431 @@ export default function LandingPage() {
           <div
             className="absolute inset-0"
             style={{
-              background: "linear-gradient(0deg, #062244 0%, rgba(6, 34, 68, 0) 50%, rgba(0, 0, 0, 0.2) 100%)",
+              background: "linear-gradient(0deg, #062244 0%, rgba(6,34,68,0.12) 48%, rgba(0,0,0,0.18) 100%)",
             }}
           />
         </div>
 
-        {/* ================= CONTENT WRAPPER ================= */}
         {/* ================= CONTENT ================= */}
-        <div className="relative z-10 mx-auto flex h-full w-full max-w-[1600px] items-center justify-end px-[clamp(20px,5vw,96px)]">
-          <div className="ml-auto w-full max-w-[820px] translate-y-[clamp(20px,4vh,55px)] text-right 2xl:max-w-[900px]">
+        <div
+          className="
+      relative
+      z-10
+      mx-auto
+      flex
+      h-full
+      w-full
+      max-w-[1440px]
+      items-center
+      justify-center
+
+      px-4
+      py-4
+
+      sm:px-6
+      md:px-8
+
+      lg:justify-start
+      lg:px-16
+
+      xl:px-20
+      lg:translate-y-[30px]
+    "
+        >
+          {/* ================= CONTENT BLOCK ================= */}
+          <div
+            className="
+        w-full
+        max-w-[760px]
+        text-center
+
+        translate-y-[15px]
+
+        sm:translate-y-[20px]
+
+        md:max-w-[780px]
+        md:translate-y-[25px]
+
+        lg:ml-auto
+        lg:mr-0
+        lg:max-w-[780px]
+        lg:translate-y-[30px]
+        lg:text-right
+
+        xl:max-w-[820px]
+        xl:translate-y-[35px]
+
+        [@media(max-height:720px)]:translate-y-[10px]
+        [@media(max-height:650px)]:scale-[0.92]
+        [@media(max-height:650px)]:translate-y-0
+      "
+          >
             {/* ================= BADGE ================= */}
-            <div
-              dir="rtl"
-              className="mb-[clamp(18px,2.2vh,28px)] inline-flex w-fit items-center gap-[clamp(7px,0.6vw,11px)] rounded-full border border-[#5B7D9F] bg-[#183B60]/70 px-[clamp(12px,1vw,18px)] py-[clamp(5px,0.55vw,9px)] font-['Cairo'] text-[clamp(11px,0.8vw,15px)] font-bold leading-[1.5] text-white backdrop-blur-sm"
-            >
-              <span className="h-[clamp(8px,0.6vw,12px)] w-[clamp(8px,0.6vw,12px)] shrink-0 rounded-full bg-[#19C6D2]" />
-              <span>منصة رقمية لإدارة رحلة الكفالة</span>
+            <div className="flex justify-center lg:justify-start">
+              <div
+                className="
+            inline-flex
+            w-fit
+            items-center
+            gap-2
+
+            rounded-full
+            border
+            border-[#5B7D9F]
+
+            bg-[#183B60]/70
+
+            px-4
+            py-2
+
+            font-['Cairo']
+            text-[11px]
+            font-bold
+            text-white
+
+            backdrop-blur-sm
+
+            sm:text-[12px]
+            md:text-[13px]
+            lg:text-[14px]
+          "
+              >
+                <span className="h-2 w-2 shrink-0 rounded-full bg-[#19C6D2]" />
+
+                <span>منصة رقمية لإدارة رحلة الكفالة</span>
+              </div>
             </div>
 
             {/* ================= HEADING ================= */}
             <h1
-              dir="rtl"
-              className="text-right font-['Cairo'] text-[clamp(38px,4.7vw,76px)] font-black leading-[1.06] tracking-[-1px] text-white lg:tracking-[-1.5px] [@media(max-height:720px)]:text-[clamp(34px,4vw,58px)] [@media(max-height:620px)]:text-[clamp(30px,3.6vw,48px)]"
+              className="
+          mt-4
+
+          font-['Cairo']
+          text-[36px]
+          font-black
+          leading-[1.2]
+          tracking-[-1px]
+          text-white
+
+          sm:text-[42px]
+
+          md:mt-5
+          md:text-[50px]
+
+          lg:text-[56px]
+          lg:leading-[1.18]
+
+          xl:text-[62px]
+
+          2xl:text-[66px]
+
+          [@media(max-height:720px)]:text-[50px]
+          [@media(max-height:650px)]:text-[44px]
+        "
             >
-              <span className="mb-[clamp(10px,1.4vh,20px)] block">كفالة أوضح.</span>
+              <span className="block">كفالة أوضح.</span>
 
-              <span className="mb-[clamp(10px,1.4vh,20px)] block text-[#19C6D2]">متابعة أسهل.</span>
+              <span className="mt-1 block text-[#19C6D2]">متابعة أسهل.</span>
 
-              <span className="block text-[#A9D9EA]">رحلة موثقة.</span>
+              <span className="mt-1 block text-[#A9D9EA]">رحلة موثقة.</span>
             </h1>
 
             {/* ================= DESCRIPTION ================= */}
             <p
-              dir="rtl"
-              className="mt-[clamp(20px,2.6vh,32px)] max-w-[780px] text-right font-['Cairo'] text-[clamp(12px,1vw,17px)] font-normal leading-[1.9] text-white [@media(max-height:700px)]:mt-4 [@media(max-height:700px)]:text-[clamp(11px,0.9vw,14px)] [@media(max-height:620px)]:leading-[1.6]"
+              className="
+          mx-auto
+          mt-4
+          max-w-[760px]
+
+          font-['Cairo']
+          text-[13px]
+          font-medium
+          leading-[1.9]
+          text-white/90
+
+          sm:text-[14px]
+
+          md:mt-5
+          md:text-[15px]
+
+          lg:mx-0
+          lg:text-[16px]
+          lg:leading-[2]
+
+          xl:text-[17px]
+
+          [@media(max-height:700px)]:mt-3
+          [@media(max-height:700px)]:text-[14px]
+        "
             >
               كفيلي منصة رقمية تنظّم رحلة الكفالة بين المؤسسة والكفيل والوصي، وتجمع الإجراءات والدفعات والتحديثات ضمن رحلة واحدة واضحة
               وقابلة للمتابعة.
             </p>
 
             {/* ================= BUTTONS ================= */}
-            <div className="mt-[clamp(20px,2.6vh,32px)] flex flex-col items-start gap-3 min-[480px]:flex-row min-[480px]:justify-start min-[480px]:gap-4">
+            <div
+              className="
+          mt-5
+          flex
+          w-full
+          flex-col
+          gap-2.5
+
+          sm:flex-row
+          sm:items-center
+          sm:justify-center
+          sm:gap-3
+
+          md:mt-6
+
+          lg:w-auto
+          lg:justify-start
+
+          [@media(max-height:700px)]:mt-4
+        "
+            >
               {/* Start Button */}
               <button
                 type="button"
-                className="inline-flex h-[clamp(44px,4vw,54px)] w-full items-center justify-center gap-2 rounded-[12px] bg-[#19C6D2] px-[clamp(20px,1.8vw,30px)] font-['Cairo'] text-[clamp(12px,0.9vw,15px)] font-bold text-[#06345A] transition-all duration-300 hover:-translate-y-1 hover:bg-[#22D3DF] min-[480px]:w-auto"
+                className="
+            inline-flex
+            h-[50px]
+            w-full
+            items-center
+            justify-center
+            gap-2
+
+            rounded-[12px]
+            bg-[#19C6D2]
+
+            px-6
+
+            font-['Cairo']
+            text-[14px]
+            font-bold
+            text-[#06345A]
+
+            shadow-[0_8px_20px_rgba(25,198,210,0.20)]
+
+            transition-all
+            duration-300
+
+            hover:-translate-y-0.5
+            hover:bg-[#22D3DF]
+
+            sm:w-auto
+            sm:min-w-[155px]
+
+            md:h-[54px]
+            md:text-[15px]
+
+            lg:min-w-[175px]
+
+            [@media(max-height:650px)]:h-[48px]
+          "
               >
                 <span>ابدأ الآن</span>
-                <FiChevronLeft size={21} strokeWidth={2.5} className="shrink-0 text-[#06345A]" />
+
+                <FiChevronLeft size={20} strokeWidth={2.5} className="shrink-0 text-[#06345A]" />
               </button>
 
-              {/* How It Works */}
+              {/* How It Works Button */}
               <button
                 type="button"
-                className="inline-flex h-[clamp(44px,4vw,54px)] w-full items-center justify-center gap-2 rounded-[12px] border border-white/30 bg-white/10 px-[clamp(20px,1.8vw,30px)] font-['Cairo'] text-[clamp(12px,0.9vw,15px)] font-bold text-white backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/20 min-[480px]:w-auto"
+                className="
+            inline-flex
+            h-[50px]
+            w-full
+            items-center
+            justify-center
+            gap-2
+
+            rounded-[12px]
+
+            border
+            border-white/30
+
+            bg-white/10
+
+            px-6
+
+            font-['Cairo']
+            text-[14px]
+            font-bold
+            text-white
+
+            backdrop-blur-sm
+
+            transition-all
+            duration-300
+
+            hover:-translate-y-0.5
+            hover:bg-white/20
+
+            sm:w-auto
+            sm:min-w-[190px]
+
+            md:h-[54px]
+            md:text-[15px]
+
+            lg:min-w-[210px]
+
+            [@media(max-height:650px)]:h-[48px]
+          "
               >
-                <FiInfo size={16} className="shrink-0 text-[#19C6D2]" />
+                <FiInfo size={17} className="shrink-0 text-[#19C6D2]" />
+
                 <span>كيف تعمل كفيلي</span>
               </button>
             </div>
 
             {/* ================= TRUST POINTS ================= */}
-            <div className="mt-[clamp(22px,3vh,38px)] border-t border-white/20 pt-[clamp(16px,2vh,26px)]">
-              <div className="grid grid-cols-1 gap-3 min-[520px]:grid-cols-3 min-[520px]:gap-[clamp(14px,1.4vw,24px)]">
-                {/* Point 1 */}
+            <div
+              className="
+          mx-auto
+          mt-5
+          w-full
+          max-w-[720px]
+
+          border-t
+          border-white/20
+
+          pt-4
+
+          lg:mx-0
+
+          md:mt-6
+
+          [@media(max-height:700px)]:mt-4
+          [@media(max-height:700px)]:pt-3
+        "
+            >
+              <div
+                className="
+            flex
+            flex-col
+            items-start
+            justify-start
+            gap-2.5
+
+            sm:flex-row
+            sm:flex-wrap
+            sm:items-center
+            sm:justify-center
+            sm:gap-x-5
+            sm:gap-y-3
+
+            lg:justify-start
+            lg:gap-x-6
+          "
+              >
+                {/* ================= POINT 1 ================= */}
                 <div
                   dir="rtl"
-                  className="flex items-center gap-2.5 font-['Cairo'] text-[clamp(10px,0.8vw,14px)] font-semibold text-gray-200"
+                  className="
+              flex
+              items-center
+              gap-2
+
+              font-['Cairo']
+              text-[11px]
+              font-semibold
+              text-gray-200
+
+              sm:text-[12px]
+              md:text-[13px]
+            "
                 >
-                  <span className="grid h-[clamp(26px,2vw,34px)] w-[clamp(26px,2vw,34px)] shrink-0 place-items-center rounded-full bg-[#164263] text-[#19C6D2]">
-                    <PiCheckCircle className="text-[clamp(17px,1.3vw,21px)]" />
+                  <span
+                    className="
+                grid
+                h-7
+                w-7
+                shrink-0
+                place-items-center
+
+                rounded-full
+                bg-[#164263]
+                text-[#19C6D2]
+              "
+                  >
+                    <PiCheckCircle size={18} />
                   </span>
-                  <span>إجراءات منظمة وموثقة</span>
+
+                  <span className="whitespace-nowrap">إجراءات منظمة وموثقة</span>
                 </div>
 
-                {/* Point 2 */}
+                {/* ================= POINT 2 ================= */}
                 <div
                   dir="rtl"
-                  className="flex items-center gap-2.5 font-['Cairo'] text-[clamp(10px,0.8vw,14px)] font-semibold text-gray-200"
+                  className="
+              flex
+              items-center
+              gap-2
+
+              font-['Cairo']
+              text-[11px]
+              font-semibold
+              text-gray-200
+
+              sm:text-[12px]
+              md:text-[13px]
+            "
                 >
-                  <span className="grid h-[clamp(26px,2vw,34px)] w-[clamp(26px,2vw,34px)] shrink-0 place-items-center rounded-full bg-[#164263] text-[#19C6D2]">
-                    <PiCheckCircle className="text-[clamp(17px,1.3vw,21px)]" />
+                  <span
+                    className="
+                grid
+                h-7
+                w-7
+                shrink-0
+                place-items-center
+
+                rounded-full
+                bg-[#164263]
+                text-[#19C6D2]
+              "
+                  >
+                    <PiCheckCircle size={18} />
                   </span>
-                  <span>خصوصية وصلاحيات متقدمة</span>
+
+                  <span className="whitespace-nowrap">خصوصية وصلاحيات متقدمة</span>
                 </div>
 
-                {/* Point 3 */}
+                {/* ================= POINT 3 ================= */}
                 <div
                   dir="rtl"
-                  className="flex items-center gap-2.5 font-['Cairo'] text-[clamp(10px,0.8vw,14px)] font-semibold text-gray-200"
+                  className="
+              flex
+              items-center
+              gap-2
+
+              font-['Cairo']
+              text-[11px]
+              font-semibold
+              text-gray-200
+
+              sm:text-[12px]
+              md:text-[13px]
+            "
                 >
-                  <span className="grid h-[clamp(26px,2vw,34px)] w-[clamp(26px,2vw,34px)] shrink-0 place-items-center rounded-full bg-[#164263] text-[#19C6D2]">
-                    <PiCheckCircle className="text-[clamp(17px,1.3vw,21px)]" />
+                  <span
+                    className="
+                grid
+                h-7
+                w-7
+                shrink-0
+                place-items-center
+
+                rounded-full
+                bg-[#164263]
+                text-[#19C6D2]
+              "
+                  >
+                    <PiCheckCircle size={18} />
                   </span>
-                  <span>شفافية في كل خطوة</span>
+
+                  <span className="whitespace-nowrap">شفافية في كل خطوة</span>
                 </div>
               </div>
             </div>
@@ -285,8 +623,8 @@ export default function LandingPage() {
         </div>
       </section>
       {/* ================= GOVERNANCE SECTION ================= */}
-      <section id="governance" className="bg-white px-[clamp(16px,3vw,48px)] py-[clamp(48px,5vw,90px)]">
-        <div className="mx-auto w-full max-w-[clamp(1100px,88vw,1500px)]">
+      <section id="governance" className="w-full bg-white px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <div className="mx-auto w-full max-w-[1280px]">
           {/* ================= HEADER ================= */}
           <div className="flex flex-col items-center text-center">
             <div
@@ -298,21 +636,21 @@ export default function LandingPage() {
 
             <h2
               dir="rtl"
-              className="mt-[clamp(12px,1.2vw,20px)] text-center font-['Cairo'] text-[clamp(26px,2.5vw,44px)] font-black leading-[1.35] tracking-[0px] text-[#101828]"
+              className="mt-[clamp(12px,1.2vw,20px)] text-center font-['Cairo'] text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.35] tracking-[0px] text-[#101828]"
             >
               رحلة واحدة تجمع أطراف الكفالة
             </h2>
 
             <p
               dir="rtl"
-              className="mt-[clamp(10px,1vw,16px)] max-w-[clamp(600px,50vw,850px)] text-center font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.75] tracking-[0px] text-[#667085]"
+              className="mt-[clamp(10px,1vw,16px)] max-w-[clamp(600px,50vw,850px)] text-center font-['Cairo'] text-sm sm:text-base lg:text-lg font-medium leading-[1.75] tracking-[0px] text-[#667085]"
             >
               لوحة رقمية متكاملة تضمن معرفة كل طرف بمهامه ومسؤولياته في كل لحظة.
             </p>
           </div>
 
           {/* ================= CARDS ================= */}
-          <div className="mt-[clamp(28px,3vw,52px)] grid grid-cols-1 justify-items-center gap-[clamp(16px,1.5vw,26px)] md:grid-cols-3">
+          <div className="mt-[clamp(28px,3vw,52px)] grid grid-cols-1 justify-items-center gap-[clamp(16px,1.5vw,26px)] md:grid-cols-2 lg:grid-cols-3">
             {/* ================= INSTITUTION ================= */}
             <div className="flex h-full min-h-[clamp(280px,22vw,360px)] w-full max-w-none flex-col rounded-[clamp(18px,1.5vw,26px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(20px,2vw,32px)] transition duration-300 hover:-translate-y-1 hover:shadow-md">
               <div className="flex items-center justify-between gap-4">
@@ -322,14 +660,14 @@ export default function LandingPage() {
 
                 <span
                   dir="rtl"
-                  className="rounded-full bg-[#EAF0F7] px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-semibold text-[#315B8C]"
+                  className="rounded-full bg-[#EAF0F7] px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-sm sm:text-[15px] font-semibold text-[#315B8C]"
                 >
                   الطرف الأول
                 </span>
               </div>
 
               <div className="mt-[clamp(16px,1.5vw,24px)] flex flex-1 flex-col text-right">
-                <h3 dir="rtl" className="font-['Cairo'] text-[clamp(17px,1.4vw,23px)] font-bold leading-[1.45] text-[#101828]">
+                <h3 dir="rtl" className="font-['Cairo'] text-xl sm:text-2xl font-bold leading-[1.45] text-[#101828]">
                   المؤسسة
                 </h3>
 
@@ -342,7 +680,7 @@ export default function LandingPage() {
 
                 <p
                   dir="rtl"
-                  className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(11px,0.9vw,15px)] font-medium leading-[1.7] text-[#667085]"
+                  className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-sm sm:text-[15px] font-medium leading-[1.7] text-[#667085]"
                 >
                   إدارة وتنظيم الكفالات ومتابعة الحالات والبيانات والتأكد من استيفاء المتطلبات.
                 </p>
@@ -350,7 +688,7 @@ export default function LandingPage() {
                 <div className="mt-auto flex min-h-[clamp(42px,3.5vw,50px)] w-full items-center justify-between gap-2 rounded-[clamp(10px,0.8vw,13px)] border border-[#E2EBF5] bg-white px-[clamp(10px,0.9vw,14px)]">
                   <span className="font-['Cairo'] text-[clamp(10px,0.8vw,13px)] font-bold text-[#334155]">الحالة التشغيلية</span>
 
-                  <span className="rounded-[4px] border border-[#DDE6F0] bg-[#F3F7FB] px-[clamp(7px,0.6vw,11px)] py-[clamp(4px,0.3vw,6px)] text-center font-['Cairo'] text-[clamp(9px,0.7vw,12px)] font-semibold leading-none text-[#19579A]">
+                  <span className="rounded-[4px] border border-[#DDE6F0] bg-[#F3F7FB] px-[clamp(7px,0.6vw,11px)] py-[clamp(4px,0.3vw,6px)] text-center font-['Cairo'] text-xs font-semibold leading-none text-[#19579A]">
                     صلاحيات إدارية كاملة
                   </span>
                 </div>
@@ -366,14 +704,14 @@ export default function LandingPage() {
 
                 <span
                   dir="rtl"
-                  className="rounded-full bg-[#E6F8F9] px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-semibold text-[#2DBCC3]"
+                  className="rounded-full bg-[#E6F8F9] px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-sm sm:text-[15px] font-semibold text-[#2DBCC3]"
                 >
                   الطرف الثاني
                 </span>
               </div>
 
               <div className="mt-[clamp(16px,1.5vw,24px)] flex flex-1 flex-col text-right">
-                <h3 dir="rtl" className="font-['Cairo'] text-[clamp(17px,1.4vw,23px)] font-bold leading-[1.45] text-[#101828]">
+                <h3 dir="rtl" className="font-['Cairo'] text-xl sm:text-2xl font-bold leading-[1.45] text-[#101828]">
                   الكفيل
                 </h3>
 
@@ -386,7 +724,7 @@ export default function LandingPage() {
 
                 <p
                   dir="rtl"
-                  className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(11px,0.9vw,15px)] font-medium leading-[1.7] text-[#667085]"
+                  className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-sm sm:text-[15px] font-medium leading-[1.7] text-[#667085]"
                 >
                   اختيار الحالة المناسبة وإنشاء الكفالة ومتابعة الدفعات والتحديثات الخاصة بها.
                 </p>
@@ -394,7 +732,7 @@ export default function LandingPage() {
                 <div className="mt-auto flex min-h-[clamp(42px,3.5vw,50px)] items-center justify-between gap-2 rounded-[clamp(10px,0.8vw,13px)] border border-[#E2EBF5] bg-white px-[clamp(10px,0.9vw,14px)]">
                   <span className="font-['Cairo'] text-[clamp(10px,0.8vw,13px)] font-bold text-[#334155]">قناة المتابعة</span>
 
-                  <span className="rounded-[4px] border border-[#BDECEF] bg-[#F2FBFC] px-[clamp(7px,0.6vw,11px)] py-[clamp(4px,0.3vw,6px)] text-center font-['Cairo'] text-[clamp(9px,0.7vw,12px)] font-semibold leading-none text-[#2DBCC3]">
+                  <span className="rounded-[4px] border border-[#BDECEF] bg-[#F2FBFC] px-[clamp(7px,0.6vw,11px)] py-[clamp(4px,0.3vw,6px)] text-center font-['Cairo'] text-xs font-semibold leading-none text-[#2DBCC3]">
                     متابعة شفافة ومباشرة
                   </span>
                 </div>
@@ -410,14 +748,14 @@ export default function LandingPage() {
 
                 <span
                   dir="rtl"
-                  className="rounded-full bg-[#FFF5DF] px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-semibold text-[#D9A441]"
+                  className="rounded-full bg-[#FFF5DF] px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-sm sm:text-[15px] font-semibold text-[#D9A441]"
                 >
                   الطرف الثالث
                 </span>
               </div>
 
               <div className="mt-[clamp(16px,1.5vw,24px)] flex flex-1 flex-col text-right">
-                <h3 dir="rtl" className="font-['Cairo'] text-[clamp(17px,1.4vw,23px)] font-bold leading-[1.45] text-[#101828]">
+                <h3 dir="rtl" className="font-['Cairo'] text-xl sm:text-2xl font-bold leading-[1.45] text-[#101828]">
                   الوصي
                 </h3>
 
@@ -430,7 +768,7 @@ export default function LandingPage() {
 
                 <p
                   dir="rtl"
-                  className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(11px,0.9vw,15px)] font-medium leading-[1.7] text-[#667085]"
+                  className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-sm sm:text-[15px] font-medium leading-[1.7] text-[#667085]"
                 >
                   تقديم البيانات والوثائق المطلوبة ومتابعة حالة الكفالة والتحويلات المتعلقة بالحالة.
                 </p>
@@ -438,7 +776,7 @@ export default function LandingPage() {
                 <div className="mt-auto flex min-h-[clamp(42px,3.5vw,50px)] items-center justify-between gap-2 rounded-[clamp(10px,0.8vw,13px)] border border-[#E2EBF5] bg-white px-[clamp(10px,0.9vw,14px)]">
                   <span className="font-['Cairo'] text-[clamp(10px,0.8vw,13px)] font-bold text-[#334155]">البيئة التفاعلية</span>
 
-                  <span className="rounded-[4px] border border-[#F3D9A0] bg-[#FFFBF2] px-[clamp(7px,0.6vw,11px)] py-[clamp(4px,0.3vw,6px)] text-center font-['Cairo'] text-[clamp(9px,0.7vw,12px)] font-semibold leading-none text-[#D99A22]">
+                  <span className="rounded-[4px] border border-[#F3D9A0] bg-[#FFFBF2] px-[clamp(7px,0.6vw,11px)] py-[clamp(4px,0.3vw,6px)] text-center font-['Cairo'] text-xs font-semibold leading-none text-[#D99A22]">
                     حفظ الخصوصية والكرامة
                   </span>
                 </div>
@@ -449,19 +787,19 @@ export default function LandingPage() {
       </section>
 
       {/* ================= PROBLEM SECTION ================= */}
-      <section id="problem" dir="rtl" className="w-full bg-[#F4F7FB] px-[clamp(16px,3vw,48px)] py-[clamp(50px,5vw,90px)]">
-        <div className="mx-auto w-full max-w-[clamp(1100px,88vw,1500px)]">
+      <section id="problem" dir="rtl" className="w-full bg-[#F4F7FB] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <div className="mx-auto w-full max-w-[1280px]">
           {/* ================= HEADER ================= */}
-          <div className="mx-auto flex w-full max-w-[clamp(650px,55vw,900px)] flex-col items-center text-center">
-            <span className="rounded-full border border-[#FFD9DF] bg-[#FFF1F2] px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-[clamp(10px,0.75vw,13px)] font-bold leading-[1.5] text-[#F04461]">
+          <div className="mx-auto flex w-full max-w-[768px] flex-col items-center text-center">
+            <span className="rounded-full border border-[#FFD9DF] bg-[#FFF1F2] px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-xs sm:text-sm font-bold leading-[1.5] text-[#F04461]">
               التحدي القائم
             </span>
 
-            <h2 className="mt-[clamp(12px,1.2vw,20px)] font-['Cairo'] text-[clamp(26px,2.5vw,44px)] font-black leading-[1.35] tracking-[-0.3px] text-[#101828]">
+            <h2 className="mt-[clamp(12px,1.2vw,20px)] font-['Cairo'] text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.35] tracking-[-0.3px] text-[#101828]">
               إدارة الكفالة لا تنتهي عند الدفع
             </h2>
 
-            <p className="mt-[clamp(12px,1.2vw,20px)] max-w-[clamp(620px,55vw,900px)] font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.75] text-[#667085]">
+            <p className="mt-[clamp(12px,1.2vw,20px)] max-w-[768px] font-['Cairo'] text-sm sm:text-base lg:text-lg font-medium leading-[1.75] text-[#667085]">
               رحلة الكفالة تشمل بيانات ومستندات ودفعات ومراجعات وتحديثات وشراكات، لكنها لا تنتهي هنا.
               <br className="hidden sm:block" />
               العمليات موزعة بين الملفات والمحادثات والأدوات المختلفة، فيصبح الإدارة والمتابعة والتوثيق أكثر صعوبة.
@@ -469,7 +807,7 @@ export default function LandingPage() {
           </div>
 
           {/* ================= PROBLEM CARDS ================= */}
-          <div className="mt-[clamp(30px,3vw,52px)] grid grid-cols-1 gap-[clamp(16px,1.5vw,26px)] md:grid-cols-3">
+          <div className="mt-[clamp(30px,3vw,52px)] grid grid-cols-1 gap-[clamp(16px,1.5vw,26px)] md:grid-cols-2 lg:grid-cols-3">
             {/* Card 1 */}
             <div className="flex min-h-[clamp(200px,16vw,270px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-white p-[clamp(20px,2vw,30px)] shadow-[0_4px_12px_rgba(16,24,40,0.03)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
               <div className="flex justify-start">
@@ -479,11 +817,9 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
-                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-[#101828]">
-                  ملفات وإجراءات متفرقة
-                </h3>
+                <h3 className="font-['Cairo'] text-lg sm:text-xl font-bold leading-[1.5] text-[#101828]">ملفات وإجراءات متفرقة</h3>
 
-                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(11px,0.9vw,15px)] font-medium leading-[1.7] text-[#667085]">
+                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-sm sm:text-[15px] font-medium leading-[1.7] text-[#667085]">
                   بيانات الكفالة قد تكون موزعة بين أكثر من أداة، مما يزيد من احتمالية ضياع المعلومات المهمة.
                 </p>
               </div>
@@ -498,9 +834,9 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
-                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-[#101828]">متابعة غير متكاملة</h3>
+                <h3 className="font-['Cairo'] text-lg sm:text-xl font-bold leading-[1.5] text-[#101828]">متابعة غير متكاملة</h3>
 
-                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(11px,0.9vw,15px)] font-medium leading-[1.7] text-[#667085]">
+                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-sm sm:text-[15px] font-medium leading-[1.7] text-[#667085]">
                   كل طرف قد يرى جزءًا من الرحلة دون رؤية منظومة الإجراءات المرتبطة به أو المعرفة الدقيقة بالمرحلة التالية.
                 </p>
               </div>
@@ -515,11 +851,9 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
-                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-[#101828]">
-                  توثيق يحتاج إلى تنظيم
-                </h3>
+                <h3 className="font-['Cairo'] text-lg sm:text-xl font-bold leading-[1.5] text-[#101828]">توثيق يحتاج إلى تنظيم</h3>
 
-                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(11px,0.9vw,15px)] font-medium leading-[1.7] text-[#667085]">
+                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-sm sm:text-[15px] font-medium leading-[1.7] text-[#667085]">
                   المستندات والمعلومات تحتاج إلى سجل واضح وموحد يربط كل كفالة بمراحلها وتحديثاتها.
                 </p>
               </div>
@@ -538,9 +872,9 @@ export default function LandingPage() {
               </div>
 
               <div className="text-right">
-                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-white">من هنا جاءت كفيلي.</h3>
+                <h3 className="font-['Cairo'] text-lg sm:text-xl font-bold leading-[1.5] text-white">من هنا جاءت كفيلي.</h3>
 
-                <p className="mt-[clamp(6px,0.6vw,10px)] max-w-[clamp(600px,60vw,950px)] font-['Cairo'] text-[clamp(11px,0.9vw,15px)] font-medium leading-[1.7] text-[#D6E4F0]">
+                <p className="mt-[clamp(6px,0.6vw,10px)] max-w-[clamp(600px,60vw,950px)] font-['Cairo'] text-sm sm:text-[15px] font-medium leading-[1.7] text-[#D6E4F0]">
                   صممنا تجربة رقمية تجمع أطراف الكفالة في مكان واحد وتساعد على تنظيمها ومتابعتها بأعلى درجات الموثوقية.
                 </p>
               </div>
@@ -560,26 +894,26 @@ export default function LandingPage() {
       <section
         id="solution"
         dir="rtl"
-        className="w-full overflow-hidden bg-gradient-to-b from-[#062246] via-[#0D4B8E] to-[#062246] px-[clamp(16px,3vw,48px)] py-[clamp(56px,5vw,96px)]"
+        className="w-full overflow-hidden bg-gradient-to-b from-[#062246] via-[#0D4B8E] to-[#062246] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24"
       >
-        <div className="mx-auto w-full max-w-[clamp(1100px,88vw,1500px)]">
+        <div className="mx-auto w-full max-w-[1280px]">
           {/* ================= HEADER ================= */}
-          <div className="mx-auto flex w-full max-w-[clamp(650px,55vw,900px)] flex-col items-center text-center">
-            <span className="rounded-full border border-[#2DBCC3]/30 bg-[#2DBCC3]/10 px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-[clamp(10px,0.75vw,13px)] font-semibold leading-[1.5] text-[#2DBCC3]">
+          <div className="mx-auto flex w-full max-w-[768px] flex-col items-center text-center">
+            <span className="rounded-full border border-[#2DBCC3]/30 bg-[#2DBCC3]/10 px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-xs sm:text-sm font-semibold leading-[1.5] text-[#2DBCC3]">
               الحل والتوجيه
             </span>
 
-            <h2 className="mt-[clamp(10px,0.8vw,14px)] font-['Cairo'] text-[clamp(28px,2.7vw,46px)] font-black leading-[1.3] text-white">
+            <h2 className="mt-[clamp(10px,0.8vw,14px)] font-['Cairo'] text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.3] text-white">
               منظومة واحدة لإدارة رحلة الكفالة
             </h2>
 
-            <p className="mt-[clamp(12px,1vw,18px)] max-w-[clamp(620px,52vw,850px)] font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.75] text-[#D6E4F0]">
+            <p className="mt-[clamp(12px,1vw,18px)] max-w-[768px] font-['Cairo'] text-sm sm:text-base lg:text-lg font-medium leading-[1.75] text-[#D6E4F0]">
               كفيلي تجمع المؤسسة والكفيل والوصي ضمن رحلة رقمية واحدة، بحيث يعرف كل طرف دوره وما يحتاج إليه.
             </p>
           </div>
 
           {/* ================= CARDS ================= */}
-          <div className="mt-[clamp(30px,3vw,52px)] grid grid-cols-1 gap-[clamp(14px,1.3vw,22px)] md:grid-cols-3">
+          <div className="mt-[clamp(30px,3vw,52px)] grid grid-cols-1 gap-[clamp(14px,1.3vw,22px)] md:grid-cols-2 lg:grid-cols-3">
             {/* Institution */}
             <div className="flex min-h-[clamp(230px,18vw,310px)] flex-col rounded-[clamp(18px,1.4vw,26px)] border border-white/10 bg-white/[0.10] p-[clamp(20px,2vw,32px)] backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/[0.14]">
               <div className="flex justify-start">
@@ -589,9 +923,9 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
-                <h3 className="font-['Cairo'] text-[clamp(20px,1.8vw,30px)] font-bold leading-[1.35] text-white">المؤسسة</h3>
+                <h3 className="font-['Cairo'] text-2xl sm:text-[26px] lg:text-3xl font-bold leading-[1.35] text-white">المؤسسة</h3>
 
-                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(12px,0.95vw,16px)] font-medium leading-[1.7] text-[#D6E4F0]">
+                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-sm sm:text-base font-medium leading-[1.7] text-[#D6E4F0]">
                   تدير حالات الكفالة والكفلاء، وتراجع المستندات والدفعات وتضمن رحلة منظمة وشفافة.
                 </p>
 
@@ -611,9 +945,9 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
-                <h3 className="font-['Cairo'] text-[clamp(20px,1.8vw,30px)] font-bold leading-[1.35] text-white">الكفيل</h3>
+                <h3 className="font-['Cairo'] text-2xl sm:text-[26px] lg:text-3xl font-bold leading-[1.35] text-white">الكفيل</h3>
 
-                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(12px,0.95vw,16px)] font-medium leading-[1.7] text-[#D6E4F0]">
+                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-sm sm:text-base font-medium leading-[1.7] text-[#D6E4F0]">
                   يتابع كفالته ومعطياتها والتحديثات المرتبطة بها، ويتمكن من رؤية آخر المستجدات بوضوح.
                 </p>
 
@@ -633,9 +967,9 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
-                <h3 className="font-['Cairo'] text-[clamp(20px,1.8vw,30px)] font-bold leading-[1.35] text-white">الوصي</h3>
+                <h3 className="font-['Cairo'] text-2xl sm:text-[26px] lg:text-3xl font-bold leading-[1.35] text-white">الوصي</h3>
 
-                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-[clamp(12px,0.95vw,16px)] font-medium leading-[1.7] text-[#D6E4F0]">
+                <p className="mt-[clamp(10px,1vw,16px)] font-['Cairo'] text-sm sm:text-base font-medium leading-[1.7] text-[#D6E4F0]">
                   يتابع الإجراءات المرتبطة بالحالة ويرفع المستندات والتحديثات المطلوبة وفق النظام.
                 </p>
 
@@ -652,23 +986,23 @@ export default function LandingPage() {
             <div className="text-right">
               <p className="font-['Cairo'] text-[clamp(10px,0.8vw,13px)] font-medium leading-[1.5] text-[#2DBCC3]">كفيلي تضمن المصداقية</p>
 
-              <h3 className="mt-[clamp(7px,0.7vw,12px)] font-['Cairo'] text-[clamp(17px,1.4vw,23px)] font-bold leading-[1.4] text-white">
+              <h3 className="mt-[clamp(7px,0.7vw,12px)] font-['Cairo'] text-xl sm:text-2xl font-bold leading-[1.4] text-white">
                 ركائز المنظومة:
               </h3>
             </div>
 
             <div className="flex w-full flex-wrap items-center gap-[clamp(8px,1vw,16px)] sm:w-auto">
-              <span className="rounded-[8px] bg-[#12385F] px-[clamp(12px,1.1vw,18px)] py-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-semibold text-white">
+              <span className="rounded-[8px] bg-[#12385F] px-[clamp(12px,1.1vw,18px)] py-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-sm sm:text-[15px] font-semibold text-white">
                 <span className="ml-2 text-[#2DBCC3]">✓</span>
                 تنظيم
               </span>
 
-              <span className="rounded-[8px] bg-[#12385F] px-[clamp(12px,1.1vw,18px)] py-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-semibold text-white">
+              <span className="rounded-[8px] bg-[#12385F] px-[clamp(12px,1.1vw,18px)] py-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-sm sm:text-[15px] font-semibold text-white">
                 <span className="ml-2 text-[#2DBCC3]">✓</span>
                 توثيق
               </span>
 
-              <span className="rounded-[8px] bg-[#12385F] px-[clamp(12px,1.1vw,18px)] py-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-semibold text-white">
+              <span className="rounded-[8px] bg-[#12385F] px-[clamp(12px,1.1vw,18px)] py-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-sm sm:text-[15px] font-semibold text-white">
                 <span className="ml-2 text-[#2DBCC3]">✓</span>
                 متابعة
               </span>
@@ -678,19 +1012,19 @@ export default function LandingPage() {
       </section>
 
       {/* ================= WHY KAFEELI SECTION ================= */}
-      <section id="why-kafeeli" dir="rtl" className="w-full bg-white px-[clamp(16px,3vw,48px)] py-[clamp(50px,5vw,90px)]">
-        <div className="mx-auto w-full max-w-[clamp(1100px,88vw,1500px)]">
+      <section id="why-kafeeli" dir="rtl" className="w-full bg-white px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <div className="mx-auto w-full max-w-[1280px]">
           {/* ================= HEADER ================= */}
-          <div className="mx-auto flex w-full max-w-[clamp(650px,55vw,900px)] flex-col items-center text-center">
-            <span className="inline-flex items-center justify-center rounded-full bg-[#EAF0F7] px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.4vw,7px)] font-['Cairo'] text-[clamp(9px,0.7vw,12px)] font-semibold leading-[1.5] text-[#19579A]">
+          <div className="mx-auto flex w-full max-w-[768px] flex-col items-center text-center">
+            <span className="inline-flex items-center justify-center rounded-full bg-[#EAF0F7] px-[clamp(10px,0.8vw,14px)] py-[clamp(4px,0.4vw,7px)] font-['Cairo'] text-xs font-semibold leading-[1.5] text-[#19579A]">
               القيمة المضافة
             </span>
 
-            <h2 className="mt-[clamp(9px,0.8vw,14px)] font-['Cairo'] text-[clamp(26px,2.5vw,44px)] font-black leading-[1.35] tracking-[0px] text-[#0F172A]">
+            <h2 className="mt-[clamp(9px,0.8vw,14px)] font-['Cairo'] text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.35] tracking-[0px] text-[#0F172A]">
               لماذا كفيلي؟
             </h2>
 
-            <p className="mt-[clamp(12px,1.2vw,20px)] max-w-[clamp(620px,55vw,900px)] font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.75] text-[#667085]">
+            <p className="mt-[clamp(12px,1.2vw,20px)] max-w-[768px] font-['Cairo'] text-sm sm:text-base lg:text-lg font-medium leading-[1.75] text-[#667085]">
               لأن التحدي ليس فقط بدء الكفالة، بل في إدارتها وتوثيقها.
             </p>
           </div>
@@ -706,9 +1040,9 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
-                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-[#0F172A]">إدارة متكاملة</h3>
+                <h3 className="font-['Cairo'] text-lg sm:text-xl font-bold leading-[1.5] text-[#0F172A]">إدارة متكاملة</h3>
 
-                <p className="mt-[clamp(7px,0.7vw,11px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-medium leading-[1.7] text-[#667085]">
+                <p className="mt-[clamp(7px,0.7vw,11px)] font-['Cairo'] text-sm sm:text-[15px] font-medium leading-[1.7] text-[#667085]">
                   تنظيم الحالات والكفلاء والأوصياء والكفالات من مكان واحد وبدون تشتيت.
                 </p>
               </div>
@@ -723,9 +1057,9 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
-                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-[#0F172A]">رحلة قابلة للتتبع</h3>
+                <h3 className="font-['Cairo'] text-lg sm:text-xl font-bold leading-[1.5] text-[#0F172A]">رحلة قابلة للتتبع</h3>
 
-                <p className="mt-[clamp(7px,0.7vw,11px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-medium leading-[1.7] text-[#667085]">
+                <p className="mt-[clamp(7px,0.7vw,11px)] font-['Cairo'] text-sm sm:text-[15px] font-medium leading-[1.7] text-[#667085]">
                   معرفة المرحلة الحالية لكل كفالة والتحديثات المرتبطة بها بوضوح زمني كامل.
                 </p>
               </div>
@@ -740,9 +1074,9 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
-                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-[#0F172A]">توثيق واضح</h3>
+                <h3 className="font-['Cairo'] text-lg sm:text-xl font-bold leading-[1.5] text-[#0F172A]">توثيق واضح</h3>
 
-                <p className="mt-[clamp(7px,0.7vw,11px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-medium leading-[1.7] text-[#667085]">
+                <p className="mt-[clamp(7px,0.7vw,11px)] font-['Cairo'] text-sm sm:text-[15px] font-medium leading-[1.7] text-[#667085]">
                   ربط المستندات والمدفوعات والتحديثات برحلة الكفالة في سجل موثوق ومعتمد.
                 </p>
               </div>
@@ -757,9 +1091,9 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-[clamp(16px,1.5vw,24px)] text-right">
-                <h3 className="font-['Cairo'] text-[clamp(15px,1.2vw,20px)] font-bold leading-[1.5] text-[#0F172A]">صلاحيات وخصوصية</h3>
+                <h3 className="font-['Cairo'] text-lg sm:text-xl font-bold leading-[1.5] text-[#0F172A]">صلاحيات وخصوصية</h3>
 
-                <p className="mt-[clamp(7px,0.7vw,11px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-medium leading-[1.7] text-[#667085]">
+                <p className="mt-[clamp(7px,0.7vw,11px)] font-['Cairo'] text-sm sm:text-[15px] font-medium leading-[1.7] text-[#667085]">
                   لكل مستخدم تجربة وصلاحيات تناسب دوره داخل المنظومة مع الحفاظ على سرية البيانات.
                 </p>
               </div>
@@ -771,12 +1105,12 @@ export default function LandingPage() {
     Problem / Challenge Section
 ========================= */}
       {/* ================= PROBLEM / INSTITUTIONS SECTION ================= */}
-      <section id="problem" dir="rtl" className="w-full bg-[#F4F7FB] px-[clamp(16px,3vw,48px)] py-[clamp(50px,5vw,90px)]">
-        <div className="mx-auto w-full max-w-[clamp(1100px,88vw,1500px)]">
+      <section id="institutions" dir="rtl" className="w-full bg-[#F4F7FB] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <div className="mx-auto w-full max-w-[1280px]">
           {/* White Container */}
           <div className="w-full rounded-[clamp(18px,1.5vw,26px)] border border-[#E2EBF5] bg-white px-[clamp(20px,2.5vw,42px)] py-[clamp(24px,3vw,48px)]">
             {/* Main Grid */}
-            <div className="mx-auto grid w-full max-w-[clamp(1000px,82vw,1380px)] min-w-0 grid-cols-1 gap-[clamp(28px,3vw,50px)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:[direction:ltr]">
+            <div className="mx-auto grid w-full max-w-[1216px] min-w-0 grid-cols-1 gap-[clamp(28px,3vw,50px)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:[direction:ltr]">
               {/* ================= CARDS ================= */}
               <div dir="rtl" className="order-2 grid w-full min-w-0 grid-cols-1 gap-[clamp(14px,1.2vw,20px)] sm:grid-cols-2 lg:order-1">
                 {/* Card 1 */}
@@ -852,17 +1186,17 @@ export default function LandingPage() {
                 className="order-1 flex w-full min-w-0 flex-col items-start justify-center overflow-hidden text-right lg:order-2"
               >
                 {/* Badge */}
-                <span className="inline-flex w-fit items-center justify-center rounded-full bg-[#EAF2F9] px-[clamp(10px,0.8vw,14px)] py-[clamp(5px,0.4vw,7px)] font-['Cairo'] text-[clamp(10px,0.75vw,13px)] font-bold leading-[1.5] text-[#19579A]">
+                <span className="inline-flex w-fit items-center justify-center rounded-full bg-[#EAF2F9] px-[clamp(10px,0.8vw,14px)] py-[clamp(5px,0.4vw,7px)] font-['Cairo'] text-xs sm:text-sm font-bold leading-[1.5] text-[#19579A]">
                   كفيلي للمؤسسات
                 </span>
 
                 {/* Title */}
-                <h2 className="mt-[clamp(12px,1.2vw,20px)] w-full min-w-0 break-words font-['Cairo'] text-[clamp(26px,2.5vw,44px)] font-black leading-[1.3] tracking-[-0.3px] text-[#0F172A]">
+                <h2 className="mt-[clamp(12px,1.2vw,20px)] w-full min-w-0 break-words font-['Cairo'] text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.3] tracking-[-0.3px] text-[#0F172A]">
                   إدارة الكفالات في نظام واحد
                 </h2>
 
                 {/* Description */}
-                <p className="mt-[clamp(12px,1.2vw,20px)] w-full max-w-[clamp(460px,38vw,620px)] min-w-0 break-words font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.75] text-[#475569]">
+                <p className="mt-[clamp(12px,1.2vw,20px)] w-full max-w-[clamp(460px,38vw,620px)] min-w-0 break-words font-['Cairo'] text-sm sm:text-base lg:text-lg font-medium leading-[1.75] text-[#475569]">
                   تساعد كفيلي المؤسسات على تنظيم الحالات والكفلاء والأوصياء والكفالات والإجراءات المرتبطة بها، بدل توزيع رحلة العمل بين
                   أدوات متعددة.
                 </p>
@@ -870,7 +1204,7 @@ export default function LandingPage() {
                 {/* Button */}
                 <button
                   type="button"
-                  className="mt-[clamp(18px,1.8vw,28px)] inline-flex h-[clamp(40px,3.2vw,50px)] max-w-full shrink-0 items-center justify-center gap-[clamp(6px,0.5vw,9px)] rounded-[clamp(8px,0.6vw,10px)] bg-[#0D5BA8] px-[clamp(16px,1.4vw,24px)] font-['Cairo'] text-[clamp(11px,0.85vw,15px)] font-bold leading-[1.5] text-white shadow-[0_4px_10px_rgba(13,91,168,0.15)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#0B4F94]"
+                  className="mt-[clamp(18px,1.8vw,28px)] inline-flex h-[clamp(40px,3.2vw,50px)] max-w-full shrink-0 items-center justify-center gap-[clamp(6px,0.5vw,9px)] rounded-[clamp(8px,0.6vw,10px)] bg-[#0D5BA8] px-[clamp(16px,1.4vw,24px)] font-['Cairo'] text-sm sm:text-[15px] font-bold leading-[1.5] text-white shadow-[0_4px_10px_rgba(13,91,168,0.15)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#0B4F94]"
                 >
                   <span>اكتشف كفيلي للمؤسسات</span>
                   <FiArrowLeft className="shrink-0 text-[clamp(15px,1vw,18px)]" strokeWidth={2} />
@@ -882,32 +1216,28 @@ export default function LandingPage() {
       </section>
 
       {/* ================= PROCESS SECTION ================= */}
-      <section
-        id="process"
-        dir="rtl"
-        className="w-full -translate-y-[clamp(24px,2.5vw,40px)] border-b border-[#F4F7FB] bg-white px-[clamp(16px,3vw,48px)] pt-[clamp(50px,5vw,90px)] pb-[clamp(50px,5vw,90px)]"
-      >
-        <div className="mx-auto w-full max-w-[clamp(1100px,88vw,1500px)]">
+      <section id="process" dir="rtl" className="w-full border-b border-[#F4F7FB] bg-white px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <div className="mx-auto w-full max-w-[1280px]">
           {/* ================= HEADER ================= */}
-          <div className="mx-auto flex w-full max-w-[clamp(650px,55vw,900px)] flex-col items-center text-center">
+          <div className="mx-auto flex w-full max-w-[768px] flex-col items-center text-center">
             {/* Badge */}
-            <span className="mb-[clamp(10px,0.8vw,14px)] inline-flex w-fit items-center justify-center rounded-full bg-[#EAF2F9] px-[clamp(9px,0.7vw,13px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-[clamp(10px,0.75vw,13px)] font-bold leading-[1.5] text-[#0D4B8E]">
+            <span className="mb-[clamp(10px,0.8vw,14px)] inline-flex w-fit items-center justify-center rounded-full bg-[#EAF2F9] px-[clamp(9px,0.7vw,13px)] py-[clamp(4px,0.35vw,6px)] font-['Cairo'] text-xs sm:text-sm font-bold leading-[1.5] text-[#0D4B8E]">
               التسلسل الإجرائي
             </span>
 
             {/* Title */}
-            <h2 className="font-['Cairo'] text-[clamp(26px,2.5vw,44px)] font-black leading-[1.35] tracking-[0] text-[#0F172A]">
+            <h2 className="font-['Cairo'] text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.35] tracking-[0] text-[#0F172A]">
               رحلة واضحة من البداية إلى المتابعة
             </h2>
 
             {/* Description */}
-            <p className="mt-[clamp(12px,1.2vw,20px)] font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.7] text-[#475569]">
+            <p className="mt-[clamp(12px,1.2vw,20px)] font-['Cairo'] text-sm sm:text-base lg:text-lg font-medium leading-[1.7] text-[#475569]">
               كل مرحلة لها إجراء واضح، وطرف مسؤول، وحالة يمكن متابعتها.
             </p>
           </div>
 
           {/* ================= STEPS ================= */}
-          <div className="mt-[clamp(30px,3vw,52px)] grid w-full grid-cols-1 gap-[clamp(14px,1.2vw,20px)] sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-[clamp(30px,3vw,52px)] grid w-full grid-cols-1 gap-[clamp(14px,1.2vw,20px)] md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {/* ================= 01 ================= */}
             <div className="flex min-h-[clamp(180px,14vw,235px)] w-full flex-col rounded-[clamp(14px,1vw,18px)] border border-[#E2EBF5] bg-[#F8FAFD] p-[clamp(17px,1.5vw,26px)] transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
               <div className="text-right">
@@ -1028,26 +1358,22 @@ export default function LandingPage() {
       </section>
       {/* Trust Section */}
       {/* ================= TRUST SECTION ================= */}
-      <section
-        id="trust"
-        dir="rtl"
-        className="w-full border-t border-[#E2EBF5] bg-white px-[clamp(16px,3vw,48px)] pt-[clamp(48px,5vw,90px)] pb-[clamp(60px,6vw,105px)]"
-      >
-        <div className="mx-auto flex w-full max-w-[clamp(1100px,88vw,1500px)] flex-col">
+      <section id="trust" dir="rtl" className="w-full border-t border-[#E2EBF5] bg-white px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <div className="mx-auto flex w-full max-w-[1280px] flex-col">
           {/* ================= HEADER ================= */}
-          <div className="mx-auto flex w-full max-w-[clamp(650px,55vw,900px)] flex-col items-center text-center">
+          <div className="mx-auto flex w-full max-w-[768px] flex-col items-center text-center">
             {/* Badge */}
-            <span className="mb-[clamp(10px,0.9vw,16px)] inline-flex w-fit items-center justify-center rounded-full bg-[rgba(45,188,195,0.1)] px-[clamp(11px,0.8vw,15px)] py-[clamp(6px,0.5vw,9px)] font-['Cairo'] text-[clamp(10px,0.75vw,13px)] font-semibold leading-[1.5] text-[#2DBCC3]">
+            <span className="mb-[clamp(10px,0.9vw,16px)] inline-flex w-fit items-center justify-center rounded-full bg-[rgba(45,188,195,0.1)] px-[clamp(11px,0.8vw,15px)] py-[clamp(6px,0.5vw,9px)] font-['Cairo'] text-xs sm:text-sm font-semibold leading-[1.5] text-[#2DBCC3]">
               الأمان والمصداقية
             </span>
 
             {/* Title */}
-            <h2 className="font-['Cairo'] text-[clamp(26px,2.5vw,44px)] font-black leading-[1.35] tracking-[0px] text-[#0F172A]">
+            <h2 className="font-['Cairo'] text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.35] tracking-[0px] text-[#0F172A]">
               الثقة تبدأ من وضوح كل خطوة
             </h2>
 
             {/* Description */}
-            <p className="mt-[clamp(12px,1.2vw,20px)] max-w-[clamp(620px,55vw,900px)] font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.8] tracking-[0px] text-[#52657D]">
+            <p className="mt-[clamp(12px,1.2vw,20px)] max-w-[768px] font-['Cairo'] text-sm sm:text-base lg:text-lg font-medium leading-[1.8] tracking-[0px] text-[#52657D]">
               لأن رحلة الكفالة تتعامل مع بيانات حساسة وإجراءات مالية، تساعد كفيلي على جعل المسؤوليات والإجراءات والمتابعة أكثر وضوحًا.
             </p>
           </div>
@@ -1061,7 +1387,7 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-[clamp(12px,1.2vw,20px)] text-right">
-                <h3 className="font-['Cairo'] text-[clamp(14px,1.15vw,19px)] font-bold leading-[1.5] text-[#0F172A]">صلاحيات حسب الدور</h3>
+                <h3 className="font-['Cairo'] text-lg sm:text-xl font-bold leading-[1.5] text-[#0F172A]">صلاحيات حسب الدور</h3>
 
                 <p className="mt-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(11px,0.85vw,14px)] font-medium leading-[1.7] text-[#52657D]">
                   يصل كل مستخدم إلى البيانات والإجراءات المرتبطة بدوره فقط.
@@ -1076,7 +1402,7 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-[clamp(12px,1.2vw,20px)] text-right">
-                <h3 className="font-['Cairo'] text-[clamp(14px,1.15vw,19px)] font-bold leading-[1.5] text-[#0F172A]">مراجعة المؤسسة</h3>
+                <h3 className="font-['Cairo'] text-lg sm:text-xl font-bold leading-[1.5] text-[#0F172A]">مراجعة المؤسسة</h3>
 
                 <p className="mt-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(11px,0.85vw,14px)] font-medium leading-[1.7] text-[#52657D]">
                   تمر الإجراءات الأساسية عبر المؤسسة المسؤولة قبل اعتمادها نهائيًا.
@@ -1091,7 +1417,7 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-[clamp(12px,1.2vw,20px)] text-right">
-                <h3 className="font-['Cairo'] text-[clamp(14px,1.15vw,19px)] font-bold leading-[1.5] text-[#0F172A]">توثيق الإجراءات</h3>
+                <h3 className="font-['Cairo'] text-lg sm:text-xl font-bold leading-[1.5] text-[#0F172A]">توثيق الإجراءات</h3>
 
                 <p className="mt-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(11px,0.85vw,14px)] font-medium leading-[1.7] text-[#52657D]">
                   تربط المستندات والدفعات والتحديثات برحلة الكفالة كاملة.
@@ -1106,7 +1432,7 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-[clamp(12px,1.2vw,20px)] text-right">
-                <h3 className="font-['Cairo'] text-[clamp(14px,1.15vw,19px)] font-bold leading-[1.5] text-[#0F172A]">متابعة واضحة</h3>
+                <h3 className="font-['Cairo'] text-lg sm:text-xl font-bold leading-[1.5] text-[#0F172A]">متابعة واضحة</h3>
 
                 <p className="mt-[clamp(6px,0.6vw,10px)] font-['Cairo'] text-[clamp(11px,0.85vw,14px)] font-medium leading-[1.7] text-[#52657D]">
                   يمكن لكل طرف متابعة الإجراءات المرتبطة به دون لبس أو غموض.
@@ -1118,8 +1444,8 @@ export default function LandingPage() {
       </section>
       {/* ================= Final CTA Section ================= */}
       {/* ================= Final CTA Section ================= */}
-      <section id="final-cta" dir="rtl" className="w-full bg-[#F4F7FB] px-[clamp(16px,3vw,48px)] py-[clamp(48px,5vw,88px)]">
-        <div className="relative mx-auto flex min-h-[clamp(300px,27vw,430px)] w-full max-w-[clamp(1100px,85vw,1500px)] items-center justify-center overflow-hidden rounded-[clamp(18px,1.5vw,28px)] border border-white/10 bg-gradient-to-br from-[#062246] via-[#0D4B8E] to-[#072B53] px-[clamp(20px,4vw,64px)] py-[clamp(36px,4vw,64px)] shadow-[0_14px_30px_rgba(6,34,70,0.18)]">
+      <section id="final-cta" dir="rtl" className="w-full bg-[#F4F7FB] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <div className="relative mx-auto flex min-h-[clamp(300px,27vw,430px)] w-full max-w-[1280px] items-center justify-center overflow-hidden rounded-[clamp(18px,1.5vw,28px)] border border-white/10 bg-gradient-to-br from-[#062246] via-[#0D4B8E] to-[#072B53] px-[clamp(20px,4vw,64px)] py-[clamp(36px,4vw,64px)] shadow-[0_14px_30px_rgba(6,34,70,0.18)]">
           {/* Decorative circles */}
           <div className="pointer-events-none absolute -bottom-[clamp(70px,7vw,130px)] -left-[clamp(70px,7vw,130px)] h-[clamp(180px,18vw,300px)] w-[clamp(180px,18vw,300px)] rounded-full border border-[#2DBCC3]/10 opacity-70" />
           <div className="pointer-events-none absolute -bottom-[clamp(50px,5vw,95px)] -left-[clamp(50px,5vw,95px)] h-[clamp(125px,12vw,210px)] w-[clamp(125px,12vw,210px)] rounded-full border border-[#2DBCC3]/10" />
@@ -1131,20 +1457,20 @@ export default function LandingPage() {
           <span className="pointer-events-none absolute right-[clamp(40px,5vw,90px)] top-[clamp(40px,5vw,90px)] h-[clamp(6px,0.5vw,9px)] w-[clamp(6px,0.5vw,9px)] rounded-full bg-[#2DBCC3]/50" />
 
           {/* Content */}
-          <div className="relative z-10 flex w-full max-w-[clamp(620px,52vw,850px)] flex-col items-center gap-[clamp(16px,1.5vw,26px)] text-center">
+          <div className="relative z-10 flex w-full max-w-[768px] flex-col items-center gap-[clamp(16px,1.5vw,26px)] text-center">
             {/* Badge */}
-            <span className="inline-flex w-fit items-center rounded-full border border-[#2DBCC3]/20 bg-[#2DBCC3]/10 px-[clamp(11px,0.9vw,16px)] py-[clamp(6px,0.5vw,9px)] font-['Cairo'] text-[clamp(10px,0.75vw,13px)] font-semibold leading-[1.5] text-[#2DBCC3]">
+            <span className="inline-flex w-fit items-center rounded-full border border-[#2DBCC3]/20 bg-[#2DBCC3]/10 px-[clamp(11px,0.9vw,16px)] py-[clamp(6px,0.5vw,9px)] font-['Cairo'] text-xs sm:text-sm font-semibold leading-[1.5] text-[#2DBCC3]">
               <span className="ml-[clamp(5px,0.4vw,8px)] h-[clamp(5px,0.4vw,7px)] w-[clamp(5px,0.4vw,7px)] rounded-full bg-[#2DBCC3]" />
               ابدأ رحلتك اليوم مع كفيلي
             </span>
 
             {/* Title */}
-            <h2 className="font-['Cairo'] text-[clamp(26px,2.5vw,44px)] font-black leading-[1.35] tracking-[-0.3px] text-white">
+            <h2 className="font-['Cairo'] text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.35] tracking-[-0.3px] text-white">
               رحلة كفالة أوضح تبدأ من هنا
             </h2>
 
             {/* Description */}
-            <p className="max-w-[clamp(600px,52vw,850px)] font-['Cairo'] text-[clamp(12px,1vw,18px)] font-medium leading-[1.8] text-[#D6E4F0]">
+            <p className="max-w-[720px] font-['Cairo'] text-sm sm:text-base lg:text-lg font-medium leading-[1.8] text-[#D6E4F0]">
               سواء كنت كفيلاً تريد متابعة كفالتك بوضوح، أو مؤسسة تريد تنظيم وإدارة كفالاتها، يجمع كفيلي الرحلة في منصة واحدة.
             </p>
 
