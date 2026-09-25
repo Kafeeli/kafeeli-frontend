@@ -266,7 +266,7 @@ export default function LandingPage() {
                   <span className="grid h-[clamp(26px,2vw,34px)] w-[clamp(26px,2vw,34px)] shrink-0 place-items-center rounded-full bg-[#164263] text-[#19C6D2]">
                     <PiCheckCircle className="text-[clamp(17px,1.3vw,21px)]" />
                   </span>
-                  <span>.خصوصية وصلاحيات متقدمة</span>
+                  <span>خصوصية وصلاحيات متقدمة</span>
                 </div>
 
                 {/* Point 3 */}
