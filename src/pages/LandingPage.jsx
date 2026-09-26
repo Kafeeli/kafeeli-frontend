@@ -520,17 +520,17 @@ export default function LandingPage() {
               reduceMotion
                 ? false
                 : {
-                    opacity: 0,
-                    x: 32,
-                  }
+                  opacity: 0,
+                  x: 32,
+                }
             }
             animate={
               reduceMotion
                 ? undefined
                 : {
-                    opacity: 1,
-                    x: 0,
-                  }
+                  opacity: 1,
+                  x: 0,
+                }
             }
             transition={{
               duration: 0.75,
@@ -547,17 +547,17 @@ export default function LandingPage() {
                 reduceMotion
                   ? false
                   : {
-                      opacity: 0,
-                      x: 20,
-                    }
+                    opacity: 0,
+                    x: 20,
+                  }
               }
               animate={
                 reduceMotion
                   ? undefined
                   : {
-                      opacity: 1,
-                      x: 0,
-                    }
+                    opacity: 1,
+                    x: 0,
+                  }
               }
               transition={{
                 duration: 0.45,
@@ -585,17 +585,17 @@ export default function LandingPage() {
                 reduceMotion
                   ? false
                   : {
-                      opacity: 0,
-                      x: 22,
-                    }
+                    opacity: 0,
+                    x: 22,
+                  }
               }
               animate={
                 reduceMotion
                   ? undefined
                   : {
-                      opacity: 1,
-                      x: 0,
-                    }
+                    opacity: 1,
+                    x: 0,
+                  }
               }
               transition={{
                 duration: 0.6,
@@ -625,17 +625,17 @@ export default function LandingPage() {
                 reduceMotion
                   ? false
                   : {
-                      opacity: 0,
-                      x: 20,
-                    }
+                    opacity: 0,
+                    x: 20,
+                  }
               }
               animate={
                 reduceMotion
                   ? undefined
                   : {
-                      opacity: 1,
-                      x: 0,
-                    }
+                    opacity: 1,
+                    x: 0,
+                  }
               }
               transition={{
                 duration: 0.6,
@@ -657,17 +657,17 @@ export default function LandingPage() {
                 reduceMotion
                   ? false
                   : {
-                      opacity: 0,
-                      x: 20,
-                    }
+                    opacity: 0,
+                    x: 20,
+                  }
               }
               animate={
                 reduceMotion
                   ? undefined
                   : {
-                      opacity: 1,
-                      x: 0,
-                    }
+                    opacity: 1,
+                    x: 0,
+                  }
               }
               transition={{
                 duration: 0.6,
@@ -712,17 +712,17 @@ export default function LandingPage() {
                 reduceMotion
                   ? false
                   : {
-                      opacity: 0,
-                      scaleX: 0.7,
-                    }
+                    opacity: 0,
+                    scaleX: 0.7,
+                  }
               }
               animate={
                 reduceMotion
                   ? undefined
                   : {
-                      opacity: 1,
-                      scaleX: 1,
-                    }
+                    opacity: 1,
+                    scaleX: 1,
+                  }
               }
               transition={{
                 duration: 0.65,
@@ -792,15 +792,15 @@ export default function LandingPage() {
             reduceMotion
               ? false
               : {
-                  opacity: 0,
-                }
+                opacity: 0,
+              }
           }
           animate={
             reduceMotion
               ? undefined
               : {
-                  opacity: 1,
-                }
+                opacity: 1,
+              }
           }
           transition={{
             duration: 0.6,
@@ -1135,8 +1135,8 @@ export default function LandingPage() {
       </AnimatedSection>
 
       {/* =====================================================
-          INSTITUTIONS
-      ===================================================== */}
+    INSTITUTIONS (KAFEELI FOR INSTITUTIONS)
+===================================================== */}
 
       <AnimatedSection
         id="institutions"
@@ -1144,80 +1144,101 @@ export default function LandingPage() {
         className="scroll-mt-24 bg-[#F4F7FB] px-5 py-[70px] sm:px-8 lg:px-8 lg:py-[90px]"
       >
         <div className="mx-auto w-full max-w-[1216px]">
-          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
-            {/* CARDS */}
 
-            <motion.div
-              className="order-2 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:order-1"
-              variants={staggerContainer}
-              initial={reduceMotion ? false : "hidden"}
-              whileInView={reduceMotion ? undefined : "visible"}
-              viewport={{ once: true, amount: 0.12 }}
-            >
-              {institutionCards.map((card) => {
-                const Icon = card.icon;
+          {/* Main White Card Container */}
+          <motion.div
+            variants={revealUp}
+            className="rounded-[32px] border border-[#E2EBF5] bg-white p-8 shadow-xl sm:p-10 lg:p-14"
+          >
+            <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-14">
 
-                return (
-                  <motion.div
-                    key={card.title}
-                    variants={cardAnimation}
-                    className="group min-h-[170px] rounded-[17px] border border-[#E2EBF5] bg-white p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(15,23,42,0.06)]"
-                  >
-                    <div
-                      className={`grid h-10 w-10 place-items-center rounded-xl ${card.iconBg} ${card.iconColor}`}
-                    >
-                      <Icon size={18} />
-                    </div>
+              {/* =================================================
+            RIGHT SIDE — CONTENT
+        ================================================= */}
 
-                    <h3 className="mt-5 font-['Cairo'] text-[14px] font-bold text-[#1E293B]">
-                      {card.title}
-                    </h3>
-
-                    <p className="mt-1 font-['Cairo'] text-[11px] font-medium leading-[20px] text-[#718096]">
-                      {card.description}
-                    </p>
-                  </motion.div>
-                );
-              })}
-            </motion.div>
-
-            {/* CONTENT */}
-
-            <motion.div
-              className="order-1 text-right lg:order-2"
-              initial={reduceMotion ? false : "hidden"}
-              whileInView={reduceMotion ? undefined : "visible"}
-              viewport={{ once: true, amount: 0.18 }}
-              variants={revealUp}
-            >
-              <span className="inline-flex rounded-full bg-[#EAF2F9] px-3 py-1.5 font-['Cairo'] text-[10px] font-bold text-[#19579A]">
-                كفيلي للمؤسسات
-              </span>
-
-              <h2 className="mt-4 font-['Cairo'] text-[30px] font-black leading-[1.35] tracking-[-0.4px] text-[#0F172A] sm:text-[34px] lg:text-[40px]">
-                إدارة الكفالات
-                <span className="block text-[#0D4B8E]">
-                  في نظام واحد
-                </span>
-              </h2>
-
-              <p className="mt-4 max-w-[540px] font-['Cairo'] text-[13px] font-medium leading-[25px] text-[#475569] sm:text-[14px] sm:leading-[27px]">
-                تساعد كفيلي المؤسسات على تنظيم الحالات
-                والكفلاء والأوصياء والكفالات والإجراءات
-                المرتبطة بها، بدل توزيع رحلة العمل بين أدوات
-                متعددة.
-              </p>
-
-              <button
-                type="button"
-                onClick={() => scrollToSection("trust")}
-                className="mt-6 inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#0D5BA8] px-5 font-['Cairo'] text-[14px] font-bold text-white shadow-[0_6px_14px_rgba(13,91,168,0.16)] transition duration-300 hover:-translate-y-0.5 hover:bg-[#0B4F94]"
+              <motion.div
+                className="order-1 text-right lg:order-1 lg:col-span-5"
+                initial={reduceMotion ? false : "hidden"}
+                whileInView={reduceMotion ? undefined : "visible"}
+                viewport={{ once: true, amount: 0.18 }}
+                variants={revealUp}
               >
-                استكشف المنظومة
-                <FiArrowLeft size={20} />
-              </button>
-            </motion.div>
-          </div>
+                {/* Badge */}
+                <span className="mb-4 inline-flex rounded-full bg-[#EAF2F9] px-4 py-1.5 font-['Cairo'] text-xs font-bold text-[#19579A]">
+                  كفيلي للمؤسسات
+                </span>
+
+                {/* Title */}
+                <h2 className="font-['Cairo'] text-[30px] font-black leading-[1.25] tracking-[-0.5px] text-[#0F172A] sm:text-[36px] lg:text-[42px]">
+                  إدارة الكفالات
+                  <span className="block text-[#0D4B8E]">
+                    في نظام واحد
+                  </span>
+                </h2>
+
+                {/* Description */}
+                <p className="mt-4 max-w-[540px] font-['Cairo'] text-xs font-medium leading-relaxed text-[#64748B] sm:text-sm lg:text-base">
+                  تساعد كفيلي المؤسسات على تنظيم الحالات والكفلاء
+                  والأوصياء والكفالات والإجراءات المرتبطة بها، بدل
+                  توزيع رحلة العمل بين أدوات متعددة.
+                </p>
+
+                {/* Button */}
+                <Link
+                  to="/organizations"
+                  className="mt-7 inline-flex items-center justify-center gap-2.5 rounded-xl bg-[#0D4B8E] px-7 py-3.5 font-['Cairo'] text-sm font-bold text-white shadow-lg shadow-[#0D4B8E]/25 transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#083463] active:scale-95 sm:text-base"
+                >
+                  <span>
+                    اكتشف كفيلي للمؤسسات
+                  </span>
+
+                  <FiArrowLeft size={18} />
+                </Link>
+              </motion.div>
+
+              {/* =================================================
+            LEFT SIDE — CARDS
+        ================================================= */}
+
+              <motion.div
+                className="order-2 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:order-2 lg:col-span-7 sm:gap-5"
+                variants={staggerContainer}
+                initial={reduceMotion ? false : "hidden"}
+                whileInView={reduceMotion ? undefined : "visible"}
+                viewport={{ once: true, amount: 0.12 }}
+              >
+                {institutionCards.map((card) => {
+                  const Icon = card.icon;
+
+                  return (
+                    <motion.div
+                      key={card.title}
+                      variants={cardAnimation}
+                      className="group min-h-[175px] rounded-2xl border border-[#E2EBF5] bg-[#F8FAFD] p-6 text-right transition-all duration-300 hover:-translate-y-1 hover:border-[#0D4B8E]/30 hover:shadow-md"
+                    >
+                      {/* Icon */}
+                      <div
+                        className={`grid h-11 w-11 place-items-center rounded-xl ${card.iconBg} ${card.iconColor} transition-transform duration-300 group-hover:scale-105`}
+                      >
+                        <Icon size={20} />
+                      </div>
+
+                      {/* Title */}
+                      <h3 className="mt-4 font-['Cairo'] text-[15px] font-extrabold text-[#0F172A]">
+                        {card.title}
+                      </h3>
+
+                      {/* Description */}
+                      <p className="mt-1.5 font-['Cairo'] text-[12px] font-medium leading-[21px] text-[#64748B]">
+                        {card.description}
+                      </p>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
+
+            </div>
+          </motion.div>
         </div>
       </AnimatedSection>
 
@@ -1277,10 +1298,10 @@ export default function LandingPage() {
           <div className="mt-8 flex justify-center">
             <Link
               to="/how-it-works"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#0D5BA8] px-5 font-['Cairo'] text-[12px] font-bold text-white shadow-[0_6px_14px_rgba(13,91,168,0.15)] transition duration-300 hover:-translate-y-0.5 hover:bg-[#0B4F94]"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#0D5BA8] px-5 font-['Cairo'] text-[14px] font-bold text-white shadow-[0_6px_14px_rgba(13,91,168,0.15)] transition duration-300 hover:-translate-y-0.5 hover:bg-[#0B4F94]"
             >
               شاهد الرحلة بالتفصيل
-              <FiArrowLeft size={16} />
+              <FiArrowLeft size={20} />
             </Link>
           </div>
         </div>
