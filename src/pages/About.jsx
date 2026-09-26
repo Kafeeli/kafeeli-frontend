@@ -62,7 +62,7 @@ export default function About() {
       iconColor: "#2DBCC3",
       icon: LuPalette,
       image: backendImg,
-      whatsapp: "#",
+      whatsapp: "+972592161058",
       linkedin:
         "https://www.linkedin.com/in/ameer-saqer?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app",
     },
