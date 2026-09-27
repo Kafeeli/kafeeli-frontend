@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import { FiEdit2, FiEye, FiRefreshCw, FiSearch } from "react-icons/fi";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { FiEdit2, FiEye, FiRefreshCw, FiSearch, FiX, FiDownload } from "react-icons/fi";
 import { MdDescription } from "react-icons/md";
 import {
   DOCUMENT_STATUS_FILTERS,
@@ -9,7 +9,7 @@ import {
   adminDocumentTypeLabel,
 } from "../../../config/adminDocumentReviewConfig";
 import { adminApi } from "../../../services/adminApi";
-import { apiErrorMessage, openProtectedBlob, unwrapResult } from "../../../utils/apiUi";
+import { apiErrorMessage, unwrapResult } from "../../../utils/apiUi";
 import { emptyPagedData, normalizePagedData } from "../../../utils/adminPagination";
 import { formatArabicDateTime } from "../../../utils/date";
 import AdminLayout from "../Adminlayout";
@@ -48,6 +48,14 @@ export default function AdminGuardianDocumentsReviewPage() {
   const [busy, setBusy] = useState("");
   const [guardianApproval, setGuardianApproval] = useState(null);
   const [statusChangeDocument, setStatusChangeDocument] = useState(null);
+  // معاينة الوثيقة داخل الصفحة
+  const [previewModal, setPreviewModal] = useState(null); // { blobUrl, fileName, isVideo }
+  // تقدم التحميل
+  const [downloadProgress, setDownloadProgress] = useState(null); // null | { percent, loaded, total }
+  // cache: documentId → { blobUrl, fileName, isVideo, mimeType }
+  const blobCacheRef = useRef(new Map());
+
+  const abortControllerRef = useRef(null);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => setDebouncedSearch(searchInput.trim()), 400);
@@ -55,6 +63,13 @@ export default function AdminGuardianDocumentsReviewPage() {
   }, [searchInput]);
 
   const loadDocuments = useCallback(async ({ silent = false } = {}) => {
+    // إلغاء أي طلب سابق لم يكتمل بعد
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     if (!silent) setLoading(true);
     else setRefreshing(true);
     setError("");
@@ -70,21 +85,31 @@ export default function AdminGuardianDocumentsReviewPage() {
         reviewedFrom,
         reviewedTo,
       };
-      const result = await adminApi.getAllGuardianDocuments(query);
+      const result = await adminApi.getAllGuardianDocuments(query, controller.signal);
+      // إذا ألغينا الطلب، تجاهل النتيجة
+      if (controller.signal.aborted) return;
       const normalized = normalizePagedData(unwrapResult(result, "تعذر تحميل وثائق الأوصياء."), query);
       setDocuments(normalized.items);
       setPagination(normalized);
     } catch (requestError) {
+      // تجاهل خطأ الإلغاء (CanceledError / AbortError)
+      if (requestError?.name === "CanceledError" || requestError?.name === "AbortError" || controller.signal.aborted) return;
       setError(apiErrorMessage(requestError, "تعذر تحميل وثائق الأوصياء."));
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (!controller.signal.aborted) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   }, [debouncedSearch, documentTypeFilter, page, pageSize, reviewedFrom, reviewedTo, statusFilter, uploadedFrom, uploadedTo]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(loadDocuments, 0);
-    return () => window.clearTimeout(timeoutId);
+    return () => {
+      window.clearTimeout(timeoutId);
+      // إلغاء أي طلب جارٍ عند Unmount
+      if (abortControllerRef.current) abortControllerRef.current.abort();
+    };
   }, [loadDocuments]);
 
   const hasActiveFilters = Boolean(searchInput.trim() || statusFilter || documentTypeFilter || uploadedFrom || uploadedTo || reviewedFrom || reviewedTo);
@@ -98,17 +123,48 @@ export default function AdminGuardianDocumentsReviewPage() {
     setUploadedFrom(""); setUploadedTo(""); setReviewedFrom(""); setReviewedTo("");
   };
 
-  const viewDocument = async (document) => {
-    if (busy || !document.hasFile) return;
-    setBusy(`view-${document.documentId}`);
+  const viewDocument = async (doc) => {
+    if (busy || !doc.hasFile) return;
     setActionError("");
+
+    // فحص الـ cache أولاً — إذا محمل مسبقاً يظهر فوراً
+    if (blobCacheRef.current.has(doc.documentId)) {
+      setPreviewModal(blobCacheRef.current.get(doc.documentId));
+      return;
+    }
+
+    setBusy(`view-${doc.documentId}`);
+    setDownloadProgress({ percent: 0, loaded: 0, total: null });
     try {
-      openProtectedBlob(await adminApi.getDocumentFile(document.documentId));
+      const blob = await adminApi.getDocumentFile(doc.documentId, {
+        onProgress: (percent, loaded, total) => {
+          setDownloadProgress({ percent, loaded, total });
+        },
+      });
+      const blobUrl = URL.createObjectURL(blob);
+      const isVideo =
+        blob.type?.startsWith("video/") ||
+        Boolean(doc.displayFileName?.match(/\.(mp4|mov|webm|avi)$/i));
+      const entry = {
+        blobUrl,
+        fileName: doc.displayFileName || "وثيقة",
+        isVideo,
+        mimeType: blob.type,
+      };
+      // خزن في الـ cache
+      blobCacheRef.current.set(doc.documentId, entry);
+      setPreviewModal(entry);
     } catch (requestError) {
       setActionError(documentFileErrorMessage(requestError));
     } finally {
       setBusy("");
+      setDownloadProgress(null);
     }
+  };
+
+  const closePreview = () => {
+    // لا نلغي الـ blob URL من الذاكرة لأنه مخزّن بالـ cache
+    setPreviewModal(null);
   };
 
   const approveGuardian = async () => {
@@ -299,7 +355,7 @@ export default function AdminGuardianDocumentsReviewPage() {
                 <td title={document.displayFileName || undefined} className="max-w-[180px] px-3 py-3"><p className="whitespace-nowrap font-bold">{adminDocumentTypeLabel(document.documentType)}</p><p className="mt-1 truncate text-[11px] text-gray-500">{document.displayFileName || "—"}</p></td>
                 <td className="whitespace-nowrap px-3 py-3"><span className={`rounded-full px-2 py-1 text-[10px] font-bold ${adminDocumentStatusClasses(document.status)}`}>{adminDocumentStatusLabel(document.status)}</span></td>
                 <td className="whitespace-nowrap px-3 py-3 text-[11px] text-gray-600">{formatArabicDateTime(document.uploadedAt)}</td><td className="whitespace-nowrap px-3 py-3 text-[11px] text-gray-600">{formatArabicDateTime(document.reviewedAt)}</td>
-                <td className="px-3 py-3"><div className="flex items-center gap-1 whitespace-nowrap">{document.hasFile && <AdminTableIconButton label="عرض الوثيقة" tone="view" disabled={Boolean(busy)} onClick={() => viewDocument(document)}><FiEye aria-hidden="true" /></AdminTableIconButton>}<AdminTableIconButton label="تغيير الحالة" tone="edit" disabled={Boolean(busy)} onClick={() => { setActionError(""); setStatusChangeDocument(document); }}><FiEdit2 aria-hidden="true" /></AdminTableIconButton></div></td>
+                <td className="px-3 py-3"><div className="flex items-center gap-1 whitespace-nowrap">{document.hasFile && <AdminTableIconButton label="عرض الوثيقة" tone="view" disabled={Boolean(busy)} onClick={() => viewDocument(document)}>{busy === `view-${document.documentId}` ? <span className="inline-block w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin" /> : <FiEye aria-hidden="true" />}</AdminTableIconButton>}<AdminTableIconButton label="تغيير الحالة" tone="edit" disabled={Boolean(busy)} onClick={() => { setActionError(""); setStatusChangeDocument(document); }}><FiEdit2 aria-hidden="true" /></AdminTableIconButton></div></td>
               </tr>
             ))}</tbody>
           </table></div></div>
@@ -309,6 +365,107 @@ export default function AdminGuardianDocumentsReviewPage() {
 
       {statusChangeDocument && <AdminDocumentStatusModal document={statusChangeDocument} currentStatus={statusChangeDocument.status} entityType="guardian" loading={busy === `status-${statusChangeDocument.documentId}`} error={actionError} onSubmit={changeDocumentStatus} onCancel={() => { if (!busy) { setStatusChangeDocument(null); setActionError(""); } }} />}
       {guardianApproval && <AdminConfirmationDialog title="اعتماد حساب الوصي" message={`اكتملت مراجعة جميع وثائق ${guardianApproval.fullName || "الوصي"}. هل تريد اعتماد حساب الوصي؟`} confirmLabel="اعتماد حساب الوصي" onConfirm={approveGuardian} onCancel={() => { if (!busy) setGuardianApproval(null); }} loading={busy === `guardian-${guardianApproval.guardianId}`} error={actionError} />}
+
+      {/* Loading overlay أثناء تحميل الملف */}
+      {busy?.startsWith("view-") && downloadProgress !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" dir="rtl">
+          <div className="bg-white rounded-2xl shadow-2xl px-8 py-7 flex flex-col items-center gap-4 w-[320px] text-center">
+            {/* سبينر */}
+            <div className="w-10 h-10 border-4 border-[#0D4B8E] border-t-transparent rounded-full animate-spin" />
+            <p className="text-[#003469] font-bold text-sm">جارٍ تحميل الوثيقة...</p>
+
+            {/* Progress bar */}
+            <div className="w-full">
+              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[#0D4B8E] rounded-full transition-all duration-300"
+                  style={{ width: `${downloadProgress.percent ?? 0}%` }}
+                />
+              </div>
+              <p className="mt-2 text-xs text-gray-500">
+                {downloadProgress.percent !== null
+                  ? `${downloadProgress.percent}%`
+                  : "جارٍ..."}{
+                  downloadProgress.total
+                    ? ` — ${(downloadProgress.loaded / 1024 / 1024).toFixed(1)} / ${(downloadProgress.total / 1024 / 1024).toFixed(1)} MB`
+                    : downloadProgress.loaded > 0
+                    ? ` — ${(downloadProgress.loaded / 1024 / 1024).toFixed(1)} MB`
+                    : ""
+                }
+              </p>
+            </div>
+
+            <p className="text-gray-400 text-xs">الملفات الكبيرة قد تستغرق وقتاً أطول. سيظهر بعد اكتمال التحميل.</p>
+          </div>
+        </div>
+      )}
+
+      {/* Modal معاينة الوثيقة */}
+      {previewModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          dir="rtl"
+          onClick={closePreview}
+        >
+          <div
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200 bg-[#F5F7FA] rounded-t-2xl shrink-0">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={closePreview}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-200 transition"
+                  aria-label="إغلاق"
+                >
+                  <FiX className="text-lg" />
+                </button>
+                <span className="text-sm font-bold text-[#003469] truncate max-w-[300px]" title={previewModal.fileName}>
+                  {previewModal.fileName}
+                </span>
+              </div>
+              <a
+                href={previewModal.blobUrl}
+                download={previewModal.fileName}
+                className="flex items-center gap-2 rounded-lg bg-[#003469] px-4 py-2 text-xs font-bold text-white hover:bg-[#002b57] transition"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <FiDownload /> تحميل
+              </a>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-auto bg-gray-100 flex items-center justify-center p-4 min-h-[300px]">
+              {previewModal.isVideo ? (
+                <video
+                  src={previewModal.blobUrl}
+                  controls
+                  autoPlay
+                  className="max-w-full max-h-[70vh] rounded-lg shadow"
+                />
+              ) : previewModal.mimeType === "application/pdf" || previewModal.fileName?.endsWith(".pdf") ? (
+                <iframe
+                  src={previewModal.blobUrl}
+                  title={previewModal.fileName}
+                  className="w-full h-[70vh] rounded-lg border-0"
+                />
+              ) : (
+                <img
+                  src={previewModal.blobUrl}
+                  alt={previewModal.fileName}
+                  className="max-w-full max-h-[70vh] rounded-lg shadow object-contain"
+                  onError={(e) => {
+                    // fallback: إذا ما قدر يعرضها كصورة جرب iframe
+                    e.target.style.display = "none";
+                    e.target.nextSibling.style.display = "block";
+                  }}
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }

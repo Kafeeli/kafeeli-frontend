@@ -4,6 +4,7 @@ import {
   MdCloudUpload,
   MdInfoOutline,
   MdVolunteerActivism,
+  MdErrorOutline,
 } from "react-icons/md";
 import { useParams } from "react-router-dom";
 import { sponsorshipApi } from "../../services/sponsorshipApi";
@@ -250,9 +251,18 @@ export default function SponsorSponsorshipDetailsPage() {
             الخطوة التالية
           </h2>
           {sponsorship.nextStepInfo ? (
-            <p className="mt-3 rounded-lg bg-[#E8F1FA] p-4 text-sm leading-6 text-[#003469]">
-              {sponsorship.nextStepInfo}
-            </p>
+            sponsorship.nextStepInfo.includes("رفض") ? (
+              <div className="mt-3 flex items-start gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
+                <MdErrorOutline className="mt-0.5 shrink-0 text-xl text-red-600" />
+                <p className="text-sm leading-6 text-red-700">
+                  {sponsorship.nextStepInfo}
+                </p>
+              </div>
+            ) : (
+              <p className="mt-3 rounded-lg bg-[#E8F1FA] p-4 text-sm leading-6 text-[#003469]">
+                {sponsorship.nextStepInfo}
+              </p>
+            )
           ) : (
             <p className="mt-3 text-sm leading-6 text-gray-600">
               الكفالة بانتظار الخطوة التالية التي يدعمها الخادم.

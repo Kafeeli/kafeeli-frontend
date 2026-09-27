@@ -47,6 +47,7 @@ export const VERIFICATION_STATUS_TO_KEY = {
   Pending: "pendingReview",
   Approved: "approved",
   NeedsUpdate: "needsUpdate",
+  Rejected: "rejected",
 };
  
 // لو has=false، معناها الوثيقة أصلاً ما انرفعت — مفيش verificationStatus فعلي
