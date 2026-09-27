@@ -67,21 +67,31 @@ const STATUS_CONFIG = {
   pendingReview: { label: "قيد المراجعة", badgeClass: "bg-teal-50 text-teal-700", icon: MdCheckCircle },
   approved: { label: "تم الاعتماد", badgeClass: "bg-teal-50 text-teal-700", icon: MdCheckCircle },
   needsUpdate: { label: "تحتاج تعديل", badgeClass: "bg-red-100 text-red-700", icon: MdWarningAmber },
+  rejected: { label: "مرفوضة", badgeClass: "bg-red-100 text-red-700", icon: MdWarningAmber },
 };
 
 function buildDocumentsFromApi(apiDocuments) {
   const byKey = {};
   (apiDocuments || []).forEach((d) => {
     const key = DOCUMENT_TYPE_NAME_TO_KEY[d.documentType];
+    // 🔍 مؤقت: لمعرفة الحقول الحقيقية الراجعة من السيرفر
+    if (import.meta.env.DEV) console.log("[GuardianDocuments] apiDoc fields:", d);
     if (key) byKey[key] = d;
   });
   return DISPLAY_ORDER.map((key) => {
     const apiDoc = byKey[key];
+    // نجرب كل أسماء الحقل الممكنة للسبب
+    const reason =
+      apiDoc?.needsUpdateReason ||
+      apiDoc?.rejectionReason ||
+      apiDoc?.updateReason ||
+      apiDoc?.reason ||
+      "";
     return {
       key,
       ...DOCUMENT_META[key],
       status: apiDoc ? mapDocumentStatus(apiDoc.hasCurrentDocument, apiDoc.verificationStatus) : "notUploaded",
-      rejectionReason: apiDoc?.needsUpdateReason || "",
+      rejectionReason: reason,
       documentId: apiDoc?.documentId || null,
       canReupload: apiDoc?.canReupload ?? false,
     };
@@ -89,6 +99,7 @@ function buildDocumentsFromApi(apiDocuments) {
 }
 
 function getOverallStatus(documents) {
+  if (documents.some((d) => d.status === "rejected")) return "rejected";
   if (documents.some((d) => d.status === "needsUpdate")) return "needsUpdate";
   if (documents.some((d) => d.status === "pendingReview")) return "pendingReview";
   if (documents.every((d) => d.status === "approved")) return "approved";
@@ -303,9 +314,15 @@ const DocumentCard = ({ doc, onUploadClick, onViewClick, viewing, guardianReject
         <p className="text-[11px] text-[#9CA3AF] mt-1.5">الصيغ المقبولة: {doc.acceptedFormats} — حتى {doc.maxSizeMB}MB</p>
       </div>
 
-      {doc.status === "needsUpdate" && doc.rejectionReason && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2">
-          <p className="text-[11px] text-red-700 leading-5">{doc.rejectionReason}</p>
+      {(doc.status === "needsUpdate" || doc.status === "rejected") && doc.rejectionReason && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2 flex items-start gap-2">
+          <MdErrorOutline className="text-red-500 text-[14px] shrink-0 mt-0.5" />
+          <div>
+            <p className="text-[11px] font-bold text-red-700 mb-0.5">
+              {doc.status === "rejected" ? "سبب الرفض:" : "سبب طلب التعديل:"}
+            </p>
+            <p className="text-[11px] text-red-700 leading-5">{doc.rejectionReason}</p>
+          </div>
         </div>
       )}
 

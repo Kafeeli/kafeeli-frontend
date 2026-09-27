@@ -44,6 +44,7 @@ export const STATUS_LABELS = {
   Confirmed: "مؤكدة",
   AwaitingReview: "بانتظار المراجعة",
   PendingPayment: "بانتظار الدفع",
+  PendingAdminApproval: "بانتظار موافقة الإدارة",
   PaymentProofUploaded: "تم رفع إثبات الدفع",
   Preschool: "رياض الأطفال",
   Primary: "المرحلة الابتدائية",

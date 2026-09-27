@@ -223,17 +223,27 @@ export const adminApi = {
 
   // ============ مراجعة وثائق الأوصياء ============
 
-  getAllGuardianDocuments: async (filters = {}) => {
+  getAllGuardianDocuments: async (filters = {}, signal) => {
     const params = buildAdminQuery(filters);
-    const response = await api.get("/api/v1/admin/guardian-documents", { params });
+    const response = await api.get("/api/v1/admin/guardian-documents", { params, signal });
     return response.data;
   },
 
   // GET /api/v1/admin/guardian-documents/{documentId}/file
-  getDocumentFile: async (documentId) => {
+  getDocumentFile: async (documentId, { onProgress } = {}) => {
     const response = await api.get(
       `/api/v1/admin/guardian-documents/${documentId}/file`,
-      { responseType: "blob" }
+      {
+        responseType: "blob",
+        onDownloadProgress: onProgress
+          ? (e) => {
+              const percent = e.total
+                ? Math.round((e.loaded / e.total) * 100)
+                : null;
+              onProgress(percent, e.loaded, e.total);
+            }
+          : undefined,
+      }
     );
     return response.data;
   },
@@ -384,14 +394,7 @@ export const adminApi = {
     const response = await api.delete(`/api/v1/admin/orphans/${orphanId}`);
     return response.data;
   },
-  approveOrphan: async (orphanId, documentId = null) => {
-    if (documentId) {
-      try {
-        await adminApi.updateOrphanDocumentStatus(documentId, "Approved");
-      } catch {
-        // Document may already be approved
-      }
-    }
+  approveOrphan: async (orphanId) => {
     const response = await api.post(`/api/v1/admin/orphans/${orphanId}/approve`);
     return response.data;
   },
@@ -406,6 +409,10 @@ export const adminApi = {
   },
   requestOrphanDocumentUpdate: async (documentId, reason) => {
     const response = await api.post(`/api/v1/admin/orphan-documents/${documentId}/needs-update`, { reason });
+    return response.data;
+  },
+  requestOrphanUpdate: async (orphanId, reason) => {
+    const response = await api.post(`/api/v1/admin/orphans/${orphanId}/needs-update`, { reason });
     return response.data;
   },
   updateOrphanDocumentStatus: async (documentId, status, reason = "") => {

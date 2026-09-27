@@ -1,9 +1,8 @@
 
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import kafeeli from "../assets/kafeeli.png";
-import { MdOutlineMailOutline } from "react-icons/md";
+import { MdCheckCircle, MdOutlineMailOutline } from "react-icons/md";
 import { LuLock } from "react-icons/lu";
 import { TbShieldCheck, TbScan } from "react-icons/tb";
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
@@ -13,6 +12,8 @@ import { getDashboardPath } from "../utils/session";
 
 function Login() {
   const navigate = useNavigate();
+
+  const passwordChanged = new URLSearchParams(window.location.search).get("passwordChanged") === "1";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -124,6 +125,13 @@ function Login() {
           <p className="text-center text-[#777] text-[13px] mb-5">
             الرجاء إدخال بياناتك للوصول إلى لوحة التحكم
           </p>
+
+          {passwordChanged && (
+            <div className="flex items-center gap-2 rounded-lg bg-emerald-50 border border-emerald-200 px-4 py-3 mb-4 text-sm text-emerald-700">
+              <MdCheckCircle className="text-emerald-500 text-lg shrink-0" />
+              <p>تم تغيير كلمة المرور بنجاح. يرجى تسجيل الدخول من جديد.</p>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit}>
             <label className="block text-right mb-2 text-[#555] text-sm">البريد الإلكتروني</label>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { MdClose, MdCheckCircle, MdRadioButtonUnchecked, MdErrorOutline } from "react-icons/md";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import { authApi } from "../../services/authApi";
+import { clearSessionStorage } from "../../utils/session";
 
 /* ========================================================================== */
 /*                    شروط قوة كلمة المرور (قابلة لإعادة الاستخدام)            */
@@ -156,17 +157,50 @@ const ChangePasswordModal = ({ onClose, onSuccess }) => {
       });
       onSuccess?.();
       onClose?.();
+      // بعد تغيير كلمة المرور بنجاح → تسجيل خروج تلقائيلأن الـ accessToken القديم لم يعد صالحًا
+      clearSessionStorage();
+      window.location.href = "/login?passwordChanged=1";
     } catch (err) {
       const status = err?.response?.status;
       const responseData = err?.response?.data || {};
       const details = [responseData.message, ...flattenServerErrors(responseData.errors)].filter(Boolean);
+      const combinedMessage = details.join(" ").toLowerCase();
 
       if (status === 400) {
-        // غالبًا كلمة المرور الحالية غلط أو الجديدة ما بتحقق شروط السيرفر
-        setErrors((prev) => ({
-          ...prev,
-          currentPassword: details.length ? details.join(" - ") : "كلمة المرور الحالية غير صحيحة",
-        }));
+        // نحلل رسالة السيرفر لنعرف أيّ حقل فيه المشكلة:
+        // - لو الرسالة تتعلق بكلمة المرور الجديدة (رموز، شروط، قوة...) → نضع الخطأ على newPassword
+        // - لو الرسالة تتعلق بالكلمة الحالية (غير صحيحة، خاطئة...) → نضع الخطأ على currentPassword
+        const isNewPasswordError =
+          combinedMessage.includes("special") ||
+          combinedMessage.includes("رمز") ||
+          combinedMessage.includes("حرف") ||
+          combinedMessage.includes("قوة") ||
+          combinedMessage.includes("جديد") ||
+          combinedMessage.includes("new password") ||
+          combinedMessage.includes("password must") ||
+          combinedMessage.includes("كلمة المرور يجب") ||
+          combinedMessage.includes("كلمة المرور بحاجة") ||
+          combinedMessage.includes("contain") ||
+          combinedMessage.includes("uppercase") ||
+          combinedMessage.includes("lowercase") ||
+          combinedMessage.includes("digit") ||
+          combinedMessage.includes("تحديث كلمة المرور");
+
+        if (isNewPasswordError) {
+          setErrors((prev) => ({
+            ...prev,
+            newPassword: details.length
+              ? details.join(" - ")
+              : "كلمة المرور الجديدة لا تستوفي الشروط المطلوبة",
+          }));
+        } else {
+          setErrors((prev) => ({
+            ...prev,
+            currentPassword: details.length
+              ? details.join(" - ")
+              : "كلمة المرور الحالية غير صحيحة",
+          }));
+        }
       } else if (status === 401) {
         setServerError("انتهت صلاحية الجلسة، الرجاء تسجيل الدخول من جديد.");
       } else if (status >= 500) {
